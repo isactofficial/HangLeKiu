@@ -1,97 +1,56 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
+// PUBLIC
+Route::get('/', fn() => view('welcome'));
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
+Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
+Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
+Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
 
-/*
-|--------------------------------------------------------------------------
-| Authentication Routes (Guest only)
-|--------------------------------------------------------------------------
-*/
+Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
+Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
+Route::get('/admin/register', [AuthController::class, 'showAdminRegister'])->name('admin.register');
+Route::post('/admin/register',[AuthController::class, 'adminRegister'])->name('admin.register.post');
 
+// GUEST ONLY
 Route::middleware('guest')->group(function () {
-    // Login
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-
-    // Register
+    Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login',   [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
-
-    // Admin Login
-    Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
-
-    // Admin Register
-    Route::get('/admin/register', [AuthController::class, 'showAdminRegister'])->name('admin.register');
+    Route::post('/register',[AuthController::class, 'register']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Authenticated Routes
-|--------------------------------------------------------------------------
-*/
-
+// AUTH
 Route::middleware('auth')->group(function () {
-    // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Admin Routes
+    // ADMIN
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
-        // Dashboard — Halaman utama admin
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard',    fn() => view('admin.dashboard'))->name('dashboard');
+        Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
+        Route::get('/registration', fn() => view('admin.registration'))->name('registration');
+        Route::get('/emr',          fn() => view('admin.emr'))->name('emr');
+        Route::get('/pharmacy',     fn() => view('admin.pharmacy'))->name('pharmacy');
+        Route::get('/cashier',      fn() => view('admin.cashier'))->name('cashier');
+        Route::get('/profile',      fn() => view('admin.profile'))->name('profile');
+        Route::get('/messages',     fn() => view('admin.messages'))->name('messages');
 
-        // Rawat Jalan — Manajemen pasien rawat jalan
-        Route::get('/outpatient', function () {
-            return view('admin.outpatient');
-        })->name('outpatient');
-
-        // Registrasi — Pendaftaran pasien baru
-        Route::get('/registration', function () {
-            return view('admin.registration');
-        })->name('registration');
-
-        // Rekam Medis Elektronik (EMR) — Data rekam medis pasien
-        Route::get('/emr', function () {
-            return view('admin.emr');
-        })->name('emr');
-
-        // Apotek — Manajemen obat dan resep
-        Route::get('/pharmacy', function () {
-            return view('admin.pharmacy');
-        })->name('pharmacy');
-
-        // Kasir — Pembayaran dan transaksi
-        Route::get('/cashier', function () {
-            return view('admin.cashier');
-        })->name('cashier');
-
-        // Profil — Pengaturan profil pengguna
-        Route::get('/profile', function () {
-            return view('admin.profile');
-        })->name('profile');
-
-        // Pesan — Pusat pesan / notifikasi
-        Route::get('/messages', function () {
-            return view('admin.messages');
-        })->name('messages');
+        // Update status appointment (dipanggil dari /admin/appointments/{id}/status)
+        Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
+             ->name('appointments.updateStatus');
     });
 
-    // User Routes
+    // USER
     Route::middleware('role:user')->prefix('user')->name('user.')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('user.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', fn() => view('user.dashboard'))->name('dashboard');
     });
+
+    Route::post('/registration/store', function () {
+        return back()->withErrors(['(dummy) Belum disambungkan ke database.']);
+    })->name('registration.store');
 });

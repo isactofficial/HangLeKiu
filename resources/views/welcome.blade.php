@@ -34,6 +34,10 @@
     {{-- Main Content --}}
     <main class="flex-1 flex flex-col items-center justify-center px-6 pb-20 relative z-10">
         <div class="w-full max-w-2xl text-center">
+            <a href="{{ route('registration.form') }}"
+                class="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 px-6 rounded-lg transition duration-300 inline-block">
+                + Daftar Kunjungan
+            </a>
             
             <div class="mb-12">
                 <div class="inline-flex items-center gap-2 bg-white/80 text-orange-950 text-xs font-bold px-5 py-2.5 rounded-full mb-8 backdrop-blur-sm border border-orange-900/10 shadow-sm">
@@ -41,6 +45,8 @@
                     Klinik Gigi Terpercaya & Profesional
                 </div>
                 
+            
+
                 <h1 class="text-5xl md:text-6xl font-extrabold text-orange-950 leading-tight mb-6">
                     Senyum Sehat,<br>
                     <span class="text-orange-700">Hidup Bahagia</span>

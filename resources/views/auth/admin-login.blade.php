@@ -254,7 +254,6 @@
             <div class="logo-container">
                 <div class="logo-icon"><img src="{{ asset('images/logo-hds.png') }}" alt="Hanglekiu Dental Clinic"></div>
             </div>
-            <div class="logo-title">Admin Login</div>
         </div>
 
         @if($errors->any())
@@ -265,7 +264,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('admin.login.post') }}">
             @csrf
 
             <div class="form-group">
