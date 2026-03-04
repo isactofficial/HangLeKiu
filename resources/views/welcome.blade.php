@@ -352,8 +352,69 @@
                     <img src="{{ asset('images/PLN 1.svg') }}" alt="PLN Insurance" class="h-29 object-contain">
                 </div>
                 <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/logooriginal 1.svg') }}" alt="CareNow" class="h-14 object-contain">
+                    <img src="{{ asset('images/logooriginal 1.svg') }}" alt="CareNow" class="h-13 object-contain">
                 </div>
+            </div>
+
+        </div>
+    </section>
+
+    {{-- Section: Apresiasi Pasien --}}
+    <section class="w-full bg-white py-14 md:py-20">
+        <div class="max-w-7xl mx-auto px-6 md:px-10 lg:px-16">
+
+            {{-- Header --}}
+            <div class="text-center mb-12">
+                <p class="text-[18.75px] font-semibold text-[#C58F59] tracking-wide mb-2">APRESIASI PASIEN</p>
+                <h2 class="text-[48px] font-bold text-[#582C0C] leading-tight mb-3">Cerita Di Balik Senyum Mereka</h2>
+                <p class="text-[18.75px] font-normal text-[#582C0C]">Pengalaman Nyata. Hasil Yang Personal.</p>
+            </div>
+
+            {{-- Testimonial Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                {{-- Card 1 --}}
+                <div class="bg-white rounded-2xl p-8 shadow-md">
+                    <div class="flex items-center gap-4 mb-5">
+                        <img src="{{ asset('images/raffi.png') }}" alt="Raffi Ahmad" class="w-14 h-14 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-[20px] font-bold text-[#582C0C]">Raffi Ahmad</h4>
+                            <p class="text-[16px] font-normal text-[#6B513E]">Artis</p>
+                        </div>
+                    </div>
+                    <p class="text-[16px] font-normal text-[#582C0C] leading-relaxed">
+                        "Sebagai orang yang sangat sibuk, saya butuh layanan yang serba cepat namun tetap privat dan profesional. Tim dokter di sini benar-benar ahli dalam merancang senyum yang natural dengan teknologi paling modern. Sekarang saya jauh lebih percaya diri saat tampil, karena kualitasnya memang kelas dunia."
+                    </p>
+                </div>
+
+                {{-- Card 2 --}}
+                <div class="bg-white rounded-2xl p-8 shadow-md">
+                    <div class="flex items-center gap-4 mb-5">
+                        <img src="{{ asset('images/raffi.png') }}" alt="Raffi Ahmad" class="w-14 h-14 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-[20px] font-bold text-[#582C0C]">Raffi Ahmad</h4>
+                            <p class="text-[16px] font-normal text-[#6B513E]">Artis</p>
+                        </div>
+                    </div>
+                    <p class="text-[16px] font-normal text-[#582C0C] leading-relaxed">
+                        "Sebagai orang yang sangat sibuk, saya butuh layanan yang serba cepat namun tetap privat dan profesional. Tim dokter di sini benar-benar ahli dalam merancang senyum yang natural dengan teknologi paling modern. Sekarang saya jauh lebih percaya diri saat tampil, karena kualitasnya memang kelas dunia."
+                    </p>
+                </div>
+
+                {{-- Card 3 --}}
+                <div class="bg-white rounded-2xl p-8 shadow-md">
+                    <div class="flex items-center gap-4 mb-5">
+                        <img src="{{ asset('images/raffi.png') }}" alt="Raffi Ahmad" class="w-14 h-14 rounded-full object-cover">
+                        <div>
+                            <h4 class="text-[20px] font-bold text-[#582C0C]">Raffi Ahmad</h4>
+                            <p class="text-[16px] font-normal text-[#6B513E]">Artis</p>
+                        </div>
+                    </div>
+                    <p class="text-[16px] font-normal text-[#6B513E] leading-relaxed">
+                        "Sebagai orang yang sangat sibuk, saya butuh layanan yang serba cepat namun tetap privat dan profesional. Tim dokter di sini benar-benar ahli dalam merancang senyum yang natural dengan teknologi paling modern. Sekarang saya jauh lebih percaya diri saat tampil, karena kualitasnya memang kelas dunia."
+                    </p>
+                </div>
+
             </div>
 
         </div>
