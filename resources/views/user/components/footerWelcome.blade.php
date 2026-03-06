@@ -53,15 +53,16 @@
                     <li><a href="{{ url('/#pelayanan') }}"
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Pelayanan</a>
                     </li>
-                    <li><a href="{{ url('/#klinik') }}"
+                    <li><a href="{{ route('klinik') }}"
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Klinik</a>
+                    </li>
+                    {{-- Menu Artikel Baru Ditambahkan di Footer --}}
+                    <li><a href="{{ url('/#artikel') }}"
+                            class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Artikel</a>
                     </li>
                     <li><a href="{{ url('/#klinik') }}"
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Profil
                             Dokter</a></li>
-                    <li><a href="{{ route('artikel') }}"
-                            class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Artikel</a>
-                    </li>
                 </ul>
             </div>
 

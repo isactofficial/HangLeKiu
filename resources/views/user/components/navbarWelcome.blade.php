@@ -12,9 +12,11 @@
                 class="text-[var(--fs-md)] font-normal {{ request()->is('/') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Beranda</a>
             <a href="{{ url('/#pelayanan') }}"
                 class="text-[var(--fs-md)] font-normal text-[var(--font-color-secondary)] hover:text-primary transition-colors duration-200">Pelayanan</a>
-            <a href="{{ url('/#klinik') }}"
-                class="text-[var(--fs-md)] font-normal text-[var(--font-color-secondary)] hover:text-primary transition-colors duration-200">Klinik</a>
-            <a href="{{ route('artikel') }}"
+            <a href="{{ route('klinik') }}"
+                class="text-[var(--fs-md)] font-normal {{ request()->routeIs('klinik') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Klinik</a>
+            
+            {{-- Menu Artikel Baru Ditambahkan --}}
+            <a href="{{ url('/#artikel') }}"
                 class="text-[var(--fs-md)] font-normal {{ request()->routeIs('artikel') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Artikel</a>
 
             {{-- Masuk Button --}}
