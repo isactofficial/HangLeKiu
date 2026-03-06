@@ -8,14 +8,14 @@
 
         {{-- Right: Navigation + Masuk --}}
         <div class="flex items-center gap-8">
-            <a href="#beranda"
-                class="text-[var(--fs-md)] font-normal text-[var(--font-color-primary)] hover:text-primary transition-colors duration-200">Beranda</a>
-            <a href="#pelayanan"
+            <a href="{{ url('/') }}"
+                class="text-[var(--fs-md)] font-normal {{ request()->is('/') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Beranda</a>
+            <a href="{{ url('/#pelayanan') }}"
                 class="text-[var(--fs-md)] font-normal text-[var(--font-color-secondary)] hover:text-primary transition-colors duration-200">Pelayanan</a>
-            <a href="#klinik"
+            <a href="{{ url('/#klinik') }}"
                 class="text-[var(--fs-md)] font-normal text-[var(--font-color-secondary)] hover:text-primary transition-colors duration-200">Klinik</a>
-            <a href="#artikel"
-                class="text-[var(--fs-md)] font-normal text-[var(--font-color-secondary)] hover:text-primary transition-colors duration-200">Artikel</a>
+            <a href="{{ route('artikel') }}"
+                class="text-[var(--fs-md)] font-normal {{ request()->routeIs('artikel') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Artikel</a>
 
             {{-- Masuk Button --}}
             <a href="{{ route('login') }}"

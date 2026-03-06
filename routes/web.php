@@ -5,7 +5,8 @@ use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
 
 // PUBLIC
-Route::get('/', fn() => view('welcome'));
+Route::get('/', fn() => view('welcome'))->name('home');
+Route::get('/artikel', fn() => view('user.pages.artikel'))->name('artikel');
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
