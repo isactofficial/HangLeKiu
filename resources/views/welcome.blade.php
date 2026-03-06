@@ -137,11 +137,6 @@
                             <div class="doctor-slot absolute bottom-24"
                                 style="left:19%; width:66%; z-index:5; opacity:1; filter:blur(0px); transition: left 700ms cubic-bezier(0.25,0.1,0.25,1), width 700ms cubic-bezier(0.25,0.1,0.25,1), opacity 700ms cubic-bezier(0.25,0.1,0.25,1), filter 700ms cubic-bezier(0.25,0.1,0.25,1);">
                                 <img src="" alt="" class="w-full h-auto object-contain drop-shadow-2xl">
-                                {{-- Graduation badges --}}
-                                <img src="{{ asset('images/dokter_animate/lulusan2.png') }}" alt="Lulusan"
-                                    class="absolute top-2 -left-8 w-24 h-24 object-contain doctor-badge-left">
-                                <img src="{{ asset('images/dokter_animate/lulusan.png') }}" alt="Lulusan"
-                                    class="absolute top-2 -right-8 w-24 h-24 object-contain doctor-badge-right">
                             </div>
                             <div class="doctor-slot absolute bottom-24"
                                 style="left:48%; width:52%; z-index:2; opacity:0.5; filter:blur(0.5px); transition: left 700ms cubic-bezier(0.25,0.1,0.25,1), width 700ms cubic-bezier(0.25,0.1,0.25,1), opacity 700ms cubic-bezier(0.25,0.1,0.25,1), filter 700ms cubic-bezier(0.25,0.1,0.25,1);">
@@ -154,6 +149,16 @@
                             <div class="doctor-slot absolute bottom-24"
                                 style="left:97%; width:42%; z-index:0; opacity:0; filter:blur(2px); transition: left 700ms cubic-bezier(0.25,0.1,0.25,1), width 700ms cubic-bezier(0.25,0.1,0.25,1), opacity 700ms cubic-bezier(0.25,0.1,0.25,1), filter 700ms cubic-bezier(0.25,0.1,0.25,1);">
                                 <img src="" alt="" class="w-full h-auto object-contain">
+                            </div>
+
+
+                            {{-- Graduation Badges — kanan, berdampingan, lurus --}}
+                            <div id="doctor-badges-container"
+                                style="position:absolute; right:16px; bottom:110px; z-index:10; display:flex; flex-direction:row; gap:4px; align-items:center; pointer-events:none;">
+                                <img id="doctor-badge-1" src="{{ asset('images/dokter_animate/lulusan1.png') }}" alt="Lulusan 1"
+                                    style="width:110px; height:110px; object-fit:contain; object-position:center; opacity:1; transition:opacity 0.18s ease; transform:rotate(0deg); display:block;" />
+                                <img id="doctor-badge-2" src="{{ asset('images/dokter_animate/lulusan2.png') }}" alt="Lulusan 2"
+                                    style="width:110px; height:110px; object-fit:contain; object-position:center; opacity:1; transition:opacity 0.18s ease; transform:rotate(0deg); display:block;" />
                             </div>
                         </div>
                     </div>
@@ -171,11 +176,7 @@
 
                         <p id="doctor-bio"
                             class="text-[var(--fs-md)] font-normal text-[var(--font-color-secondary)] leading-relaxed mb-5 text-justify">
-                            Lulusan Universitas Indonesia Yang Kemudian Mendalami Spesialisasi Di University Of
-                            Adelaide, Beliau Telah Berdedikasi Selama Lebih Dari 12 Tahun Dalam Menangani Kasus
-                            Maloklusi Kompleks. Keahlian Beliau Berfokus Pada Penyelarasan Struktur Wajah Melalui
-                            Perpaduan Presisi Medis Dan Teknologi Ortodonti Terkini Untuk Menciptakan Profil Senyum Yang
-                            Harmonis Serta Fungsional.
+                            Lulusan Universitas Indonesia & University of Adelaide. 12+ tahun pengalaman ortodonti, fokus pada maloklusi kompleks dan teknologi ortodonti modern.
                         </p>
 
                         {{-- Social Media --}}
@@ -213,6 +214,8 @@
                                 </svg>
                             </button>
                         </div>
+
+
                     </div>
 
                 </div>
@@ -632,6 +635,49 @@
 
         // ========== Doctor Character-Select Carousel ==========
         (function() {
+            // Badge images per doctor (2 badges each)
+            const doctorBadges = [
+                [ // Jenny Wilson
+                    { img: "{{ asset('images/dokter_animate/lulusan1.png') }}",  alt: 'Universitas Indonesia' },
+                    { img: "{{ asset('images/dokter_animate/lulusan2.png') }}", alt: 'University of Adelaide' }
+                ],
+                [ // Sarah Mitchell
+                    { img: "{{ asset('images/dokter_animate/lulusan3.png') }}", alt: 'Universitas Gadjah Mada' },
+                    { img: "{{ asset('images/dokter_animate/lulusan4.png') }}", alt: 'Konservasi Gigi' }
+                ],
+                [ // Amanda Lee
+                    { img: "{{ asset('images/dokter_animate/lulusan3.png') }}", alt: 'Universitas Airlangga' },
+                    { img: "{{ asset('images/dokter_animate/lulusan1.png') }}",  alt: 'Periodonti' }
+                ],
+                [ // Michael Tan
+                    { img: "{{ asset('images/dokter_animate/lulusan4.png') }}", alt: 'Universitas Padjadjaran' },
+                    { img: "{{ asset('images/dokter_animate/lulusan2.png') }}", alt: 'Bedah Mulut' }
+                ],
+                [ // David Chen
+                    { img: "{{ asset('images/dokter_animate/lulusan2.png') }}", alt: 'Universitas Trisakti' },
+                    { img: "{{ asset('images/dokter_animate/lulusan4.png') }}", alt: 'Tokyo Medical Dental' }
+                ]
+            ];
+
+            const badge1El = document.getElementById('doctor-badge-1');
+            const badge2El = document.getElementById('doctor-badge-2');
+
+            function updateBadges(docIdx) {
+                const badges = doctorBadges[docIdx];
+                // Fade out
+                badge1El.style.opacity = '0';
+                badge2El.style.opacity = '0';
+                setTimeout(() => {
+                    badge1El.src = badges[0].img;
+                    badge1El.alt = badges[0].alt;
+                    badge2El.src = badges[1].img;
+                    badge2El.alt = badges[1].alt;
+                    // Fade in
+                    badge1El.style.opacity = '1';
+                    badge2El.style.opacity = '1';
+                }, 180);
+            }
+
             const doctors = [{
                     image: "{{ asset('images/dokter_animate/budok1.png') }}",
                     shadow: "{{ asset('images/dokter_animate/bayangan_budok1.png') }}",
@@ -847,12 +893,18 @@
                 }, 720);
             }
 
-            prevBtn.addEventListener('click', () => animateTo(-1));
-            nextBtn.addEventListener('click', () => animateTo(1));
+            prevBtn.addEventListener('click', () => {
+                updateBadges(ci(currentIndex - 1));
+                animateTo(-1);
+            });
+            nextBtn.addEventListener('click', () => {
+                updateBadges(ci(currentIndex + 1));
+                animateTo(1);
+            });
 
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft') animateTo(-1);
-                if (e.key === 'ArrowRight') animateTo(1);
+                if (e.key === 'ArrowLeft') { updateBadges(ci(currentIndex - 1)); animateTo(-1); }
+                if (e.key === 'ArrowRight') { updateBadges(ci(currentIndex + 1)); animateTo(1); }
             });
 
             renderInitial();
