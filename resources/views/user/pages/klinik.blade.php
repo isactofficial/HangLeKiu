@@ -19,7 +19,7 @@
         <section id="hero-section" class="relative w-full h-[calc(100vh-60px)] flex items-end overflow-hidden" style="margin-top: 60px;">
             {{-- Background Image --}}
             <div class="absolute inset-0 z-0">
-                <img src="{{ asset('images/artikel/bg-artikel.png') }}" alt="Hanglekiu Dental Specialist - Artikel"
+                <img src="{{ asset('images/klinik/bg-artikel.png') }}" alt="Hanglekiu Dental Specialist - Artikel"
                     class="w-full h-full object-cover">
                 {{-- Gradient overlay bottom matching welcome.blade.php --}}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
@@ -39,14 +39,6 @@
                     eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim<br>
                     ad minim veniam.
                 </p>
-                
-                {{-- Decorative Star Icon based on reference --}}
-                <div class="absolute bottom-8 right-8 md:bottom-12 md:right-12 opacity-80">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 1C12 7.075 16.925 12 23 12C16.925 12 12 16.925 12 23C12 16.925 7.075 12 1 12C7.075 12 12 7.075 12 1Z" fill="#E5D6C5"/>
-                    </svg>
-                </div>
-            </div>
         </section>
 
         {{-- Lorem Ipsum Gallery Section --}}
@@ -65,23 +57,23 @@
                         
                         {{-- Left Column (Spans 1 col) --}}
                         <div class="flex flex-col gap-4 md:gap-5 col-span-1">
-                            <img src="{{ asset('images/artikel/artikel-left-top.png') }}" alt="Artikel Gallery" 
+                            <img src="{{ asset('images/klinik/artikel-left-top.png') }}" alt="Artikel Gallery" 
                                  class="w-full aspect-square md:aspect-auto md:flex-1 object-cover rounded-2xl shadow-sm">
-                            <img src="{{ asset('images/artikel/artikel-left-bot.png') }}" alt="Artikel Gallery" 
+                            <img src="{{ asset('images/klinik/artikel-left-bot.png') }}" alt="Artikel Gallery" 
                                  class="w-full aspect-square md:aspect-auto md:flex-1 object-cover rounded-2xl shadow-sm">
                         </div>
 
                         {{-- Middle Column --}}
                         <div class="col-span-1 relative min-h-[250px] md:min-h-0">
-                            <img src="{{ asset('images/artikel/artikel-mid.png') }}" alt="Artikel Gallery" 
+                            <img src="{{ asset('images/klinik/artikel-mid.png') }}" alt="Artikel Gallery" 
                                  class="absolute inset-0 w-full h-full object-cover rounded-2xl shadow-sm">
                         </div>
 
                         {{-- Right Column (Spans 1 col) --}}
                         <div class="flex flex-col gap-4 md:gap-5 col-span-1">
-                            <img src="{{ asset('images/artikel/artikel-right-top.png') }}" alt="Artikel Gallery" 
+                            <img src="{{ asset('images/klinik/artikel-right-top.png') }}" alt="Artikel Gallery" 
                                  class="w-full aspect-square md:aspect-auto md:flex-1 object-cover rounded-2xl shadow-sm">
-                            <img src="{{ asset('images/artikel/artikel-right-bot.png') }}" alt="Artikel Gallery" 
+                            <img src="{{ asset('images/klinik/artikel-right-bot.png') }}" alt="Artikel Gallery" 
                                  class="w-full aspect-square md:aspect-auto md:flex-1 object-cover rounded-2xl shadow-sm">
                         </div>
 

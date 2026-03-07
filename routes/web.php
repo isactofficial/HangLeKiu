@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ArticleController;
 use Illuminate\Support\Facades\Route;
 
 // PUBLIC
 Route::get('/', fn() => view('welcome'))->name('home');
 Route::get('/klinik', fn() => view('user.pages.klinik'))->name('klinik');
+Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');

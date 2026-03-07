@@ -57,7 +57,7 @@
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Klinik</a>
                     </li>
                     {{-- Menu Artikel Baru Ditambahkan di Footer --}}
-                    <li><a href="{{ url('/#artikel') }}"
+                    <li><a href="{{ route('artikel') }}"
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Artikel</a>
                     </li>
                     <li><a href="{{ url('/#klinik') }}"

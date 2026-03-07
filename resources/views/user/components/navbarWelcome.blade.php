@@ -16,7 +16,7 @@
                 class="text-[var(--fs-md)] font-normal {{ request()->routeIs('klinik') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Klinik</a>
             
             {{-- Menu Artikel Baru Ditambahkan --}}
-            <a href="{{ url('/#artikel') }}"
+            <a href="{{ route('artikel') }}"
                 class="text-[var(--fs-md)] font-normal {{ request()->routeIs('artikel') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Artikel</a>
 
             {{-- Masuk Button --}}
