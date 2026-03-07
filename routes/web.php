@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn() => view('welcome'))->name('home');
 Route::get('/klinik', fn() => view('user.pages.klinik'))->name('klinik');
 Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
+Route::get('/artikel/{id}', [ArticleController::class, 'show'])->name('artikel.show');
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
