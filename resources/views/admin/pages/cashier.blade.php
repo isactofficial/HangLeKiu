@@ -110,7 +110,7 @@
         {{-- Tab: Hutang & Piutang --}}
         <div class="cashier-tab-content" id="tab-hutang">
             <div class="admin-card" style="padding: 40px; text-align: center;">
-                <h3 style="font-size: 16px; font-weight: 700; color: #582C0C;">Hutang & Piutang</h3>
+                <h3 style="font-size: 18.75px; font-weight: 700; color: #582C0C;">Hutang & Piutang</h3>
                 <p style="font-size: 13px; color: #6B513E; margin-top: 8px;">Fitur hutang dan piutang. Halaman ini masih dalam pengembangan.</p>
             </div>
         </div>
@@ -122,20 +122,19 @@
 
     /* Header */
     .cashier-header {
-        margin-bottom: 24px;
+        margin-bottom: 20px;
     }
 
     .cashier-title {
-        font-size: 24px;
+        font-size: 30px; 
         font-weight: 700;
         color: #582C0C;
         margin: 0;
     }
 
     .cashier-subtitle {
-        font-size: 14px;
+        font-size: 18.75px;
         color: #C58F59;
-        margin-top: 4px;
     }
 
     /* Layout */
@@ -160,7 +159,7 @@
         padding: 12px 16px;
         border: none;
         background: none;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 500;
         font-family: 'Instrument Sans', sans-serif;
         color: #6B513E;
@@ -213,7 +212,7 @@
         padding-right: 44px;
         border: 1.5px solid #E5D6C5;
         border-radius: 8px;
-        font-size: 14px;
+        font-size: 13px;
         font-family: 'Instrument Sans', sans-serif;
         color: #582C0C;
         background: white;
@@ -296,7 +295,7 @@
     }
 
     .cashier-date-group label {
-        font-size: 12px;
+        font-size: 13px;
         color: #6B513E;
         font-weight: 500;
     }
@@ -355,7 +354,7 @@
     }
 
     .invoice-number {
-        font-size: 12px;
+        font-size: 13px;
         color: #C58F59;
         margin-top: 4px;
     }
@@ -385,7 +384,7 @@
         background: #C58F59;
         color: white;
         border-radius: 6px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
     }
 
@@ -436,7 +435,7 @@
         border-radius: 6px;
         background: white;
         color: #6B513E;
-        font-size: 12px;
+        font-size: 13px;
         cursor: pointer;
         display: flex;
         align-items: center;

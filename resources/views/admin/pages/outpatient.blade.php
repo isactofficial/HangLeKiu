@@ -228,7 +228,7 @@
         }
 
         .rj-outer {
-            padding: 20px;
+            padding: 0 0px 20px 0px;
             font-family: 'Instrument Sans', sans-serif;
             font-size: 13px;
         }
@@ -341,8 +341,8 @@
         }
 
         .rj-header-left { flex: 1; min-width: 160px; }
-        .rj-title { color: var(--brown); margin: 0; }
-        .rj-subtitle { color: var(--gold); margin: 2px 0 0; }
+        .rj-title { color: var(--brown); margin: 0; font-size: 30px; font-weight: 700; }
+        .rj-subtitle { color: var(--gold); margin: 4px 0 0 0; font-size: 18.75px; }
 
         .rj-legend {
             display: flex;

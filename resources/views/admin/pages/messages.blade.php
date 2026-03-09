@@ -89,20 +89,18 @@
 
     /* Header */
     .mc-header {
-        margin-bottom: 24px;
+        margin-bottom: 20px;
     }
 
     .mc-title {
-        font-size: 24px;
+        font-size: 30px;
         font-weight: 700;
         color: #582C0C;
-        margin: 0;
     }
 
     .mc-subtitle {
-        font-size: 14px;
+        font-size: 18.75px;
         color: #C58F59;
-        margin-top: 4px;
     }
 
     /* Layout */
