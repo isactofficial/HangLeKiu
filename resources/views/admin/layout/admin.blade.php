@@ -35,6 +35,34 @@
             transition: margin-left 0.3s ease;
         }
 
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 99;
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .admin-content {
+                margin-left: 0;
+                padding: 16px;
+                padding-top: 24px;
+            }
+        }
+
         .admin-topbar {
             display: flex;
             justify-content: space-between;
@@ -82,6 +110,9 @@
     
     @include('admin.components.sidebar')
 
+    {{-- Overlay untuk mode seluler --}}
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <main class="admin-content">
         
         @hasSection('navbar')
@@ -100,5 +131,18 @@
         
     </main>
 
+    <script>
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-open');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (document.body.classList.contains('sidebar-open')) {
+                overlay.style.display = 'block';
+                setTimeout(() => overlay.classList.add('show'), 10);
+            } else {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.style.display = 'none', 300);
+            }
+        }
+    </script>
 </body>
 </html>

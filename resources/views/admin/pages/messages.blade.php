@@ -270,7 +270,7 @@
 
         .mc-tabs {
             flex-direction: row;
-            min-width: auto;
+            min-width: 100%;
             justify-content: center;
             gap: 4px;
         }
@@ -278,8 +278,9 @@
         .mc-tab {
             flex: 1;
             text-align: center;
-            padding: 10px 12px;
-            font-size: 13px;
+            padding: 10px 8px;
+            font-size: 12px;
+            white-space: normal;
         }
 
         .mc-row {

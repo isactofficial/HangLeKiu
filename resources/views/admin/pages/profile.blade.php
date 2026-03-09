@@ -171,7 +171,7 @@
     }
 
     /* Responsive */
-    @media (max-width: 992px) {
+    @media (max-width: 768px) {
         .profile-card {
             flex-direction: column;
         }
@@ -179,10 +179,27 @@
         .profile-card-illustration {
             flex: none;
             padding: 24px;
+            width: 100%;
         }
 
         .profile-card-info {
-            padding: 28px;
+            padding: 24px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .profile-card-label {
+            margin: 0 auto 6px auto;
+        }
+
+        .profile-card-action {
+            justify-content: center;
+            width: 100%;
+        }
+
+        .profile-edit-btn {
+            width: 100%;
+            text-align: center;
         }
 
         .profile-card-title {

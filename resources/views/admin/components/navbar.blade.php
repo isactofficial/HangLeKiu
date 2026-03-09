@@ -5,11 +5,25 @@
 
 <header class="admin-navbar">
     {{-- Right: Actions --}}
-    <div class="navbar-right">
-        {{-- HDS Logo --}}
-        <div class="navbar-hds-logo">
-            <img src="/images/logo-hds.png" alt="HDS">
+    <div class="navbar-right w-full flex align-center w-[100%] justify-between md:justify-end">
+        
+        {{-- Left Items (Mobile) --}}
+        <div class="navbar-left flex items-center md:hidden">
+            <button class="navbar-hamburger-btn" onclick="toggleSidebar()" title="Toggle Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
         </div>
+
+        {{-- Right Items --}}
+        <div class="navbar-actions flex items-center gap-2">
+            {{-- HDS Logo --}}
+            <div class="navbar-hds-logo hidden md:flex">
+                <img src="/images/logo-hds.png" alt="HDS">
+            </div>
 
         {{-- Clinic Dropdown --}}
         <div class="navbar-dropdown" id="clinicDropdown">
@@ -72,6 +86,7 @@
                 <button type="submit" class="dropdown-item dropdown-logout">Logout</button>
             </form>
         </div>
+        </div>
     </div>
 </header>
 
@@ -98,8 +113,30 @@
     .navbar-right {
         display: flex;
         align-items: center;
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .navbar-actions {
+        display: flex;
+        align-items: center;
         gap: 8px;
         position: relative;
+    }
+
+    .navbar-hamburger-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: #582C0C;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+
+    .navbar-hamburger-btn:hover {
+        background: rgba(197, 143, 89, 0.1);
     }
 
     /* HDS Logo */
@@ -277,11 +314,21 @@
     @media (max-width: 768px) {
         .admin-navbar {
             padding: 16px;
-            margin: -72px -16px 20px -16px;
-            padding-left: 64px;
+            margin: -24px -16px 20px -16px; 
+            padding-left: 16px; /* Reset padding for mobile */
+        }
+
+        .navbar-hamburger-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .navbar-right {
+            justify-content: space-between;
+        }
+
+        .navbar-actions {
             gap: 4px;
         }
 
@@ -317,8 +364,7 @@
         }
 
         .navbar-hds-logo {
-            width: 32px;
-            height: 32px;
+            display: none !important; /* Disembunyikan karena sudah ada hamburger icon */
         }
 
         .navbar-dropdown-menu {

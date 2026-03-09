@@ -125,8 +125,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        z-index: 100;
+        z-index: 1000; /* Increased to ensure it's above everything on mobile */
         padding: 24px 0;
+        transition: transform 0.3s ease;
     }
 
     .sidebar-logo {
@@ -245,5 +246,18 @@
     .sidebar .logout-btn:focus-visible {
         background-color: var(--color-background-secondary, #E5D6C5) !important;
         color: var(--color-warning, #EF4444) !important;
+    }
+
+    /* Responsive: Mobile */
+    @media (max-width: 768px) {
+        .sidebar {
+            /* Sembunyikan ke kiri secara default di mobile */
+            transform: translateX(-100%);
+        }
+
+        /* Saat di-toggle via JavaScript, tampilkan */
+        body.sidebar-open .sidebar {
+            transform: translateX(0);
+        }
     }
 </style>

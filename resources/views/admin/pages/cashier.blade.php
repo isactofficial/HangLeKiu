@@ -338,6 +338,7 @@
         font-size: 13px;
         font-weight: 700;
         color: #582C0C;
+        white-space: nowrap;
     }
 
     .cashier-table td {
@@ -364,6 +365,7 @@
         display: grid;
         grid-template-columns: auto 1fr;
         gap: 6px 16px;
+        min-width: 320px; /* Force spread to ensure table is scrollable */
     }
 
     .ket-label {
@@ -462,7 +464,7 @@
 
         .cashier-tabs {
             flex-direction: row;
-            min-width: auto;
+            min-width: 100%;
             justify-content: center;
             gap: 4px;
         }
@@ -472,33 +474,48 @@
             text-align: center;
             padding: 10px 12px;
             font-size: 13px;
+            white-space: normal;
         }
 
         .cashier-toolbar {
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+        
+        .cashier-toolbar .cashier-search,
+        .cashier-toolbar .cashier-btn {
+            width: 100%;
         }
 
         .cashier-filter {
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .cashier-filter .cashier-date-group {
+            width: 100%;
+        }
+
+        .cashier-filter .cashier-btn {
+            width: 100%;
         }
 
         .cashier-table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            width: 100%;
         }
 
         .cashier-table {
-            min-width: 700px;
+            min-width: 800px; /* Lebarkan sedikit supaya lebih jelas jadinya ada scroll */
         }
 
         .cashier-pagination {
             flex-direction: column;
             gap: 12px;
             align-items: center;
-        }
-
-        .keterangan-grid {
-            grid-template-columns: 1fr;
         }
     }
 </style>
