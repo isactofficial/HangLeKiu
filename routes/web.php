@@ -43,7 +43,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
         Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
         Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
-        Route::get('/office',       fn() => view('admin.pages.office'))->name('office');
+        Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
+        Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
 
         // Update status appointment (dipanggil dari /admin/appointments/{id}/status)
         Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])

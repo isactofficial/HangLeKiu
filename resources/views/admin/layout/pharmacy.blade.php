@@ -28,12 +28,12 @@
     .apt-container, .apt-container * { font-family: 'Instrument Sans', sans-serif; font-size: 13px; box-sizing: border-box; }
     .apt-date-full { font-size: 18.75px; font-weight: 700; }
     .apt-stat-number { font-size: 30px; font-weight: 700; }
-    .apt-container { padding: 0 16px 24px 16px; }
+    .apt-container { padding: 0 0 24px 0px; }
 
     /* Header */
     .apt-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; padding-top: 4px; }
     .apt-title    { color: #582C0C; margin: 0; line-height: 1; font-size: 30px; font-weight: 700}
-    .apt-subtitle { color: #C58F59; margin: 4px 0 0; font-weight: 600}
+    .apt-subtitle { font-size: 18.75px; color: #C58F59; margin: 4px 0 0 0; }
     .apt-header-actions { display: flex; align-items: center; gap: 16px; }
     .apt-date-nav  { display: flex; align-items: center; gap: 10px; }
     .apt-date-text { display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
@@ -142,8 +142,15 @@
         </div>
 
         <div class="apt-main">
-            @if (view()->exists('admin.components.' . $active))
-                @include('admin.components.' . $active)
+            @php
+                $pharmacyView = 'admin.components.pharmacy.' . $active;
+                $legacyView = 'admin.components.' . $active;
+            @endphp
+
+            @if (view()->exists($pharmacyView))
+                @include($pharmacyView)
+            @elseif (view()->exists($legacyView))
+                @include($legacyView)
             @else
                 <div style="background:#fff;border:1px solid #E5D6C5;border-radius:8px;padding:20px;color:#6B513E;">
                     Konten menu <strong>{{ $active }}</strong> belum tersedia.

@@ -69,7 +69,7 @@
 
     <style>
         .emr-container {
-            padding: 0 16px 24px 16px;
+            padding: 0 0px 24px 0px;
             position: relative;
             min-height: calc(100vh - 100px);
             font-family: 'Instrument Sans', sans-serif;
@@ -84,7 +84,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 16px;
         }
@@ -98,9 +98,8 @@
         }
 
         .emr-subtitle {
+            font-size: 18.75px;
             color: #C58F59;
-            margin: 4px 0 0 0;
-            font-weight: 600;
         }
 
         .emr-status-legend {
