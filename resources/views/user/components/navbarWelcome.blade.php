@@ -19,11 +19,19 @@
             <a href="{{ route('artikel') }}"
                 class="text-[var(--fs-md)] font-normal {{ request()->routeIs('artikel') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Artikel</a>
 
-            {{-- Masuk Button --}}
-            <a href="{{ route('login') }}"
-                class="ml-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white text-[var(--fs-md)] font-normal rounded-full transition-all duration-200 hover:shadow-lg">
-                Masuk
-            </a>
+            {{-- Auth Section --}}
+            @auth
+                <a href="{{ route('user.dashboard') }}" class="ml-2 flex items-center justify-center w-10 h-10 bg-gray-200 text-gray-600 hover:bg-gray-300 rounded-full transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </a>
+            @else
+                <a href="{{ route('login') }}"
+                    class="ml-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white text-[var(--fs-md)] font-normal rounded-full transition-all duration-200 hover:shadow-lg">
+                    Masuk
+                </a>
+            @endauth
         </div>
     </div>
 </nav>
