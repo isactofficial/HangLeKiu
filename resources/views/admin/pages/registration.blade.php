@@ -187,7 +187,7 @@
 <style>
     /* ===== REGISTRATION PAGE - BROWN THEME ===== */
     .reg-container {
-        padding: 0 16px 24px 16px;
+        padding: 0 0px 24px 0px;
         font-family: 'Instrument Sans', sans-serif;
     }
 
@@ -208,13 +208,11 @@
         font-size: 30px !important; /* Wajib 30px */
         font-weight: 700;
         color: #582C0C;
-        margin: 0;
     }
 
     .reg-subtitle {
+        font-size: 18.75px;
         color: #C58F59;
-        margin: 4px 0 0 0;
-        font-weight: 600;
     }
 
     .reg-btn-warning {
