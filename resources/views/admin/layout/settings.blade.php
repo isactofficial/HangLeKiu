@@ -132,6 +132,45 @@
         .stg-main {
             flex: 1;
             min-width: 0;
+            width: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stg-body {
+                flex-direction: column;
+            }
+            .stg-sidebar {
+                width: 100%;
+                margin-bottom: 20px;
+                display: flex;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                border-radius: 8px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .stg-sidebar::-webkit-scrollbar {
+                height: 0px;
+                display: none;
+            }
+            .stg-menu-item {
+                flex: 0 0 auto;
+                white-space: nowrap;
+                border-bottom: none;
+                border-right: 1px solid #E5D6C5;
+            }
+            .stg-menu-item:last-child {
+                border-right: none;
+            }
+            .stg-main {
+                width: 100%;
+            }
+            .stg-page-title {
+                font-size: 24px;
+            }
+            .stg-page-subtitle {
+                font-size: 16px;
+            }
         }
     </style>
 

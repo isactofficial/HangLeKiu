@@ -30,6 +30,14 @@
             {{-- ─── SIDEBAR ─── --}}
             <div class="rj-sidebar">
                 <div class="rj-sidebar-title">Dokter</div>
+                <div class="rj-mobile-doc-nav">
+                    <select class="rj-doc-select" onchange="if(this.value) window.location.href=this.value">
+                        <option value="{{ route('admin.outpatient', ['date' => $date]) }}" {{ $viewMode === 'all' ? 'selected' : '' }}>Semua Dokter</option>
+                        @foreach ($doctors as $doc)
+                            <option value="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $doc->id]) }}" {{ $selectedDoctorId == $doc->id ? 'selected' : '' }}>{{ $doc->name }} @if($doc->practice) - {{ $doc->practice }} @endif</option>
+                        @endforeach
+                    </select>
+                </div>
                 <ul class="rj-doctor-list">
                     <li>
                         <a href="{{ route('admin.outpatient', ['date' => $date]) }}"
@@ -124,8 +132,8 @@
                     </div>
                 </div>
 
-                {{-- Grid --}}
-                <div class="rj-table-wrap">
+                {{-- Grid Desktop --}}
+                <div class="rj-table-wrap desktop-table">
                     <table class="rj-table">
                         <thead>
                             <tr>
@@ -195,6 +203,77 @@
                         </tbody>
                     </table>
                 </div>
+
+                {{-- Mobile Cards --}}
+                <div class="rj-mobile-schedule">
+                    @if ($viewMode === 'all')
+                        @foreach ($timeSlots as $slot)
+                            @php
+                                $hasApt = false;
+                                foreach($doctors as $doc) {
+                                    if(isset($schedule[$doc->id][$slot])) $hasApt = true;
+                                }
+                            @endphp
+                            <div class="mobile-time-group">
+                                <div class="m-time-label">{{ $slot }}</div>
+                                <div class="m-cards">
+                                    @if ($hasApt)
+                                        @foreach ($doctors as $doc)
+                                            @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
+                                            @if ($apt)
+                                                <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                                    <div class="m-card-header">
+                                                        <div class="apt-name">{{ $apt->patient_name }}</div>
+                                                        <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                    </div>
+                                                    <div class="apt-treat">{{ $apt->treatment->name }}</div>
+                                                    <div class="m-doc-name">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
+                                                        {{ $doc->name }}
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <div class="m-empty-slot">Kosong</div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        @foreach ($dateColumns as $dc)
+                            @php 
+                                $dcCarbon = \Carbon\Carbon::parse($dc); 
+                                $aptsForDate = \App\Models\Appointment::with('treatment')
+                                    ->where('doctor_id', $selectedDoctorId)
+                                    ->whereDate('appointment_date', $dc)
+                                    ->orderBy('appointment_time')
+                                    ->get();
+                            @endphp
+                            <div class="mobile-time-group">
+                                <div class="m-time-label" style="background: var(--gold); color: white;">
+                                    {{ $dcCarbon->locale('id')->isoFormat('dddd, D MMM YYYY') }}
+                                </div>
+                                <div class="m-cards">
+                                    @if ($aptsForDate->count() > 0)
+                                        @foreach ($aptsForDate as $apt)
+                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                                <div class="m-card-header">
+                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_time)->format('H:i') }} | {{ $apt->patient_name }}</div>
+                                                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                </div>
+                                                <div class="apt-treat">{{ $apt->treatment->name }}</div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="m-empty-slot">Tidak ada jadwal</div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+
             </div>
         </div>
     </div>
@@ -492,6 +571,101 @@
             text-align: left; transition: opacity .2s;
         }
         .modal-btns button:hover { opacity: .85; }
+
+        .rj-mobile-doc-nav { display: none; padding: 0 16px 16px; }
+        .rj-doc-select {
+            width: 100%; padding: 10px 14px; border-radius: 8px;
+            border: 1.5px solid var(--border); font-family: inherit;
+            font-size: 14px; font-weight: 600; color: var(--brown); background: white;
+            outline: none; transition: border-color .2s;
+        }
+        .rj-doc-select:focus { border-color: var(--gold); }
+
+        .rj-mobile-schedule { display: none; padding: 16px; background: rgba(197, 143, 89, 0.05); }
+        .mobile-time-group { margin-bottom: 24px; }
+        .m-time-label { 
+            font-weight: 700; color: var(--brown); margin-bottom: 12px; 
+            padding: 6px 14px; background: var(--border); border-radius: 8px; 
+            display: inline-block; font-size: 14px; 
+        }
+        .m-cards { display: flex; flex-direction: column; gap: 12px; margin-left: 10px; border-left: 2px dashed var(--border); padding-left: 16px; }
+        .m-card { background: white; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(88, 44, 12, 0.04); padding: 12px; height: auto; }
+        .m-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .m-card .apt-name { font-size: 15px; white-space: normal; overflow: visible; text-overflow: clip; }
+        .m-doc-name { font-size: 12px; color: var(--gold); font-weight: 600; display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+        .m-empty-slot { color: #A89F91; font-size: 13px; font-style: italic; padding: 8px 0; }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .rj-wrap {
+                flex-direction: column;
+            }
+
+            .rj-sidebar {
+                width: 100%;
+            }
+
+            .rj-doctor-list {
+                display: none;
+            }
+
+            .rj-mobile-doc-nav {
+                display: block;
+            }
+            
+            .desktop-table {
+                display: none;
+            }
+
+            .rj-mobile-schedule {
+                display: block;
+            }
+
+            .rj-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .rj-header-left {
+                text-align: center;
+            }
+
+            .rj-legend {
+                justify-content: center;
+                padding: 12px 0;
+                border-top: 1px dashed var(--border);
+                border-bottom: 1px dashed var(--border);
+            }
+
+            .rj-nav {
+                justify-content: center;
+            }
+
+            .rj-table {
+                min-width: 800px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .rj-title {
+                font-size: 24px;
+            }
+            .rj-subtitle {
+                font-size: 16px;
+            }
+            .rj-nav {
+                flex-wrap: wrap;
+            }
+            .rj-today-btn {
+                width: 100%;
+                text-align: center;
+                margin-top: 8px;
+            }
+            .modal-box {
+                width: 90%;
+            }
+        }
 
     </style>
 

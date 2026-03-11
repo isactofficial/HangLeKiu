@@ -12,6 +12,12 @@
     .gs-item:hover .gs-item-label { color: #582C0C; }
     .gs-item-label { font-size: 13px; font-weight: 600; color: #C58F59; transition: color .15s; }
     .gs-item-arrow { color: #C58F59; flex-shrink: 0; transition: color .15s; }
+
+    @media (max-width: 768px) {
+        .gs-title { font-size: 16px; margin: 0 0 16px; }
+        .gs-item { padding: 14px 16px; }
+        .gs-item-label { font-size: 12px; }
+    }
 </style>
 
 <h2 class="gs-title">General Settings</h2>

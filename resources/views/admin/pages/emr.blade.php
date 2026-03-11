@@ -324,6 +324,46 @@
                 flex-wrap: wrap;
             }
         }
+        
+        @media (max-width: 768px) {
+            .emr-title {
+                font-size: 24px !important;
+            }
+            
+            .emr-subtitle {
+                font-size: 16px;
+            }
+
+            .emr-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .emr-status-legend {
+                gap: 12px;
+            }
+            .emr-status-item {
+                font-size: 11px;
+            }
+
+            .emr-header-actions {
+                width: 100%;
+            }
+
+            .emr-icon-btn {
+                flex: 1;
+            }
+
+            .emr-empty-img {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .emr-empty-title {
+                font-size: 16px;
+            }
+        }
     </style>
 
     {{-- SCRIPT CUSTOM DROPDOWN --}}

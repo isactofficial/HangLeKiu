@@ -94,6 +94,17 @@
     .ms-page-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 0; }
     .ms-page-btn:not([disabled]):hover { color: #582C0C; background: #fdf8f4; }
     .ms-page-btn[disabled] { opacity: .4; cursor: default; pointer-events: none; }
+
+    @media (max-width: 768px) {
+        .ms-header-row { flex-direction: column; align-items: stretch; gap: 12px; }
+        .ms-actions-row { flex-direction: column; align-items: stretch; width: 100%; }
+        .ms-btn-group { width: 100%; display: flex; }
+        .ms-btn-group-item { flex: 1; text-align: center; }
+        .ms-btn-primary, .ms-search-box, .ms-btn-filter { width: 100%; justify-content: center; box-sizing: border-box; }
+        .ms-search-box input { width: 100%; }
+        .ms-pagination { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .ms-table td, .ms-table th { padding: 10px 14px; }
+    }
 </style>
 
 <div class="ms-header-row">
@@ -101,19 +112,18 @@
         <h2 class="ms-title">Manajemen Staff</h2>
         <p class="ms-subtitle">Last Update: 17 Desember 2024 (13:50 WIB)</p>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <div class="ms-actions-row">
         <div class="ms-btn-group">
             <button class="ms-btn-group-item active">Informasi PIC</button>
             <button class="ms-btn-group-item">Tidak Aktif</button>
         </div>
         <button class="ms-btn-primary">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             + Tambah Staff
         </button>
     </div>
 </div>
 
-<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+<div class="ms-actions-row">
     <div class="ms-search-box">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <input type="text" placeholder="Cari staff">

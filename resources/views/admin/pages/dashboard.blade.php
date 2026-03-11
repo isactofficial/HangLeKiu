@@ -33,30 +33,32 @@
                 </div>
 
                 {{-- Mockup Bar Chart CSS --}}
-                <div class="dash-bar-chart">
-                    <div class="y-axis">
-                        <span>40</span><span>30</span><span>20</span><span>10</span><span>0</span>
-                    </div>
-                    <div class="bar-area">
-                        {{-- Garis grid background --}}
-                        <div class="grid-line" style="bottom: 25%"></div>
-                        <div class="grid-line" style="bottom: 50%"></div>
-                        <div class="grid-line" style="bottom: 75%"></div>
-                        <div class="grid-line" style="bottom: 100%"></div>
-                        
-                        {{-- Bars (Warna diganti ke tema cokelat) --}}
-                        <div class="bar-group"><div class="bar" style="height: 100%;"></div><span>Jan</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 75%;"></div><span>Feb</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Mar</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Apr</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>May</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Jun</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Jul</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Aug</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Sep</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Oct</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Nov</span></div>
-                        <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Dec</span></div>
+                <div class="dash-bar-chart-wrapper" style="overflow-x: auto; padding-bottom: 8px;">
+                    <div class="dash-bar-chart" style="min-width: 500px;">
+                        <div class="y-axis">
+                            <span>40</span><span>30</span><span>20</span><span>10</span><span>0</span>
+                        </div>
+                        <div class="bar-area">
+                            {{-- Garis grid background --}}
+                            <div class="grid-line" style="bottom: 25%"></div>
+                            <div class="grid-line" style="bottom: 50%"></div>
+                            <div class="grid-line" style="bottom: 75%"></div>
+                            <div class="grid-line" style="bottom: 100%"></div>
+                            
+                            {{-- Bars (Warna diganti ke tema cokelat) --}}
+                            <div class="bar-group"><div class="bar" style="height: 100%;"></div><span>Jan</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 75%;"></div><span>Feb</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Mar</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Apr</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>May</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Jun</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Jul</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Aug</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Sep</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Oct</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Nov</span></div>
+                            <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Dec</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -290,6 +292,7 @@
         display: flex;
         gap: 12px;
         margin-bottom: 16px;
+        flex-wrap: wrap;
     }
     .dash-select {
         padding: 8px 12px;
@@ -559,11 +562,23 @@
     @media (max-width: 1200px) {
         .dash-layout { flex-direction: column; }
         .dash-left-col, .dash-right-col { width: 100%; }
+        .dash-container { padding: 0 16px 24px 16px; }
     }
     @media (max-width: 768px) {
         .dash-bottom-row { flex-direction: column; }
         .dash-stats-grid { grid-template-columns: 1fr; }
-        .dash-donut-content { flex-direction: column; align-items: flex-start; }
+        .dash-donut-content { flex-direction: column; align-items: center; }
+        .dash-donut-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+        .table-footer { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .dash-donut-legend { width: 100%; }
+    }
+    @media (max-width: 480px) {
+        .dash-title { font-size: 24px; }
+        .dash-chart-number { font-size: 24px; }
+        .stat-value { font-size: 16px; }
+        .dash-select { width: 100%; }
+        .table-actions { flex-direction: column; gap: 8px; align-items: stretch; }
+        .action-btn { justify-content: center; }
     }
 </style>
 @endsection

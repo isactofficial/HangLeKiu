@@ -63,6 +63,15 @@
         cursor: pointer; font-family: inherit; transition: all .2s;
     }
     .itm-btn-edit:hover { border-color: #C58F59; color: #C58F59; }
+
+    @media (max-width: 768px) {
+        .itm-toolbar { flex-direction: column; align-items: stretch; gap: 12px; }
+        .itm-search-box, .itm-btn-filter, .itm-btn-tambah { width: 100%; justify-content: center; box-sizing: border-box; }
+        .itm-search-box input { width: 100%; }
+        .itm-grid { grid-template-columns: 1fr; }
+        .itm-card { flex-direction: column; align-items: center; text-align: center; }
+        .itm-btn-edit { width: 100%; justify-content: center; margin-top: 14px; }
+    }
 </style>
 
 <div class="itm-toolbar">
@@ -75,7 +84,6 @@
         FILTER
     </button>
     <button class="itm-btn-tambah">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         + TAMBAH DATA TENAGA MEDIS
     </button>
 </div>

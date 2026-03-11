@@ -48,6 +48,19 @@
     .ha-page-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 0; }
     .ha-page-btn:not([disabled]):hover { color: #582C0C; background: #fdf8f4; }
     .ha-page-btn[disabled] { opacity: .4; cursor: default; pointer-events: none; }
+
+    .ha-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ha-table-wrapper::-webkit-scrollbar { height: 6px; }
+    .ha-table-wrapper::-webkit-scrollbar-thumb { background: #C58F59; border-radius: 3px; }
+
+    @media (max-width: 768px) {
+        .ha-header-row { flex-direction: column; align-items: stretch; gap: 8px; }
+        .ha-btn-primary { justify-content: center; width: 100%; }
+        .ha-title { font-size: 16px; }
+        .ha-subtitle { margin-bottom: 12px; font-size: 12px; }
+        .ha-pagination { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .ha-table td, .ha-table th { padding: 10px 14px; }
+    }
 </style>
 
 <div class="ha-header-row">
@@ -56,14 +69,14 @@
         <p class="ha-subtitle">Last Update: Data belum pernah di update</p>
     </div>
     <button class="ha-btn-primary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         + Tambah Tipe Akses
     </button>
 </div>
 
 <div class="ha-table-card">
-    <table class="ha-table">
-        <thead>
+    <div class="ha-table-wrapper">
+        <table class="ha-table">
+            <thead>
             <tr>
                 <th>Tipe Akses</th>
                 <th>Fitur</th>
@@ -98,7 +111,8 @@
                 </tr>
             @endforeach
         </tbody>
-    </table>
+        </table>
+    </div>
     <div class="ha-pagination">
         <div class="ha-page-size">Jumlah baris per halaman: <select><option>5</option><option>10</option></select></div>
         <div class="ha-page-info">1–5 dari 7 data</div>

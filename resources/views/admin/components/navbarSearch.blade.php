@@ -4,8 +4,17 @@
 @props(['title' => ''])
 
 <header class="admin-navbar">
-    {{-- Left: Search Area --}}
-    <div class="navbar-left">
+    {{-- Left: Search Area & Mobile Toggle --}}
+    <div class="navbar-left w-full md:w-auto flex items-center gap-2">
+        {{-- Hamburger Menu (Mobile) --}}
+        <button class="navbar-hamburger-btn md:hidden" onclick="toggleSidebar()" title="Toggle Menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
         <div class="navbar-search-group">
             <div class="navbar-search-wrapper">
                 {{-- Search Icon --}}
@@ -112,6 +121,22 @@
     .navbar-left {
         display: flex;
         align-items: center;
+        gap: 12px;
+    }
+
+    .navbar-hamburger-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: #582C0C;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+
+    .navbar-hamburger-btn:hover {
+        background: rgba(197, 143, 89, 0.1);
     }
 
     .navbar-search-group {
@@ -365,6 +390,12 @@
 
         .navbar-left, .navbar-search-group, .navbar-search-input {
             width: 100%;
+        }
+
+        .navbar-hamburger-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .navbar-search-input {
