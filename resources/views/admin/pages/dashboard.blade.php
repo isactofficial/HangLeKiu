@@ -17,10 +17,8 @@
         <p class="dash-subtitle">hanglekiu dental specialist</p>
     </div>
 
-    {{-- Layout Utama (Kiri 65%, Kanan 35%) --}}
     <div class="dash-layout">
-        
-        {{-- KOLOM KIRI (Grafik & Keuangan) --}}
+
         <div class="dash-left-col">
             
             {{-- Card: Grafik Kunjungan --}}
