@@ -11,12 +11,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite([
+        'resources/css/app.css',
+        'resources/css/topbar.css',
+        'resources/css/sidebar-mobile.css',
+        'resources/css/pharmacy-mobile.css',
+        'resources/js/app.js'
+    ])
     
-    {{-- Mobile Responsive CSS --}}
-    <link rel="stylesheet" href="{{ asset('css/topbar.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/sidebar-mobile.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/pharmacy-mobile.css') }}">
     @stack('styles')
     
     <style>
