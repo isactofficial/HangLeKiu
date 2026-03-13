@@ -13,6 +13,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
+    {{-- Mobile Responsive CSS --}}
+    <link rel="stylesheet" href="{{ asset('css/topbar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sidebar-mobile.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pharmacy-mobile.css') }}">
+    @stack('styles')
+    
     <style>
         * { 
             margin: 0; 
@@ -99,6 +105,49 @@
         @yield('content')
         
     </main>
+
+    {{-- Admin Sidebar Overlay for Mobile --}}
+    <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+
+    <script>
+        // Toggle Admin Sidebar (Mobile)
+        function toggleAdminSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('adminSidebarOverlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+                
+                // Prevent body scroll when sidebar is open
+                if (sidebar.classList.contains('show')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+
+        // Close sidebar when clicking menu item (mobile only)
+        if (window.innerWidth <= 768) {
+            document.addEventListener('DOMContentLoaded', function() {
+                const sidebarItems = document.querySelectorAll('.sidebar-item');
+                
+                sidebarItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const sidebar = document.querySelector('.sidebar');
+                        const overlay = document.getElementById('adminSidebarOverlay');
+                        
+                        if (sidebar && overlay && sidebar.classList.contains('show')) {
+                            sidebar.classList.remove('show');
+                            overlay.classList.remove('show');
+                            document.body.style.overflow = '';
+                        }
+                    });
+                });
+            });
+        }
+    </script>
 
 </body>
 </html>

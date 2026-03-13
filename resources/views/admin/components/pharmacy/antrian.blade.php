@@ -1,3 +1,7 @@
+@push('styles')
+    @vite('resources/css/pharmacy/antrian.css')
+@endpush
+
 <style>
     .apt-card {
         background: #fff;
@@ -197,7 +201,8 @@
 
     .apt-page-controls {
         display: flex;
-        gap: 4px;
+        gap: 8px;
+        align-items: center;
     }
 
     .apt-page-btn {
@@ -220,6 +225,7 @@
         cursor: default;
         pointer-events: none;
     }
+
 </style>
 
 <div class="apt-card">
@@ -304,12 +310,12 @@
                 <option>25</option>
                 <option>50</option>
             </select></div>
-        <div class="apt-page-info">1–4 dari 4 data</div>
         <div class="apt-page-controls">
             <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2.5">
                     <path d="M15 18l-6-6 6-6" />
                 </svg></button>
+            <div class="apt-page-info">1–4 dari 4 data</div>
             <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2.5">
                     <path d="M9 18l6-6-6-6" />

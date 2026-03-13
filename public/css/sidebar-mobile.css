@@ -1,0 +1,50 @@
+/* ===================================
+   MOBILE RESPONSIVE - ADMIN SIDEBAR
+   =================================== */
+
+/* Sidebar Overlay */
+.admin-sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.admin-sidebar-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Tablet dan Mobile - 768px ke bawah */
+@media (max-width: 768px) {
+    /* Sidebar jadi drawer */
+    .sidebar {
+        left: -72px !important;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 100 !important;
+    }
+
+    /* Sidebar active (terbuka) */
+    .sidebar.show {
+        left: 0 !important;
+    }
+
+    /* Admin content tidak perlu margin left di mobile */
+    .admin-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* Mobile kecil - 480px ke bawah */
+@media (max-width: 480px) {
+    /* Sidebar tetap sama */
+    .sidebar {
+        width: 72px !important;
+    }
+}

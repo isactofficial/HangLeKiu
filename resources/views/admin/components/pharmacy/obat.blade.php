@@ -1,3 +1,7 @@
+@push('styles')
+    @vite('resources/css/pharmacy/obat.css')
+@endpush
+
 <style>
     .apt-card { background: #fff; border-radius: 8px; border: 1px solid #E5D6C5; box-shadow: 0 1px 3px rgba(88,44,12,.06); }
     .apt-card-header { padding: 18px 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px; border-bottom: 1px solid #E5D6C5; }
@@ -36,10 +40,11 @@
     .apt-page-size { display: flex; align-items: center; gap: 6px; color: #6B513E; }
     .apt-page-size select { border: none; outline: none; font-weight: 600; color: #582C0C; font-size: 13px; cursor: pointer; background: transparent; }
     .apt-page-info { color: #6B513E; }
-    .apt-page-controls { display: flex; gap: 4px; }
+    .apt-page-controls { display: flex; gap: 8px; align-items: center; }
     .apt-page-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 0; }
     .apt-page-btn:hover { color: #582C0C; background: #fdf8f4; }
     .apt-page-btn[disabled] { opacity: .4; cursor: default; pointer-events: none; }
+
 </style>
 
 <div class="apt-card">
@@ -168,9 +173,9 @@
 
     <div class="apt-pagination">
         <div class="apt-page-size">Jumlah baris per halaman: <select><option>10</option><option>25</option><option>50</option></select></div>
-        <div class="apt-page-info">1–5 dari 5 data</div>
         <div class="apt-page-controls">
             <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <div class="apt-page-info">1–5 dari 5 data</div>
             <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
     </div>

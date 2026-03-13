@@ -4,6 +4,13 @@
 @props(['title' => ''])
 
 <header class="admin-navbar">
+    {{-- Hamburger Button (Mobile Only) --}}
+    <button class="navbar-hamburger" onclick="toggleAdminSidebar()" aria-label="Toggle Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
     {{-- Right: Actions --}}
     <div class="navbar-right">
         {{-- HDS Logo --}}
@@ -29,6 +36,9 @@
 
         {{-- Divider --}}
         <div class="navbar-divider"></div>
+
+        {{-- Mobile Divider (before icons) --}}
+        <div class="navbar-divider-mobile"></div>
 
         {{-- Help --}}
         <button class="navbar-icon-btn" title="Bantuan" onclick="alert('Halaman bantuan akan segera hadir!')">
