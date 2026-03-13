@@ -1,68 +1,8 @@
+﻿@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/components/settings/hak_akses.css') }}">
+@endpush
+
 {{-- resources/views/admin/settings/hak_akses.blade.php --}}
-
-<style>
-    .ha-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 12px; }
-    .ha-title    { font-size: 18.75px; font-weight: 700; color: #582C0C; margin: 0; }
-    .ha-subtitle { font-size: 13px; color: #6B513E; margin: 4px 0 20px; }
-
-    .ha-btn-primary {
-        background: #C58F59; color: #fff; border: none; padding: 9px 16px; border-radius: 6px;
-        font-size: 13px; font-weight: 600; cursor: pointer;
-        display: inline-flex; align-items: center; gap: 6px;
-        font-family: inherit; white-space: nowrap; transition: background .2s;
-    }
-    .ha-btn-primary:hover { background: #b07d4a; }
-
-    .ha-table-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(88,44,12,.05); }
-    .ha-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .ha-table th {
-        background: #fdf8f4; color: #582C0C; font-size: 13px; font-weight: 600;
-        padding: 12px 20px; border-bottom: 2px solid #E5D6C5; white-space: nowrap;
-    }
-    .ha-table td { padding: 16px 20px; font-size: 13px; color: #374151; border-bottom: 1px solid #F3EDE6; vertical-align: top; }
-    .ha-table tr:last-child td { border-bottom: none; }
-    .ha-table tr:hover td { background: rgba(253,248,244,.7); }
-    .ha-table .col-tipe { width: 140px; color: #582C0C; font-weight: 500; white-space: nowrap; }
-    .ha-table .col-fitur { color: #6B513E; line-height: 1.8; }
-    .ha-table .col-actions { width: 80px; white-space: nowrap; }
-
-    .ha-view-more { color: #C58F59; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 4px; }
-    .ha-view-more:hover { text-decoration: underline; }
-
-    .ha-action-row { display: flex; align-items: center; gap: 8px; }
-    .ha-icon-btn {
-        width: 30px; height: 30px; border-radius: 6px;
-        border: 1.5px solid #E5D6C5; background: #fff;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: #6B513E; transition: all .2s;
-    }
-    .ha-icon-btn:hover { border-color: #C58F59; color: #C58F59; }
-    .ha-icon-btn.del { border-color: #FEE2E2; color: #FCA5A5; }
-    .ha-icon-btn.del:hover { border-color: #EF4444; color: #EF4444; }
-
-    .ha-pagination { display: flex; justify-content: flex-end; align-items: center; padding: 12px 20px; gap: 20px; border-top: 1px solid #E5D6C5; }
-    .ha-page-size { display: flex; align-items: center; gap: 6px; color: #6B513E; }
-    .ha-page-size select { border: none; outline: none; font-weight: 600; color: #582C0C; font-size: 13px; cursor: pointer; background: transparent; font-family: inherit; }
-    .ha-page-info { color: #6B513E; }
-    .ha-page-controls { display: flex; gap: 4px; }
-    .ha-page-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 0; }
-    .ha-page-btn:not([disabled]):hover { color: #582C0C; background: #fdf8f4; }
-    .ha-page-btn[disabled] { opacity: .4; cursor: default; pointer-events: none; }
-
-    .ha-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .ha-table-wrapper::-webkit-scrollbar { height: 6px; }
-    .ha-table-wrapper::-webkit-scrollbar-thumb { background: #C58F59; border-radius: 3px; }
-
-    @media (max-width: 768px) {
-        .ha-header-row { flex-direction: column; align-items: stretch; gap: 8px; }
-        .ha-btn-primary { justify-content: center; width: 100%; }
-        .ha-title { font-size: 16px; }
-        .ha-subtitle { margin-bottom: 12px; font-size: 12px; }
-        .ha-pagination { flex-direction: column; align-items: flex-start; gap: 12px; }
-        .ha-table td, .ha-table th { padding: 10px 14px; }
-    }
-</style>
-
 <div class="ha-header-row">
     <div>
         <h2 class="ha-title">Hak Akses</h2>

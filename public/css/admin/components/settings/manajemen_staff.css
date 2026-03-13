@@ -1,0 +1,109 @@
+﻿/* ==========================================================
+   Extracted from: resources\views\admin\components\settings\manajemen_staff.blade.php
+   ========================================================== */
+
+.ms-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 12px; }
+    .ms-title    { font-size: 18.75px; font-weight: 700; color: #582C0C; margin: 0; }
+    .ms-subtitle { font-size: 13px; color: #6B513E; margin: 4px 0 18px; }
+    .ms-actions-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .ms-btn-group { display: flex; border: 1.5px solid #E5D6C5; border-radius: 6px; overflow: hidden; }
+    .ms-btn-group-item {
+        padding: 8px 14px; font-size: 13px; font-weight: 600;
+        color: #582C0C; background: #fff; border: none;
+        cursor: pointer; font-family: inherit; white-space: nowrap;
+        transition: background .15s;
+    }
+    .ms-btn-group-item:not(:last-child) { border-right: 1.5px solid #E5D6C5; }
+    .ms-btn-group-item:hover  { background: #fdf8f4; }
+    .ms-btn-group-item.active { background: #E5D6C5; color: #582C0C; font-weight: 700; }
+
+    .ms-btn-primary {
+        background: #C58F59; color: #fff;
+        border: none; padding: 8px 16px; border-radius: 6px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: inherit; white-space: nowrap; transition: background .2s;
+    }
+    .ms-btn-primary:hover { background: #b07d4a; }
+
+    .ms-search-box {
+        display: flex; align-items: center;
+        border: 1.5px solid #E5D6C5; border-radius: 6px;
+        padding: 8px 14px; gap: 8px; background: #fff; transition: border-color .2s;
+    }
+    .ms-search-box:focus-within { border-color: #C58F59; }
+    .ms-search-box input { border: none; outline: none; font-size: 13px; color: #582C0C; background: transparent; width: 200px; font-family: inherit; }
+    .ms-search-box input::placeholder { color: #b09a88; }
+
+    .ms-btn-filter {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 14px; border: 1.5px solid #E5D6C5; border-radius: 6px;
+        background: #fff; color: #582C0C; font-size: 13px; font-weight: 600;
+        cursor: pointer; font-family: inherit; transition: all .2s;
+    }
+    .ms-btn-filter:hover { border-color: #C58F59; color: #C58F59; }
+
+    /* Table */
+    .ms-table-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(88,44,12,.05); margin-top: 16px; }
+    .ms-table-wrapper { width: 100%; overflow-x: auto; }
+    .ms-table-wrapper::-webkit-scrollbar { height: 6px; }
+    .ms-table-wrapper::-webkit-scrollbar-thumb { background: #C58F59; border-radius: 3px; }
+    .ms-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .ms-table th {
+        background: #fdf8f4; color: #582C0C;
+        font-size: 13px; font-weight: 600;
+        padding: 12px 18px; border-bottom: 2px solid #E5D6C5; white-space: nowrap;
+    }
+    .ms-table th .sort { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; user-select: none; }
+    .ms-table th .sort svg { opacity: .5; }
+    .ms-table td { padding: 13px 18px; font-size: 13px; color: #374151; border-bottom: 1px solid #F3EDE6; white-space: nowrap; }
+    .ms-table tr:last-child td { border-bottom: none; }
+    .ms-table tr:hover td { background: rgba(253,248,244,.7); }
+
+    .ms-badge-aktif {
+        display: inline-block; padding: 4px 14px; border-radius: 20px;
+        background: #D1FAE5; color: #065F46; font-size: 13px; font-weight: 600;
+    }
+    .ms-badge-nonaktif {
+        display: inline-block; padding: 4px 14px; border-radius: 20px;
+        background: #FEE2E2; color: #991B1B; font-size: 13px; font-weight: 600;
+    }
+
+    .ms-action-row { display: flex; align-items: center; gap: 8px; }
+    .ms-icon-btn {
+        width: 30px; height: 30px; border-radius: 6px;
+        border: 1.5px solid #E5D6C5; background: #fff;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: #6B513E; transition: all .2s;
+    }
+    .ms-icon-btn:hover { border-color: #C58F59; color: #C58F59; }
+    .ms-kebab-btn {
+        width: 30px; height: 30px; border-radius: 6px;
+        border: none; background: transparent;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: #9CA3AF; transition: color .2s;
+    }
+    .ms-kebab-btn:hover { color: #582C0C; }
+
+    /* Pagination */
+    .ms-pagination { display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px; gap: 20px; border-top: 1px solid #E5D6C5; }
+    .ms-page-size { display: flex; align-items: center; gap: 6px; color: #6B513E; }
+    .ms-page-size select { border: none; outline: none; font-weight: 600; color: #582C0C; font-size: 13px; cursor: pointer; background: transparent; font-family: inherit; }
+    .ms-page-info { color: #6B513E; }
+    .ms-page-controls { display: flex; gap: 4px; }
+    .ms-page-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 0; }
+    .ms-page-btn:not([disabled]):hover { color: #582C0C; background: #fdf8f4; }
+    .ms-page-btn[disabled] { opacity: .4; cursor: default; pointer-events: none; }
+
+    @media (max-width: 768px) {
+        .ms-header-row { flex-direction: column; align-items: stretch; gap: 12px; }
+        .ms-actions-row { flex-direction: column; align-items: stretch; width: 100%; }
+        .ms-btn-group { width: 100%; display: flex; }
+        .ms-btn-group-item { flex: 1; text-align: center; }
+        .ms-btn-primary, .ms-search-box, .ms-btn-filter { width: 100%; justify-content: center; box-sizing: border-box; }
+        .ms-search-box input { width: 100%; }
+        .ms-pagination { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .ms-table td, .ms-table th { padding: 10px 14px; }
+    }
+

@@ -5,6 +5,10 @@
     @include('admin.components.navbar', ['title' => 'Settings'])
 @endsection
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/layout/settings.css') }}">
+@endpush
+
 @section('content')
 
     @php
@@ -16,163 +20,6 @@
         ];
         $active = request('menu', 'general-settings');
     @endphp
-
-    <style>
-        .stg-wrap,
-        .stg-wrap * {
-            font-size: 13px;
-            box-sizing: border-box;
-        }
-
-        .stg-wrap {
-            padding: 0;
-        }
-
-        .stg-header {
-            padding: 0 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .stg-page-title {
-            font-size: 30px;
-            font-weight: 700;
-            color: #582C0C;
-            line-height: 1.2;
-        }
-
-        .stg-page-subtitle {
-            font-size: 18.75px;
-            color: #C58F59;
-        }
-
-        .stg-refresh-btn {
-            width: 34px;
-            height: 34px;
-            border: 1.5px solid #E5D6C5;
-            border-radius: 6px;
-            background: #fff;
-            color: #C58F59;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all .2s;
-        }
-
-        .stg-refresh-btn:hover {
-            border-color: #C58F59;
-            background: rgba(197, 143, 89, .05);
-        }
-
-        .stg-body {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-        }
-
-        /* Sidebar */
-        .stg-sidebar {
-            width: 200px;
-            flex-shrink: 0;
-            background: #fff;
-            border: 1px solid #E5D6C5;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .stg-menu-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            font-size: 13px;
-            color: #6B513E;
-            text-decoration: none;
-            border-bottom: 1px solid #E5D6C5;
-            transition: background .15s;
-        }
-
-        .stg-menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .stg-menu-item:hover {
-            background: rgba(197, 143, 89, .05);
-            color: #582C0C;
-        }
-
-        .stg-menu-item.active {
-            background: #C58F59;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .stg-menu-badge {
-            background: #EF4444;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .stg-menu-item.active .stg-menu-badge {
-            background: #fff;
-            color: #EF4444;
-        }
-
-        /* Main */
-        .stg-main {
-            flex: 1;
-            min-width: 0;
-            width: 100%;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .stg-body {
-                flex-direction: column;
-            }
-            .stg-sidebar {
-                width: 100%;
-                margin-bottom: 20px;
-                display: flex;
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                border-radius: 8px;
-                -webkit-overflow-scrolling: touch;
-            }
-            .stg-sidebar::-webkit-scrollbar {
-                height: 0px;
-                display: none;
-            }
-            .stg-menu-item {
-                flex: 0 0 auto;
-                white-space: nowrap;
-                border-bottom: none;
-                border-right: 1px solid #E5D6C5;
-            }
-            .stg-menu-item:last-child {
-                border-right: none;
-            }
-            .stg-main {
-                width: 100%;
-            }
-            .stg-page-title {
-                font-size: 24px;
-            }
-            .stg-page-subtitle {
-                font-size: 16px;
-            }
-        }
-    </style>
 
     <div class="stg-wrap">
 
@@ -212,7 +59,7 @@
                 @if (view()->exists($settingsView))
                     @include($settingsView)
                 @else
-                    <div style="background:#fff;border:1px solid #E5D6C5;border-radius:8px;padding:16px;color:#6B513E;">
+                    <div class="stg-error-box">
                         Menu settings <strong>{{ $active }}</strong> belum tersedia.
                     </div>
                 @endif

@@ -1,0 +1,372 @@
+﻿/* ==========================================================
+   Extracted from: resources\views\admin\pages\outpatient.blade.php
+   ========================================================== */
+
+:root {
+            --brown: #582C0C;
+            --gold: #C58F59;
+            --cream: #fdf8f4;
+            --border: #E5D6C5;
+        }
+
+        .rj-outer {
+            padding: 0 0px 20px 0px;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 13px;
+        }
+
+        .rj-outer * {
+            font-size: 13px;
+        }
+
+        .rj-title,
+        .th-datenum,
+        .modal-head h3 {
+            font-size: 18.75px;
+            font-weight: 700;
+        }
+
+        .rj-wrap {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .rj-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            align-self: flex-start;
+            overflow: hidden;
+        }
+
+        .rj-sidebar-title {
+            padding: 16px 18px 10px;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .rj-doctor-list {
+            list-style: none;
+            padding: 0 8px 12px;
+            margin: 0;
+        }
+
+        .rj-doc-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--brown);
+            transition: background .15s;
+            cursor: pointer;
+        }
+
+        .rj-doc-item:hover { background: rgba(197, 143, 89, .08); }
+        .rj-doc-item.active { background: rgba(88, 44, 12, .08); }
+
+        .rj-doc-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--gold);
+            color: white;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .rj-doc-avatar.all { background: var(--brown); }
+
+        .rj-doc-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .rj-doc-name {
+            font-weight: 600;
+            color: var(--brown);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rj-doc-spec { color: var(--gold); }
+
+        .rj-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .rj-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rj-header-left { flex: 1; min-width: 160px; }
+        .rj-title { color: var(--brown); margin: 0; font-size: 30px; font-weight: 700; }
+        .rj-subtitle { color: var(--gold); margin: 4px 0 0 0; font-size: 18.75px; }
+
+        .rj-legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .rj-leg {
+            color: #6B513E;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .rj-nav { display: flex; align-items: center; gap: 8px; }
+        .rj-nav-btn {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            border: 2px solid var(--brown);
+            background: var(--brown);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; cursor: pointer; transition: all .2s;
+        }
+        .rj-nav-btn:hover { background: #401f08; border-color: #401f08; }
+        .rj-nav-btn.disabled { background: transparent; color: var(--brown); cursor: not-allowed; opacity: .5; pointer-events: none; }
+        
+        .rj-nav-date { display: flex; flex-direction: column; align-items: center; line-height: 1.2; min-width: 130px; }
+        .rj-nav-day { font-weight: 700; color: var(--gold); }
+        .rj-nav-full { font-weight: 700; color: var(--brown); }
+
+        .rj-today-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer; text-decoration: none; transition: all .2s;
+            background: var(--brown); color: white; border: 2px solid var(--brown);
+        }
+        .rj-today-btn:hover { background: #401f08; }
+        .rj-today-btn.disabled { background: transparent; color: var(--brown); cursor: not-allowed; opacity: .6; pointer-events: none; border-color: var(--brown); }
+
+        .rj-table-wrap {
+            height: 500px;
+            overflow: auto;
+        }
+        .rj-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
+        .rj-table-wrap::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+
+        .rj-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .th-time, .td-time {
+            width: 72px;
+            position: sticky; left: 0;
+            background: white; z-index: 2;
+            border-right: 1px solid var(--border);
+            text-align: center;
+            color: var(--brown);
+            font-weight: 600;
+        }
+
+        .rj-table th {
+            background: var(--brown);
+            color: white;
+            font-weight: 600;
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, .1);
+            position: sticky; top: 0; z-index: 1;
+        }
+
+        .rj-table th.th-time { z-index: 3; }
+        .rj-table th.th-today { background: #401f08; }
+
+        .th-date-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .th-weekday, .th-month { opacity: .7; }
+        .th-datenum { line-height: 1; }
+        .th-datenum.today-badge {
+            background: var(--gold); color: white;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .rj-table td {
+            border: 1px solid var(--border);
+            height: 60px;
+            padding: 6px;
+            vertical-align: top;
+        }
+        .rj-table td.col-today { background: rgba(88, 44, 12, .02); }
+        .td-time { height: 60px; vertical-align: middle !important; }
+
+        .apt-card {
+            border-radius: 5px;
+            padding: 6px;
+            cursor: pointer;
+            border-left: 4px solid var(--gold);
+            background: var(--cream);
+            transition: background .15s;
+            height: 100%;
+        }
+        .apt-card:hover { background: #f0e8df; }
+
+        .apt-name {
+            font-weight: 700; color: var(--brown);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .apt-treat {
+            color: #9a7a60;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .apt-badge {
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0, 0, 0, .4); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: white; border-radius: 16px; width: 340px; overflow: hidden; box-shadow: 0 8px 40px rgba(88, 44, 12, .2); }
+        .modal-head { background: var(--brown); color: white; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-head button { background: none; border: none; color: white; cursor: pointer; opacity: .8; }
+        .modal-body { padding: 16px; }
+        .modal-body p { color: #6B513E; margin: 0 0 12px; }
+        .modal-btns { display: flex; flex-direction: column; gap: 7px; }
+        .modal-btns button {
+            width: 100%; padding: 9px; border: none; border-radius: 8px;
+            color: white; font-weight: 600; cursor: pointer;
+            text-align: left; transition: opacity .2s;
+        }
+        .modal-btns button:hover { opacity: .85; }
+
+        .rj-mobile-doc-nav { display: none; padding: 0 16px 16px; }
+        .rj-doc-select {
+            width: 100%; padding: 10px 14px; border-radius: 8px;
+            border: 1.5px solid var(--border); font-family: inherit;
+            font-size: 14px; font-weight: 600; color: var(--brown); background: white;
+            outline: none; transition: border-color .2s;
+        }
+        .rj-doc-select:focus { border-color: var(--gold); }
+
+        .rj-mobile-schedule { display: none; padding: 16px; background: rgba(197, 143, 89, 0.05); }
+        .mobile-time-group { margin-bottom: 24px; }
+        .m-time-label { 
+            font-weight: 700; color: var(--brown); margin-bottom: 12px; 
+            padding: 6px 14px; background: var(--border); border-radius: 8px; 
+            display: inline-block; font-size: 14px; 
+        }
+        .m-cards { display: flex; flex-direction: column; gap: 12px; margin-left: 10px; border-left: 2px dashed var(--border); padding-left: 16px; }
+        .m-card { background: white; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(88, 44, 12, 0.04); padding: 12px; height: auto; }
+        .m-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .m-card .apt-name { font-size: 15px; white-space: normal; overflow: visible; text-overflow: clip; }
+        .m-doc-name { font-size: 12px; color: var(--gold); font-weight: 600; display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+        .m-empty-slot { color: #A89F91; font-size: 13px; font-style: italic; padding: 8px 0; }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .rj-wrap {
+                flex-direction: column;
+            }
+
+            .rj-sidebar {
+                width: 100%;
+            }
+
+            .rj-doctor-list {
+                display: none;
+            }
+
+            .rj-mobile-doc-nav {
+                display: block;
+            }
+            
+            .desktop-table {
+                display: none;
+            }
+
+            .rj-mobile-schedule {
+                display: block;
+            }
+
+            .rj-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .rj-header-left {
+                text-align: center;
+            }
+
+            .rj-legend {
+                justify-content: center;
+                padding: 12px 0;
+                border-top: 1px dashed var(--border);
+                border-bottom: 1px dashed var(--border);
+            }
+
+            .rj-nav {
+                justify-content: center;
+            }
+
+            .rj-table {
+                min-width: 800px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .rj-title {
+                font-size: 24px;
+            }
+            .rj-subtitle {
+                font-size: 16px;
+            }
+            .rj-nav {
+                flex-wrap: wrap;
+            }
+            .rj-today-btn {
+                width: 100%;
+                text-align: center;
+                margin-top: 8px;
+            }
+            .modal-box {
+                width: 90%;
+            }
+        }
+

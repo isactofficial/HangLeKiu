@@ -1,0 +1,63 @@
+﻿/* ==========================================================
+   Extracted from: resources\views\admin\components\office\dashboard_harian.blade.php
+   ========================================================== */
+
+.dsh-section-title { font-size: 18.75px; font-weight: 700; color: #582C0C; margin: 0; }
+    .dsh-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .dsh-btn-export { background: #582C0C; color: #fff; border: none; padding: 9px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: inherit; transition: background .2s; white-space: nowrap; }
+    .dsh-btn-export:hover { background: #401f08; }
+
+    .dsh-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    .dsh-stat-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(88,44,12,.05); }
+    .dsh-stat-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .dsh-stat-label { font-size: 13px; color: #6B513E; margin: 0; }
+    .dsh-stat-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .dsh-stat-icon.blue   { background: #EFF6FF; color: #3B82F6; }
+    .dsh-stat-icon.green  { background: #ECFDF5; color: #10B981; }
+    .dsh-stat-icon.orange { background: #FFF7ED; color: #F97316; }
+    .dsh-stat-icon.purple { background: #F5F3FF; color: #8B5CF6; }
+    .dsh-stat-number { font-size: 30px; font-weight: 700; line-height: 1; margin: 6px 0 4px; }
+    .dsh-stat-number.green  { color: #10B981; }
+    .dsh-stat-number.orange { color: #F97316; }
+    .dsh-stat-number.purple { color: #8B5CF6; }
+    .dsh-stat-number.default { color: #582C0C; }
+    .dsh-stat-change { font-size: 13px; color: #6B513E; display: flex; align-items: center; gap: 4px; }
+
+    .dsh-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; box-shadow: 0 1px 3px rgba(88,44,12,.05); overflow: hidden; }
+    .dsh-tabs { display: flex; gap: 8px; padding: 16px 20px; border-bottom: 1px solid #E5D6C5; flex-wrap: wrap; }
+    .dsh-tab { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all .15s; text-decoration: none; }
+    .dsh-tab.active   { background: #C58F59; color: #fff; }
+    .dsh-tab.inactive { background: #F3EDE6; color: #6B513E; }
+    .dsh-tab.inactive:hover { background: #E5D6C5; color: #582C0C; }
+
+    .dsh-detail-body { display: flex; }
+    .dsh-filter-col { width: 180px; flex-shrink: 0; border-right: 1px solid #E5D6C5; padding: 16px 0; }
+    .dsh-filter-item { padding: 10px 18px; font-size: 13px; color: #6B513E; cursor: pointer; border-bottom: 1px solid #F3EDE6; transition: background .15s; }
+    .dsh-filter-item:last-child { border-bottom: none; }
+    .dsh-filter-item:hover { background: rgba(197,143,89,.05); }
+    .dsh-filter-item.active { background: #fdf8f4; color: #582C0C; font-weight: 600; border-left: 3px solid #C58F59; }
+    .dsh-chart-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; min-height: 220px; }
+    .dsh-empty-title { font-size: 13px; font-weight: 600; color: #6B513E; margin: 0 0 4px; }
+    .dsh-empty-sub   { font-size: 13px; color: #b09a88; margin: 0; }
+
+    .dsh-breakdown-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .dsh-breakdown-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(88,44,12,.05); }
+    .dsh-breakdown-heading { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #582C0C; margin: 0 0 14px; }
+    .dsh-breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F3EDE6; font-size: 13px; }
+    .dsh-breakdown-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .dsh-breakdown-row-label { display: flex; align-items: center; gap: 8px; color: #6B513E; }
+    .dsh-breakdown-row-label svg { color: #C58F59; flex-shrink: 0; }
+    .dsh-breakdown-row-amount { font-weight: 600; color: #582C0C; }
+
+    .dsh-labarugi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .dsh-labarugi-card { border-radius: 8px; padding: 22px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; }
+    .dsh-labarugi-card.masuk  { background: #ECFDF5; border: 1px solid #A7F3D0; }
+    .dsh-labarugi-card.keluar { background: #FEF2F2; border: 1px solid #FECACA; }
+    .dsh-labarugi-card.saldo  { background: #EFF6FF; border: 1px solid #BFDBFE; }
+    .dsh-labarugi-label  { font-size: 13px; color: #6B513E; margin: 0; }
+    .dsh-labarugi-amount { font-size: 30px; font-weight: 700; margin: 0; }
+    .dsh-labarugi-card.masuk  .dsh-labarugi-amount { color: #10B981; }
+    .dsh-labarugi-card.keluar .dsh-labarugi-amount { color: #EF4444; }
+    .dsh-labarugi-card.saldo  .dsh-labarugi-amount { color: #3B82F6; }
+    .dsh-labarugi-sub { font-size: 13px; color: #9CA3AF; margin: 0; }
+

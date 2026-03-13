@@ -1,28 +1,7 @@
-<style>
-    .apt-card { background: #fff; border-radius: 8px; border: 1px solid #E5D6C5; box-shadow: 0 1px 3px rgba(88,44,12,.06); }
-    .apt-card-header { padding: 18px 20px 16px; border-bottom: 1px solid #E5D6C5; }
-    .apt-card-title { font-size: 18.75px; font-weight: 700; color: #C58F59; margin: 0; }
-    .apt-label { font-size: 13px; color: #6B513E; display: block; margin-bottom: 4px; }
-    .apt-input { border: 1px solid #E5D6C5; border-radius: 5px; padding: 8px 10px; font-size: 13px; color: #582C0C; background: #fff; outline: none; width: 100%; font-family: inherit; }
-    .apt-input:focus { border-color: #C58F59; }
-    .apt-input-line { border: none; border-bottom: 1px solid #E5D6C5; padding: 4px 0; font-size: 13px; color: #582C0C; outline: none; background: transparent; font-family: inherit; }
-    .apt-input-line:focus { border-color: #C58F59; }
-    .apt-select { border: 1px solid #E5D6C5; border-radius: 5px; padding: 8px 28px 8px 10px; font-size: 13px; color: #582C0C; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C58F59' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center; outline: none; appearance: none; width: 100%; font-family: inherit; }
-    .apt-select:focus { border-color: #C58F59; }
-    .apt-search-box { display: flex; align-items: center; border: 1px solid #E5D6C5; border-radius: 5px; padding: 7px 10px; gap: 7px; background: #fff; width: 100%; }
-    .apt-search-box:focus-within { border-color: #C58F59; }
-    .apt-search-box input { border: none; outline: none; font-size: 13px; color: #582C0C; background: transparent; flex: 1; }
-    .apt-search-box input::placeholder { color: #b09a88; }
-    .apt-checkbox { width: 15px; height: 15px; accent-color: #C58F59; cursor: pointer; }
-    .apt-btn-print { background: #EF4444; color: #fff; border: none; padding: 9px 28px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-    .apt-btn-print:hover { background: #dc2626; }
-    .apt-btn-add { background: none; border: none; color: #C58F59; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; }
-    .apt-btn-add:hover { color: #b07d4a; }
-    .obat-remove { background: #EF4444; border: none; color: #fff; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .obat-remove:hover { background: #dc2626; }
-    .obat-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-    .divider { border: none; border-top: 1px solid #E5D6C5; margin: 4px 0; }
-</style>
+﻿@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/components/pharmacy/resep.css') }}">
+@endpush
+
 
 <div class="apt-card">
 

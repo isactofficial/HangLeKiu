@@ -1,87 +1,9 @@
+﻿@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/components/office/pasien.css') }}">
+@endpush
+
 {{-- resources/views/admin/office/pasien.blade.php --}}
 @php $tab = request('tab', 'summary'); @endphp
-
-<style>
-    .pas-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
-    .pas-tab {
-        padding: 8px 22px; border-radius: 6px;
-        font-size: 13px; font-weight: 600;
-        border: none; cursor: pointer; font-family: inherit;
-        text-decoration: none; display: inline-block; transition: all .15s;
-    }
-    .pas-tab.active   { background: #C58F59; color: #fff; }
-    .pas-tab.inactive { background: #F3EDE6; color: #6B513E; }
-    .pas-tab.inactive:hover { background: #E5D6C5; color: #582C0C; }
-
-    /* stat cards */
-    .pas-stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
-    .pas-stat {
-        background: #fff; border: 1px solid #E5D6C5; border-radius: 8px;
-        padding: 20px; text-align: center;
-        box-shadow: 0 1px 3px rgba(88,44,12,.05);
-    }
-    .pas-stat-label  { font-size: 13px; font-weight: 700; color: #582C0C; margin: 0 0 10px; }
-    .pas-stat-number { font-size: 30px; font-weight: 700; color: #C58F59; margin: 0; line-height: 1; }
-
-    /* upcoming birthdays */
-    .pas-bday-section { margin-bottom: 20px; }
-    .pas-bday-label { font-size: 13px; color: #6B513E; margin: 0 0 8px; }
-    .pas-bday-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .pas-bday-card {
-        background: #fff; border: 1.5px solid #C58F59; border-radius: 6px;
-        padding: 10px 16px; font-size: 13px; color: #582C0C; font-weight: 500;
-        flex: 1; min-width: 180px;
-    }
-
-    /* charts grid */
-    .pas-chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .pas-chart-card {
-        background: #fff; border: 1px solid #E5D6C5; border-radius: 8px;
-        padding: 16px 18px; box-shadow: 0 1px 3px rgba(88,44,12,.05);
-    }
-    .pas-chart-title { font-size: 13px; font-weight: 700; color: #582C0C; text-align: center; margin: 0 0 14px; }
-    .pas-chart-area  { position: relative; height: 150px; }
-
-    /* simple bar chart drawn with CSS */
-    .pas-bar-wrap { display: flex; align-items: flex-end; gap: 16px; height: 130px; padding: 0 10px; }
-    .pas-bar-col  { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-    .pas-bar      { width: 100%; background: #f4a4a4; border-radius: 4px 4px 0 0; }
-    .pas-bar-label { font-size: 13px; color: #6B513E; text-align: center; }
-    .pas-y-axis   { display: flex; flex-direction: column-reverse; justify-content: space-between; height: 130px; padding: 0; }
-    .pas-y-tick   { font-size: 13px; color: #9CA3AF; }
-    .pas-chart-inner { display: flex; gap: 6px; }
-    .pas-chart-border { border: 1px solid #E5D6C5; border-radius: 4px; padding: 6px 8px; }
-
-    /* data pasien table */
-    .pas-card { background:#fff; border:1px solid #E5D6C5; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(88,44,12,.05); }
-    .pas-card-header { padding:14px 18px; border-bottom:1px solid #E5D6C5; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    .pas-card-title { font-size:18.75px; font-weight:700; color:#C58F59; margin:0; }
-    .pas-search-box { display:flex; align-items:center; border:1px solid #E5D6C5; border-radius:5px; padding:7px 10px; gap:7px; background:#fff; }
-    .pas-search-box:focus-within { border-color:#C58F59; }
-    .pas-search-box input { border:none; outline:none; font-size:13px; color:#582C0C; background:transparent; width:220px; font-family:inherit; }
-    .pas-search-box input::placeholder { color:#b09a88; }
-    .pas-btn-export { background:#582C0C; color:#fff; border:none; padding:8px 14px; border-radius:5px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; white-space:nowrap; }
-    .pas-table-wrapper { width:100%; overflow-x:auto; }
-    .pas-table-wrapper::-webkit-scrollbar { height:6px; }
-    .pas-table-wrapper::-webkit-scrollbar-thumb { background:#C58F59; border-radius:3px; }
-    .pas-table { width:100%; border-collapse:collapse; text-align:left; }
-    .pas-table th { background:#fdf8f4; color:#582C0C; font-size:13px; font-weight:600; padding:11px 16px; border-bottom:2px solid #E5D6C5; white-space:nowrap; }
-    .pas-table td { padding:11px 16px; font-size:13px; color:#374151; border-bottom:1px solid #F3EDE6; white-space:nowrap; }
-    .pas-table tr:last-child td { border-bottom:none; }
-    .pas-table tr:hover td { background:rgba(253,248,244,.7); }
-    .pas-badge { display:inline-block; padding:3px 9px; border-radius:20px; font-size:13px; font-weight:600; }
-    .pas-badge-ok { background:#D1FAE5; color:#065F46; }
-    .pas-badge-warning { background:#FEF3C7; color:#92400E; }
-    .pas-pagination { display:flex; justify-content:flex-end; align-items:center; padding:12px 18px; gap:20px; border-top:1px solid #E5D6C5; }
-    .pas-page-size { display:flex; align-items:center; gap:6px; color:#6B513E; }
-    .pas-page-size select { border:none; outline:none; font-weight:600; color:#582C0C; font-size:13px; cursor:pointer; background:transparent; font-family:inherit; }
-    .pas-page-info { color:#6B513E; }
-    .pas-page-controls { display:flex; gap:4px; }
-    .pas-page-btn { background:none; border:none; color:#9CA3AF; cursor:pointer; padding:4px 6px; border-radius:4px; line-height:0; }
-    .pas-page-btn:not([disabled]):hover { color:#582C0C; background:#fdf8f4; }
-    .pas-page-btn[disabled] { opacity:.4; cursor:default; pointer-events:none; }
-</style>
-
 <div class="pas-tabs">
     <a href="?menu=pasien&tab=summary"     class="pas-tab {{ $tab==='summary'     ? 'active' : 'inactive' }}">Summary</a>
     <a href="?menu=pasien&tab=data-pasien" class="pas-tab {{ $tab==='data-pasien' ? 'active' : 'inactive' }}">Data Pasien</a>
