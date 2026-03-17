@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('user')->after('password');
+        Schema::create('master_guarantor_type', function (Blueprint $table) {
+            $table->string('id', 50)->primary();
+            $table->string('name', 50);
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        Schema::dropIfExists('master_guarantor_type');
     }
 };
