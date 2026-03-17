@@ -35,7 +35,6 @@
             min-height: 100vh;
         }
 
-
         .admin-content {
             margin-left: 72px; 
             min-height: 100vh;
@@ -84,6 +83,14 @@
             box-shadow: 0 1px 3px rgba(88, 44, 12, 0.06);
         }
 
+        /* ── TAMBAHAN MOBILE ── */
+        @media (max-width: 768px) {
+            .admin-content {        
+                margin-left: 0 !important;        
+                padding: 16px;        
+                overflow-x: hidden;    
+            }
+        }
     </style>
 </head>
 <body>

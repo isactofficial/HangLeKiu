@@ -4,11 +4,18 @@
 @props(['title' => ''])
 
 <header class="admin-navbar">
+<<<<<<< HEAD
     {{-- Hamburger Button (Mobile Only) --}}
     <button class="navbar-hamburger" onclick="toggleAdminSidebar()" aria-label="Toggle Menu">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
+=======
+
+    {{-- Hamburger — inline, hanya mobile --}}
+    <button id="sidebarToggle" class="sidebar-hamburger" type="button" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+>>>>>>> origin/database_schema
     </button>
 
     {{-- Right: Actions --}}
@@ -26,7 +33,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
                 </svg>
             </button>
-            {{-- Dropdown menu --}}
             <div class="navbar-dropdown-menu" id="clinicMenu">
                 <a href="#" class="dropdown-item active">Hanglekiu Dental Clinic</a>
                 <a href="#" class="dropdown-item">Cabang Kemang</a>
@@ -96,13 +102,7 @@
         background: white;
         box-shadow: 0 1px 4px rgba(88, 44, 12, 0.06);
         border-bottom: 1px solid #E5D6C5;
-    }
-
-    .navbar-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #582C0C;
-        margin: 0;
+        gap: 8px;
     }
 
     .navbar-right {
@@ -110,6 +110,33 @@
         align-items: center;
         gap: 8px;
         position: relative;
+    }
+
+    /* Hamburger — inline, hidden desktop */
+    .sidebar-hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        background: white;
+        border: 1px solid #E5D6C5;
+        border-radius: 8px;
+        padding: 7px;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 1px 4px rgba(88,44,12,0.10);
+        transition: opacity 0.2s;
+        margin-right: auto; /* dorong ke kiri */
+    }
+    .sidebar-hamburger span {
+        display: block;
+        width: 18px;
+        height: 2px;
+        background: #582C0C;
+        border-radius: 2px;
     }
 
     /* HDS Logo */
@@ -123,7 +150,6 @@
         justify-content: center;
         flex-shrink: 0;
     }
-
     .navbar-hds-logo img {
         width: 20px;
         height: auto;
@@ -131,9 +157,7 @@
     }
 
     /* Dropdown button */
-    .navbar-dropdown {
-        position: relative;
-    }
+    .navbar-dropdown { position: relative; }
 
     .navbar-dropdown-btn {
         display: flex;
@@ -151,14 +175,8 @@
         transition: all 0.2s;
         white-space: nowrap;
     }
-
-    .navbar-dropdown-btn:hover {
-        box-shadow: 0 4px 12px rgba(197, 143, 89, 0.3);
-    }
-
-    .navbar-dropdown-btn svg {
-        flex-shrink: 0;
-    }
+    .navbar-dropdown-btn:hover { box-shadow: 0 4px 12px rgba(197,143,89,0.3); }
+    .navbar-dropdown-btn svg { flex-shrink: 0; }
 
     /* Dropdown menu */
     .navbar-dropdown-menu {
@@ -167,19 +185,17 @@
         right: 0;
         background: white;
         border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(88, 44, 12, 0.15);
+        box-shadow: 0 8px 30px rgba(88,44,12,0.15);
         min-width: 220px;
         padding: 6px;
         z-index: 100;
         display: none;
         border: 1px solid #E5D6C5;
     }
-
     .navbar-dropdown-menu.show {
         display: block;
         animation: dropdownFade 0.15s ease;
     }
-
     @keyframes dropdownFade {
         from { opacity: 0; transform: translateY(-4px); }
         to   { opacity: 1; transform: translateY(0); }
@@ -200,57 +216,23 @@
         text-align: left;
         transition: background 0.15s;
     }
-
-    .dropdown-item:hover {
-        background: rgba(197, 143, 89, 0.1);
-    }
-
-    .dropdown-item.active {
-        background: rgba(197, 143, 89, 0.15);
-        color: #582C0C;
-        font-weight: 600;
-    }
+    .dropdown-item:hover { background: rgba(197,143,89,0.1); }
+    .dropdown-item.active { background: rgba(197,143,89,0.15); color: #582C0C; font-weight: 600; }
 
     .dropdown-header {
         padding: 12px 14px;
         border-bottom: 1px solid #E5D6C5;
         margin-bottom: 4px;
     }
+    .dropdown-header strong { display: block; font-size: 14px; color: #582C0C; }
+    .dropdown-header small  { display: block; font-size: 12px; color: #C58F59; margin-top: 2px; }
 
-    .dropdown-header strong {
-        display: block;
-        font-size: 14px;
-        color: #582C0C;
-    }
-
-    .dropdown-header small {
-        display: block;
-        font-size: 12px;
-        color: #C58F59;
-        margin-top: 2px;
-    }
-
-    .dropdown-divider {
-        height: 1px;
-        background: #E5D6C5;
-        margin: 4px 0;
-    }
-
-    .dropdown-logout {
-        color: #dc2626 !important;
-    }
-
-    .dropdown-logout:hover {
-        background: rgba(220, 38, 38, 0.08) !important;
-    }
+    .dropdown-divider { height: 1px; background: #E5D6C5; margin: 4px 0; }
+    .dropdown-logout { color: #dc2626 !important; }
+    .dropdown-logout:hover { background: rgba(220,38,38,0.08) !important; }
 
     /* Divider */
-    .navbar-divider {
-        width: 1px;
-        height: 24px;
-        background: #E5D6C5;
-        margin: 0 4px;
-    }
+    .navbar-divider { width: 1px; height: 24px; background: #E5D6C5; margin: 0 4px; }
 
     /* Icon buttons */
     .navbar-icon-btn {
@@ -266,74 +248,49 @@
         color: #6B513E;
         transition: all 0.2s;
     }
+    .navbar-icon-btn:hover { background: rgba(197,143,89,0.1); color: #582C0C; }
+    .navbar-icon-btn svg { width: 20px; height: 20px; }
 
-    .navbar-icon-btn:hover {
-        background: rgba(197, 143, 89, 0.1);
-        color: #582C0C;
-    }
+    .navbar-profile-menu { top: 48px; right: 0; }
 
-    .navbar-icon-btn svg {
-        width: 20px;
-        height: 20px;
-    }
-
-    /* Profile menu positioning */
-    .navbar-profile-menu {
-        top: 48px;
-        right: 0;
-    }
-
-    /* ===== RESPONSIVE: Mobile ===== */
+    /* ===== MOBILE ===== */
     @media (max-width: 768px) {
         .admin-navbar {
-            padding: 16px;
-            margin: -72px -16px 20px -16px;
-            padding-left: 64px;
+            padding: 12px 16px;
+            margin: -16px -16px 16px -16px;
+            width: calc(100% + 32px);
+            max-width: calc(100% + 32px);
+            justify-content: flex-start;
         }
 
+        /* Tampilkan hamburger */
+        .sidebar-hamburger { display: flex; }
+
         .navbar-right {
-            gap: 4px;
+            gap: 6px;
+            margin-left: auto;
         }
 
         .navbar-dropdown-btn {
-            padding: 6px 10px;
-            font-size: 11px;
+            padding: 7px 12px;
+            font-size: 12px;
             border-radius: 16px;
         }
-
         .navbar-dropdown-btn span {
-            max-width: 60px;
+            max-width: 80px;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .navbar-dropdown-btn svg { width: 13px; height: 13px; }
 
-        .navbar-dropdown-btn svg {
-            width: 12px;
-            height: 12px;
-        }
+        .navbar-divider { margin: 0 2px; }
 
-        .navbar-divider {
-            margin: 0 2px;
-        }
+        .navbar-icon-btn { width: 34px; height: 34px; }
+        .navbar-icon-btn svg { width: 20px; height: 20px; }
 
-        .navbar-icon-btn {
-            width: 32px;
-            height: 32px;
-        }
+        .navbar-hds-logo { width: 34px; height: 34px; }
 
-        .navbar-icon-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .navbar-hds-logo {
-            width: 32px;
-            height: 32px;
-        }
-
-        .navbar-dropdown-menu {
-            right: -16px;
-        }
+        .navbar-dropdown-menu { right: -8px; }
     }
 </style>
 
@@ -341,16 +298,10 @@
     function toggleDropdown(menuId) {
         const menu = document.getElementById(menuId);
         const allMenus = document.querySelectorAll('.navbar-dropdown-menu');
-
-        // Close all other menus
-        allMenus.forEach(m => {
-            if (m.id !== menuId) m.classList.remove('show');
-        });
-
+        allMenus.forEach(m => { if (m.id !== menuId) m.classList.remove('show'); });
         menu.classList.toggle('show');
     }
 
-    // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.navbar-dropdown') && !e.target.closest('.navbar-icon-btn')) {
             document.querySelectorAll('.navbar-dropdown-menu').forEach(m => m.classList.remove('show'));

@@ -79,7 +79,10 @@
     ];
 @endphp
 
-<aside class="sidebar">
+{{-- Backdrop --}}
+<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+<aside class="sidebar" id="appSidebar">
     {{-- Logo Container --}}
     <div class="sidebar-logo">
         <img src="/images/logo-hds.png" alt="HDS">
@@ -88,15 +91,12 @@
     {{-- Navigation --}}
     <nav class="sidebar-nav">
         @foreach ($menuItems as $item)
-            {{-- Mengecek apakah item ini adalah garis pemisah --}}
             @if (isset($item['is_divider']) && $item['is_divider'])
                 <div class="sidebar-divider"></div>
             @else
-                {{-- Jika bukan garis pemisah, render icon seperti biasa --}}
                 <a href="{{ route($item['route']) }}"
                     class="sidebar-item {{ request()->routeIs($item['route']) ? 'active' : '' }}">
                     @if (isset($item['is_image']) && $item['is_image'])
-                        {{-- Untuk icon yang merupakan file SVG --}}
                         <img src="{{ $item['icon'] }}" alt="icon" class="sidebar-icon-img">
                     @elseif ($item['filled'] ?? false)
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -115,6 +115,7 @@
 </aside>
 
 <style>
+    /* ── TIDAK ADA YANG BERUBAH DARI SINI ── */
     .sidebar {
         width: 72px;
         height: 100vh;
@@ -127,6 +128,7 @@
         align-items: center;
         z-index: 100;
         padding: 24px 0;
+        transition: transform 0.25s ease; /* tambahan kecil untuk animasi mobile */
     }
 
     .sidebar-logo {
@@ -159,14 +161,8 @@
         overflow-x: hidden;
     }
 
-    .sidebar-nav::-webkit-scrollbar {
-        display: none;
-    }
-
-    .sidebar-nav {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+    .sidebar-nav { -ms-overflow-style: none; scrollbar-width: none; }
 
     .sidebar-nav .sidebar-divider {
         display: block;
@@ -200,12 +196,10 @@
         cursor: pointer;
         transition: all 0.2s ease;
         flex-shrink: 0;
+        text-decoration: none;
     }
 
-    .sidebar-item svg {
-        width: 24px;
-        height: 24px;
-    }
+    .sidebar-item svg { width: 24px; height: 24px; }
 
     .sidebar-item .sidebar-icon-img {
         width: 24px;
@@ -236,9 +230,7 @@
         padding-top: 24px;
     }
 
-    .logout-btn {
-        color: var(--color-warning, #EF4444);
-    }
+    .logout-btn { color: var(--color-warning, #EF4444); }
 
     .sidebar .logout-btn:hover,
     .sidebar .logout-btn:active,
@@ -246,4 +238,102 @@
         background-color: var(--color-background-secondary, #E5D6C5) !important;
         color: var(--color-warning, #EF4444) !important;
     }
+
+    /* ── TAMBAHAN MOBILE ── */
+    .sidebar-hamburger {
+        display: none;
+        position: fixed;
+        left: 16px;
+        top: 18px;
+        z-index: 200;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        background: white;
+        border: 1px solid #E5D6C5;
+        border-radius: 8px;
+        padding: 7px;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 1px 4px rgba(88,44,12,0.10);
+    }
+
+    @media (max-width: 768px) {
+        .sidebar-hamburger {
+            position: static;
+            display: none; /* diatur ulang oleh navbar-left via flex */
+            z-index: auto;
+            top: auto;
+            left: auto;
+            box-shadow: none;
+            flex-shrink: 0;
+        }
+    }
+
+    .sidebar-hamburger span {
+        display: block;
+        width: 18px;
+        height: 2px;
+        background: #582C0C;
+        border-radius: 2px;
+    }
+
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 99;
+        opacity: 0;
+        transition: opacity 0.25s;
+        pointer-events: none;
+    }
+
+    .sidebar-backdrop.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar { 
+            transform: translateX(-100%) !important;
+            z-index: 150;
+
+        }
+        .sidebar.open { 
+            transform: translateX(0) !important;
+        
+        }
+
+        .sidebar-backdrop { display: block; }
+    }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const toggle   = document.getElementById('sidebarToggle');
+    const sidebar  = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (!toggle || !sidebar) return;
+
+    function open()  {
+        sidebar.classList.add('open');
+        if (backdrop) backdrop.classList.add('show');
+        toggle.style.opacity = '0';
+        toggle.style.pointerEvents = 'none';
+    }
+    function close() {
+        sidebar.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('show');
+        toggle.style.opacity = '1';
+        toggle.style.pointerEvents = 'auto';
+    }
+
+    toggle.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.querySelectorAll('.sidebar-item').forEach(el => el.addEventListener('click', close));
+});
+</script>
