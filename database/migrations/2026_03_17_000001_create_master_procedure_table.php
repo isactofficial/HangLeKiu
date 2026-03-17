@@ -8,11 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('treatments', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->unsignedInteger('duration_minutes')->default(30);
-            $table->decimal('price', 12, 2)->default(0);
+        Schema::create('master_procedure', function (Blueprint $table) {
+            $table->string('id', 50)->primary();
+            $table->string('procedure_name', 150)->nullable();
+            $table->decimal('base_price', 12, 2)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -20,6 +19,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('treatments');
+        Schema::dropIfExists('master_procedure');
     }
 };
