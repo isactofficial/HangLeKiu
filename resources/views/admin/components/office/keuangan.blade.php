@@ -1,4 +1,4 @@
-{{-- resources/views/admin/office/keuangan.blade.php --}}
+{{-- resources/views/admin/components/office/keuangan.blade.php --}}
 @php $tab = request('tab', 'ikhtisar'); @endphp
 
 <style>
@@ -104,7 +104,7 @@
     .keu-badge-ok      { background:#D1FAE5; color:#065F46; }
     .keu-badge-warning { background:#FEF3C7; color:#92400E; }
     .keu-badge-danger  { background:#FEE2E2; color:#991B1B; }
-    .keu-pagination { display:flex; justify-content:flex-end; align-items:center; padding:12px 18px; gap:20px; border-top:1px solid #E5D6C5; }
+    .keu-pagination { display:flex; justify-content:flex-end; align-items:center; padding:12px 18px; gap:20px; border-top:1px solid #E5D6C5; flex-wrap:wrap; }
     .keu-page-size { display:flex; align-items:center; gap:6px; color:#6B513E; }
     .keu-page-size select { border:none; outline:none; font-weight:600; color:#582C0C; font-size:13px; cursor:pointer; background:transparent; font-family:inherit; }
     .keu-page-info { color:#6B513E; }
@@ -112,13 +112,75 @@
     .keu-page-btn { background:none; border:none; color:#9CA3AF; cursor:pointer; padding:4px 6px; border-radius:4px; line-height:0; }
     .keu-page-btn:not([disabled]):hover { color:#582C0C; background:#fdf8f4; }
     .keu-page-btn[disabled] { opacity:.4; cursor:default; pointer-events:none; }
+
+    /* ══════════════════════════════
+       MOBILE ≤ 768px
+    ══════════════════════════════ */
+    @media (max-width: 768px) {
+
+        /* Tab bar: scroll horizontal */
+        .keu-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            gap: 6px;
+            margin-bottom: 14px;
+            padding-bottom: 2px;
+        }
+        .keu-tabs::-webkit-scrollbar { display: none; }
+        .keu-tab {
+            flex-shrink: 0;
+            white-space: nowrap;
+            padding: 7px 14px;
+            font-size: 11.72px;
+        }
+
+        /* Filter row: wrap ke baris baru */
+        .keu-filter-row {
+            margin-left: 0;
+            width: 100%;
+            gap: 6px;
+        }
+        .keu-date-input { width: 90px; font-size: 11.72px; }
+        .keu-btn-filter { padding: 6px 12px; font-size: 11.72px; }
+
+        /* Wrapper tab + filter: stack vertikal */
+        .keu-topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+        /* Stat grids: 2 kolom */
+        .keu-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .keu-grid-3 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .keu-grid-2 { grid-template-columns: 1fr; gap: 8px; }
+
+        .keu-stat { padding: 14px 14px; gap: 4px; }
+        .keu-stat-label { font-size: 11.72px; }
+        .keu-stat-amount { font-size: 13px; }
+        .keu-stat-sub { font-size: 11.72px; }
+        .keu-show-more { padding: 14px 14px; }
+        .keu-show-more-label { font-size: 11.72px; }
+
+        /* Card header: stack */
+        .keu-card-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .keu-card-title { font-size: 13px; }
+        .keu-search-box input { width: 140px; font-size: 11.72px; }
+
+        /* Pagination: center */
+        .keu-pagination { justify-content: center; gap: 10px; padding: 10px 12px; }
+        .keu-page-size { font-size: 11.72px; }
+        .keu-page-info { font-size: 11.72px; }
+
+        /* Section label */
+        .keu-section-label { font-size: 11.72px; }
+    }
 </style>
 
 {{-- Tab Bar + Date Filter --}}
-<div style="display:flex; align-items:center; gap:4px; margin-bottom:20px; flex-wrap:wrap;">
-    @foreach (['ikhtisar'=>'Ikhtisar','pemasukan'=>'Pemasukan','pengeluaran'=>'Pengeluaran','klaim'=>'Klaim'] as $key=>$label)
-        <a href="?menu=keuangan&tab={{ $key }}" class="keu-tab {{ $tab===$key ? 'active' : 'inactive' }}">{{ $label }}</a>
-    @endforeach
+<div style="display:flex; align-items:center; gap:4px; margin-bottom:20px; flex-wrap:wrap;" class="keu-topbar">
+    <div class="keu-tabs">
+        @foreach (['ikhtisar'=>'Ikhtisar','pemasukan'=>'Pemasukan','pengeluaran'=>'Pengeluaran','klaim'=>'Klaim'] as $key=>$label)
+            <a href="?menu=keuangan&tab={{ $key }}" class="keu-tab {{ $tab===$key ? 'active' : 'inactive' }}">{{ $label }}</a>
+        @endforeach
+    </div>
     <div class="keu-filter-row">
         <input type="text" class="keu-date-input" value="01/03/2026">
         <span class="keu-sep">-</span>
@@ -211,7 +273,7 @@
     <div class="keu-card">
         <div class="keu-card-header">
             <h2 class="keu-card-title">Pemasukan</h2>
-            <div style="display:flex;gap:10px;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <div class="keu-search-box">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input type="text" placeholder="Cari transaksi...">
@@ -289,7 +351,7 @@
     <div class="keu-card">
         <div class="keu-card-header">
             <h2 class="keu-card-title">Pengeluaran</h2>
-            <div style="display:flex;gap:10px;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <div class="keu-search-box">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input type="text" placeholder="Cari pengeluaran...">
@@ -350,7 +412,7 @@
     <div class="keu-card">
         <div class="keu-card-header">
             <h2 class="keu-card-title">Klaim</h2>
-            <div style="display:flex;gap:10px;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <div class="keu-search-box">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input type="text" placeholder="Cari klaim...">

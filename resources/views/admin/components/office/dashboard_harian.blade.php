@@ -1,5 +1,4 @@
-{{-- resources/views/admin/office/dashboard_harian.blade.php --}}
-{{-- Re-use the full dashboard content from the original office.blade.php --}}
+{{-- resources/views/admin/components/office/dashboard_harian.blade.php --}}
 
 @php $activeTab = request('tab', 'kunjungan'); @endphp
 
@@ -9,6 +8,7 @@
     .dsh-btn-export { background: #582C0C; color: #fff; border: none; padding: 9px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: inherit; transition: background .2s; white-space: nowrap; }
     .dsh-btn-export:hover { background: #401f08; }
 
+    /* ── Stat Grid ── */
     .dsh-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
     .dsh-stat-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(88,44,12,.05); }
     .dsh-stat-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -25,6 +25,7 @@
     .dsh-stat-number.default { color: #582C0C; }
     .dsh-stat-change { font-size: 13px; color: #6B513E; display: flex; align-items: center; gap: 4px; }
 
+    /* ── Card & Tabs ── */
     .dsh-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; box-shadow: 0 1px 3px rgba(88,44,12,.05); overflow: hidden; }
     .dsh-tabs { display: flex; gap: 8px; padding: 16px 20px; border-bottom: 1px solid #E5D6C5; flex-wrap: wrap; }
     .dsh-tab { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all .15s; text-decoration: none; }
@@ -32,6 +33,7 @@
     .dsh-tab.inactive { background: #F3EDE6; color: #6B513E; }
     .dsh-tab.inactive:hover { background: #E5D6C5; color: #582C0C; }
 
+    /* ── Detail body ── */
     .dsh-detail-body { display: flex; }
     .dsh-filter-col { width: 180px; flex-shrink: 0; border-right: 1px solid #E5D6C5; padding: 16px 0; }
     .dsh-filter-item { padding: 10px 18px; font-size: 13px; color: #6B513E; cursor: pointer; border-bottom: 1px solid #F3EDE6; transition: background .15s; }
@@ -42,6 +44,7 @@
     .dsh-empty-title { font-size: 13px; font-weight: 600; color: #6B513E; margin: 0 0 4px; }
     .dsh-empty-sub   { font-size: 13px; color: #b09a88; margin: 0; }
 
+    /* ── Breakdown ── */
     .dsh-breakdown-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
     .dsh-breakdown-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(88,44,12,.05); }
     .dsh-breakdown-heading { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #582C0C; margin: 0 0 14px; }
@@ -51,6 +54,7 @@
     .dsh-breakdown-row-label svg { color: #C58F59; flex-shrink: 0; }
     .dsh-breakdown-row-amount { font-weight: 600; color: #582C0C; }
 
+    /* ── Laba Rugi ── */
     .dsh-labarugi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
     .dsh-labarugi-card { border-radius: 8px; padding: 22px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; }
     .dsh-labarugi-card.masuk  { background: #ECFDF5; border: 1px solid #A7F3D0; }
@@ -62,6 +66,80 @@
     .dsh-labarugi-card.keluar .dsh-labarugi-amount { color: #EF4444; }
     .dsh-labarugi-card.saldo  .dsh-labarugi-amount { color: #3B82F6; }
     .dsh-labarugi-sub { font-size: 13px; color: #9CA3AF; margin: 0; }
+
+    /* ══════════════════════════════
+       MOBILE ≤ 768px
+    ══════════════════════════════ */
+    @media (max-width: 768px) {
+
+        /* Stat grid: 2 kolom */
+        .dsh-stat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+        /* Font ikut rumus ÷ 1.6 */
+        .dsh-section-title  { font-size: 13px; }  /* 18.75 ÷ 1.6 = 11.72 */
+        .dsh-stat-label     { font-size: 11.72px; }   /* 13 ÷ 1.6 = 8.13 */
+        .dsh-stat-number    { font-size: 18.75px; }  /* 30 ÷ 1.6 */
+        .dsh-stat-change    { font-size: 11.27px; } /* 8.13 */
+        .dsh-empty-title    { font-size: 11.27px; } /* 8.13 */
+        .dsh-empty-sub      { font-size: 11.27px; } /* 8.13 */
+        .dsh-breakdown-heading { font-size: 11.27px; } /* 8.13 */
+        .dsh-breakdown-row  { font-size: 11.27px; } /* 8.13 */
+        .dsh-labarugi-label { font-size: 11.27px; } /* 8.13 */
+        .dsh-labarugi-amount { font-size: 18.75px; } /* 30 ÷ 1.6 */
+        .dsh-labarugi-sub   { font-size: 11.27px; }/* 8.13 */
+        .dsh-tab            { font-size: 11.72px; } /* 8.13 */
+        .dsh-filter-item    { font-size: 10px; } /* 8.13 */
+
+        /* Section header: inline, export tetap di kanan */
+        .dsh-section-header { flex-direction: row; align-items: center; gap: 10px; flex-wrap: nowrap; }
+        .dsh-btn-export { width: auto; padding: 7px 12px; font-size: 11.27px; }
+
+        /* Tabs: scroll horizontal 1 baris */
+        .dsh-tabs { flex-wrap: nowrap; overflow-x: auto; padding: 10px 12px; gap: 6px; }
+        .dsh-tabs::-webkit-scrollbar { display: none; }
+        .dsh-tab { padding: 6px 12px; white-space: nowrap; flex-shrink: 0; }
+
+        /* Detail body: stack vertikal */
+        .dsh-detail-body { flex-direction: column; }
+
+        /* Filter: scroll horizontal 1 baris */
+        .dsh-filter-col {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #E5D6C5;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+    padding: 10px 12px;
+}
+.dsh-filter-col::-webkit-scrollbar { display: none; }
+.dsh-filter-item {
+    border-bottom: none;
+    border: 1px solid #E5D6C5;
+    border-radius: 20px;
+    padding: 5px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+}
+        .dsh-filter-item.active {
+            border-color: #C58F59;
+            border-left-width: 1px;
+            background: #FDF8F4;
+            color: #582C0C;
+            font-weight: 600;
+        }
+
+        /* Breakdown: 1 kolom */
+        .dsh-breakdown-grid { grid-template-columns: 1fr; gap: 10px; }
+
+        /* Laba rugi: 1 kolom, horizontal */
+        .dsh-labarugi-grid { grid-template-columns: 1fr; gap: 10px; }
+        .dsh-labarugi-card { padding: 14px 16px; flex-direction: row; justify-content: space-between; text-align: left; gap: 8px; align-items: center; }
+    }
 </style>
 
 {{-- ═══ RINGKASAN HARIAN ═══ --}}

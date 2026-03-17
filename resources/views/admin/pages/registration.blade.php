@@ -47,7 +47,6 @@
                         
                         <div class="reg-input-group" style="flex: 1.5;">
                             <label>Poli *</label>
-                            {{-- CUSTOM DROPDOWN 1: POLI --}}
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
                                     <span class="reg-select-text">Semua Poli</span>
@@ -66,7 +65,6 @@
                     <div class="reg-filter-row">
                         <div class="reg-input-group">
                             <label>Tenaga Medis *</label>
-                            {{-- CUSTOM DROPDOWN 2: TENAGA MEDIS --}}
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
                                     <span class="reg-select-text">Semua Tenaga Medis</span>
@@ -87,7 +85,6 @@
                         
                         <div class="reg-input-group">
                             <label>Metode Pembayaran *</label>
-                            {{-- CUSTOM DROPDOWN 3: METODE PEMBAYARAN --}}
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
                                     <span class="reg-select-text">Semua Metode Pembayaran</span>
@@ -132,30 +129,30 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="reg-status succeed">Succeed</span></td>
-                                <td>25/02/2026,<br>13:00</td>
-                                <td>25/02/2026,<br>19:32</td>
-                                <td>1</td>
-                                <td>Gigi</td>
-                                <td>Bpk Johndoe,<br>MR000096,<br>40 Tahun</td>
-                                <td>-</td>
-                                <td>drg. Hanglekiu</td>
-                                <td>Asuransi</td>
-                                <td>Pembersihan Karang Gigi</td>
-                                <td><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
+                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
+                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>13:00</td>
+                                <td data-label="Tanggal Dibuat">25/02/2026,<br>19:32</td>
+                                <td data-label="No">1</td>
+                                <td data-label="Poli">Gigi</td>
+                                <td data-label="Nama Pasien">Bpk Johndoe,<br>MR000096,<br>40 Tahun</td>
+                                <td data-label="Rencana Tindakan">-</td>
+                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
+                                <td data-label="Metode Bayar">Asuransi</td>
+                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
+                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
                             </tr>
                             <tr>
-                                <td><span class="reg-status succeed">Succeed</span></td>
-                                <td>25/02/2026,<br>14:00</td>
-                                <td>25/02/2026,<br>20:32</td>
-                                <td>2</td>
-                                <td>Gigi</td>
-                                <td>Bpk Budi,<br>MR000099,<br>40 Tahun</td>
-                                <td>-</td>
-                                <td>drg. Hanglekiu</td>
-                                <td>Asuransi</td>
-                                <td>Pembersihan Karang Gigi</td>
-                                <td><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
+                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
+                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>14:00</td>
+                                <td data-label="Tanggal Dibuat">25/02/2026,<br>20:32</td>
+                                <td data-label="No">2</td>
+                                <td data-label="Poli">Gigi</td>
+                                <td data-label="Nama Pasien">Bpk Budi,<br>MR000099,<br>40 Tahun</td>
+                                <td data-label="Rencana Tindakan">-</td>
+                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
+                                <td data-label="Metode Bayar">Asuransi</td>
+                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
+                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -185,18 +182,18 @@
 </div>
 
 <style>
-    /* ===== REGISTRATION PAGE - BROWN THEME ===== */
+    /* ============================================
+       DESKTOP — tidak diubah sama sekali
+    ============================================ */
     .reg-container {
         padding: 0 0px 24px 0px;
         font-family: 'Instrument Sans', sans-serif;
     }
 
-    /* KUNCI FONT SIZE GLOBAL (13px) */
     .reg-container * {
         font-size: 13px;
     }
 
-    /* Header */
     .reg-header {
         display: flex;
         justify-content: space-between;
@@ -205,7 +202,7 @@
     }
 
     .reg-title {
-        font-size: 30px !important; /* Wajib 30px */
+        font-size: 30px !important;
         font-weight: 700;
         color: #582C0C;
     }
@@ -216,7 +213,7 @@
     }
 
     .reg-btn-warning {
-        background-color: #F59E0B; 
+        background-color: #F59E0B;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -228,17 +225,15 @@
         box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
     }
 
-    /* Layout */
     .reg-layout {
         display: flex;
         gap: 24px;
         align-items: flex-start;
     }
 
-    /* Konten Utama Kanan */
     .reg-main {
         flex: 1;
-        min-width: 0; 
+        min-width: 0;
     }
 
     .reg-card {
@@ -257,7 +252,7 @@
     }
 
     .reg-card-title {
-        font-size: 18.75px !important; /* Wajib 18.75px */
+        font-size: 18.75px !important;
         font-weight: 700;
         color: #582C0C;
         margin: 0;
@@ -265,9 +260,7 @@
         align-items: center;
     }
 
-    .reg-card-title i {
-        font-size: 18.75px !important;
-    }
+    .reg-card-title i { font-size: 18.75px !important; }
 
     .reg-card-actions {
         display: flex;
@@ -296,11 +289,8 @@
         transition: color 0.2s;
     }
 
-    .reg-icon-btn:hover {
-        color: #C58F59;
-    }
+    .reg-icon-btn:hover { color: #C58F59; }
 
-    /* Filters */
     .reg-filters {
         padding: 20px 24px;
         border-bottom: 1px solid #E5D6C5;
@@ -322,9 +312,7 @@
         flex: 1;
     }
 
-    .reg-input-group label {
-        color: #A38C7A;
-    }
+    .reg-input-group label { color: #A38C7A; }
 
     .reg-input {
         border: none;
@@ -372,24 +360,16 @@
         color: #582C0C;
     }
 
-    .reg-search-box i {
-        color: #C58F59;
-    }
+    .reg-search-box i { color: #C58F59; }
 
-    /* ========================================= */
-    /* CUSTOM DROPDOWN CSS UNTUK HALAMAN REGIS   */
-    /* ========================================= */
-    .reg-custom-select {
-        position: relative;
-        width: 100%;
-    }
+    .reg-custom-select { position: relative; width: 100%; }
 
     .reg-select-trigger {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        padding: 8px 0; /* Menyesuaikan dengan padding .reg-input supaya sejajar */
+        padding: 8px 0;
         border-bottom: 1px solid #C58F59;
         cursor: pointer;
         background: transparent;
@@ -409,9 +389,7 @@
         flex-shrink: 0;
     }
 
-    .reg-custom-select.open .reg-select-icon {
-        transform: rotate(180deg);
-    }
+    .reg-custom-select.open .reg-select-icon { transform: rotate(180deg); }
 
     .reg-options {
         position: absolute;
@@ -424,19 +402,14 @@
         box-shadow: 0 4px 16px rgba(88, 44, 12, 0.08);
         padding: 6px;
         z-index: 100;
-        
-        /* Animasi Melayang */
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
         transition: all 0.2s ease;
-        
-        /* Jika dokternya banyak, biar bisa di-scroll */
         max-height: 250px;
         overflow-y: auto;
     }
 
-    /* Styling Scrollbar khusus Dropdown */
     .reg-options::-webkit-scrollbar { width: 6px; }
     .reg-options::-webkit-scrollbar-track { background: transparent; }
     .reg-options::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
@@ -458,23 +431,12 @@
         margin-bottom: 2px;
     }
 
-    .reg-option:hover {
-        background-color: #FCFAF8;
-        color: #C58F59;
-    }
+    .reg-option:hover { background-color: #FCFAF8; color: #C58F59; }
+    .reg-option.is-selected { background-color: #FDF8F4; color: #582C0C; font-weight: 700; }
 
-    .reg-option.is-selected {
-        background-color: #FDF8F4;
-        color: #582C0C;
-        font-weight: 700;
-    }
-
-    /* ========================================= */
-    /* ===== TABLE DENGAN HORIZONTAL SCROLL =====*/
-    /* ========================================= */
     .reg-table-wrapper {
         width: 100%;
-        overflow-x: auto; 
+        overflow-x: auto;
         padding-bottom: 8px;
     }
 
@@ -485,18 +447,18 @@
 
     .reg-table {
         width: 100%;
-        min-width: 1200px; 
+        min-width: 1200px;
         border-collapse: collapse;
         text-align: left;
     }
 
     .reg-table th {
-        background-color: #FDF8F4; 
+        background-color: #FDF8F4;
         color: #582C0C;
         font-weight: 600;
         padding: 14px 20px;
         border-bottom: 2px solid #E5D6C5;
-        white-space: nowrap; 
+        white-space: nowrap;
     }
 
     .reg-table td {
@@ -504,17 +466,14 @@
         color: #374151;
         border-bottom: 1px solid #E5E7EB;
         vertical-align: top;
-        white-space: nowrap; 
+        white-space: nowrap;
     }
 
-    .reg-table tr:hover td {
-        background-color: #FAFAF9;
-    }
+    .reg-table tr:hover td { background-color: #FAFAF9; }
 
     .reg-status { font-weight: 600; }
     .reg-status.succeed { color: #65A30D; }
 
-    /* Pagination */
     .reg-pagination {
         display: flex;
         justify-content: flex-end;
@@ -534,14 +493,21 @@
     }
 
     .reg-page-controls { display: flex; gap: 8px; }
+
     .reg-page-btn {
         background: none;
         border: none;
         color: #9CA3AF;
         cursor: pointer;
     }
+
     .reg-page-btn:not([disabled]):hover { color: #582C0C; }
 
+    /* ============================================
+       MOBILE TAMBAHAN — mulai dari sini
+    ============================================ */
+
+    /* Filter stack vertikal */
     @media (max-width: 1024px) {
         .reg-layout { flex-direction: column; }
         .reg-filter-row {
@@ -549,6 +515,63 @@
             align-items: stretch;
             gap: 16px;
         }
+    }
+
+    /* Tabel jadi card layout di mobile */
+    @media (max-width: 768px) {
+        .reg-table,
+        .reg-table thead,
+        .reg-table tbody,
+        .reg-table tr,
+        .reg-table th,
+        .reg-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .reg-table thead { display: none; }
+        .reg-table { min-width: unset; }
+
+        .reg-table tbody tr {
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #E5D6C5;
+            box-shadow: 0 2px 8px rgba(88, 44, 12, 0.06);
+            overflow: hidden;
+        }
+
+        .reg-table td {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px 14px;
+            border: none;
+            border-bottom: 1px solid #F5EDE0;
+            white-space: normal;
+        }
+
+        .reg-table td:last-child { border-bottom: none; }
+        .reg-table td:first-child { background: #FDF8F4; }
+
+        /* Label dari data-label */
+        .reg-table td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: #C58F59;
+            font-size: 11px;
+            min-width: 110px;
+            flex-shrink: 0;
+            padding-top: 1px;
+        }
+
+        .reg-filters { padding: 14px 16px; }
+        .reg-card-header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+        .reg-pagination { padding: 12px 14px; flex-wrap: wrap; justify-content: space-between; }
+    }
+
+    @media (max-width: 480px) {
+        .reg-table td::before { min-width: 90px; font-size: 10px; }
+        .reg-table td { font-size: 12px; padding: 8px 12px; }
     }
 </style>
 
@@ -563,39 +586,27 @@
             const hiddenInput = dropdown.querySelector('input[type="hidden"]');
 
             trigger.addEventListener('click', function(e) {
-                e.stopPropagation(); 
-                
+                e.stopPropagation();
                 customSelects.forEach(other => {
-                    if (other !== dropdown) {
-                        other.classList.remove('open');
-                    }
+                    if (other !== dropdown) other.classList.remove('open');
                 });
-                
                 dropdown.classList.toggle('open');
             });
 
             options.forEach(option => {
                 option.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    
                     options.forEach(opt => opt.classList.remove('is-selected'));
-                    
                     this.classList.add('is-selected');
-                    
                     textDisplay.textContent = this.textContent;
-                    if (hiddenInput) {
-                        hiddenInput.value = this.dataset.value;
-                    }
-                    
+                    if (hiddenInput) hiddenInput.value = this.dataset.value;
                     dropdown.classList.remove('open');
                 });
             });
         });
 
         window.addEventListener('click', function() {
-            customSelects.forEach(dropdown => {
-                dropdown.classList.remove('open');
-            });
+            customSelects.forEach(dropdown => dropdown.classList.remove('open'));
         });
     });
 </script>
