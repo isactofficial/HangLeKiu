@@ -23,9 +23,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->foreign('registration_id')->references('id')->on('registration');
-            $table->foreign('patient_id')->references('id')->on('patient');
-            $table->foreign('doctor_id')->references('id')->on('doctor');
+            // FK ditambahkan di migration lanjutan agar urutan create table aman.
         });
     }
 

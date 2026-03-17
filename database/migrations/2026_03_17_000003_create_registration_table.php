@@ -43,13 +43,7 @@ return new class extends Migration
             $table->text('patient_condition')->nullable();
             $table->text('procedure_plan')->nullable();
 
-            $table->foreign('patient_id')->references('id')->on('patient');
-            $table->foreign('doctor_id')->references('id')->on('doctor');
-            $table->foreign('poli_id')->references('id')->on('master_poli');
-            $table->foreign('guarantor_type_id')->references('id')->on('master_guarantor_type');
-            $table->foreign('payment_method_id')->references('id')->on('master_payment_method');
-            $table->foreign('visit_type_id')->references('id')->on('master_visit_type');
-            $table->foreign('care_type_id')->references('id')->on('master_care_type');
+            // FK ditambahkan di migration lanjutan agar urutan create table aman.
         });
     }
 

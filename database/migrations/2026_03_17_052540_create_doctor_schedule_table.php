@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('doctor_shedule', function (Blueprint $table) {
+        Schema::create('doctor_schedule', function (Blueprint $table) {
             $table->string('id', 50)->primary();
             $table->string('doctor_id', 50);
             $table->enum('day', ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']);
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('doctor_shedule');
+        Schema::dropIfExists('doctor_schedule');
     }
 };
