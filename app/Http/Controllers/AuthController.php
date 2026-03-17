@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -91,15 +93,30 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'max:255', 'unique:users'],
+            'email'    => ['required', 'email', 'max:255', 'unique:user,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
+        $userRole = Role::where('code', 'PAT')->first();
+
+        if (! $userRole) {
+            $userRole = Role::create([
+                'id' => (string) Str::uuid(),
+                'code' => 'PAT',
+                'name' => 'Patient',
+                'permissions' => null,
+                'created_at' => now(),
+            ]);
+        }
+
         $user = User::create([
+            'id' => (string) Str::uuid(),
+            'role_id' => $userRole->id,
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role'     => 'user',
+            'is_active' => true,
+            'is_verified' => false,
         ]);
 
         Auth::login($user);
@@ -114,15 +131,30 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'max:255', 'unique:users'],
+            'email'    => ['required', 'email', 'max:255', 'unique:user,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
+        $adminRole = Role::where('code', 'ADM')->first();
+
+        if (! $adminRole) {
+            $adminRole = Role::create([
+                'id' => (string) Str::uuid(),
+                'code' => 'ADM',
+                'name' => 'Admin',
+                'permissions' => null,
+                'created_at' => now(),
+            ]);
+        }
+
         $user = User::create([
+            'id' => (string) Str::uuid(),
+            'role_id' => $adminRole->id,
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role'     => 'admin',
+            'is_active' => true,
+            'is_verified' => true,
         ]);
 
         Auth::login($user);

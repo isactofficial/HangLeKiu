@@ -51,7 +51,6 @@
                         
                         <div class="reg-input-group" style="flex: 1.5;">
                             <label>Poli *</label>
-                            {{-- CUSTOM DROPDOWN 1: POLI --}}
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
                                     <span class="reg-select-text">Semua Poli</span>
@@ -70,7 +69,6 @@
                     <div class="reg-filter-row">
                         <div class="reg-input-group">
                             <label>Tenaga Medis *</label>
-                            {{-- CUSTOM DROPDOWN 2: TENAGA MEDIS --}}
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
                                     <span class="reg-select-text">Semua Tenaga Medis</span>
@@ -91,7 +89,6 @@
                         
                         <div class="reg-input-group">
                             <label>Metode Pembayaran *</label>
-                            {{-- CUSTOM DROPDOWN 3: METODE PEMBAYARAN --}}
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
                                     <span class="reg-select-text">Semua Metode Pembayaran</span>
@@ -136,30 +133,30 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="reg-status succeed">Succeed</span></td>
-                                <td>25/02/2026,<br>13:00</td>
-                                <td>25/02/2026,<br>19:32</td>
-                                <td>1</td>
-                                <td>Gigi</td>
-                                <td>Bpk Johndoe,<br>MR000096,<br>40 Tahun</td>
-                                <td>-</td>
-                                <td>drg. Hanglekiu</td>
-                                <td>Asuransi</td>
-                                <td>Pembersihan Karang Gigi</td>
-                                <td><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
+                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
+                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>13:00</td>
+                                <td data-label="Tanggal Dibuat">25/02/2026,<br>19:32</td>
+                                <td data-label="No">1</td>
+                                <td data-label="Poli">Gigi</td>
+                                <td data-label="Nama Pasien">Bpk Johndoe,<br>MR000096,<br>40 Tahun</td>
+                                <td data-label="Rencana Tindakan">-</td>
+                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
+                                <td data-label="Metode Bayar">Asuransi</td>
+                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
+                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
                             </tr>
                             <tr>
-                                <td><span class="reg-status succeed">Succeed</span></td>
-                                <td>25/02/2026,<br>14:00</td>
-                                <td>25/02/2026,<br>20:32</td>
-                                <td>2</td>
-                                <td>Gigi</td>
-                                <td>Bpk Budi,<br>MR000099,<br>40 Tahun</td>
-                                <td>-</td>
-                                <td>drg. Hanglekiu</td>
-                                <td>Asuransi</td>
-                                <td>Pembersihan Karang Gigi</td>
-                                <td><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
+                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
+                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>14:00</td>
+                                <td data-label="Tanggal Dibuat">25/02/2026,<br>20:32</td>
+                                <td data-label="No">2</td>
+                                <td data-label="Poli">Gigi</td>
+                                <td data-label="Nama Pasien">Bpk Budi,<br>MR000099,<br>40 Tahun</td>
+                                <td data-label="Rencana Tindakan">-</td>
+                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
+                                <td data-label="Metode Bayar">Asuransi</td>
+                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
+                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -198,39 +195,27 @@
             const hiddenInput = dropdown.querySelector('input[type="hidden"]');
 
             trigger.addEventListener('click', function(e) {
-                e.stopPropagation(); 
-                
+                e.stopPropagation();
                 customSelects.forEach(other => {
-                    if (other !== dropdown) {
-                        other.classList.remove('open');
-                    }
+                    if (other !== dropdown) other.classList.remove('open');
                 });
-                
                 dropdown.classList.toggle('open');
             });
 
             options.forEach(option => {
                 option.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    
                     options.forEach(opt => opt.classList.remove('is-selected'));
-                    
                     this.classList.add('is-selected');
-                    
                     textDisplay.textContent = this.textContent;
-                    if (hiddenInput) {
-                        hiddenInput.value = this.dataset.value;
-                    }
-                    
+                    if (hiddenInput) hiddenInput.value = this.dataset.value;
                     dropdown.classList.remove('open');
                 });
             });
         });
 
         window.addEventListener('click', function() {
-            customSelects.forEach(dropdown => {
-                dropdown.classList.remove('open');
-            });
+            customSelects.forEach(dropdown => dropdown.classList.remove('open'));
         });
     });
 </script>

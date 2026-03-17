@@ -79,7 +79,10 @@
     ];
 @endphp
 
-<aside class="sidebar">
+{{-- Backdrop --}}
+<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+<aside class="sidebar" id="appSidebar">
     {{-- Logo Container --}}
     <div class="sidebar-logo">
         <img src="/images/logo-hds.png" alt="HDS">
@@ -88,15 +91,12 @@
     {{-- Navigation --}}
     <nav class="sidebar-nav">
         @foreach ($menuItems as $item)
-            {{-- Mengecek apakah item ini adalah garis pemisah --}}
             @if (isset($item['is_divider']) && $item['is_divider'])
                 <div class="sidebar-divider"></div>
             @else
-                {{-- Jika bukan garis pemisah, render icon seperti biasa --}}
                 <a href="{{ route($item['route']) }}"
                     class="sidebar-item {{ request()->routeIs($item['route']) ? 'active' : '' }}">
                     @if (isset($item['is_image']) && $item['is_image'])
-                        {{-- Untuk icon yang merupakan file SVG --}}
                         <img src="{{ $item['icon'] }}" alt="icon" class="sidebar-icon-img">
                     @elseif ($item['filled'] ?? false)
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -113,3 +113,30 @@
         @endforeach
     </nav>
 </aside>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const toggle   = document.getElementById('sidebarToggle');
+    const sidebar  = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (!toggle || !sidebar) return;
+
+    function open()  {
+        sidebar.classList.add('open');
+        if (backdrop) backdrop.classList.add('show');
+        toggle.style.opacity = '0';
+        toggle.style.pointerEvents = 'none';
+    }
+    function close() {
+        sidebar.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('show');
+        toggle.style.opacity = '1';
+        toggle.style.pointerEvents = 'auto';
+    }
+
+    toggle.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.querySelectorAll('.sidebar-item').forEach(el => el.addEventListener('click', close));
+});
+</script>

@@ -1,4 +1,4 @@
-﻿@push('styles')
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/office/dashboard_harian.css') }}">
 @endpush
 

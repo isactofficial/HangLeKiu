@@ -1,14 +1,16 @@
-﻿@push('styles')
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/office/keuangan.css') }}">
 @endpush
 
 {{-- resources/views/admin/office/keuangan.blade.php --}}
 @php $tab = request('tab', 'ikhtisar'); @endphp
 {{-- Tab Bar + Date Filter --}}
-<div style="display:flex; align-items:center; gap:4px; margin-bottom:20px; flex-wrap:wrap;">
-    @foreach (['ikhtisar'=>'Ikhtisar','pemasukan'=>'Pemasukan','pengeluaran'=>'Pengeluaran','klaim'=>'Klaim'] as $key=>$label)
-        <a href="?menu=keuangan&tab={{ $key }}" class="keu-tab {{ $tab===$key ? 'active' : 'inactive' }}">{{ $label }}</a>
-    @endforeach
+<div style="display:flex; align-items:center; gap:4px; margin-bottom:20px; flex-wrap:wrap;" class="keu-topbar">
+    <div class="keu-tabs">
+        @foreach (['ikhtisar'=>'Ikhtisar','pemasukan'=>'Pemasukan','pengeluaran'=>'Pengeluaran','klaim'=>'Klaim'] as $key=>$label)
+            <a href="?menu=keuangan&tab={{ $key }}" class="keu-tab {{ $tab===$key ? 'active' : 'inactive' }}">{{ $label }}</a>
+        @endforeach
+    </div>
     <div class="keu-filter-row">
         <input type="text" class="keu-date-input" value="01/03/2026">
         <span class="keu-sep">-</span>
@@ -101,7 +103,7 @@
     <div class="keu-card">
         <div class="keu-card-header">
             <h2 class="keu-card-title">Pemasukan</h2>
-            <div style="display:flex;gap:10px;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <div class="keu-search-box">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input type="text" placeholder="Cari transaksi...">
@@ -179,7 +181,7 @@
     <div class="keu-card">
         <div class="keu-card-header">
             <h2 class="keu-card-title">Pengeluaran</h2>
-            <div style="display:flex;gap:10px;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <div class="keu-search-box">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input type="text" placeholder="Cari pengeluaran...">
@@ -240,7 +242,7 @@
     <div class="keu-card">
         <div class="keu-card-header">
             <h2 class="keu-card-title">Klaim</h2>
-            <div style="display:flex;gap:10px;align-items:center;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <div class="keu-search-box">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input type="text" placeholder="Cari klaim...">

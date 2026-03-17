@@ -4,6 +4,12 @@
 @props(['title' => ''])
 
 <header class="admin-navbar">
+
+    {{-- Hamburger — inline, hanya mobile --}}
+    <button id="sidebarToggle" class="sidebar-hamburger" type="button" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+    </button>
+
     {{-- Right: Actions --}}
     <div class="navbar-right w-full flex align-center w-[100%] justify-between md:justify-end">
         
@@ -33,7 +39,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
                 </svg>
             </button>
-            {{-- Dropdown menu --}}
             <div class="navbar-dropdown-menu" id="clinicMenu">
                 <a href="#" class="dropdown-item active">Hanglekiu Dental Clinic</a>
                 <a href="#" class="dropdown-item">Cabang Kemang</a>
@@ -43,6 +48,9 @@
 
         {{-- Divider --}}
         <div class="navbar-divider"></div>
+
+        {{-- Mobile Divider (before icons) --}}
+        <div class="navbar-divider-mobile"></div>
 
         {{-- Help --}}
         <button class="navbar-icon-btn" title="Bantuan" onclick="alert('Halaman bantuan akan segera hadir!')">
@@ -93,16 +101,10 @@
     function toggleDropdown(menuId) {
         const menu = document.getElementById(menuId);
         const allMenus = document.querySelectorAll('.navbar-dropdown-menu');
-
-        // Close all other menus
-        allMenus.forEach(m => {
-            if (m.id !== menuId) m.classList.remove('show');
-        });
-
+        allMenus.forEach(m => { if (m.id !== menuId) m.classList.remove('show'); });
         menu.classList.toggle('show');
     }
 
-    // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.navbar-dropdown') && !e.target.closest('.navbar-icon-btn')) {
             document.querySelectorAll('.navbar-dropdown-menu').forEach(m => m.classList.remove('show'));

@@ -1,0 +1,409 @@
+/* ===================================
+   MOBILE RESPONSIVE - TOP NAVIGATION BAR
+   =================================== */
+
+/* Hamburger button - Hidden by default */
+.navbar-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 1px solid #E5D6C5;
+    color: #582C0C;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.navbar-hamburger:hover {
+    background: rgba(197, 143, 89, 0.1);
+    border-color: #C58F59;
+}
+
+.navbar-hamburger svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Mobile Divider - Hidden by default */
+.navbar-divider-mobile {
+    display: none;
+}
+
+/* Pharmacy Menu Dropdown - Hidden by default (Desktop) */
+.navbar-pharmacy-dropdown {
+    display: none;
+}
+
+.navbar-pharmacy-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: white;
+    border: 1px solid #E5D6C5;
+    border-radius: 8px;
+    color: #582C0C;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+.navbar-pharmacy-btn:hover {
+    background: rgba(197, 143, 89, 0.05);
+    border-color: #C58F59;
+}
+
+.navbar-pharmacy-btn span {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.navbar-pharmacy-btn svg {
+    flex-shrink: 0;
+}
+
+.navbar-pharmacy-menu {
+    max-height: 320px;
+    overflow-y: auto;
+    left: 0;
+    right: auto;
+    min-width: 240px;
+}
+
+/* Custom scrollbar for pharmacy menu dropdown */
+.navbar-pharmacy-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.navbar-pharmacy-menu::-webkit-scrollbar-track {
+    background: #F7F7F7;
+    border-radius: 3px;
+}
+
+.navbar-pharmacy-menu::-webkit-scrollbar-thumb {
+    background: #C58F59;
+    border-radius: 3px;
+}
+
+.navbar-pharmacy-menu::-webkit-scrollbar-thumb:hover {
+    background: #A67847;
+}
+
+/* Tablet dan Mobile - 768px ke bawah */
+@media (max-width: 768px) {
+    /* Show hamburger button */
+    .navbar-hamburger {
+        display: flex !important;
+    }
+
+    /* Show pharmacy menu dropdown */
+    .navbar-pharmacy-dropdown {
+        display: block !important;
+        flex: 1;
+        max-width: 280px;
+    }
+
+    .navbar-pharmacy-btn {
+        width: 100%;
+        font-size: 12px;
+        padding: 7px 12px;
+    }
+
+    /* Navbar layout - Full width */
+    .admin-navbar {
+        padding: 12px 16px !important;
+        margin: 0 -16px 16px -16px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 12px !important;
+        width: calc(100% + 32px) !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 50 !important;
+        border-radius: 0 !important;
+        box-shadow: 0 2px 8px rgba(88, 44, 12, 0.08) !important;
+        background: white !important;
+    }
+
+    /* Admin content padding adjustment */
+    .admin-content {
+        padding: 0 16px 16px 16px !important;
+    }
+
+    /* Logo HDS lebih kecil */
+    .navbar-hds-logo {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .navbar-hds-logo img {
+        width: 18px !important;
+    }
+
+    /* Dropdown button lebih kompak */
+    .navbar-dropdown-btn {
+        padding: 7px 12px !important;
+        font-size: 12px !important;
+        max-width: 140px;
+    }
+
+    .navbar-dropdown-btn span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 90px;
+    }
+
+    .navbar-dropdown-btn svg {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    /* Icon buttons lebih kecil */
+    .navbar-icon-btn {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .navbar-icon-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    /* Spacing lebih kecil */
+    .navbar-right {
+        gap: 6px !important;
+    }
+
+    /* Divider lebih kecil */
+    .navbar-divider {
+        height: 20px !important;
+    }
+
+    /* Show mobile divider */
+    .navbar-divider-mobile {
+        display: block !important;
+        width: 1px;
+        height: 24px;
+        background: #E5D6C5;
+        margin: 0 2px;
+        flex-shrink: 0;
+    }
+}
+
+/* Mobile kecil - 480px ke bawah */
+@media (max-width: 480px) {
+    .admin-navbar {
+        padding: 10px 12px !important;
+        margin: 0 -12px 12px -12px !important;
+        width: calc(100% + 24px) !important;
+    }
+
+    /* Admin content padding lebih kecil */
+    .admin-content {
+        padding: 0 12px 12px 12px !important;
+    }
+
+    /* Hamburger lebih kecil */
+    .navbar-hamburger {
+        width: 36px !important;
+        height: 36px !important;
+    }
+
+    .navbar-hamburger svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    /* Mobile divider lebih kecil */
+    .navbar-divider-mobile {
+        height: 22px !important;
+        margin: 0 1px !important;
+    }
+
+    /* Pharmacy dropdown lebih kompak */
+    .navbar-pharmacy-dropdown {
+        max-width: 220px !important;
+    }
+
+    .navbar-pharmacy-btn {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+    }
+
+    .navbar-pharmacy-btn svg {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    .navbar-pharmacy-menu {
+        max-height: 280px !important;
+        min-width: 200px !important;
+    }
+
+    .navbar-pharmacy-menu .dropdown-item {
+        font-size: 12px !important;
+        padding: 9px 12px !important;
+    }
+
+    /* Logo */
+    .navbar-hds-logo {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .navbar-hds-logo img {
+        width: 16px !important;
+    }
+
+    /* Dropdown lebih kecil */
+    .navbar-dropdown-btn {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        max-width: 120px;
+    }
+
+    .navbar-dropdown-btn span {
+        max-width: 70px;
+    }
+
+    /* Icon buttons - tetap tampil semua */
+    .navbar-icon-btn {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .navbar-icon-btn svg {
+        width: 17px !important;
+        height: 17px !important;
+    }
+
+    /* Hide divider untuk hemat space */
+    .navbar-divider {
+        display: none !important;
+    }
+
+    /* Spacing lebih kompak */
+    .navbar-right {
+        gap: 4px !important;
+    }
+
+    /* Dropdown menu lebih kecil */
+    .navbar-dropdown-menu {
+        min-width: 180px !important;
+        right: -8px;
+    }
+
+    .dropdown-item {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+    }
+}
+
+/* Mobile sangat kecil - 360px ke bawah */
+@media (max-width: 360px) {
+    .admin-navbar {
+        padding: 8px 10px !important;
+        margin: 0 -10px 10px -10px !important;
+        width: calc(100% + 20px) !important;
+    }
+
+    /* Admin content padding lebih kecil */
+    .admin-content {
+        padding: 0 10px 10px 10px !important;
+    }
+
+    /* Hamburger sangat kecil */
+    .navbar-hamburger {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .navbar-hamburger svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    /* Mobile divider sangat kecil */
+    .navbar-divider-mobile {
+        height: 20px !important;
+    }
+
+    /* Pharmacy dropdown sangat kompak */
+    .navbar-pharmacy-dropdown {
+        max-width: 180px !important;
+    }
+
+    .navbar-pharmacy-btn {
+        font-size: 10px !important;
+        padding: 5px 8px !important;
+    }
+
+    .navbar-pharmacy-btn svg {
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    .navbar-pharmacy-menu {
+        max-height: 240px !important;
+        min-width: 180px !important;
+        font-size: 11px !important;
+    }
+
+    .navbar-pharmacy-menu .dropdown-item {
+        font-size: 11px !important;
+        padding: 8px 10px !important;
+    }
+
+    /* Logo lebih kecil lagi */
+    .navbar-hds-logo {
+        width: 26px !important;
+        height: 26px !important;
+    }
+
+    .navbar-hds-logo img {
+        width: 14px !important;
+    }
+
+    /* Dropdown sangat kompak */
+    .navbar-dropdown-btn {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+        max-width: 100px;
+    }
+
+    .navbar-dropdown-btn span {
+        max-width: 60px;
+    }
+
+    .navbar-dropdown-btn svg {
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    /* Icon buttons sangat kecil */
+    .navbar-icon-btn {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .navbar-icon-btn svg {
+        width: 15px !important;
+        height: 15px !important;
+    }
+
+    /* Spacing minimal */
+    .navbar-right {
+        gap: 3px !important;
+    }
+}

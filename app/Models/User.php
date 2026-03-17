@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -12,16 +13,27 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'user';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
+        'id',
+        'role_id',
         'name',
         'email',
         'password',
-        'role',
+        'avatar_url',
+        'is_active',
+        'is_verified',
+        'last_login_at',
     ];
 
     /**
@@ -42,8 +54,42 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'is_verified' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
+    }
+
+    public function roleRecord(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function getRoleAttribute(): ?string
+    {
+        $role = $this->relationLoaded('roleRecord')
+            ? $this->getRelation('roleRecord')
+            : $this->roleRecord()->first();
+
+        if (! $role) {
+            return null;
+        }
+
+        $code = strtoupper((string) $role->code);
+
+        if ($code === 'ADM' || $code === 'OWN') {
+            return 'admin';
+        }
+
+        if ($code === 'PAT') {
+            return 'user';
+        }
+
+        if ($code === 'DCT') {
+            return 'doctor';
+        }
+
+        return strtolower((string) $role->name);
     }
 }

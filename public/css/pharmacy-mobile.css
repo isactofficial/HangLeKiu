@@ -1,0 +1,335 @@
+/* ===================================
+   MOBILE RESPONSIVE - PHARMACY PAGE
+   =================================== */
+
+/* Mobile Stats Section - Hidden by default (Desktop) */
+.apt-mobile-stats-section {
+    display: none;
+}
+
+/* Mobile Menu Section - Hidden by default (Desktop) */
+.apt-mobile-menu-section {
+    display: none;
+}
+
+/* Tablet dan Mobile - 768px ke bawah */
+@media (max-width: 768px) {
+    /* Show mobile stats section */
+    .apt-mobile-stats-section {
+        display: block !important;
+        margin-bottom: 16px;
+    }
+
+    .apt-mobile-stats-scroll {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #C58F59 #F7F7F7;
+        padding-bottom: 8px;
+    }
+
+    .apt-mobile-stats-scroll::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .apt-mobile-stats-scroll::-webkit-scrollbar-track {
+        background: #F7F7F7;
+        border-radius: 3px;
+    }
+
+    .apt-mobile-stats-scroll::-webkit-scrollbar-thumb {
+        background: #C58F59;
+        border-radius: 3px;
+    }
+
+    .apt-mobile-stats-scroll::-webkit-scrollbar-thumb:hover {
+        background: #A67847;
+    }
+
+    .apt-mobile-stats-scroll .apt-stat-card,
+    .apt-mobile-stats-scroll .apt-alert-card {
+        flex: 0 0 280px;
+        scroll-snap-align: start;
+    }
+
+    /* Show mobile menu section */
+    .apt-mobile-menu-section {
+        display: block !important;
+        margin-bottom: 16px;
+    }
+
+    .apt-mobile-menu-header {
+        background: #C58F59;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+        user-select: none;
+    }
+
+    .apt-mobile-menu-header svg {
+        transition: transform 0.3s ease;
+    }
+
+    .apt-mobile-menu-dropdown {
+        display: none;
+        background: white;
+        border: 1px solid #E5D6C5;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        margin-top: -8px;
+        padding-top: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .apt-mobile-menu-dropdown.show {
+        display: block;
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .apt-mobile-menu-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .apt-mobile-menu-list::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .apt-mobile-menu-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .apt-mobile-menu-list::-webkit-scrollbar-thumb {
+        background: #E5D6C5;
+        border-radius: 2px;
+    }
+
+    .apt-mobile-menu-list::-webkit-scrollbar-thumb:hover {
+        background: #C58F59;
+    }
+
+    .apt-mobile-menu-item {
+        display: block;
+        padding: 12px 16px;
+        color: #6B513E;
+        text-decoration: none;
+        border-bottom: 1px solid #F3EDE6;
+        font-size: 13px;
+        transition: background 0.15s;
+    }
+
+    .apt-mobile-menu-item:hover {
+        background: rgba(197, 143, 89, 0.05);
+    }
+
+    .apt-mobile-menu-item.active {
+        background: rgba(197, 143, 89, 0.15);
+        color: #582C0C;
+        font-weight: 600;
+        border-left: 3px solid #C58F59;
+    }
+
+
+
+    /* Hide desktop sidebar in mobile */
+    .apt-sidebar-wrapper {
+        display: none !important;
+    }
+
+    /* Layout: Main content full width */
+    .apt-layout {
+        flex-direction: column !important;
+    }
+
+    /* Container tanpa padding berlebihan */
+    .apt-container {
+        padding: 0 16px 16px 16px !important;
+        margin-top: 0 !important;
+    }
+
+    /* Main content full width */
+    .apt-main {
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    /* Header lebih compact */
+    .apt-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .apt-header-actions {
+        align-self: stretch;
+        justify-content: center !important;
+    }
+
+    .apt-date-nav {
+        justify-content: center !important;
+        width: 100%;
+    }
+
+    .apt-header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* Card header - pindahkan actions ke bawah */
+    .apt-card > div[style*="display:flex"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    /* Tabs tetap di atas */
+    .apt-tabs {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+    }
+
+    /* Actions pindah ke bawah dengan full width */
+    .apt-card-actions {
+        width: 100%;
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    /* Search box full width */
+    .apt-search-box {
+        width: 100% !important;
+    }
+
+    .apt-search-box input {
+        width: 100% !important;
+        flex: 1;
+    }
+
+    /* Button full width */
+    .apt-btn-primary {
+        width: 100% !important;
+        justify-content: center;
+    }
+}
+
+/* Mobile kecil - 480px ke bawah */
+@media (max-width: 480px) {
+    /* Pharmacy navbar wrapper margin */
+    .apt-navbar-wrapper {
+        margin: 0 -12px 12px -12px !important;
+    }
+
+    /* Navbar inside pharmacy */
+    .apt-navbar-wrapper .admin-navbar {
+        padding: 10px 12px !important;
+    }
+
+    /* Sidebar drawer lebih kecil */
+    .apt-sidebar-wrapper {
+        width: 260px !important;
+        max-width: 80%;
+    }
+
+    /* Container padding lebih kecil */
+    .apt-container {
+        padding: 0 12px 12px 12px !important;
+    }
+
+    /* Header lebih compact */
+    .apt-title {
+        font-size: 30px !important;
+    }
+
+    .apt-subtitle {
+        font-size: 18.75px !important;
+    }
+
+    .apt-date-full {
+        font-size: 18.75px !important;
+    }
+
+    /* Layout gap lebih kecil */
+    .apt-layout {
+        gap: 16px !important;
+    }
+
+    /* Card padding lebih kecil */
+    .apt-card > div[style*="display:flex"] {
+        padding: 10px 12px !important;
+    }
+
+    /* Tabs lebih compact */
+    .apt-tab {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+
+    /* Search box lebih compact */
+    .apt-search-box {
+        padding: 6px 8px !important;
+    }
+
+    .apt-search-box input {
+        font-size: 12px !important;
+    }
+
+    /* Button lebih compact */
+    .apt-btn-primary {
+        padding: 7px 12px !important;
+        font-size: 12px !important;
+    }
+
+    /* Stat card lebih compact */
+    .apt-stat-number {
+        font-size: 30px !important;
+    }
+
+    /* Mobile menu section compact */
+    .apt-mobile-menu-header {
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+    }
+
+    .apt-mobile-menu-item {
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+    }
+
+    /* Mobile stats scroll compact */
+    .apt-mobile-stats-scroll {
+        gap: 10px !important;
+    }
+
+    .apt-mobile-stats-scroll .apt-stat-card,
+    .apt-mobile-stats-scroll .apt-alert-card {
+        flex: 0 0 260px !important;
+    }
+}

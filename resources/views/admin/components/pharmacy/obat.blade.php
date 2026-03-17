@@ -1,4 +1,4 @@
-﻿@push('styles')
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/pharmacy/obat.css') }}">
 @endpush
 
@@ -129,9 +129,9 @@
 
     <div class="apt-pagination">
         <div class="apt-page-size">Jumlah baris per halaman: <select><option>10</option><option>25</option><option>50</option></select></div>
-        <div class="apt-page-info">1–5 dari 5 data</div>
         <div class="apt-page-controls">
             <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <div class="apt-page-info">1–5 dari 5 data</div>
             <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
     </div>
