@@ -6,6 +6,10 @@
 <header class="admin-navbar">
     {{-- Left: Search Area --}}
     <div class="navbar-left">
+        <button id="sidebarToggle" class="sidebar-hamburger" type="button" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
+
         <div class="navbar-search-group">
             <div class="navbar-search-wrapper">
                 {{-- Search Icon --}}
@@ -118,6 +122,31 @@
         display: flex;
         gap: 12px;
         align-items: center;
+    }
+
+    .sidebar-hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        background: white;
+        border: 1px solid #E5D6C5;
+        border-radius: 8px;
+        padding: 7px;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 1px 4px rgba(88, 44, 12, 0.10);
+    }
+
+    .sidebar-hamburger span {
+        display: block;
+        width: 18px;
+        height: 2px;
+        background: #582C0C;
+        border-radius: 2px;
     }
 
     .navbar-search-wrapper {
@@ -379,8 +408,24 @@
 
     @media (max-width: 768px) {
         .admin-navbar {
-            margin: -72px -16px 20px -16px;
-            padding-left: 64px;
+            margin: -16px -16px 20px -16px;
+            padding: 12px 16px;
+        }
+
+        .sidebar-hamburger {
+            display: flex;
+        }
+
+        .navbar-left {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-search-group {
+            flex: 1;
+            min-width: 0;
         }
 
         .navbar-right {

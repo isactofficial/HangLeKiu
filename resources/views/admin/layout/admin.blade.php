@@ -36,10 +36,12 @@
         }
 
         .admin-content {
-            margin-left: 72px; 
+            margin-left: 72px;
+            width: calc(100% - 72px);
             min-height: 100vh;
             padding: 28px 32px;
             transition: margin-left 0.3s ease;
+            overflow-x: hidden;
         }
 
         .admin-topbar {
@@ -87,6 +89,7 @@
         @media (max-width: 768px) {
             .admin-content {        
                 margin-left: 0 !important;        
+                width: 100%;
                 padding: 16px;        
                 overflow-x: hidden;    
             }
@@ -114,49 +117,6 @@
         @yield('content')
         
     </main>
-
-    {{-- Admin Sidebar Overlay for Mobile --}}
-    <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
-
-    <script>
-        // Toggle Admin Sidebar (Mobile)
-        function toggleAdminSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.getElementById('adminSidebarOverlay');
-            
-            if (sidebar && overlay) {
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-                
-                // Prevent body scroll when sidebar is open
-                if (sidebar.classList.contains('show')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
-        }
-
-        // Close sidebar when clicking menu item (mobile only)
-        if (window.innerWidth <= 768) {
-            document.addEventListener('DOMContentLoaded', function() {
-                const sidebarItems = document.querySelectorAll('.sidebar-item');
-                
-                sidebarItems.forEach(item => {
-                    item.addEventListener('click', function() {
-                        const sidebar = document.querySelector('.sidebar');
-                        const overlay = document.getElementById('adminSidebarOverlay');
-                        
-                        if (sidebar && overlay && sidebar.classList.contains('show')) {
-                            sidebar.classList.remove('show');
-                            overlay.classList.remove('show');
-                            document.body.style.overflow = '';
-                        }
-                    });
-                });
-            });
-        }
-    </script>
 
 </body>
 </html>

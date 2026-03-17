@@ -4,18 +4,10 @@
 @props(['title' => ''])
 
 <header class="admin-navbar">
-<<<<<<< HEAD
-    {{-- Hamburger Button (Mobile Only) --}}
-    <button class="navbar-hamburger" onclick="toggleAdminSidebar()" aria-label="Toggle Menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-=======
 
     {{-- Hamburger — inline, hanya mobile --}}
     <button id="sidebarToggle" class="sidebar-hamburger" type="button" aria-label="Toggle menu">
         <span></span><span></span><span></span>
->>>>>>> origin/database_schema
     </button>
 
     {{-- Right: Actions --}}

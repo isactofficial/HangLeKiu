@@ -22,6 +22,11 @@
     @include('admin.components.navbar', ['title' => 'Apotek'])
 @endsection
 
+@push('styles')
+    @vite('resources/css/pharmacy-mobile.css')
+    <link rel="stylesheet" href="{{ asset('css/pharmacy-mobile.css') }}?v={{ file_exists(public_path('css/pharmacy-mobile.css')) ? filemtime(public_path('css/pharmacy-mobile.css')) : time() }}">
+@endpush
+
 @section('content')
 
 <style>
@@ -29,6 +34,12 @@
     .apt-date-full { font-size: 18.75px; font-weight: 700; }
     .apt-stat-number { font-size: 30px; font-weight: 700; }
     .apt-container { padding: 0 0 24px 0px; }
+
+    /* Fallback visibility: desktop by default */
+    .apt-mobile-stats-section,
+    .apt-mobile-menu-section {
+        display: none;
+    }
 
     /* Header */
     .apt-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; padding-top: 4px; }
@@ -78,6 +89,18 @@
     .apt-alert-title { font-weight: 600; color: #582C0C; }
     .apt-alert-link  { display: block; padding: 10px 14px; color: #C58F59; text-decoration: none; font-weight: 500; }
     .apt-alert-link:hover { text-decoration: underline; }
+
+    /* Fallback visibility: mobile */
+    @media (max-width: 768px) {
+        .apt-mobile-stats-section,
+        .apt-mobile-menu-section {
+            display: block;
+        }
+
+        .apt-sidebar-wrapper {
+            display: none;
+        }
+    }
 </style>
 
 <div class="apt-container">
