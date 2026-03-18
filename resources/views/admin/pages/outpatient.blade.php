@@ -38,7 +38,7 @@
                     <select class="rj-doc-select" onchange="if(this.value) window.location.href=this.value">
                         <option value="{{ route('admin.outpatient', ['date' => $date]) }}" {{ $viewMode === 'all' ? 'selected' : '' }}>Semua Dokter</option>
                         @foreach ($doctors as $doc)
-                            <option value="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $doc->id]) }}" {{ $selectedDoctorId == $doc->id ? 'selected' : '' }}>{{ $doc->name }} @if($doc->practice) - {{ $doc->practice }} @endif</option>
+                            <option value="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $doc->id]) }}" {{ $selectedDoctorId == $doc->id ? 'selected' : '' }}>{{ $doc->full_name }} @if($doc->specialization) - {{ $doc->specialization }} @endif</option>
                         @endforeach
                     </select>
                 </div>
@@ -61,11 +61,11 @@
                         <li>
                             <a href="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $doc->id]) }}"
                                 class="rj-doc-item {{ $selectedDoctorId == $doc->id ? 'active' : '' }}">
-                                <span class="rj-doc-avatar">{{ strtoupper(substr($doc->name, 5, 1)) }}</span>
+                                <span class="rj-doc-avatar">{{ strtoupper(substr($doc->full_name, 0, 1)) }}</span>
                                 <div class="rj-doc-info">
-                                    <span class="rj-doc-name">{{ $doc->name }}</span>
-                                    @if ($doc->practice)
-                                        <span class="rj-doc-spec">{{ $doc->practice }}</span>
+                                    <span class="rj-doc-name">{{ $doc->full_name }}</span>
+                                    @if ($doc->specialization)
+                                        <span class="rj-doc-spec">{{ $doc->specialization }}</span>
                                     @endif
                                 </div>
                             </a>
@@ -118,7 +118,7 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6" /></svg>
                             </a>
                             <div class="rj-nav-date">
-                                <span class="rj-nav-day">{{ $selectedDoctor?->name }}</span>
+                                <span class="rj-nav-day">{{ $selectedDoctor?->full_name }}</span>
                                 <span class="rj-nav-full">
                                     {{ \Carbon\Carbon::parse($dateColumns[0])->locale('id')->isoFormat('D MMM') }}
                                     – {{ \Carbon\Carbon::parse($dateColumns[6])->locale('id')->isoFormat('D MMM YYYY') }}
@@ -175,7 +175,7 @@
                                                 @if ($apt)
                                                     <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
-                                                        <div class="apt-treat">{{ $apt->treatment->name }}</div>
+                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 @endif
@@ -184,10 +184,10 @@
                                     @else
                                         @foreach ($dateColumns as $dc)
                                             @php
-                                                $apt = \App\Models\Appointment::with('treatment')
+                                                $apt = \App\Models\Appointment::with('patient')
                                                     ->where('doctor_id', $selectedDoctorId)
-                                                    ->whereDate('appointment_date', $dc)
-                                                    ->where('appointment_time', $slot . ':00')
+                                                    ->whereDate('appointment_datetime', $dc)
+                                                    ->whereTime('appointment_datetime', $slot)
                                                     ->first();
                                                 $isColToday = $dc === $today;
                                             @endphp
@@ -195,7 +195,7 @@
                                                 @if ($apt)
                                                     <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
-                                                        <div class="apt-treat">{{ $apt->treatment->name }}</div>
+                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 @endif
@@ -230,10 +230,10 @@
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
-                                                    <div class="apt-treat">{{ $apt->treatment->name }}</div>
+                                                    <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                     <div class="m-doc-name">
                                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
-                                                        {{ $doc->name }}
+                                                        {{ $doc->full_name }}
                                                     </div>
                                                 </div>
                                             @endif
@@ -248,10 +248,10 @@
                         @foreach ($dateColumns as $dc)
                             @php 
                                 $dcCarbon = \Carbon\Carbon::parse($dc); 
-                                $aptsForDate = \App\Models\Appointment::with('treatment')
+                                $aptsForDate = \App\Models\Appointment::with('patient')
                                     ->where('doctor_id', $selectedDoctorId)
-                                    ->whereDate('appointment_date', $dc)
-                                    ->orderBy('appointment_time')
+                                    ->whereDate('appointment_datetime', $dc)
+                                    ->orderBy('appointment_datetime')
                                     ->get();
                             @endphp
                             <div class="mobile-time-group">
@@ -263,10 +263,10 @@
                                         @foreach ($aptsForDate as $apt)
                                             <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
                                                 <div class="m-card-header">
-                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_time)->format('H:i') }} | {{ $apt->patient_name }}</div>
+                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }} | {{ $apt->patient_name }}</div>
                                                     <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                 </div>
-                                                <div class="apt-treat">{{ $apt->treatment->name }}</div>
+                                                <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                             </div>
                                         @endforeach
                                     @else

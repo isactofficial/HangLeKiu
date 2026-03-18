@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Route;
 
 // PUBLIC
@@ -15,6 +16,12 @@ Route::get('/registration',  [AppointmentController::class, 'create'])->name('re
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
 Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
+
+Route::prefix('api/patients')->group(function () {
+    Route::post('/', [PatientController::class, 'store']);
+    Route::get('/', [PatientController::class, 'index']);
+    Route::get('/{id}', [PatientController::class, 'show']);
+});
 
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
