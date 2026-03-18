@@ -2,28 +2,21 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
-    protected $table = 'user';
-
-    protected $keyType = 'string';
-
+    protected $table     = 'user'; // tabel singular sesuai ERD tim
     public $incrementing = false;
+    protected $keyType   = 'string';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'id',
         'role_id',
@@ -36,60 +29,45 @@ class User extends Authenticatable
         'last_login_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'is_active'     => 'boolean',
+        'is_verified'   => 'boolean',
+        'last_login_at' => 'datetime',
+        'deleted_at'    => 'datetime',
+    ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
+
+    // ── JWT ───────────────────────────────────────────
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(): array
     {
         return [
-            'password' => 'hashed',
-            'is_active' => 'boolean',
-            'is_verified' => 'boolean',
-            'last_login_at' => 'datetime',
+            'role'  => $this->role?->code,
+            'email' => $this->email,
+            'name'  => $this->name,
         ];
     }
 
-    public function roleRecord(): BelongsTo
+    // ── Relations ─────────────────────────────────────
+    public function role()
     {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
-
-    public function getRoleAttribute(): ?string
-    {
-        $role = $this->relationLoaded('roleRecord')
-            ? $this->getRelation('roleRecord')
-            : $this->roleRecord()->first();
-
-        if (! $role) {
-            return null;
-        }
-
-        $code = strtoupper((string) $role->code);
-
-        if ($code === 'ADM' || $code === 'OWN') {
-            return 'admin';
-        }
-
-        if ($code === 'PAT') {
-            return 'user';
-        }
-
-        if ($code === 'DCT') {
-            return 'doctor';
-        }
-
-        return strtolower((string) $role->name);
+        return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 }

@@ -1,6 +1,8 @@
 @extends('admin.layout.admin')
 @section('title', 'Apotek')
 
+@section('content')
+
 @php
     $menuList = [
         'antrian'          => 'Antrian Hari Ini',
