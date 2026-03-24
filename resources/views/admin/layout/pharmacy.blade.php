@@ -20,7 +20,10 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/layout/pharmacy.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pharmacy-mobile.css') }}">
 @endpush
+
+@section('content')
 
 <div class="apt-container">
 
