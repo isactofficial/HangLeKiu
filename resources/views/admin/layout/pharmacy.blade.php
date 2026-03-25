@@ -22,6 +22,9 @@
     <link rel="stylesheet" href="{{ asset('css/admin/layout/pharmacy.css') }}">
 @endpush
 
+{{-- PERBAIKAN: Menambahkan tag pembuka section di sini --}}
+@section('content')
+
 <div class="apt-container">
 
     <div class="apt-header">
