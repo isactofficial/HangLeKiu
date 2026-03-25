@@ -47,6 +47,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
         Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
         Route::get('/registration', fn() => view('admin.pages.registration'))->name('registration');
+        Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
+        Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
         Route::get('/emr',          fn() => view('admin.pages.emr'))->name('emr');
         Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');

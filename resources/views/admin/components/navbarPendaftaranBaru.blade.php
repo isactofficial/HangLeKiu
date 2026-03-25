@@ -30,15 +30,15 @@
 
             <div class="navbar-dropdown" id="pendaftaranDropdown">
                 <button class="navbar-btn-primary" onclick="toggleDropdown('pendaftaranMenu')">
-                    <span class="btn-text-desktop">Pendaftaran Baru</span>
+                    <span class="btn-text-desktop">{{ $title ?: 'Pilih Opsi' }}</span>
                     <span class="btn-text-mobile">Daftar</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                     </svg>
                 </button>
                 <div class="navbar-dropdown-menu" id="pendaftaranMenu" style="left:0;right:auto;top:calc(100% + 4px);">
-                    <a href="#" class="dropdown-item">Pasien Baru</a>
-                    <a href="#" class="dropdown-item">Pasien Lama</a>
+                    <a href="{{ route('admin.registration.pendaftaran-baru') }}" class="dropdown-item">Pendaftaran Baru</a>
+                    <a href="{{ route('admin.registration.pasien-baru') }}" class="dropdown-item">Pasien Baru</a>
                 </div>
             </div>
         </div>

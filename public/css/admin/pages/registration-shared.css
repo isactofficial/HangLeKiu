@@ -1,0 +1,280 @@
+/* =============================================================
+   registration-shared.css
+   Shared styles for Pasien Baru & Pendaftaran Baru pages
+   ============================================================= */
+
+/* ── CSS Variables ── */
+:root {
+    --cream-50:  #fdf9f5;
+    --cream-100: #f7f0e6;
+    --cream-200: #ecdcca;
+    --gold-300:  #d4a96a;
+    --gold-400:  #C58F59;
+    --gold-500:  #a97540;
+    --brown-600: #7a4f28;
+    --brown-700: #582C0C;
+    --brown-900: #2e1505;
+    --white:     #ffffff;
+    --req-star:  #e05252;
+    --text-gray: #b09a85;
+    --shadow-md: 0 4px 16px rgba(88,44,12,0.08), 0 2px 6px rgba(88,44,12,0.05);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; }
+
+/* ── Page Wrapper ── */
+body, .page-wrapper {
+    font-family: 'Instrument Sans', sans-serif;
+    background: var(--cream-50);
+}
+
+.page-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+}
+
+/* ── Page Title ── */
+.page-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--brown-700);
+    margin-bottom: 24px;
+}
+
+/* ── Card Container ── */
+.form-card {
+    background: var(--white);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+/* ── Section Header ── */
+.section-header {
+    background: var(--brown-700);
+    color: var(--white);
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+/* ── Form Body ── */
+.form-body {
+    padding: 32px 40px 40px;
+}
+
+/* ── Grid Layouts ── */
+.grid-1 { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 40px; margin-bottom: 32px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px 24px; margin-bottom: 32px; }
+
+@media (max-width: 768px) {
+    .grid-1, .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* ── Form Groups ── */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.form-label {
+    font-size: 13px;
+    color: var(--gold-400);
+    margin-bottom: 8px;
+}
+
+.form-label .req {
+    color: var(--req-star);
+}
+
+/* ── Required Notice ── */
+.req-notice {
+    color: var(--gold-400);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.req-notice span {
+    color: var(--req-star);
+}
+
+/* ── Line Input (Text, Email, Number) ── */
+.input-line {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid var(--cream-200);
+    background: transparent;
+    padding: 4px 0 8px 0;
+    font-size: 15px;
+    font-family: 'Instrument Sans', sans-serif;
+    color: var(--brown-700);
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.input-line::placeholder { color: var(--cream-200); }
+.input-line:focus { border-bottom-color: var(--gold-400); }
+.input-line[readonly] { color: var(--text-gray); }
+
+/* ── Icon Input Wrapper (Date, Time, Phone) ── */
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid var(--cream-200);
+    transition: border-color var(--transition);
+}
+
+.input-icon-wrapper:focus-within {
+    border-bottom-color: var(--gold-400);
+}
+
+.input-icon-wrapper .input-line {
+    border-bottom: none;
+}
+
+.icon-left {
+    margin-right: 8px;
+    color: var(--gold-400);
+    width: 18px;
+    height: 18px;
+}
+
+.icon-right {
+    position: absolute;
+    right: 0;
+    color: var(--text-gray);
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+/* ── Flex Input Wrapper (e.g. duration + suffix) ── */
+.input-flex-wrapper {
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid var(--cream-200);
+    transition: border-color var(--transition);
+}
+
+.input-flex-wrapper:focus-within { border-bottom-color: var(--gold-400); }
+.input-flex-wrapper .input-line { border-bottom: none; flex: 1; }
+.input-suffix { color: var(--text-gray); font-size: 14px; margin-left: 8px; }
+
+/* ── Pill Select (Dropdown) ── */
+.input-pill {
+    width: 100%;
+    border: 1.5px solid var(--gold-400);
+    border-radius: 999px;
+    padding: 10px 36px 10px 16px;
+    font-size: 14px;
+    font-family: 'Instrument Sans', sans-serif;
+    color: var(--brown-700);
+    background-color: transparent;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C58F59' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    transition: box-shadow var(--transition);
+}
+
+.input-pill:focus {
+    box-shadow: 0 0 0 3px rgba(197,143,89,0.12);
+}
+
+.input-pill:disabled {
+    border-color: var(--cream-200);
+    color: var(--text-gray);
+    cursor: not-allowed;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b09a85' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* ── Sub-text (Helper text below inputs) ── */
+.sub-text {
+    font-size: 11px;
+    color: var(--text-gray);
+    margin-top: 6px;
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+}
+
+/* ── Checkbox Wrapper ── */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    cursor: pointer;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--gold-400);
+    cursor: pointer;
+}
+
+.checkbox-wrapper span {
+    font-size: 13px;
+    color: var(--brown-700);
+}
+
+/* ── Button: Outline ── */
+.btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--gold-400);
+    color: var(--gold-400);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Instrument Sans', sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all var(--transition);
+}
+
+.btn-outline:hover {
+    background: var(--cream-50);
+    color: var(--gold-500);
+}
+
+/* ── Button: Solid ── */
+.btn-solid {
+    background: var(--gold-400);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Instrument Sans', sans-serif;
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.btn-solid:hover { background: var(--gold-500); }
+
+/* ── Hide native date/time picker icons ── */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
