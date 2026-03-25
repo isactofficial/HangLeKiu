@@ -147,3 +147,127 @@ Not found response (404):
   "message": "Data pasien tidak ditemukan"
 }
 ```
+
+## 4) Update Pasien (Data Patient + User)
+
+- Method: PUT
+- Endpoint: /api/patients/{id}
+- Headers:
+  - Content-Type: application/json
+  - Accept: application/json
+  - Authorization/Cookie Session login user
+
+Contoh:
+PUT /api/patients/550e8400-e29b-41d4-a716-446655440000
+
+Request body (partial update diperbolehkan):
+```json
+{
+  "full_name": "Muhammad Farhan Update",
+  "email": "farhan.update@gmail.com",
+  "password": "passwordBaru123",
+  "city": "Jakarta",
+  "allergy_history": "Alergi udang"
+}
+```
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data pasien berhasil diperbarui",
+  "data": {
+    "user": {
+      "id": "uuid",
+      "name": "Muhammad Farhan Update",
+      "email": "farhan.update@gmail.com"
+    },
+    "patient": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "user_id": "uuid",
+      "full_name": "Muhammad Farhan Update",
+      "email": "farhan.update@gmail.com",
+      "city": "Jakarta",
+      "allergy_history": "Alergi udang",
+      "updated_at": "2026-03-24T10:00:00.000000Z"
+    }
+  }
+}
+```
+
+Not found response (404):
+```json
+{
+  "success": false,
+  "message": "Data pasien tidak ditemukan"
+}
+```
+
+Unauthorized response (401):
+```json
+{
+  "success": false,
+  "message": "Unauthenticated"
+}
+```
+
+Forbidden response (403):
+```json
+{
+  "success": false,
+  "message": "Anda tidak memiliki akses untuk mengubah data pasien ini"
+}
+```
+
+Validation notes:
+- Semua field bersifat opsional (partial update).
+- Jika mengirim email, email harus unik pada tabel user (kecuali milik user pasien yang sedang diupdate).
+- Jika mengirim password kosong/null, password user tidak diubah.
+
+## 5) Delete Pasien (Soft Delete)
+
+- Method: DELETE
+- Endpoint: /api/patients/{id}
+- Headers:
+  - Accept: application/json
+  - Authorization/Cookie Session login user
+
+Contoh:
+DELETE /api/patients/550e8400-e29b-41d4-a716-446655440000
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data pasien berhasil dihapus (soft delete)"
+}
+```
+
+Not found response (404):
+```json
+{
+  "success": false,
+  "message": "Data pasien tidak ditemukan"
+}
+```
+
+Unauthorized response (401):
+```json
+{
+  "success": false,
+  "message": "Unauthenticated"
+}
+```
+
+Forbidden response (403):
+```json
+{
+  "success": false,
+  "message": "Anda tidak memiliki akses untuk mengubah data pasien ini"
+}
+```
+
+Catatan:
+- Endpoint ini melakukan soft delete pada data patient dan user terkait (jika ada).
+- Data tidak hilang permanen dari database, hanya terisi deleted_at.
+- Admin bisa update/delete semua data pasien, user hanya bisa update/delete data miliknya sendiri.

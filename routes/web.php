@@ -21,6 +21,8 @@ Route::prefix('api/patients')->group(function () {
     Route::post('/', [PatientController::class, 'store']);
     Route::get('/', [PatientController::class, 'index']);
     Route::get('/{id}', [PatientController::class, 'show']);
+    Route::put('/{id}', [PatientController::class, 'update']);
+    Route::delete('/{id}', [PatientController::class, 'destroy']);
 });
 
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
