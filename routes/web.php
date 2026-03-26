@@ -93,8 +93,6 @@ Route::middleware('auth')->group(function () {
         // Create akun dokter hanya dari menu settings admin.
         Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])
             ->name('settings.staff.doctor.store');
-    });
-
 
         // ── Registration API (diakses dari Blade via fetch) ──
         Route::prefix('api/registration')->group(function () {
@@ -127,9 +125,4 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', fn() => view('doctor.pages.dashboard'))->name('dashboard');
     });
-
-    // dummy lama
-    Route::post('/registration/store', function () {
-        return back()->withErrors(['(dummy) Belum disambungkan ke database.']);
-    })->name('registration.store');
 });
