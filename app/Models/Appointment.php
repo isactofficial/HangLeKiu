@@ -40,11 +40,7 @@ class Appointment extends Model
     ];
 
     protected $casts = [
-<<<<<<< Updated upstream
-        'registration_date' => 'date',
-=======
         'registration_date'    => 'date',
->>>>>>> Stashed changes
         'appointment_datetime' => 'datetime',
     ];
 
@@ -70,11 +66,7 @@ class Appointment extends Model
 
     public function patient(): BelongsTo
     {
-<<<<<<< Updated upstream
-        return $this->belongsTo(Patient::class);
-=======
         return $this->belongsTo(Patient::class, 'patient_id');
->>>>>>> Stashed changes
     }
 
     public function admin(): BelongsTo
@@ -118,6 +110,24 @@ class Appointment extends Model
         return self::STATUS_COLORS[$this->status] ?? '#6B7280';
     }
 
+    /**
+     * Get Bootstrap-compatible badge class for status
+     */
+    public function getStatusBadgeClass(): string
+    {
+        return match($this->status) {
+            'pending' => 'badge-pending',
+            'confirmed' => 'badge-confirmed',
+            'waiting' => 'badge-waiting',
+            'engaged' => 'badge-engaged',
+            'succeed' => 'badge-succeed',
+            default => 'badge-default'
+        };
+    }
+
+    /**
+     * Format jam: "19:30" → "19:30 WIB"
+     */
     public function getFormattedTimeAttribute(): string
     {
         if (!$this->appointment_datetime) {
@@ -125,56 +135,6 @@ class Appointment extends Model
         }
 
         return Carbon::parse($this->appointment_datetime)->format('H:i') . ' WIB';
-<<<<<<< Updated upstream
-    }
-
-    // Kompatibilitas ke view lama yang masih memakai appointment_time
-    public function getAppointmentTimeAttribute(): ?string
-    {
-        if (!$this->appointment_datetime) {
-            return null;
-        }
-
-        return Carbon::parse($this->appointment_datetime)->format('H:i:s');
-    }
-
-    // Kompatibilitas ke view lama yang masih memakai appointment_date
-    public function getAppointmentDateAttribute(): ?string
-    {
-        if (!$this->appointment_datetime) {
-            return null;
-        }
-
-        return Carbon::parse($this->appointment_datetime)->toDateString();
-    }
-
-    // Kompatibilitas untuk kartu jadwal yang menampilkan nama pasien
-    public function getPatientNameAttribute(): string
-    {
-        if ($this->relationLoaded('patient') && $this->patient) {
-            return $this->patient->full_name;
-        }
-
-        if ($this->patient_id) {
-            $patient = Patient::query()->select('full_name')->find($this->patient_id);
-            if ($patient?->full_name) {
-                return $patient->full_name;
-            }
-        }
-
-        if ($this->complaint && preg_match('/Nama\s*:\s*(.+)/i', $this->complaint, $matches)) {
-            return trim($matches[1]);
-        }
-
-        return 'Pasien';
-    }
-
-    // Kompatibilitas untuk field treatment di halaman outpatient
-    public function getTreatmentNameAttribute(): string
-    {
-        return $this->procedure_plan ?: '-';
-=======
->>>>>>> Stashed changes
     }
 
     // Kompatibilitas view lama

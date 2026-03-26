@@ -33,6 +33,11 @@ class AuthController extends Controller
         return view('admin.pages.admin-register');
     }
 
+    public function showDoctorLogin()
+    {
+        return view('doctor.pages.login');
+    }
+
     // ── USER LOGIN ────────────────────────────────────────────
 
     public function login(Request $request)
@@ -43,16 +48,58 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            // Kalau yang login ternyata admin, tolak
-            if (Auth::user()->role?->code === 'ADM') {
+            // Halaman login user hanya untuk role PAT.
+            $roleCode = Auth::user()->role?->code;
+
+            if ($roleCode === 'ADM') {
                 Auth::logout();
                 return back()->withErrors([
                     'email' => 'Akun admin harus login lewat halaman admin.',
                 ])->onlyInput('email');
             }
 
+            if ($roleCode === 'DCT') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Akun dokter harus login lewat halaman dokter.',
+                ])->onlyInput('email');
+            }
+
+            if ($roleCode !== 'PAT') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Akun ini bukan akun user.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
             return redirect()->intended('/user/dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->onlyInput('email');
+    }
+
+    // ── DOCTOR LOGIN ───────────────────────────────────────
+
+    public function doctorLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            if (Auth::user()->role?->code !== 'DCT') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Akun ini bukan akun dokter.',
+                ])->onlyInput('email');
+            }
+
+            $request->session()->regenerate();
+            return redirect()->intended(route('doctor.dashboard'));
         }
 
         return back()->withErrors([

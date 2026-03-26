@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Treatment;
-use App\Models\Patient;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -51,23 +50,9 @@ class AppointmentController extends Controller
             'procedure_plan' => $treatment?->procedure_name,
             'complaint' => trim("Nama: {$validated['patient_name']}\nWhatsApp: {$validated['patient_phone']}\nCatatan: " . ($validated['notes'] ?? '-')),
         ]);
-        $appointmentDateTime = Carbon::parse(
-            $validated['appointment_date'] . ' ' . $validated['appointment_time']
-        );
 
-        $treatment = Treatment::find($validated['treatment_id']);
-
-        Appointment::create([
-            'id'                   => (string) Str::uuid(),
-            'doctor_id'            => $validated['doctor_id'],
-            'registration_date'    => $validated['appointment_date'],
-            'appointment_datetime' => $appointmentDateTime,
-            'status'               => 'pending',
-            'procedure_plan'       => $treatment?->procedure_name,
-            'complaint'            => "Nama: {$validated['patient_name']}\nWA: {$validated['patient_phone']}\nCatatan: " . ($validated['notes'] ?? '-'),
-        ]);
-
-        return redirect()->route('appointments.success');
+        return redirect()->route('appointments.success')
+            ->with('success', 'Pendaftaran berhasil! Kami akan konfirmasi via WhatsApp dalam 1x24 jam.');
     }
 
     public function success()
@@ -92,10 +77,6 @@ class AppointmentController extends Controller
 
         $doctors = Doctor::active()->orderBy('full_name')->get();
 
-<<<<<<< Updated upstream
-        // Ambil semua appointment di tanggal ini
-=======
->>>>>>> Stashed changes
         $appointments = Appointment::with(['doctor', 'patient'])
             ->forDate($date)
             ->get();

@@ -13,9 +13,143 @@
             <button class="ms-btn-group-item active">Informasi PIC</button>
             <button class="ms-btn-group-item">Tidak Aktif</button>
         </div>
-        <button class="ms-btn-primary">
+        <button class="ms-btn-primary" type="button" id="ms-open-doctor-modal">
             + Tambah Staff
         </button>
+    </div>
+</div>
+
+@if (session('success'))
+    <div class="ms-alert ms-alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if($errors->has('doctor_create') || $errors->any())
+    <div class="ms-alert ms-alert-error">
+        {{ $errors->first('doctor_create') ?: 'Periksa kembali form tambah staff.' }}
+    </div>
+@endif
+
+<div id="ms-doctor-modal" class="ms-modal-overlay" aria-hidden="true">
+    <div class="ms-modal-card" role="dialog" aria-modal="true" aria-labelledby="ms-doctor-modal-title">
+        <div class="ms-modal-header">
+            <h3 id="ms-doctor-modal-title">Tambah Staff Dokter</h3>
+            <button type="button" class="ms-modal-close" id="ms-close-doctor-modal" aria-label="Tutup">x</button>
+        </div>
+
+        <form method="POST" action="{{ route('admin.settings.staff.doctor.store') }}" class="ms-modal-form">
+            @csrf
+
+            <section class="ms-section">
+                <h4 class="ms-section-title">Akun Login (Wajib)</h4>
+                <p class="ms-section-help">Data ini dipakai dokter untuk login ke halaman dokter.</p>
+                <div class="ms-form-grid">
+                    <div class="ms-field full">
+                        <label for="full_name">Nama Lengkap *</label>
+                        <input id="full_name" name="full_name" type="text" value="{{ old('full_name') }}" placeholder="Contoh: drg. Anisa Putri" required>
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="email">Email Login *</label>
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="dokter@hanglekiu.com" required>
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="password">Password Login *</label>
+                        <input id="password" name="password" type="password" placeholder="Minimal 8 karakter" required>
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="password_confirmation">Konfirmasi Password *</label>
+                        <input id="password_confirmation" name="password_confirmation" type="password" required>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ms-section">
+                <h4 class="ms-section-title">Profil Dokter</h4>
+                <div class="ms-form-grid">
+                    <div class="ms-field">
+                        <label for="phone_number">Nomor HP</label>
+                        <input id="phone_number" name="phone_number" type="text" value="{{ old('phone_number') }}" placeholder="08xxxxxxxxxx">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="title_prefix">Gelar Depan</label>
+                        <input id="title_prefix" name="title_prefix" type="text" value="{{ old('title_prefix') }}" placeholder="Contoh: drg.">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="specialization">Spesialisasi</label>
+                        <input id="specialization" name="specialization" type="text" value="{{ old('specialization') }}" placeholder="Contoh: Sp.Ortho">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="subspecialization">Subspesialisasi</label>
+                        <input id="subspecialization" name="subspecialization" type="text" value="{{ old('subspecialization') }}">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="job_title">Jabatan</label>
+                        <input id="job_title" name="job_title" type="text" value="{{ old('job_title') }}" placeholder="Contoh: Dokter Gigi Spesialis">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="is_active">Status</label>
+                        <select id="is_active" name="is_active">
+                            <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>Aktif</option>
+                            <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Tidak Aktif</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <details class="ms-section ms-optional" {{ old('license_no') || old('str_number') || old('sip_number') ? 'open' : '' }}>
+                <summary class="ms-section-title">Legalitas: STR, SIP, Lisensi</summary>
+                <div class="ms-form-grid">
+                    <div class="ms-field">
+                        <label for="license_no">Nomor Lisensi</label>
+                        <input id="license_no" name="license_no" type="text" value="{{ old('license_no') }}">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="str_institution">Instansi STR</label>
+                        <input id="str_institution" name="str_institution" type="text" value="{{ old('str_institution') }}">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="str_number">Nomor STR</label>
+                        <input id="str_number" name="str_number" type="text" value="{{ old('str_number') }}">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="str_expiry_date">Tanggal Expired STR</label>
+                        <input id="str_expiry_date" name="str_expiry_date" type="date" value="{{ old('str_expiry_date') }}">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="sip_institution">Instansi SIP</label>
+                        <input id="sip_institution" name="sip_institution" type="text" value="{{ old('sip_institution') }}">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="sip_number">Nomor SIP</label>
+                        <input id="sip_number" name="sip_number" type="text" value="{{ old('sip_number') }}">
+                    </div>
+
+                    <div class="ms-field">
+                        <label for="sip_expiry_date">Tanggal Expired SIP</label>
+                        <input id="sip_expiry_date" name="sip_expiry_date" type="date" value="{{ old('sip_expiry_date') }}">
+                    </div>
+                </div>
+            </details>
+
+            <div class="ms-modal-actions">
+                <button type="button" class="ms-btn-filter" id="ms-cancel-doctor-modal">Batal</button>
+                <button type="submit" class="ms-btn-primary">Simpan Akun Dokter</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -29,6 +163,52 @@
         Filter
     </button>
 </div>
+
+<script>
+    (function () {
+        const modal = document.getElementById('ms-doctor-modal');
+        const openBtn = document.getElementById('ms-open-doctor-modal');
+        const closeBtn = document.getElementById('ms-close-doctor-modal');
+        const cancelBtn = document.getElementById('ms-cancel-doctor-modal');
+
+        if (!modal || !openBtn) {
+            return;
+        }
+
+        const openModal = () => {
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('ms-modal-open');
+            document.getElementById('full_name')?.focus();
+        };
+
+        const closeModal = () => {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('ms-modal-open');
+        };
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn?.addEventListener('click', closeModal);
+        cancelBtn?.addEventListener('click', closeModal);
+
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modal.classList.contains('show')) {
+                closeModal();
+            }
+        });
+
+        @if($errors->has('doctor_create') || $errors->any())
+            openModal();
+        @endif
+    })();
+</script>
 
 <div class="ms-table-card">
     <div class="ms-table-wrapper">

@@ -44,6 +44,151 @@
     }
     .ms-btn-filter:hover { border-color: #C58F59; color: #C58F59; }
 
+    .ms-alert {
+        margin: 12px 0;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 13px;
+        border: 1px solid transparent;
+    }
+    .ms-alert-success { background: #edf7ed; border-color: #b7dfb7; color: #2f6b2f; }
+    .ms-alert-error { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+
+    .ms-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(43, 27, 14, .38);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 18px;
+    }
+    .ms-modal-overlay.show { display: flex; }
+
+    .ms-modal-card {
+        width: min(980px, 100%);
+        max-height: 92vh;
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #E5D6C5;
+        box-shadow: 0 16px 46px rgba(39, 22, 8, .24);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ms-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid #EEE2D4;
+    }
+    .ms-modal-header h3 {
+        margin: 0;
+        color: #582C0C;
+        font-size: 17px;
+    }
+    .ms-modal-close {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #E5D6C5;
+        border-radius: 8px;
+        background: #fff;
+        color: #6B513E;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .ms-modal-form {
+        overflow: auto;
+        padding: 16px;
+    }
+
+    .ms-section {
+        border: 1px solid #efe2d3;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 12px;
+        background: #fff;
+    }
+
+    .ms-section-title {
+        margin: 0 0 8px;
+        color: #4f3420;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .ms-section-help {
+        margin: 0 0 10px;
+        font-size: 12px;
+        color: #8a6b52;
+    }
+
+    .ms-optional summary {
+        cursor: pointer;
+        list-style: none;
+    }
+    .ms-optional summary::-webkit-details-marker {
+        display: none;
+    }
+    .ms-optional summary::after {
+        content: ' +';
+        color: #8a6b52;
+        font-weight: 600;
+    }
+    .ms-optional[open] summary::after {
+        content: ' -';
+    }
+    .ms-optional .ms-form-grid {
+        margin-top: 10px;
+    }
+
+    .ms-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .ms-field.full { grid-column: 1 / -1; }
+    .ms-field label {
+        display: block;
+        margin-bottom: 6px;
+        color: #6B513E;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .ms-field input,
+    .ms-field select {
+        width: 100%;
+        border: 1px solid #dbc7b2;
+        border-radius: 8px;
+        padding: 9px 10px;
+        font-size: 13px;
+        font-family: inherit;
+        color: #3f2a1b;
+        background: #fff;
+    }
+    .ms-field input:focus,
+    .ms-field select:focus {
+        outline: none;
+        border-color: #C58F59;
+        box-shadow: 0 0 0 2px rgba(197, 143, 89, .15);
+    }
+
+    .ms-modal-actions {
+        margin-top: 14px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    body.ms-modal-open {
+        overflow: hidden;
+    }
+
     /* Table */
     .ms-table-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(88,44,12,.05); margin-top: 16px; }
     .ms-table-wrapper { width: 100%; overflow-x: auto; }
@@ -105,5 +250,10 @@
         .ms-search-box input { width: 100%; }
         .ms-pagination { flex-direction: column; align-items: flex-start; gap: 12px; }
         .ms-table td, .ms-table th { padding: 10px 14px; }
+        .ms-form-grid { grid-template-columns: 1fr; }
+        .ms-modal-card { max-height: 95vh; }
+        .ms-modal-actions { flex-direction: column-reverse; }
+        .ms-modal-actions .ms-btn-primary,
+        .ms-modal-actions .ms-btn-filter { width: 100%; justify-content: center; }
     }
 
