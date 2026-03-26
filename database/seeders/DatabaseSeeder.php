@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class, // harus urutan pertama, karena UserSeeder butuh role_id
             UserSeeder::class,
+            MasterDataSeeder::class,
         ]);
     }
 }

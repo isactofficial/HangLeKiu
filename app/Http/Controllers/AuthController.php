@@ -44,7 +44,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             // Kalau yang login ternyata admin, tolak
-            if (Auth::user()->role === 'admin') {
+            if (Auth::user()->role?->code === 'ADM') {
                 Auth::logout();
                 return back()->withErrors([
                     'email' => 'Akun admin harus login lewat halaman admin.',
@@ -71,7 +71,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             // Kalau yang login ternyata bukan admin, tolak
-            if (Auth::user()->role !== 'admin') {
+            if (Auth::user()->role?->code !== 'ADM') {
                 Auth::logout();
                 return back()->withErrors([
                     'email' => 'Akun ini bukan akun admin.',

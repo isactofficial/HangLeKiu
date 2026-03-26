@@ -9,21 +9,18 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use App\Mail\VerifyEmailMail;
 
 class AuthController extends Controller
 {
     // ── Register ──────────────────────────────────────────────────────────────
     /**
      * POST /api/auth/register
-     *
-     * Body:
-     *  - name                  : string, required, max 50
-     *  - email                 : string, required, email, unique
-     *  - password              : string, required, min 8
-     *  - password_confirmation : string, required, harus sama dengan password
      */
     public function register(Request $request): JsonResponse
     {
@@ -51,7 +48,6 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Default role = PAT (Patient) untuk registrasi publik
         $patientRole = Role::where('code', 'PAT')->first();
 
         if (! $patientRole) {
@@ -62,17 +58,39 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'role_id'  => $patientRole->id,
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
+            'role_id'                  => $patientRole->id,
+            'name'                     => $request->name,
+            'email'                    => $request->email,
+            'password'                 => Hash::make($request->password),
+            'email_verification_token' => Str::random(64),
         ]);
+
+        // Kirim email verifikasi
+        try {
+            $verificationUrl = url('/api/auth/verify/' . $user->email_verification_token);
+            Mail::to($user->email)->send(new VerifyEmailMail($verificationUrl, $user->name));
+        } catch (\Exception $e) {
+            // Tetap return sukses walau email gagal, tapi beri tahu user
+            $user->load('role');
+            return response()->json([
+                'success' => true,
+                'message' => 'Registrasi berhasil, namun email verifikasi gagal dikirim. Hubungi administrator.',
+                'data'    => [
+                    'id'          => $user->id,
+                    'name'        => $user->name,
+                    'email'       => $user->email,
+                    'role'        => $user->role->code,
+                    'is_verified' => $user->is_verified,
+                    'created_at'  => $user->created_at,
+                ],
+            ], 201);
+        }
 
         $user->load('role');
 
         return response()->json([
             'success' => true,
-            'message' => 'Registrasi berhasil! Silakan login.',
+            'message' => 'Registrasi berhasil! Cek email kamu untuk verifikasi.',
             'data'    => [
                 'id'          => $user->id,
                 'name'        => $user->name,
@@ -84,13 +102,88 @@ class AuthController extends Controller
         ], 201);
     }
 
+    // ── Verify Email ──────────────────────────────────────────────────────────
+    /**
+     * GET /api/auth/verify/{token}
+     */
+    public function verifyEmail(string $token): JsonResponse
+    {
+        $user = User::where('email_verification_token', $token)->first();
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token verifikasi tidak valid atau sudah digunakan.',
+            ], 400);
+        }
+
+        $user->update([
+            'is_verified'              => true,
+            'email_verification_token' => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email berhasil diverifikasi! Silakan login.',
+        ]);
+    }
+
+    // ── Resend Verification Email ─────────────────────────────────────────────
+    /**
+     * POST /api/auth/resend-verification
+     * Body: email
+     */
+    public function resendVerification(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email'    => 'Format email tidak valid.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        // Selalu return sukses agar tidak bocorkan info email terdaftar atau tidak
+        if (! $user || $user->is_verified) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Jika email terdaftar dan belum diverifikasi, link verifikasi telah dikirim.',
+            ]);
+        }
+
+        // Generate token baru
+        $user->update([
+            'email_verification_token' => Str::random(64),
+        ]);
+
+        try {
+            $verificationUrl = url('/api/auth/verify/' . $user->email_verification_token);
+            Mail::to($user->email)->send(new VerifyEmailMail($verificationUrl, $user->name));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim email. Coba lagi.',
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jika email terdaftar dan belum diverifikasi, link verifikasi telah dikirim.',
+        ]);
+    }
+
     // ── Login ─────────────────────────────────────────────────────────────────
     /**
      * POST /api/auth/login
-     *
-     * Body:
-     *  - email    : string, required
-     *  - password : string, required
      */
     public function login(Request $request): JsonResponse
     {
@@ -111,7 +204,6 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Cek user exist (include soft-deleted)
         $user = User::withTrashed()->where('email', $request->email)->first();
 
         if (! $user) {
@@ -121,7 +213,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Cek akun soft deleted
         if ($user->deleted_at !== null) {
             return response()->json([
                 'success' => false,
@@ -129,11 +220,19 @@ class AuthController extends Controller
             ], 403);
         }
 
-        // Cek akun dinonaktifkan (soft ban)
         if (! $user->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Akun Anda dinonaktifkan. Hubungi administrator.',
+            ], 403);
+        }
+
+        // Cek email sudah diverifikasi
+        if (! $user->is_verified) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email belum diverifikasi. Cek inbox email kamu.',
+                'action'  => 'resend_verification', // hint untuk frontend
             ], 403);
         }
 
@@ -153,7 +252,6 @@ class AuthController extends Controller
             ], 500);
         }
 
-        // Update last_login_at
         $user->update(['last_login_at' => now()]);
         $user->load('role');
 
@@ -163,7 +261,7 @@ class AuthController extends Controller
             'data'    => [
                 'token'      => $token,
                 'token_type' => 'bearer',
-                'expires_in' => config('jwt.ttl') * 60, // dalam detik
+                'expires_in' => config('jwt.ttl') * 60,
                 'user'       => [
                     'id'            => $user->id,
                     'name'          => $user->name,

@@ -8,17 +8,53 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Doctor extends Model
 {
     protected $table = 'doctor';
-    protected $fillable = ['full_name', 'specialization', 'subspecialization', 'is_active', 'user_id', 'email', 'phone_number', 'title_prefix', 'license_no', 'str_institution', 'str_number', 'str_expiry_date', 'sip_institution', 'sip_number', 'sip_expiry_date', 'job_title'];
 
-    protected $casts = ['is_active' => 'boolean'];
+    // 🔥 WAJIB kalau pakai ID string (D001, dll)
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'id',
+        'full_name',
+        'specialization',
+        'subspecialization',
+        'is_active',
+        'user_id',
+        'email',
+        'phone_number',
+        'title_prefix',
+        'license_no',
+        'str_institution',
+        'str_number',
+        'str_expiry_date',
+        'sip_institution',
+        'sip_number',
+        'sip_expiry_date',
+        'job_title'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'str_expiry_date' => 'date',
+        'sip_expiry_date' => 'date',
+    ];
+
+    // ================= RELATION =================
 
     public function appointments(): HasMany
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasMany(Appointment::class, 'doctor_id');
     }
 
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(DoctorSchedule::class, 'doctor_id');
+    }
+
+    // ================= ACCESSOR =================
+
     /**
-     * Nama lengkap dengan gelar & spesialisasi
      * Contoh: "drg. Jane Doe Sp.Ortho"
      */
     public function getFullTitleAttribute(): string
@@ -27,6 +63,8 @@ class Doctor extends Model
             ? "{$this->full_name} {$this->specialization}"
             : $this->full_name;
     }
+
+    // ================= SCOPE =================
 
     public function scopeActive($query)
     {

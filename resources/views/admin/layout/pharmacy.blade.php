@@ -25,9 +25,6 @@
     <link rel="stylesheet" href="{{ asset('css/pharmacy-mobile.css') }}">
 @endpush
 
-{{-- PERBAIKAN: Menambahkan tag pembuka section di sini --}}
-@section('content')
-
 @section('content')
 
 <div class="apt-container">

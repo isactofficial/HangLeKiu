@@ -15,13 +15,10 @@ class User extends Authenticatable implements JWTSubject
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
-    protected $table = 'user';
-
-    protected $keyType = 'string';
-
-    protected $table     = 'user'; // tabel singular sesuai ERD tim
+    protected $table     = 'user';
     public $incrementing = false;
     protected $keyType   = 'string';
+    protected $with = ['role'];
 
     protected $fillable = [
         'id',
@@ -29,6 +26,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'email_verification_token',
         'avatar_url',
         'is_active',
         'is_verified',
