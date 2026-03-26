@@ -62,34 +62,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
         Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
 
-        // Tambahan Yusmia (PENDAFTARAN BACKEND)
-        Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])
-            ->name('appointments.create');
-        Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])
-            ->name('appointments.store');
-        Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
-            ->name('appointments.updateStatus');
-
-        // ── Registration API (diakses dari Blade via fetch) ──
-        Route::prefix('api/registration')->group(function () {
-            Route::get('/master-data',    [RegistrationController::class, 'masterData']);
-            Route::get('/doctors',        [RegistrationController::class, 'doctors']);
-            Route::get('/slots',          [RegistrationController::class, 'availableSlots']);
-            Route::get('/search-patient', [RegistrationController::class, 'searchPatient']);
-            Route::post('/',              [RegistrationController::class, 'store']);
-        });
-
-        // ── Medicine/Stok Obat API (diakses dari Blade via fetch) ──
-        Route::prefix('api/medicine')->group(function () {
-            Route::get('/',                   [MedicineController::class, 'index']);
-            Route::post('/',                  [MedicineController::class, 'store']);
-            Route::get('/{id}',               [MedicineController::class, 'show']);
-            Route::put('/{id}',               [MedicineController::class, 'update']);
-            Route::delete('/{id}',            [MedicineController::class, 'destroy']);
-            Route::post('/{id}/stock-in',     [MedicineController::class, 'stockIn']);
-            Route::post('/{id}/stock-out',    [MedicineController::class, 'stockOut']);
-            Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);
-        });
     });
 
     // ================= USER =================

@@ -18,8 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'jwt.auth' => JwtMiddleware::class,                       // ← tambahkan ini
         ]);
 
-        $middleware->validateCsrfTokens(except: [
+         $middleware->validateCsrfTokens(except: [
             'api/*',
+            'admin/api/registration/*',
+            'admin/api/medicine/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
