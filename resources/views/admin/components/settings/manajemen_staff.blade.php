@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="ms-field full">
-                        <label for="ttd">TTD Dokter (Gambar)</label>
+                        <label for="ttd">TTD Dokter</label>
                         <input id="ttd" name="ttd" type="file" accept="image/png,image/jpeg,image/jpg,image/webp">
                         <small id="ttd-file-name" style="display:block;margin-top:6px;color:#8a6b52;">Belum ada file TTD dipilih.</small>
                         <img id="ttd-preview" alt="Preview TTD" style="display:none;margin-top:8px;max-height:90px;border:1px solid #dbc7b2;border-radius:8px;padding:4px;background:#fff;">

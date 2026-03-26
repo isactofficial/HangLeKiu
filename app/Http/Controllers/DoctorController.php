@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -227,7 +228,7 @@ class DoctorController extends Controller
                         $userPayload['email'] = $validated['email'];
                     }
                     if (array_key_exists('password', $validated) && ! empty($validated['password'])) {
-                        $userPayload['password'] = $validated['password'];
+                        $userPayload['password'] = Hash::make($validated['password']);
                     }
 
                     if (! empty($userPayload)) {
@@ -372,7 +373,7 @@ class DoctorController extends Controller
                 'role_id' => $roleDoctor->id,
                 'name' => $validated['full_name'],
                 'email' => $validated['email'],
-                'password' => $validated['password'],
+                'password' => Hash::make($validated['password']),
                 'is_active' => true,
                 'is_verified' => true,
             ]);

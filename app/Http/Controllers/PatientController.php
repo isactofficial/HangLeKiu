@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class PatientController extends Controller
@@ -42,7 +43,7 @@ class PatientController extends Controller
 				'role_id' => $rolePatient->id,
 				'name' => $validated['full_name'],
 				'email' => $validated['email'],
-				'password' => $validated['password'],
+				'password' => Hash::make($validated['password']),
 				'is_active' => true,
 				'is_verified' => false,
 			]);

@@ -69,7 +69,7 @@
 <body>
     <div class="card">
         <h1>Dashboard Dokter</h1>
-        <p>Akun dokter berhasil dibuat dan sudah login.</p>
+        <p>Berhasil login.</p>
 
         <div class="meta">
             <div><strong>Nama:</strong> {{ auth()->user()->name }}</div>
