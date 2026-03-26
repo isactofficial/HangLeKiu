@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Doctor;
+use App\Models\DoctorSchedule;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -10,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -21,6 +23,9 @@ class DoctorController extends Controller
             'full_name' => 'required|string|max:100',
             'email' => 'required|email|max:50|unique:user,email',
             'password' => 'required|string|min:8|confirmed',
+            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'ttd' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'estimasi_konsultasi' => 'nullable|integer|min:1|max:600',
             'phone_number' => 'nullable|string|max:20',
             'title_prefix' => 'nullable|string|max:50',
             'license_no' => 'nullable|string|max:50',
@@ -34,10 +39,14 @@ class DoctorController extends Controller
             'subspecialization' => 'nullable|string|max:100',
             'job_title' => 'nullable|string|max:50',
             'is_active' => 'nullable|boolean',
+            'schedules' => 'nullable|array',
+            'schedules.*.is_active' => 'nullable|in:0,1,true,false',
+            'schedules.*.start_time' => 'nullable|date_format:H:i',
+            'schedules.*.end_time' => 'nullable|date_format:H:i',
         ]);
 
         try {
-            $this->createDoctorUserAndProfile($validated);
+            $this->createDoctorUserAndProfile($validated, $request);
 
             return redirect()
                 ->route('admin.settings', ['menu' => 'manajemen-staff'])
@@ -75,6 +84,9 @@ class DoctorController extends Controller
             'full_name' => 'required|string|max:100',
             'email' => 'required|email|max:50|unique:user,email',
             'password' => 'required|string|min:8',
+            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'ttd' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'estimasi_konsultasi' => 'nullable|integer|min:1|max:600',
             'phone_number' => 'nullable|string|max:20',
             'title_prefix' => 'nullable|string|max:50',
             'license_no' => 'nullable|string|max:50',
@@ -88,10 +100,14 @@ class DoctorController extends Controller
             'subspecialization' => 'nullable|string|max:100',
             'job_title' => 'nullable|string|max:50',
             'is_active' => 'nullable|boolean',
+            'schedules' => 'nullable|array',
+            'schedules.*.is_active' => 'nullable|in:0,1,true,false',
+            'schedules.*.start_time' => 'nullable|date_format:H:i',
+            'schedules.*.end_time' => 'nullable|date_format:H:i',
         ]);
 
         try {
-            $result = $this->createDoctorUserAndProfile($validated);
+            $result = $this->createDoctorUserAndProfile($validated, $request);
 
             return response()->json([
                 'success' => true,
@@ -168,6 +184,9 @@ class DoctorController extends Controller
             'full_name' => 'sometimes|required|string|max:100',
             'email' => ['sometimes', 'required', 'email', 'max:50', $emailRule],
             'password' => 'sometimes|nullable|string|min:8',
+            'foto_profil' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'ttd' => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'estimasi_konsultasi' => 'sometimes|nullable|integer|min:1|max:600',
             'phone_number' => 'sometimes|nullable|string|max:20',
             'title_prefix' => 'sometimes|nullable|string|max:50',
             'license_no' => 'sometimes|nullable|string|max:50',
@@ -181,10 +200,19 @@ class DoctorController extends Controller
             'subspecialization' => 'sometimes|nullable|string|max:100',
             'job_title' => 'sometimes|nullable|string|max:50',
             'is_active' => 'sometimes|boolean',
+            'schedules' => 'sometimes|array',
+            'schedules.*.is_active' => 'nullable|in:0,1,true,false',
+            'schedules.*.start_time' => 'nullable|date_format:H:i',
+            'schedules.*.end_time' => 'nullable|date_format:H:i',
         ]);
 
         try {
-            $result = DB::transaction(function () use ($doctor, $validated) {
+            $schedulePayload = null;
+            if (array_key_exists('schedules', $validated)) {
+                $schedulePayload = $this->normalizeSchedules($validated['schedules'] ?? []);
+            }
+
+            $result = DB::transaction(function () use ($doctor, $validated, $request, $schedulePayload) {
                 $user = null;
                 if ($doctor->user_id) {
                     $user = User::find($doctor->user_id);
@@ -209,7 +237,27 @@ class DoctorController extends Controller
 
                 $doctorPayload = $validated;
                 unset($doctorPayload['password']);
+                unset($doctorPayload['schedules']);
+                unset($doctorPayload['foto_profil']);
+                unset($doctorPayload['ttd']);
+
+                if (array_key_exists('estimasi_konsultasi', $doctorPayload) && $doctorPayload['estimasi_konsultasi'] === '') {
+                    $doctorPayload['estimasi_konsultasi'] = null;
+                }
+
+                if ($request->hasFile('foto_profil')) {
+                    $doctorPayload['foto_profil'] = $this->storeProfilePhoto($request, $doctor->foto_profil);
+                }
+
+                if ($request->hasFile('ttd')) {
+                    $doctorPayload['ttd'] = $this->storeSignature($request, $doctor->ttd);
+                }
+
                 $doctor->update($doctorPayload);
+
+                if (is_array($schedulePayload)) {
+                    $this->syncDoctorSchedules($doctor, $schedulePayload);
+                }
 
                 $doctor->refresh();
                 if ($user) {
@@ -308,7 +356,7 @@ class DoctorController extends Controller
      *
      * @throws \RuntimeException
      */
-    private function createDoctorUserAndProfile(array $validated): array
+    private function createDoctorUserAndProfile(array $validated, Request $request): array
     {
         $roleDoctor = Role::where('code', 'DCT')->first();
 
@@ -316,7 +364,9 @@ class DoctorController extends Controller
             throw new \RuntimeException('Role DCT tidak ditemukan. Jalankan seeder terlebih dahulu.');
         }
 
-        return DB::transaction(function () use ($validated, $roleDoctor) {
+        $schedulePayload = $this->normalizeSchedules($validated['schedules'] ?? []);
+
+        return DB::transaction(function () use ($validated, $roleDoctor, $request, $schedulePayload) {
             $user = User::create([
                 'id' => (string) Str::uuid(),
                 'role_id' => $roleDoctor->id,
@@ -332,6 +382,9 @@ class DoctorController extends Controller
                 'user_id' => $user->id,
                 'full_name' => $validated['full_name'],
                 'email' => $validated['email'],
+                'foto_profil' => $request->hasFile('foto_profil') ? $this->storeProfilePhoto($request) : null,
+                'ttd' => $request->hasFile('ttd') ? $this->storeSignature($request) : null,
+                'estimasi_konsultasi' => $validated['estimasi_konsultasi'] ?? null,
                 'phone_number' => $validated['phone_number'] ?? null,
                 'title_prefix' => $validated['title_prefix'] ?? null,
                 'license_no' => $validated['license_no'] ?? null,
@@ -347,10 +400,93 @@ class DoctorController extends Controller
                 'is_active' => $validated['is_active'] ?? true,
             ]);
 
+            $this->syncDoctorSchedules($doctor, $schedulePayload);
+
             return [
                 'user' => $user,
                 'doctor' => $doctor,
             ];
         });
+    }
+
+    private function storeProfilePhoto(Request $request, ?string $oldPath = null): string
+    {
+        $newPath = $request->file('foto_profil')->store('doctor_profiles', 'public');
+
+        if ($oldPath) {
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        return $newPath;
+    }
+
+    private function storeSignature(Request $request, ?string $oldPath = null): string
+    {
+        $newPath = $request->file('ttd')->store('doctor_signatures', 'public');
+
+        if ($oldPath) {
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        return $newPath;
+    }
+
+    private function normalizeSchedules(?array $schedules): array
+    {
+        $allowedDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        $normalized = [];
+
+        if (! is_array($schedules)) {
+            return $normalized;
+        }
+
+        foreach ($allowedDays as $day) {
+            $row = $schedules[$day] ?? null;
+
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $isActive = in_array((string) ($row['is_active'] ?? '0'), ['1', 'true'], true);
+            $startTime = trim((string) ($row['start_time'] ?? ''));
+            $endTime = trim((string) ($row['end_time'] ?? ''));
+
+            if (! $isActive && $startTime === '' && $endTime === '') {
+                continue;
+            }
+
+            if ($startTime === '' || $endTime === '') {
+                throw new \RuntimeException("Jadwal {$day} harus diisi jam mulai dan jam selesai.");
+            }
+
+            if (strtotime($endTime) <= strtotime($startTime)) {
+                throw new \RuntimeException("Jam selesai jadwal {$day} harus lebih besar dari jam mulai.");
+            }
+
+            $normalized[] = [
+                'day' => $day,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
+                'is_active' => $isActive,
+            ];
+        }
+
+        return $normalized;
+    }
+
+    private function syncDoctorSchedules(Doctor $doctor, array $schedules): void
+    {
+        DoctorSchedule::where('doctor_id', $doctor->id)->delete();
+
+        foreach ($schedules as $schedule) {
+            DoctorSchedule::create([
+                'id' => (string) Str::uuid(),
+                'doctor_id' => $doctor->id,
+                'day' => $schedule['day'],
+                'start_time' => $schedule['start_time'],
+                'end_time' => $schedule['end_time'],
+                'is_active' => $schedule['is_active'],
+            ]);
+        }
     }
 }

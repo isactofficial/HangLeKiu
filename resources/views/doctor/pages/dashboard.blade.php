@@ -74,7 +74,6 @@
         <div class="meta">
             <div><strong>Nama:</strong> {{ auth()->user()->name }}</div>
             <div><strong>Email:</strong> {{ auth()->user()->email }}</div>
-            <div><strong>Role:</strong> {{ auth()->user()->role }}</div>
         </div>
 
         <form method="POST" action="{{ route('logout') }}">
