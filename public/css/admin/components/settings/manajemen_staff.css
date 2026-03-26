@@ -3,8 +3,8 @@
    ========================================================== */
 
 .ms-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 12px; }
-    .ms-title    { font-size: 18.75px; font-weight: 700; color: #582C0C; margin: 0; }
-    .ms-subtitle { font-size: 13px; color: #6B513E; margin: 4px 0 18px; }
+    .ms-title    { font-size: 30px; font-weight: 700; color: #582C0C; margin: 0; }
+    .ms-subtitle { font-size: 12px; color: #6B513E; margin: 4px 0 18px; }
     .ms-actions-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
     .ms-btn-group { display: flex; border: 1.5px solid #E5D6C5; border-radius: 6px; overflow: hidden; }
@@ -88,7 +88,7 @@
     .ms-modal-header h3 {
         margin: 0;
         color: #582C0C;
-        font-size: 17px;
+        font-size: 30px;
     }
     .ms-modal-close {
         width: 30px;
@@ -117,7 +117,7 @@
     .ms-section-title {
         margin: 0 0 8px;
         color: #4f3420;
-        font-size: 13px;
+        font-size: 18.75px;
         font-weight: 700;
     }
 
@@ -166,7 +166,7 @@
         border: 1px solid #dbc7b2;
         border-radius: 8px;
         padding: 9px 10px;
-        font-size: 13px;
+        font-size: 12px;
         font-family: inherit;
         color: #3f2a1b;
         background: #fff;
@@ -176,6 +176,18 @@
         outline: none;
         border-color: #C58F59;
         box-shadow: 0 0 0 2px rgba(197, 143, 89, .15);
+    }
+
+    .ms-field input:invalid,
+    .ms-field select:invalid {
+        border-color: #d14343;
+        box-shadow: 0 0 0 2px rgba(209, 67, 67, .12);
+    }
+
+    .ms-field input:invalid:focus,
+    .ms-field select:invalid:focus {
+        border-color: #b91c1c;
+        box-shadow: 0 0 0 2px rgba(185, 28, 28, .18);
     }
 
     .ms-modal-actions {

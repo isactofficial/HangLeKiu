@@ -58,7 +58,9 @@
             "dev-master": "12.x-dev"
         },
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "php-open-source-saver/jwt-auth"
+            ]
         }
     },
     "config": {
