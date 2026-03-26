@@ -7,6 +7,7 @@ use App\Models\Doctor;
 use App\Models\Treatment;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class AppointmentController extends Controller
 {
@@ -16,8 +17,8 @@ class AppointmentController extends Controller
      */
     public function create()
     {
-        $doctors    = Doctor::active()->orderBy('name')->get();
-        $treatments = Treatment::active()->orderBy('name')->get();
+        $doctors    = Doctor::active()->orderBy('full_name')->get();
+        $treatments = Treatment::active()->orderBy('procedure_name')->get();
 
         return view('user.components.create', compact('doctors', 'treatments'));
     }
@@ -31,8 +32,8 @@ class AppointmentController extends Controller
         $validated = $request->validate([
             'patient_name'     => 'required|string|max:100',
             'patient_phone'    => 'required|string|max:20',
-            'doctor_id'        => 'required|exists:doctors,id',
-            'treatment_id'     => 'required|exists:treatments,id',
+            'doctor_id'        => 'required|exists:doctor,id',
+            'treatment_id'     => 'required|exists:master_procedure,id',
             'appointment_date' => 'required|date|after_or_equal:today',
             'appointment_time' => 'required|date_format:H:i',
             'payment_method'   => 'required|in:tunai',
@@ -50,9 +51,18 @@ class AppointmentController extends Controller
             'appointment_time.date_format' => 'Format jam tidak valid.',
         ]);
 
-        $validated['status'] = 'pending'; // default
+        $appointmentDateTime = Carbon::parse($validated['appointment_date'] . ' ' . $validated['appointment_time']);
+        $treatment = Treatment::query()->find($validated['treatment_id']);
 
-        Appointment::create($validated);
+        Appointment::create([
+            'id' => (string) Str::ulid(),
+            'doctor_id' => $validated['doctor_id'],
+            'registration_date' => $validated['appointment_date'],
+            'appointment_datetime' => $appointmentDateTime,
+            'status' => 'pending',
+            'procedure_plan' => $treatment?->procedure_name,
+            'complaint' => trim("Nama: {$validated['patient_name']}\nWhatsApp: {$validated['patient_phone']}\nCatatan: " . ($validated['notes'] ?? '-')),
+        ]);
 
         return redirect()->route('appointments.success')
             ->with('success', 'Pendaftaran berhasil! Kami akan konfirmasi via WhatsApp dalam 1×24 jam.');
@@ -76,10 +86,10 @@ class AppointmentController extends Controller
         $date    = $request->get('date', today()->toDateString());
         $carbon  = Carbon::parse($date);
 
-        $doctors = Doctor::active()->orderBy('name')->get();
+        $doctors = Doctor::active()->orderBy('full_name')->get();
 
         // Ambil semua appointment di tanggal ini
-        $appointments = Appointment::with(['doctor', 'treatment'])
+        $appointments = Appointment::with(['doctor', 'patient'])
             ->forDate($date)
             ->get();
 
@@ -87,7 +97,7 @@ class AppointmentController extends Controller
         // Contoh: $schedule[1]['19:30'] = Appointment object
         $schedule = [];
         foreach ($appointments as $apt) {
-            $time = Carbon::parse($apt->appointment_time)->format('H:i');
+            $time = Carbon::parse($apt->appointment_datetime)->format('H:i');
             $schedule[$apt->doctor_id][$time] = $apt;
         }
 

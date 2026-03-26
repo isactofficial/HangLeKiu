@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Doctor extends Model
 {
-    protected $fillable = ['name', 'specialization', 'is_active'];
+    protected $table = 'doctor';
+    protected $fillable = ['full_name', 'specialization', 'subspecialization', 'is_active', 'user_id', 'email', 'phone_number', 'title_prefix', 'license_no', 'str_institution', 'str_number', 'str_expiry_date', 'sip_institution', 'sip_number', 'sip_expiry_date', 'job_title'];
 
     protected $casts = ['is_active' => 'boolean'];
 
@@ -23,8 +24,8 @@ class Doctor extends Model
     public function getFullTitleAttribute(): string
     {
         return $this->specialization
-            ? "{$this->name} {$this->specialization}"
-            : $this->name;
+            ? "{$this->full_name} {$this->specialization}"
+            : $this->full_name;
     }
 
     public function scopeActive($query)

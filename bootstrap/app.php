@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'     => \App\Http\Middleware\RoleMiddleware::class, // ← tetap ada
             'jwt.auth' => JwtMiddleware::class,                       // ← tambahkan ini
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'api/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

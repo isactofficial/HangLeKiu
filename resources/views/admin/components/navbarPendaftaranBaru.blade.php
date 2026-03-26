@@ -5,44 +5,47 @@
 
     {{-- DESKTOP & MOBILE BARIS 1: Search + Daftar --}}
     <div class="navbar-left">
-
-        {{-- Hamburger — hanya tampil di mobile, inline dalam navbar --}}
+        {{-- Hamburger — hanya tampil di mobile --}}
         <button id="sidebarToggle" class="sidebar-hamburger" type="button" aria-label="Toggle menu">
-            <span></span><span></span><span></span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
         </button>
 
-        <div class="navbar-search-wrapper">
-            <svg class="navbar-search-icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" class="navbar-search-input" placeholder="Cari Pasien / No MR / No Ktp / No Asuransi...">
-            <svg class="navbar-user-icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-        </div>
-
-        <div class="navbar-dropdown" id="pendaftaranDropdown">
-            <button class="navbar-btn-primary" onclick="toggleDropdown('pendaftaranMenu')">
-                <span class="btn-text-desktop">Pendaftaran Baru</span>
-                <span class="btn-text-mobile">Daftar</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        {{-- DITAMBAHKAN: Pembungkus yang sesuai dengan CSS Anda --}}
+        <div class="navbar-search-group">
+            <div class="navbar-search-wrapper">
+                <svg class="navbar-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-            </button>
-            <div class="navbar-dropdown-menu" id="pendaftaranMenu" style="left:0;right:auto;top:calc(100% + 4px);">
-                <a href="#" class="dropdown-item">Pasien Baru</a>
-                <a href="#" class="dropdown-item">Pasien Lama</a>
+                <input type="text" class="navbar-search-input" placeholder="Cari Pasien / No MR / No Ktp / No Asuransi...">
+                <svg class="navbar-user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+
+            <div class="navbar-dropdown" id="pendaftaranDropdown">
+                <button class="navbar-btn-primary" onclick="toggleDropdown('pendaftaranMenu')">
+                    <span class="btn-text-desktop">{{ $title ?: 'Pilih Opsi' }}</span>
+                    <span class="btn-text-mobile">Daftar</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </button>
+                <div class="navbar-dropdown-menu" id="pendaftaranMenu" style="left:0;right:auto;top:calc(100% + 4px);">
+                    <a href="{{ route('admin.registration.pendaftaran-baru') }}" class="dropdown-item">Pendaftaran Baru</a>
+                    <a href="{{ route('admin.registration.pasien-baru') }}" class="dropdown-item">Pasien Baru</a>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- DESKTOP: Right icons (selalu tampil di desktop) --}}
-    {{-- MOBILE: disembunyikan, muncul lewat tombol "more" --}}
+    {{-- DESKTOP: Right icons --}}
     <div class="navbar-right">
-
-        {{-- Grup yang bisa di-collapse di mobile --}}
         <div class="navbar-collapsible" id="navbarIconGroup">
             <div class="navbar-hds-logo">
                 <img src="/images/logo-hds.png" alt="HDS">
@@ -79,38 +82,39 @@
                 </svg>
             </button>
 
-            <button class="navbar-icon-btn" title="Profil" onclick="toggleDropdown('profileMenu')">
-                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 13a3 3 0 1 0 0 -6a3 3 0 0 0 0 6" />
-                    <path d="M12 3c7.2 0 9 1.8 9 9c0 7.2 -1.8 9 -9 9c-7.2 0 -9 -1.8 -9 -9c0 -7.2 1.8 -9 9 -9" />
-                    <path d="M6 20.05v-.05a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v.05" />
-                </svg>
-            </button>
-
-            <div class="navbar-dropdown-menu navbar-profile-menu" id="profileMenu">
-                <div class="dropdown-header">
-                    <strong>{{ Auth::check() ? Auth::user()->name : 'Admin' }}</strong>
-                    <small>{{ Auth::check() ? Auth::user()->email : 'admin@hds.com' }}</small>
+            <div class="navbar-dropdown">
+                <button class="navbar-icon-btn" title="Profil" onclick="toggleDropdown('profileMenu')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 13a3 3 0 1 0 0 -6a3 3 0 0 0 0 6" />
+                        <path d="M12 3c7.2 0 9 1.8 9 9c0 7.2 -1.8 9 -9 9c-7.2 0 -9 -1.8 -9 -9c0 -7.2 1.8 -9 9 -9" />
+                        <path d="M6 20.05v-.05a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v.05" />
+                    </svg>
+                </button>
+                <div class="navbar-dropdown-menu navbar-profile-menu" id="profileMenu">
+                    <div class="dropdown-header">
+                        <strong>{{ Auth::check() ? Auth::user()->name : 'Admin' }}</strong>
+                        <small>{{ Auth::check() ? Auth::user()->email : 'admin@hds.com' }}</small>
+                    </div>
+                    <a href="#" class="dropdown-item">Pengaturan Profil</a>
+                    <div class="dropdown-divider"></div>
+                    <form method="POST" action="#">
+                        @csrf
+                        <button type="submit" class="dropdown-item dropdown-logout">Logout</button>
+                    </form>
                 </div>
-                <a href="#" class="dropdown-item">Pengaturan Profil</a>
-                <div class="dropdown-divider"></div>
-                <form method="POST" action="#">
-                    @csrf
-                    <button type="submit" class="dropdown-item dropdown-logout">Logout</button>
-                </form>
             </div>
         </div>
 
         {{-- Tombol MORE — hanya tampil di mobile --}}
         <button class="navbar-more-btn" id="navbarMoreBtn" onclick="toggleNavbarMore()">
             more
-            <svg id="navbarMoreChevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg id="navbarMoreChevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;">
                 <path d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
             </svg>
         </button>
-
     </div>
 </header>
+
 <script>
     function toggleNavbarMore() {
         const group   = document.getElementById('navbarIconGroup');
