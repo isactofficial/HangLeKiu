@@ -27,6 +27,7 @@ class Patient extends Model
         'blood_type',
         'rhesus',
         'address',
+        'phone_number',
         'city',
         'id_card_number',
         'allergy_history',

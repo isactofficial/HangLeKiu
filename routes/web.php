@@ -4,11 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\PatientController;
-use App\Http\Controllers\ProcedureController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\RegistrationController;
-use App\Http\Controllers\MedicineController;
 
 // PUBLIC
 Route::get('/', fn() => view('welcome'))->name('home');
@@ -20,30 +16,6 @@ Route::get('/registration',  [AppointmentController::class, 'create'])->name('re
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
 Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
-
-Route::prefix('api/patients')->group(function () {
-    Route::post('/', [PatientController::class, 'store']);
-    Route::get('/', [PatientController::class, 'index']);
-    Route::get('/{id}', [PatientController::class, 'show']);
-    Route::put('/{id}', [PatientController::class, 'update']);
-    Route::delete('/{id}', [PatientController::class, 'destroy']);
-});
-
-Route::prefix('api/procedures')->group(function () {
-    Route::post('/', [ProcedureController::class, 'store']);
-    Route::get('/', [ProcedureController::class, 'index']);
-    Route::get('/{id}', [ProcedureController::class, 'show']);
-    Route::put('/{id}', [ProcedureController::class, 'update']);
-    Route::delete('/{id}', [ProcedureController::class, 'destroy']);
-});
-
-Route::prefix('api/doctors')->group(function () {
-    Route::post('/', [DoctorController::class, 'store']);
-    Route::get('/', [DoctorController::class, 'index']);
-    Route::get('/{id}', [DoctorController::class, 'show']);
-    Route::put('/{id}', [DoctorController::class, 'update']);
-    Route::delete('/{id}', [DoctorController::class, 'destroy']);
-});
 
 // ADMIN AUTH
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
@@ -94,26 +66,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])
             ->name('settings.staff.doctor.store');
 
-        // ── Registration API (diakses dari Blade via fetch) ──
-        Route::prefix('api/registration')->group(function () {
-            Route::get('/master-data',    [RegistrationController::class, 'masterData']);
-            Route::get('/doctors',        [RegistrationController::class, 'doctors']);
-            Route::get('/slots',          [RegistrationController::class, 'availableSlots']);
-            Route::get('/search-patient', [RegistrationController::class, 'searchPatient']);
-            Route::post('/',              [RegistrationController::class, 'store']);
-        });
-
-        // ── Medicine/Stok Obat API (diakses dari Blade via fetch) ──
-        Route::prefix('api/medicine')->group(function () {
-            Route::get('/',                   [MedicineController::class, 'index']);
-            Route::post('/',                  [MedicineController::class, 'store']);
-            Route::get('/{id}',               [MedicineController::class, 'show']);
-            Route::put('/{id}',               [MedicineController::class, 'update']);
-            Route::delete('/{id}',            [MedicineController::class, 'destroy']);
-            Route::post('/{id}/stock-in',     [MedicineController::class, 'stockIn']);
-            Route::post('/{id}/stock-out',    [MedicineController::class, 'stockOut']);
-            Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);
-        });
     });
 
     // ================= USER =================

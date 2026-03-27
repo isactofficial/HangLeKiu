@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Medicine;
-use App\Models\MedicineStockLog;
+use App\Models\StockMutation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -118,12 +118,14 @@ class MedicineController extends Controller
 
         $medicine = Medicine::findOrFail($id);
 
-        // simpan log
-        MedicineStockLog::create([
+        // simpan ke stock_mutation
+        StockMutation::create([
+            'id' => Str::uuid(),
             'medicine_id' => $id,
-            'type' => 'IN',
-            'qty' => $request->qty,
-            'note' => $request->note
+            'user_id' => null,
+            'type' => 'in',
+            'quantity' => $request->qty,
+            'notes' => $request->note,
         ]);
 
         // update stok
@@ -153,12 +155,14 @@ class MedicineController extends Controller
             ], 400);
         }
 
-        // simpan log
-        MedicineStockLog::create([
+        // simpan ke stock_mutation
+        StockMutation::create([
+            'id' => Str::uuid(),
             'medicine_id' => $id,
-            'type' => 'OUT',
-            'qty' => $request->qty,
-            'note' => $request->note
+            'user_id' => null,
+            'type' => 'out',
+            'quantity' => $request->qty,
+            'notes' => $request->note,
         ]);
 
         // update stok
@@ -176,7 +180,7 @@ class MedicineController extends Controller
     {
         $medicine = Medicine::findOrFail($id);
 
-        $logs = MedicineStockLog::where('medicine_id', $id)
+        $logs = StockMutation::where('medicine_id', $id)
             ->latest()
             ->get();
 
