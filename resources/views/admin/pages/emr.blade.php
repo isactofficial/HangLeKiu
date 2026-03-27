@@ -11,7 +11,7 @@
 
 @section('content')
     <div class="emr-container">
-        
+
         <div class="emr-header">
             <div class="emr-title-area">
                 <h1 class="emr-title">Electronic Medical Record</h1>
@@ -38,7 +38,7 @@
 
         <div class="emr-layout">
             <div class="emr-sidebar">
-                
+
                 <div class="emr-filter-box" id="customFilterDropdown">
                     <div class="emr-select-trigger">
                         <span class="emr-select-text">Hari Ini</span>
@@ -69,7 +69,33 @@
             </div>
         </div>
 
+        <div class="emr-fab-container" id="fabContainer">
+        <!-- Menu Popup -->
+        <div class="emr-fab-menu" id="fabMenu">
+            <div class="emr-fab-search-box">
+                <input type="text" id="fabSearchInput" placeholder="Cari fitur" class="emr-fab-search-input">
+            </div>
+            <ul class="emr-fab-list" id="fabList">
+                <li><a href="#" class="emr-fab-item" onclick="toggleProsedureModal(true)">Tambah Prosedur</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Organ</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Dokter</a></li>
+                <li><a href="#" class="emr-fab-item" onclick="toggleOdontogramModal(true)">Tambah Odontogram</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Asuhan Keperawatan</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Obgyn</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Obstetri</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan KB</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Rekam Medis Tubuh</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Awal Kehamilan</a></li>
+            </ul>
+        </div>
+        <!-- Tombol Utama Biru -->
+        <button class="emr-fab-btn" id="fabBtn">📄</button>
+</div>
+<!-- END: Floating Action Button -->
+
     </div>
+
+
 {{-- SCRIPT CUSTOM DROPDOWN --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -87,12 +113,12 @@
             options.forEach(option => {
                 option.addEventListener('click', function() {
                     options.forEach(opt => opt.classList.remove('is-selected'));
-                    
+
                     this.classList.add('is-selected');
-                    
+
                     textDisplay.textContent = this.textContent;
                     hiddenInput.value = this.dataset.value;
-                    
+
                     dropdown.classList.remove('open');
                 });
             });
@@ -103,5 +129,64 @@
                 }
             });
         });
+
+        // --- SCRIPT FLOATING ACTION BUTTON ---
+const fabBtn = document.getElementById('fabBtn');
+const fabMenu = document.getElementById('fabMenu');
+const fabSearchInput = document.getElementById('fabSearchInput');
+const fabListItems = document.querySelectorAll('.emr-fab-item');
+
+// Toggle menu saat FAB diklik
+fabBtn.addEventListener('click', function(e) {
+    e.stopPropagation(); // Mencegah event merambat ke window
+    fabMenu.classList.toggle('active');
+
+    // Auto-focus ke input pencarian jika menu dibuka
+    if(fabMenu.classList.contains('active')) {
+        setTimeout(() => fabSearchInput.focus(), 100);
+    }
+});
+
+// Tutup menu jika klik di luar elemen FAB
+window.addEventListener('click', function(e) {
+    const fabContainer = document.getElementById('fabContainer');
+    if (!fabContainer.contains(e.target)) {
+        fabMenu.classList.remove('active');
+    }
+});
+
+// Fitur Pencarian Realtime
+fabSearchInput.addEventListener('input', function(e) {
+    const filterText = e.target.value.toLowerCase();
+
+    fabListItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        // Sembunyikan item yang tidak cocok dengan kata kunci
+        if (text.includes(filterText)) {
+            item.parentElement.style.display = 'block';
+        } else {
+            item.parentElement.style.display = 'none';
+        }
+    });
+});
+
+// Fungsi untuk membuka Modal Odontogram dari Menu FAB
+function openModalOdontogram(e) {
+    e.preventDefault(); // Mencegah scroll ke atas karena tag <a>
+    fabMenu.classList.remove('active'); // Tutup menu FAB
+
+    // Pastikan di file modal-odontogram.blade.php yang dibuat sebelumnya,
+    // div pembungkus overlay modalnya memiliki id="modalOdontogramOverlay" (atau sesuaikan)
+    const modal = document.getElementById('modalOdontogramOverlay');
+    if(modal) {
+        modal.classList.remove('hidden'); // Atau sesuaikan dengan class CSS Anda untuk menampilkan modal
+    } else {
+        console.error("Modal Odontogram tidak ditemukan.");
+    }
+}
     </script>
 @endsection
+
+
+@include('admin.components.emr.modal-odontogram')
+@include('admin.components.emr.modal-prosedure')
