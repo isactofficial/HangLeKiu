@@ -1,4 +1,4 @@
-﻿/* ==========================================================
+/* ==========================================================
    Extracted from: resources\views\admin\pages\outpatient.blade.php
    ========================================================== */
 
@@ -187,7 +187,7 @@
             table-layout: fixed;
         }
 
-        .th-time, .td-time {
+        .td-time {
             width: 72px;
             position: sticky; left: 0;
             background: white; z-index: 2;
@@ -195,6 +195,15 @@
             text-align: center;
             color: var(--brown);
             font-weight: 600;
+        }
+        
+        .th-time {
+            width: 72px;
+            position: sticky; left: 0;
+            background: var(--brown) !important; /* Ensure it stays brown like other headers */
+            color: white !important;
+            z-index: 3;
+            border-right: 1px solid rgba(255, 255, 255, .1) !important;
         }
 
         .rj-table th {
@@ -224,9 +233,15 @@
             height: 60px;
             padding: 6px;
             vertical-align: top;
+            cursor: pointer;
+            transition: background var(--transition, 0.15s);
+        }
+        .rj-table td:not(.td-time):hover {
+            background-color: rgba(197, 143, 89, 0.1); /* light gold/cream hover */
         }
         .rj-table td.col-today { background: rgba(88, 44, 12, .02); }
-        .td-time { height: 60px; vertical-align: middle !important; }
+        .td-time { height: 60px; vertical-align: middle !important; cursor: default !important; }
+        .td-time:hover { background-color: white !important; }
 
         .apt-card {
             border-radius: 5px;

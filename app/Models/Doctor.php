@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Doctor extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'doctor';
 
     // 🔥 WAJIB kalau pakai ID string (D001, dll)
@@ -42,6 +45,7 @@ class Doctor extends Model
         'estimasi_konsultasi' => 'integer',
         'str_expiry_date' => 'date',
         'sip_expiry_date' => 'date',
+        'deleted_at' => 'datetime',
     ];
 
     // ================= RELATION =================

@@ -1,4 +1,4 @@
-﻿@extends('admin.layout.admin')
+@extends('admin.layout.admin')
 @section('title', 'Rawat Jalan')
 
 @section('navbar')
@@ -7,6 +7,9 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/pages/outpatient.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/registration-shared.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pasien-baru.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pendaftaran-baru.css') }}">
 @endpush
 
 @section('content')
@@ -170,11 +173,14 @@
                                     <td class="td-time">{{ $slot }}</td>
                                     @if ($viewMode === 'all')
                                         @foreach ($doctors as $doc)
-                                            @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
-                                            <td>
+                                            @php 
+                                                $apt = $schedule[$doc->id][$slot] ?? null; 
+                                                $poliId = $doc->poli_id ?? ''; // Assuming doctor has poli_id relation or attribute
+                                            @endphp
+                                            <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}')">
                                                 @if ($apt)
-                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
-                                                        <div class="apt-name">{{ $apt->patient_name }}</div>
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="event.stopPropagation(); openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
@@ -190,11 +196,12 @@
                                                     ->whereTime('appointment_datetime', $slot)
                                                     ->first();
                                                 $isColToday = $dc === $today;
+                                                $poliId = $selectedDoctor->poli_id ?? '';
                                             @endphp
-                                            <td class="{{ $isColToday ? 'col-today' : '' }}">
+                                            <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
                                                 @if ($apt)
-                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
-                                                        <div class="apt-name">{{ $apt->patient_name }}</div>
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="event.stopPropagation(); openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
@@ -239,7 +246,7 @@
                                             @endif
                                         @endforeach
                                     @else
-                                        <div class="m-empty-slot">Kosong</div>
+                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer;">Kosong (Klik untuk Daftar)</div>
                                     @endif
                                 </div>
                             </div>
@@ -270,7 +277,7 @@
                                             </div>
                                         @endforeach
                                     @else
-                                        <div class="m-empty-slot">Tidak ada jadwal</div>
+                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $selectedDoctor->poli_id ?? '' }}', '{{ $dc }}')" style="cursor:pointer;">Tidak ada jadwal (Klik untuk Daftar)</div>
                                     @endif
                                 </div>
                             </div>
@@ -339,5 +346,51 @@
                     }
                 });
         }
+
+        // Registration Modal Functions
+        function openRegModal(modalId, doctorId = null, time = null, poliId = null, date = null) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden'; 
+
+            if (modalId === 'modalPendaftaranBaru') {
+                // Pre-fill fields in pendaftaran-baru.blade.php
+                if (doctorId) {
+                    const docSelect = document.getElementById('pb_doctor_id');
+                    if (docSelect) docSelect.value = doctorId;
+                }
+                if (time) {
+                    const timeInput = document.getElementById('pb_appointment_time');
+                    if (timeInput) timeInput.value = time;
+                }
+                if (poliId) {
+                    const poliSelect = document.getElementById('pb_poli_id');
+                    if (poliSelect) poliSelect.value = poliId;
+                }
+                if (date) {
+                    const dateInput = document.getElementById('pb_appointment_date');
+                    if (dateInput) dateInput.value = date;
+                }
+            }
+        }
+        
+        function closeRegModal(modalId) {
+            document.getElementById(modalId).classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Close registration modals when clicking overlay
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('reg-modal-overlay')) {
+                closeRegModal(e.target.id);
+            }
+        });
     </script>
+
+    <!-- Include Registration Modals -->
+    @include('admin.components.pasien-baru')
+    @include('admin.components.pendaftaran-baru')
+
 @endsection

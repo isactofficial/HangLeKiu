@@ -22,8 +22,9 @@ Request body:
   "blood_type": "O",
   "rhesus": "+",
   "address": "Jl. Bandung No 10",
+  "phone_number": "081234567890",
   "city": "Bandung",
-  "id_card_number": "087726425124",
+  "id_card_number": "362832982308273",
   "allergy_history": "Tidak ada"
 }
 ```
@@ -55,6 +56,7 @@ Success response (201):
       "blood_type": "O",
       "rhesus": "+",
       "address": "Jl. Bandung No 10",
+      "phone_number": "081234567890",
       "city": "Bandung",
       "id_card_number": "087726425124",
       "allergy_history": "Tidak ada",
@@ -68,6 +70,7 @@ Success response (201):
 Validation notes:
 - gender harus: Male atau Female.
 - email harus unik pada tabel user.
+- phone_number opsional, maksimal 20 karakter.
 - jika role PAT tidak ada, API mengembalikan 422.
 
 ## 2) Read Semua Pasien
@@ -94,6 +97,7 @@ Success response (200):
       "blood_type": "O",
       "rhesus": "+",
       "address": "Jl. Bandung No 10",
+      "phone_number": "081234567890",
       "city": "Bandung",
       "id_card_number": "087726425124",
       "allergy_history": "Tidak ada",
@@ -131,6 +135,7 @@ Success response (200):
     "blood_type": "O",
     "rhesus": "+",
     "address": "Jl. Bandung No 10",
+    "phone_number": "081234567890",
     "city": "Bandung",
     "id_card_number": "087726425124",
     "allergy_history": "Tidak ada",
@@ -155,7 +160,6 @@ Not found response (404):
 - Headers:
   - Content-Type: application/json
   - Accept: application/json
-  - Authorization/Cookie Session login user
 
 Contoh:
 PUT /api/patients/550e8400-e29b-41d4-a716-446655440000
@@ -166,6 +170,7 @@ Request body (partial update diperbolehkan):
   "full_name": "Muhammad Farhan Update",
   "email": "farhan.update@gmail.com",
   "password": "passwordBaru123",
+  "phone_number": "081298765432",
   "city": "Jakarta",
   "allergy_history": "Alergi udang"
 }
@@ -187,6 +192,7 @@ Success response (200):
       "user_id": "uuid",
       "full_name": "Muhammad Farhan Update",
       "email": "farhan.update@gmail.com",
+      "phone_number": "081298765432",
       "city": "Jakarta",
       "allergy_history": "Alergi udang",
       "updated_at": "2026-03-24T10:00:00.000000Z"
@@ -203,26 +209,22 @@ Not found response (404):
 }
 ```
 
-Unauthorized response (401):
+Server error response (500):
 ```json
 {
   "success": false,
-  "message": "Unauthenticated"
-}
-```
-
-Forbidden response (403):
-```json
-{
-  "success": false,
-  "message": "Anda tidak memiliki akses untuk mengubah data pasien ini"
+  "message": "Gagal memperbarui data pasien",
+  "error": "..."
 }
 ```
 
 Validation notes:
 - Semua field bersifat opsional (partial update).
 - Jika mengirim email, email harus unik pada tabel user (kecuali milik user pasien yang sedang diupdate).
+- Jika mengirim password, minimal 6 karakter.
 - Jika mengirim password kosong/null, password user tidak diubah.
+- Jika mengirim phone_number, maksimal 20 karakter.
+- Field `medical_record_no` tidak diproses oleh endpoint update.
 
 ## 5) Delete Pasien (Soft Delete)
 
@@ -230,7 +232,6 @@ Validation notes:
 - Endpoint: /api/patients/{id}
 - Headers:
   - Accept: application/json
-  - Authorization/Cookie Session login user
 
 Contoh:
 DELETE /api/patients/550e8400-e29b-41d4-a716-446655440000
@@ -251,26 +252,19 @@ Not found response (404):
 }
 ```
 
-Unauthorized response (401):
+Server error response (500):
 ```json
 {
   "success": false,
-  "message": "Unauthenticated"
-}
-```
-
-Forbidden response (403):
-```json
-{
-  "success": false,
-  "message": "Anda tidak memiliki akses untuk mengubah data pasien ini"
+  "message": "Gagal menghapus data pasien",
+  "error": "..."
 }
 ```
 
 Catatan:
 - Endpoint ini melakukan soft delete pada data patient dan user terkait (jika ada).
 - Data tidak hilang permanen dari database, hanya terisi deleted_at.
-- Admin bisa update/delete semua data pasien, user hanya bisa update/delete data miliknya sendiri.
+- Saat ini endpoint belum membatasi role/ownership (authorization) di level controller.
 
 ---
 
@@ -691,3 +685,540 @@ Forbidden response (403):
 Catatan:
 - Endpoint delete akan menghapus data dokter dan soft delete user terkait.
 - Admin bisa update/delete semua data dokter, dokter hanya bisa update/delete data miliknya sendiri.
+
+---
+
+# API Doctor Note
+
+Base URL:
+http://localhost:8000
+
+## 1) Create Doctor Note
+
+- Method: POST
+- Endpoint: /api/doctor-notes
+- Headers:
+  - Content-Type: application/json
+  - Accept: application/json
+
+Request body:
+```json
+{
+  "procedure_id": "mp-1",
+  "user_id": "user-2",
+  "notes": "Pasien mengeluh nyeri saat mengunyah di gigi molar kanan bawah."
+}
+```
+
+Success response (201):
+```json
+{
+  "success": true,
+  "message": "Data doctor note berhasil dibuat",
+  "data": {
+    "id": "dn-1",
+    "procedure_id": "mp-1",
+    "user_id": "user-2",
+    "notes": "Pasien mengeluh nyeri saat mengunyah di gigi molar kanan bawah.",
+    "deleted_at": null
+  }
+}
+```
+
+Validation notes:
+- `procedure_id` harus ada di tabel medical_procedure (foreign key check).
+- `user_id` harus ada di tabel user (foreign key check).
+- Catatan: DoctorNote tidak memiliki kolom created_at/updated_at, hanya id, procedure_id, user_id, notes, dan deleted_at.
+
+## 2) Read Doctor Note by ID
+
+- Method: GET
+- Endpoint: /api/doctor-notes/{id}
+- Headers:
+  - Accept: application/json
+
+Contoh:
+GET /api/doctor-notes/dn-1
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data doctor note berhasil diambil",
+  "data": {
+    "id": "dn-1",
+    "procedure_id": "mp-1",
+    "user_id": "user-2",
+    "notes": "Pasien mengeluh nyeri saat mengunyah di gigi molar kanan bawah.",
+    "deleted_at": null,
+    "medical_procedure": {
+      "id": "mp-1",
+      "registration_id": "reg-1",
+      "patient_id": "pat-1",
+      "doctor_id": "doc-1",
+      "discount_type": "none",
+      "discount_value": "0.00",
+      "total_amount": "300000.00",
+      "notes": "Perawatan scaling gigi umum",
+      "created_at": "2026-03-27T10:30:00.000000Z",
+      "updated_at": "2026-03-27T10:30:00.000000Z",
+      "deleted_at": null
+    },
+    "user": {
+      "id": "user-2",
+      "role_id": "role-dct-id",
+      "name": "drg. Jane Doe",
+      "email": "jane.doe@klinik.com",
+      "is_active": true,
+      "is_verified": true,
+      "created_at": "2026-03-26T10:00:00.000000Z",
+      "updated_at": "2026-03-26T10:00:00.000000Z"
+    }
+  }
+}
+```
+
+Not found response (404):
+```json
+{
+  "success": false,
+  "message": "Data doctor note tidak ditemukan"
+}
+```
+
+Catatan:
+- Response includes relasi `medical_procedure` (data dari tabel medical_procedure) dan `user` (data dari tabel user yang mengisi notes).
+
+## 3) Update Doctor Note by ID
+
+- Method: PUT
+- Endpoint: /api/doctor-notes/{id}
+- Headers:
+  - Content-Type: application/json
+  - Accept: application/json
+
+Contoh:
+PUT /api/doctor-notes/dn-1
+
+Request body (partial update diperbolehkan):
+```json
+{
+  "notes": "Keluhan berkurang setelah tindakan scaling."
+}
+```
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data doctor note berhasil diperbarui",
+  "data": {
+    "id": "dn-1",
+    "procedure_id": "mp-1",
+    "user_id": "user-2",
+    "notes": "Keluhan berkurang setelah tindakan scaling.",
+    "deleted_at": null
+  }
+}
+```
+
+## 4) Delete Doctor Note by ID (Soft Delete)
+
+- Method: DELETE
+- Endpoint: /api/doctor-notes/{id}
+- Headers:
+  - Accept: application/json
+
+Contoh:
+DELETE /api/doctor-notes/dn-1
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data doctor note berhasil dihapus (soft delete)"
+}
+```
+
+Catatan:
+- Endpoint ini melakukan soft delete dengan mengisi kolom deleted_at.
+- Data tidak hilang permanen dari database.
+
+---
+
+# API Medical Procedure
+
+Base URL:
+http://localhost:8000
+
+## 1) Create Medical Procedure
+
+- Method: POST
+- Endpoint: /api/medical-procedures
+- Headers:
+  - Content-Type: application/json
+  - Accept: application/json
+
+Request body:
+```json
+{
+  "registration_id": "reg-1",
+  "patient_id": "pat-1",
+  "doctor_id": "doc-1",
+  "discount_type": "none",
+  "discount_value": 0,
+  "total_amount": 300000,
+  "notes": "Perawatan scaling gigi umum"
+}
+```
+
+Success response (201):
+```json
+{
+  "success": true,
+  "message": "Data medical procedure berhasil dibuat",
+  "data": {
+    "id": "mp-1",
+    "registration_id": "reg-1",
+    "patient_id": "pat-1",
+    "doctor_id": "doc-1",
+    "discount_type": "none",
+    "discount_value": "0.00",
+    "total_amount": "300000.00",
+    "notes": "Perawatan scaling gigi umum",
+    "created_at": "2026-03-27T10:30:00.000000Z",
+    "updated_at": "2026-03-27T10:30:00.000000Z",
+    "deleted_at": null
+  }
+}
+```
+
+Validation notes:
+- `registration_id`, `patient_id`, `doctor_id` harus ada di tabel masing-masing (foreign key check).
+- `discount_type`: 'none' | 'percentage' | 'fix'
+- `discount_value` dan `total_amount` diformat sebagai decimal dengan 2 desimal.
+
+## 2) Read Medical Procedure by ID
+
+- Method: GET
+- Endpoint: /api/medical-procedures/{id}
+- Headers:
+  - Accept: application/json
+
+Contoh:
+GET /api/medical-procedures/mp-1
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data medical procedure berhasil diambil",
+  "data": {
+    "id": "mp-1",
+    "registration_id": "reg-1",
+    "patient_id": "pat-1",
+    "doctor_id": "doc-1",
+    "discount_type": "none",
+    "discount_value": "0.00",
+    "total_amount": "300000.00",
+    "notes": "Perawatan scaling gigi umum",
+    "created_at": "2026-03-27T10:30:00.000000Z",
+    "updated_at": "2026-03-27T10:30:00.000000Z",
+    "deleted_at": null,
+    "registration": {
+      "id": "reg-1",
+      "appointment_datetime": "2026-03-27T14:00:00.000000Z",
+      "patient_id": "pat-1",
+      "doctor_id": "doc-1",
+      "poli_id": "pol-1",
+      "status": "scheduled",
+      "created_at": "2026-03-27T09:00:00.000000Z",
+      "updated_at": "2026-03-27T09:00:00.000000Z",
+      "deleted_at": null
+    },
+    "patient": {
+      "id": "pat-1",
+      "user_id": "user-pat-1",
+      "full_name": "Muhammad Farhan",
+      "email": "farhan@gmail.com",
+      "medical_record_no": "MR202603270001",
+      "date_of_birth": "2001-04-12",
+      "gender": "Male",
+      "blood_type": "O",
+      "rhesus": "+",
+      "address": "Jl. Bandung No 10",
+      "phone_number": "081234567890",
+      "city": "Bandung",
+      "id_card_number": "087726425124",
+      "allergy_history": "Tidak ada",
+      "created_at": "2026-03-18T10:00:00.000000Z",
+      "updated_at": "2026-03-18T10:00:00.000000Z",
+      "deleted_at": null
+    },
+    "doctor": {
+      "id": "doc-1",
+      "user_id": "user-dct-1",
+      "full_name": "drg. Jane Doe",
+      "email": "jane.doe@klinik.com",
+      "phone_number": "081234567890",
+      "specialization": "Sp.Ortho",
+      "job_title": "Dokter Gigi",
+      "is_active": true,
+      "created_at": "2026-03-26T10:00:00.000000Z",
+      "updated_at": "2026-03-26T10:00:00.000000Z",
+      "deleted_at": null
+    }
+  }
+}
+```
+
+Not found response (404):
+```json
+{
+  "success": false,
+  "message": "Data medical procedure tidak ditemukan"
+}
+```
+
+Catatan:
+- Response includes relasi `registration` (data dari tabel registration), `patient` (data dari tabel patient), dan `doctor` (data dari tabel doctor).
+
+## 3) Update Medical Procedure by ID
+
+- Method: PUT
+- Endpoint: /api/medical-procedures/{id}
+- Headers:
+  - Content-Type: application/json
+  - Accept: application/json
+
+Contoh:
+PUT /api/medical-procedures/mp-1
+
+Request body (partial update diperbolehkan):
+```json
+{
+  "discount_type": "percentage",
+  "discount_value": 10,
+  "total_amount": 270000
+}
+```
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data medical procedure berhasil diperbarui",
+  "data": {
+    "id": "mp-1",
+    "registration_id": "reg-1",
+    "patient_id": "pat-1",
+    "doctor_id": "doc-1",
+    "discount_type": "percentage",
+    "discount_value": "10.00",
+    "total_amount": "270000.00",
+    "notes": "Perawatan scaling gigi umum",
+    "created_at": "2026-03-27T10:30:00.000000Z",
+    "updated_at": "2026-03-27T10:45:00.000000Z",
+    "deleted_at": null
+  }
+}
+```
+
+## 4) Delete Medical Procedure by ID (Soft Delete)
+
+- Method: DELETE
+- Endpoint: /api/medical-procedures/{id}
+- Headers:
+  - Accept: application/json
+
+Contoh:
+DELETE /api/medical-procedures/mp-1
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data medical procedure berhasil dihapus (soft delete)"
+}
+```
+
+Catatan:
+- Endpoint ini melakukan soft delete dengan mengisi kolom deleted_at.
+- Data tidak hilang permanen dari database.
+
+---
+
+# API Procedure Item
+
+Base URL:
+http://localhost:8000
+
+## 1) Create Procedure Item
+
+- Method: POST
+- Endpoint: /api/procedure-items
+- Headers:
+  - Content-Type: application/json
+  - Accept: application/json
+
+Request body:
+```json
+{
+  "procedure_id": "mp-1",
+  "master_procedure_id": "mpr-1",
+  "quantity": 1,
+  "unit_price": 300000,
+  "discount_type": "none",
+  "discount_value": 0,
+  "subtotal": 300000
+}
+```
+
+Success response (201):
+```json
+{
+  "success": true,
+  "message": "Data procedure item berhasil dibuat",
+  "data": {
+    "id": "pi-1",
+    "procedure_id": "mp-1",
+    "master_procedure_id": "mpr-1",
+    "quantity": 1,
+    "unit_price": "300000.00",
+    "discount_type": "none",
+    "discount_value": "0.00",
+    "subtotal": "300000.00",
+    "deleted_at": null
+  }
+}
+```
+
+Validation notes:
+- `procedure_id` dan `master_procedure_id` harus ada di tabel masing-masing (foreign key check).
+- `quantity` harus integer > 0.
+- `discount_type`: 'none' | 'percentage' | 'fix'
+- `unit_price`, `discount_value`, `subtotal` diformat sebagai decimal dengan 2 desimal.
+- Catatan: ProcedureItem tidak memiliki kolom created_at/updated_at.
+
+## 2) Read Procedure Item by ID
+
+- Method: GET
+- Endpoint: /api/procedure-items/{id}
+- Headers:
+  - Accept: application/json
+
+Contoh:
+GET /api/procedure-items/pi-1
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data procedure item berhasil diambil",
+  "data": {
+    "id": "pi-1",
+    "procedure_id": "mp-1",
+    "master_procedure_id": "mpr-1",
+    "quantity": 1,
+    "unit_price": "300000.00",
+    "discount_type": "none",
+    "discount_value": "0.00",
+    "subtotal": "300000.00",
+    "deleted_at": null,
+    "medical_procedure": {
+      "id": "mp-1",
+      "registration_id": "reg-1",
+      "patient_id": "pat-1",
+      "doctor_id": "doc-1",
+      "discount_type": "none",
+      "discount_value": "0.00",
+      "total_amount": "300000.00",
+      "notes": "Perawatan scaling gigi umum",
+      "created_at": "2026-03-27T10:30:00.000000Z",
+      "updated_at": "2026-03-27T10:30:00.000000Z",
+      "deleted_at": null
+    },
+    "master_procedure": {
+      "id": "mpr-1",
+      "procedure_name": "Scaling Gigi",
+      "base_price": "350000.00",
+      "is_active": true,
+      "created_at": "2026-03-25T10:00:00.000000Z",
+      "updated_at": "2026-03-25T10:00:00.000000Z"
+    }
+  }
+}
+```
+
+Not found response (404):
+```json
+{
+  "success": false,
+  "message": "Data procedure item tidak ditemukan"
+}
+```
+
+Catatan:
+- Response includes relasi `medical_procedure` (data dari tabel medical_procedure) dan `master_procedure` (data dari tabel master_procedure).
+
+## 3) Update Procedure Item by ID
+
+- Method: PUT
+- Endpoint: /api/procedure-items/{id}
+- Headers:
+  - Content-Type: application/json
+  - Accept: application/json
+
+Contoh:
+PUT /api/procedure-items/pi-1
+
+Request body (partial update diperbolehkan):
+```json
+{
+  "quantity": 2,
+  "discount_type": "percentage",
+  "discount_value": 5,
+  "subtotal": 570000
+}
+```
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data procedure item berhasil diperbarui",
+  "data": {
+    "id": "pi-1",
+    "procedure_id": "mp-1",
+    "master_procedure_id": "mpr-1",
+    "quantity": 2,
+    "unit_price": "300000.00",
+    "discount_type": "percentage",
+    "discount_value": "5.00",
+    "subtotal": "570000.00",
+    "deleted_at": null
+  }
+}
+```
+
+## 4) Delete Procedure Item by ID (Soft Delete)
+
+- Method: DELETE
+- Endpoint: /api/procedure-items/{id}
+- Headers:
+  - Accept: application/json
+
+Contoh:
+DELETE /api/procedure-items/pi-1
+
+Success response (200):
+```json
+{
+  "success": true,
+  "message": "Data procedure item berhasil dihapus (soft delete)"
+}
+```
+
+Catatan:
+- Endpoint ini melakukan soft delete dengan mengisi kolom deleted_at.
+- Data tidak hilang permanen dari database.

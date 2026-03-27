@@ -5,7 +5,10 @@
 
 <div class="apt-card">
     <div class="apt-card-header">
-        <h2 class="apt-card-title">Penggunaan Obat</h2>
+        <div>
+            <h2 class="apt-card-title">Penggunaan Obat</h2>
+            <p class="apt-card-subtitle">Last Update: 05/03/2026 08:00</p>
+        </div>
         <div class="apt-card-actions">
             <div class="apt-date-input">
                 <label>Dari Tanggal</label>
@@ -26,8 +29,6 @@
             </button>
         </div>
     </div>
-
-    <p style="padding:6px 18px 8px; font-size:13px; color:#6B513E;">Last Update: 05/03/2026 08:00</p>
 
     <div class="apt-table-wrapper">
         <table class="apt-table" style="min-width:800px;">

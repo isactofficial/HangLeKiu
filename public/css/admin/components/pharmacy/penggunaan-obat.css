@@ -4,7 +4,8 @@
 
 .apt-card { background: #fff; border-radius: 8px; border: 1px solid #E5D6C5; box-shadow: 0 1px 3px rgba(88,44,12,.06); }
     .apt-card-header { padding: 18px 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px; border-bottom: 1px solid #E5D6C5; }
-    .apt-card-title { font-size: 18.75px; font-weight: 700; color: #C58F59; margin: 0; line-height: 1; }
+    .apt-card-title { font-size: 18.75px; font-weight: 700; color: #C58F59; margin: 0; line-height: 1; margin-bottom: 4px; }
+    .apt-card-subtitle { font-size: 13px; color: #6B513E; margin: 0; }
     .apt-card-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .apt-date-input { display: flex; flex-direction: column; gap: 2px; }
     .apt-date-input label { font-size: 13px; color: #6B513E; }

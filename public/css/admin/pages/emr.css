@@ -1,301 +1,423 @@
-﻿/* ==========================================================
+/* ==========================================================
    Extracted from: resources\views\admin\pages\emr.blade.php
    ========================================================== */
 
 .emr-container {
-            padding: 0 0px 24px 0px;
-            position: relative;
-            min-height: calc(100vh - 100px);
-            font-family: 'Instrument Sans', sans-serif;
-        }
+    padding: 0 0px 24px 0px;
+    position: relative;
+    min-height: calc(100vh - 100px);
+    font-family: "Instrument Sans", sans-serif;
+}
 
-        .emr-container * {
-            font-size: 13px;
-        }
+.emr-container * {
+    font-size: 13px;
+}
 
-        /* ===== HEADER AREA ===== */
-        .emr-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
+/* ===== HEADER AREA ===== */
+.emr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
 
-        .emr-title {
-            font-size: 30px !important;
-            font-weight: 700;
-            color: #582C0C;
-            margin: 0;
-            line-height: 1.1;
-        }
+.emr-title {
+    font-size: 30px !important;
+    font-weight: 700;
+    color: #582c0c;
+    margin: 0;
+    line-height: 1.1;
+}
 
-        .emr-subtitle {
-            font-size: 18.75px;
-            color: #C58F59;
-        }
+.emr-subtitle {
+    font-size: 18.75px;
+    color: #c58f59;
+}
 
-        .emr-status-legend {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
+.emr-status-legend {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
 
-        .emr-status-item {
-            color: #6B513E;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-        }
+.emr-status-item {
+    color: #6b513e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
 
-        .emr-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
+.emr-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-        /* ===== TOMBOL AKSI KANAN ATAS ===== */
-        .emr-header-actions {
-            display: flex;
-            gap: 8px;
-        }
+/* ===== TOMBOL AKSI KANAN ATAS ===== */
+.emr-header-actions {
+    display: flex;
+    gap: 8px;
+}
 
-        .emr-icon-btn {
-            background: white;
-            border: 1.5px solid #E5D6C5;
-            color: #C58F59;
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+.emr-icon-btn {
+    background: white;
+    border: 1.5px solid #e5d6c5;
+    color: #c58f59;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
 
-        .emr-action-icon {
-            width: 18px;
-            height: 18px;
-        }
+.emr-action-icon {
+    width: 18px;
+    height: 18px;
+}
 
-        .emr-icon-btn:hover {
-            background: rgba(197, 143, 89, 0.05);
-            border-color: #C58F59;
-        }
+.emr-icon-btn:hover {
+    background: rgba(197, 143, 89, 0.05);
+    border-color: #c58f59;
+}
 
-        /* ===== LAYOUT & SIDEBAR ===== */
-        .emr-layout {
-            display: flex;
-            gap: 24px;
-        }
+/* ===== LAYOUT & SIDEBAR ===== */
+.emr-layout {
+    display: flex;
+    gap: 24px;
+}
 
-        .emr-sidebar {
-            width: 250px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+.emr-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
-        /* ===== CUSTOM DROPDOWN CSS ===== */
-        .emr-filter-box {
-            position: relative;
-            width: 100%;
-        }
+/* ===== CUSTOM DROPDOWN CSS ===== */
+.emr-filter-box {
+    position: relative;
+    width: 100%;
+}
 
-        .emr-select-trigger {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 12px 16px;
-            background-color: white;
-            border: 1px solid #E5D6C5;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+.emr-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 16px;
+    background-color: white;
+    border: 1px solid #e5d6c5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 
-        .emr-select-trigger:hover {
-            border-color: #C58F59;
-        }
+.emr-select-trigger:hover {
+    border-color: #c58f59;
+}
 
-        .emr-option.is-selected {
-            background-color: rgba(197, 143, 89, 0.15);
-            color: #582C0C;
-            font-weight: 700;
-        }
+.emr-option.is-selected {
+    background-color: rgba(197, 143, 89, 0.15);
+    color: #582c0c;
+    font-weight: 700;
+}
 
-        .emr-filter-box.open .emr-select-trigger {
-            border-color: #C58F59;
-            box-shadow: 0 0 0 3px rgba(197, 143, 89, 0.15); 
-        }
+.emr-filter-box.open .emr-select-trigger {
+    border-color: #c58f59;
+    box-shadow: 0 0 0 3px rgba(197, 143, 89, 0.15);
+}
 
-        .emr-select-text {
-            font-weight: 600;
-            color: #582C0C;
-        }
+.emr-select-text {
+    font-weight: 600;
+    color: #582c0c;
+}
 
-        .emr-select-icon {
-            width: 16px;
-            height: 16px;
-            transition: transform 0.3s ease;
-        }
+.emr-select-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
 
-        .emr-filter-box.open .emr-select-icon {
-            transform: rotate(180deg);
-        }
+.emr-filter-box.open .emr-select-icon {
+    transform: rotate(180deg);
+}
 
-        .emr-options {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #E5D6C5;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(88, 44, 12, 0.08);
-            padding: 6px;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-        }
+.emr-options {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5d6c5;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(88, 44, 12, 0.08);
+    padding: 6px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
 
-        .emr-filter-box.open .emr-options {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+.emr-filter-box.open .emr-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
 
-        .emr-option {
-            padding: 10px 14px;
-            font-weight: 500;
-            color: #6B513E;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 2px;
-        }
+.emr-option {
+    padding: 10px 14px;
+    font-weight: 500;
+    color: #6b513e;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+}
 
-        .emr-option:last-child {
-            margin-bottom: 0;
-        }
+.emr-option:last-child {
+    margin-bottom: 0;
+}
 
-        /* Warna Cream pas dihover */
-        .emr-option:hover {
-            background-color: #FDF8F4; 
-            color: #582C0C;
-            font-weight: 600;
-        }
+/* Warna Cream pas dihover */
+.emr-option:hover {
+    background-color: #fdf8f4;
+    color: #582c0c;
+    font-weight: 600;
+}
 
-        /* ===== ALERT ANTREAN ===== */
-        .emr-queue-alert {
-            background: white;
-            border: 1px solid #E5D6C5;
-            border-left: 4px solid #EF4444;
-            color: #EF4444;
-            padding: 14px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(88, 44, 12, 0.04);
-        }
+/* ===== ALERT ANTREAN ===== */
+.emr-queue-alert {
+    background: white;
+    border: 1px solid #e5d6c5;
+    border-left: 4px solid #ef4444;
+    color: #ef4444;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(88, 44, 12, 0.04);
+}
 
-        /* ===== MAIN AREA (EMPTY STATE) ===== */
-        .emr-main {
-            flex: 1;
-            background: #FCFAF8;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 400px;
-            border: 1px dashed #C58F59;
-        }
+/* ===== MAIN AREA (EMPTY STATE) ===== */
+.emr-main {
+    flex: 1;
+    background: #fcfaf8;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    border: 1px dashed #c58f59;
+}
 
-        .emr-empty-state {
-            text-align: center;
-            max-width: 400px;
-            padding: 20px;
-        }
+.emr-empty-state {
+    text-align: center;
+    max-width: 400px;
+    padding: 20px;
+}
 
-        .emr-empty-img {
-            width: 500px;
-            height: auto;
-            margin: 0 auto 24px;
-        }
+.emr-empty-img {
+    width: 500px;
+    height: auto;
+    margin: 0 auto 24px;
+}
 
-        .emr-empty-title {
-            font-size: 18.75px; 
-            font-weight: 700;
-            color: #582C0C;
-            margin: 0 0 8px 0;
-            line-height: 1.2;
-        }
+.emr-empty-title {
+    font-size: 18.75px;
+    font-weight: 700;
+    color: #582c0c;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+}
 
-        .emr-empty-desc {
-            color: #6B513E;
-            line-height: 1.5;
-            margin: 0;
-        }
+.emr-empty-desc {
+    color: #6b513e;
+    line-height: 1.5;
+    margin: 0;
+}
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .emr-layout {
-                flex-direction: column;
-            }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .emr-layout {
+        flex-direction: column;
+    }
 
-            .emr-sidebar {
-                width: 100%;
-            }
+    .emr-sidebar {
+        width: 100%;
+    }
 
-            .emr-status-legend {
-                flex-wrap: wrap;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .emr-title {
-                font-size: 24px !important;
-            }
-            
-            .emr-subtitle {
-                font-size: 16px;
-            }
+    .emr-status-legend {
+        flex-wrap: wrap;
+    }
+}
 
-            .emr-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
+@media (max-width: 768px) {
+    .emr-title {
+        font-size: 24px !important;
+    }
 
-            .emr-status-legend {
-                gap: 12px;
-            }
-            .emr-status-item {
-                font-size: 11px;
-            }
+    .emr-subtitle {
+        font-size: 16px;
+    }
 
-            .emr-header-actions {
-                width: 100%;
-            }
+    .emr-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
 
-            .emr-icon-btn {
-                flex: 1;
-            }
+    .emr-status-legend {
+        gap: 12px;
+    }
+    .emr-status-item {
+        font-size: 11px;
+    }
 
-            .emr-empty-img {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .emr-empty-title {
-                font-size: 16px;
-            }
-        }
+    .emr-header-actions {
+        width: 100%;
+    }
 
+    .emr-icon-btn {
+        flex: 1;
+    }
+
+    .emr-empty-img {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .emr-empty-title {
+        font-size: 16px;
+    }
+}
+
+/* --- FLOATING ACTION BUTTON (FAB) --- */
+.emr-fab-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 50; /* Pastikan di atas konten EMR, tapi di bawah Modal Overlay */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Tombol Biru */
+.emr-fab-btn {
+    width: 4rem; /* Ubah ukuran wadah tombol jika ingin lebih besar (misal: 4rem) */
+    height: 4rem; /* Pastikan width dan height sama agar proporsional */
+    background: linear-gradient(135deg, #6b513e, #6b513e);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    display: flex;
+    align-items: center; /* Ini yang membuat icon ke tengah vertikal */
+    justify-content: center; /* Ini yang membuat icon ke tengah horizontal */
+    box-shadow:
+        0 8px 16px rgba(235, 143, 37, 0.25),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-size: 2.25rem; /* Ukuran font untuk icon, bisa disesuaikan */
+}
+
+.emr-fab-btn:hover {
+    background-color: #582c0c;
+    transform: scale(1.05);
+}
+
+.emr-fab-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+/* Menu Popup / List Fitur */
+.emr-fab-menu {
+    position: absolute;
+    bottom: 4.5rem; /* Jarak dari atas tombol FAB */
+    right: 0;
+    width: 250px;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+    /* Disembunyikan secara default */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Class saat menu aktif */
+.emr-fab-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Input Pencarian di dalam FAB */
+.emr-fab-search-box {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.emr-fab-search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    outline: none;
+    color: #374151;
+}
+
+.emr-fab-search-input:focus {
+    border-color: #6b513e;
+    box-shadow: 0 0 0 1px #6b513e;
+}
+
+/* Daftar List Fitur */
+.emr-fab-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto; /* Agar bisa di-scroll jika kepanjangan */
+}
+
+/* Custom Scrollbar untuk list fitur */
+.emr-fab-list::-webkit-scrollbar {
+    width: 4px;
+}
+.emr-fab-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.emr-fab-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.emr-fab-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #4b5563;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background-color 0.15s;
+}
+
+.emr-fab-item:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}

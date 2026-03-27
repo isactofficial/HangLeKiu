@@ -278,3 +278,64 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     height: 100%;
     cursor: pointer;
 }
+
+/* ── Modal Layout ── */
+.reg-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    backdrop-filter: blur(4px);
+}
+
+.reg-modal-overlay.open {
+    display: flex;
+}
+
+.reg-modal-content {
+    width: 100%;
+    max-width: 800px; /* Lebar lebih disesuaikan untuk popup (kurang dari 900px) */
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--cream-50);
+    border-radius: var(--radius-md);
+    position: relative;
+    padding: 40px 24px 60px; /* Ditambahkan agar isinya tidak menempel batas modal */
+    /* Hide scrollbar for aesthetics but keep functionality */
+    scrollbar-width: none;
+}
+
+.reg-modal-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* Modal Close Button */
+.modal-close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: var(--white);
+    border: 1px solid var(--cream-200);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-gray);
+    transition: all var(--transition);
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.modal-close-btn:hover {
+    background: var(--cream-50);
+    color: var(--req-star);
+    border-color: var(--req-star);
+}
+

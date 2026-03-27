@@ -5,6 +5,12 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Api\RegistrationController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\DoctorNoteController;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\MedicalProcedureController;
+use App\Http\Controllers\ProcedureController;
+use App\Http\Controllers\ProcedureItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +44,48 @@ Route::prefix('patients')->group(function () {
     Route::delete('/{id}',[PatientController::class, 'destroy']);
 });
 
+// ================= PROCEDURE =================
+Route::prefix('procedures')->group(function () {
+    Route::post('/', [ProcedureController::class, 'store']);
+    Route::get('/', [ProcedureController::class, 'index']);
+    Route::get('/{id}', [ProcedureController::class, 'show']);
+    Route::put('/{id}', [ProcedureController::class, 'update']);
+    Route::delete('/{id}', [ProcedureController::class, 'destroy']);
+});
+
+// ================= DOCTOR =================
+Route::prefix('doctors')->group(function () {
+    Route::post('/', [DoctorController::class, 'store']);
+    Route::get('/', [DoctorController::class, 'index']);
+    Route::get('/{id}', [DoctorController::class, 'show']);
+    Route::put('/{id}', [DoctorController::class, 'update']);
+    Route::delete('/{id}', [DoctorController::class, 'destroy']);
+});
+
+// ================= DOCTOR NOTE =================
+Route::prefix('doctor-notes')->group(function () {
+    Route::post('/', [DoctorNoteController::class, 'store']);
+    Route::get('/{id}', [DoctorNoteController::class, 'show']);
+    Route::put('/{id}', [DoctorNoteController::class, 'update']);
+    Route::delete('/{id}', [DoctorNoteController::class, 'destroy']);
+});
+
+// ================= MEDICAL PROCEDURE =================
+Route::prefix('medical-procedures')->group(function () {
+    Route::post('/', [MedicalProcedureController::class, 'store']);
+    Route::get('/{id}', [MedicalProcedureController::class, 'show']);
+    Route::put('/{id}', [MedicalProcedureController::class, 'update']);
+    Route::delete('/{id}', [MedicalProcedureController::class, 'destroy']);
+});
+
+// ================= PROCEDURE ITEM =================
+Route::prefix('procedure-items')->group(function () {
+    Route::post('/', [ProcedureItemController::class, 'store']);
+    Route::get('/{id}', [ProcedureItemController::class, 'show']);
+    Route::put('/{id}', [ProcedureItemController::class, 'update']);
+    Route::delete('/{id}', [ProcedureItemController::class, 'destroy']);
+});
+
 // ================= REGISTRATION (ADMIN) =================
 Route::prefix('registration')->middleware('auth:api')->group(function () {
 
@@ -66,8 +114,6 @@ Route::prefix('admin')->middleware('auth:api')->group(function () {
     Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus']);
 });
 
-use App\Http\Controllers\MedicineController;
-
 Route::prefix('medicine')->group(function () {
     Route::get('/', [MedicineController::class, 'index']);
     Route::post('/', [MedicineController::class, 'store']);
@@ -78,5 +124,26 @@ Route::prefix('medicine')->group(function () {
      // stok
     Route::post('/{id}/stock-in', [MedicineController::class, 'stockIn']);
     Route::post('/{id}/stock-out', [MedicineController::class, 'stockOut']);
+    Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);
+});
+
+// ================= ADMIN REGISTRATION =================
+Route::prefix('admin/registration')->middleware('auth:api')->group(function () {
+    Route::get('/master-data',    [RegistrationController::class, 'masterData']);
+    Route::get('/doctors',        [RegistrationController::class, 'doctors']);
+    Route::get('/slots',          [RegistrationController::class, 'availableSlots']);
+    Route::get('/search-patient', [RegistrationController::class, 'searchPatient']);
+    Route::post('/',              [RegistrationController::class, 'store']);
+});
+
+// ================= ADMIN MEDICINE =================
+Route::prefix('admin/medicine')->middleware('auth:api')->group(function () {
+    Route::get('/',                   [MedicineController::class, 'index']);
+    Route::post('/',                  [MedicineController::class, 'store']);
+    Route::get('/{id}',               [MedicineController::class, 'show']);
+    Route::put('/{id}',               [MedicineController::class, 'update']);
+    Route::delete('/{id}',            [MedicineController::class, 'destroy']);
+    Route::post('/{id}/stock-in',     [MedicineController::class, 'stockIn']);
+    Route::post('/{id}/stock-out',    [MedicineController::class, 'stockOut']);
     Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);
 });

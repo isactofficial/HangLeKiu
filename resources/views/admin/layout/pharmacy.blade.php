@@ -5,17 +5,13 @@
 
 @php
     $menuList = [
-        'antrian'          => 'Antrian Hari Ini',
         'obat'             => 'Obat',
         'penggunaan-obat'  => 'Penggunaan Obat',
         'kedaluwarsa-obat' => 'Kedaluwarsa Obat',
         'bhp'              => 'Bahan Habis Pakai',
         'penggunaan-bhp'   => 'Penggunaan BHP',
         'kedaluwarsa-bhp'  => 'Kedaluwarsa Bahan Habis Pakai',
-        'resep'            => 'Resep Obat',
         'restock'          => 'Restock / Return',
-        'depot'            => 'Depot',
-        'pesanan'          => 'Pesanan & Stok Masuk',
     ];
     $active = request('menu', 'antrian');
 @endphp
@@ -117,21 +113,6 @@
                         </li>
                     @endforeach
                 </ul>
-            </div>
-
-            <div class="apt-stat-card">
-                <div class="apt-stat-header">
-                    <span class="apt-stat-number">12</span>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A38C7A" stroke-width="1.8">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                </div>
-                <p class="apt-stat-title">Total Antrian Hari Ini</p>
-                <p class="apt-stat-subtitle">8 sudah ditangani</p>
-                <div class="apt-progress-bar">
-                    <div class="apt-progress-fill" style="width:67%;"></div>
-                </div>
             </div>
 
             <div class="apt-alert-card">
