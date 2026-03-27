@@ -1,7 +1,8 @@
 ﻿@push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/pharmacy/bhp.css') }}">
+    <!-- Tambahkan Tailwind via CDN untuk styling modal jika belum ada di project -->
+    <script src="https://cdn.tailwindcss.com"></script>
 @endpush
-
 
 <div class="apt-card">
     <div class="apt-card-header">
@@ -14,10 +15,13 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cari bahan habis pakai">
             </div>
-            <button class="apt-btn-primary">
+            
+            <!-- Tombol Trigger Modal -->
+            <button class="apt-btn-primary" id="btnOpenModal">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-                Tambah Data Barang
+                Tambah Data BHP
             </button>
+
             <div class="apt-dropdown">
                 <button class="apt-btn-secondary" data-dropdown-trigger>
                     Export Excel
@@ -51,36 +55,14 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Row 1 -->
                 <tr>
                     <td><input type="checkbox" class="apt-checkbox"></td>
                     <td>BHP-001</td><td>Masker Bedah</td><td>OneMed</td><td>500</td>
                     <td>Rp 2.000</td><td>Rp 1.200</td><td>Rp 1.200</td><td>Rp 2.500</td><td>67%</td>
                     <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
                 </tr>
-                <tr>
-                    <td><input type="checkbox" class="apt-checkbox"></td>
-                    <td>BHP-002</td><td>Sarung Tangan Latex S</td><td>Medline</td><td><span class="apt-badge apt-badge-danger">8</span></td>
-                    <td>Rp 3.500</td><td>Rp 2.000</td><td>Rp 2.000</td><td>Rp 4.000</td><td>75%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="apt-checkbox"></td>
-                    <td>BHP-003</td><td>Cotton Roll</td><td>Prevest</td><td>120</td>
-                    <td>Rp 500</td><td>Rp 280</td><td>Rp 280</td><td>Rp 600</td><td>79%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="apt-checkbox"></td>
-                    <td>BHP-004</td><td>Gutta Percha Point #25</td><td>DiaDent</td><td>30</td>
-                    <td>Rp 45.000</td><td>Rp 28.000</td><td>Rp 28.000</td><td>Rp 50.000</td><td>61%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="apt-checkbox"></td>
-                    <td>BHP-005</td><td>Syringe 3cc</td><td>Terumo</td><td>200</td>
-                    <td>Rp 4.000</td><td>Rp 2.500</td><td>Rp 2.500</td><td>Rp 4.500</td><td>60%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
+                <!-- Tambahkan row lainnya di sini -->
             </tbody>
         </table>
     </div>
@@ -94,3 +76,100 @@
         </div>
     </div>
 </div>
+
+<!-- ==========================================
+     MODAL POP-UP (TAMBAH DATA BHP)
+     ========================================== -->
+<div id="modalBHP" class="modal-overlay">
+    <div class="modal-container">
+        
+        <!-- Header -->
+        <div class="modal-header">
+            <h3 class="modal-title">Tambah Data Bahan Habis Pakai Baru</h3>
+            <button id="btnCloseX" class="modal-close-btn" type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <form class="modal-form" id="formBHP">
+            <div class="form-grid">
+                
+                <div class="form-group">
+                    <label class="form-label">Kode Barang</label>
+                    <input type="text" name="kode" placeholder="BHP-XXX" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nama Barang</label>
+                    <input type="text" name="nama" placeholder="Contoh: Masker Bedah" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Brand</label>
+                    <input type="text" name="brand" placeholder="Contoh: OneMed" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Stok Awal</label>
+                    <input type="number" name="stok" placeholder="0" class="form-input">
+                </div>
+
+                <!-- Divider Harga -->
+                <div class="form-divider">
+                    <span class="form-divider-text">Informasi Keuangan (Rp)</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Harga Beli</label>
+                    <input type="number" name="harga_beli" placeholder="Rp 0" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Harga Umum</label>
+                    <input type="number" name="harga_umum" placeholder="Rp 0" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Harga OTC</label>
+                    <input type="number" name="harga_otc" placeholder="Rp 0" class="form-input">
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="modal-footer">
+                <button type="button" id="btnCancel" class="modal-btn modal-btn-cancel">Batal</button>
+                <button type="submit" class="modal-btn modal-btn-submit">Simpan Barang</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('modalBHP');
+        const btnOpen = document.getElementById('btnOpenModal');
+        const btnCloseX = document.getElementById('btnCloseX');
+        const btnCancel = document.getElementById('btnCancel');
+        const form = document.getElementById('formBHP');
+
+        // Fungsi Buka Modal
+        btnOpen.onclick = () => {
+            modal.classList.add('open');
+        };
+
+        // Fungsi Tutup Modal
+        const closeModal = () => {
+            modal.classList.remove('open');
+            form.reset();
+        };
+
+        btnCloseX.onclick = closeModal;
+        btnCancel.onclick = closeModal;
+
+        // Tutup jika klik di luar modal (overlay)
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        };
+    });
+</script>
