@@ -7,8 +7,10 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PatientController extends Controller
 {
@@ -23,6 +25,7 @@ class PatientController extends Controller
 			'blood_type' => 'nullable|in:A,B,AB,O,unknown',
 			'rhesus' => 'nullable|in:+,-,unknown',
 			'address' => 'nullable|string|max:50',
+			'phone_number' => 'nullable|string|max:20',
 			'city' => 'nullable|string|max:50',
 			'id_card_number' => 'nullable|string|max:20',
 			'allergy_history' => 'nullable|string',
@@ -59,6 +62,7 @@ class PatientController extends Controller
 				'blood_type' => $validated['blood_type'] ?? null,
 				'rhesus' => $validated['rhesus'] ?? null,
 				'address' => $validated['address'] ?? null,
+				'phone_number' => $validated['phone_number'] ?? null,
 				'city' => $validated['city'] ?? null,
 				'id_card_number' => $validated['id_card_number'] ?? null,
 				'allergy_history' => $validated['allergy_history'] ?? null,
@@ -109,6 +113,126 @@ class PatientController extends Controller
 			'message' => 'Data pasien berhasil diambil',
 			'data' => $patient,
 		], 200);
+	}
+
+	public function update(Request $request, string $id): JsonResponse
+	{
+		$patient = Patient::find($id);
+
+		if (! $patient) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Data pasien tidak ditemukan',
+			], 404);
+		}
+
+		$emailRule = Rule::unique('user', 'email');
+		if ($patient->user_id) {
+			$emailRule = $emailRule->ignore($patient->user_id, 'id');
+		}
+
+		$validated = $request->validate([
+			'full_name' => 'sometimes|required|string|max:100',
+			'email' => ['sometimes', 'required', 'email', 'max:50', $emailRule],
+			'password' => 'sometimes|nullable|string|min:6',
+			'date_of_birth' => 'sometimes|required|date',
+			'gender' => 'sometimes|required|in:Male,Female',
+			'blood_type' => 'sometimes|nullable|in:A,B,AB,O,unknown',
+			'rhesus' => 'sometimes|nullable|in:+,-,unknown',
+			'address' => 'sometimes|nullable|string|max:50',
+			'phone_number' => 'sometimes|nullable|string|max:20',
+			'city' => 'sometimes|nullable|string|max:50',
+			'id_card_number' => 'sometimes|nullable|string|max:20',
+			'allergy_history' => 'sometimes|nullable|string',
+		]);
+
+		try {
+			$result = DB::transaction(function () use ($patient, $validated) {
+				$user = null;
+				if ($patient->user_id) {
+					$user = User::find($patient->user_id);
+				}
+
+				if ($user) {
+					$userPayload = [];
+					if (array_key_exists('full_name', $validated)) {
+						$userPayload['name'] = $validated['full_name'];
+					}
+					if (array_key_exists('email', $validated)) {
+						$userPayload['email'] = $validated['email'];
+					}
+					if (array_key_exists('password', $validated) && ! empty($validated['password'])) {
+						$userPayload['password'] = Hash::make($validated['password']);
+					}
+
+					if (! empty($userPayload)) {
+						$user->update($userPayload);
+					}
+				}
+
+				$patientPayload = $validated;
+				unset($patientPayload['password']);
+				$patient->update($patientPayload);
+
+				$patient->refresh();
+				if ($user) {
+					$user->refresh();
+				}
+
+				return [
+					'user' => $user,
+					'patient' => $patient,
+				];
+			});
+
+			return response()->json([
+				'success' => true,
+				'message' => 'Data pasien berhasil diperbarui',
+				'data' => $result,
+			], 200);
+		} catch (\Exception $e) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Gagal memperbarui data pasien',
+				'error' => $e->getMessage(),
+			], 500);
+		}
+	}
+
+	public function destroy(string $id): JsonResponse
+	{
+		$patient = Patient::find($id);
+
+		if (! $patient) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Data pasien tidak ditemukan',
+			], 404);
+		}
+
+		try {
+			DB::transaction(function () use ($patient) {
+				if ($patient->user_id) {
+					$user = User::find($patient->user_id);
+					if ($user) {
+						$user->delete();
+					}
+				}
+
+				$patient->delete();
+			});
+
+			return response()->json([
+				'success' => true,
+				'message' => 'Data pasien berhasil dihapus (soft delete)',
+			], 200);
+		} catch (\Exception $e) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Gagal menghapus data pasien',
+				'error' => $e->getMessage(),
+			], 500);
+		}
 	}
 
 	private function generateMrn(): string

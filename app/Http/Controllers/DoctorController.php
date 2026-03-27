@@ -50,16 +50,16 @@ class DoctorController extends Controller
             $this->createDoctorUserAndProfile($validated, $request);
 
             return redirect()
-                ->route('admin.settings', ['menu' => 'manajemen-staff'])
+                ->route('admin.settings', ['menu' => 'info-tenaga-medis'])
                 ->with('success', 'Akun dokter berhasil dibuat.');
         } catch (\RuntimeException $e) {
             return redirect()
-                ->route('admin.settings', ['menu' => 'manajemen-staff'])
+                ->route('admin.settings', ['menu' => 'info-tenaga-medis'])
                 ->withErrors(['doctor_create' => $e->getMessage()])
                 ->withInput();
         } catch (\Exception $e) {
             return redirect()
-                ->route('admin.settings', ['menu' => 'manajemen-staff'])
+                ->route('admin.settings', ['menu' => 'info-tenaga-medis'])
                 ->withErrors(['doctor_create' => 'Gagal membuat akun dokter.'])
                 ->withInput();
         }
@@ -74,7 +74,7 @@ class DoctorController extends Controller
             ], 401);
         }
 
-        if (strtolower((string) (Auth::user()->role ?? '')) !== 'admin') {
+        if ($this->getCurrentRoleCode() !== 'ADM') {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki akses untuk membuat akun dokter',
@@ -336,13 +336,13 @@ class DoctorController extends Controller
         }
 
         $currentUser = Auth::user();
-        $role = strtolower((string) ($currentUser->role ?? ''));
+        $roleCode = $this->getCurrentRoleCode();
 
-        if ($role === 'admin') {
+        if ($roleCode === 'ADM') {
             return null;
         }
 
-        if ($role === 'doctor' && (string) $currentUser->id === (string) $doctor->user_id) {
+        if ($roleCode === 'DCT' && (string) $currentUser->id === (string) $doctor->user_id) {
             return null;
         }
 
@@ -350,6 +350,29 @@ class DoctorController extends Controller
             'success' => false,
             'message' => 'Anda tidak memiliki akses untuk mengubah data dokter ini',
         ], 403);
+    }
+
+    private function getCurrentRoleCode(): ?string
+    {
+        $role = Auth::user()?->role;
+
+        if (is_object($role) && isset($role->code)) {
+            return (string) $role->code;
+        }
+
+        if (is_string($role)) {
+            $role = strtoupper($role);
+            if (in_array($role, ['ADM', 'DCT', 'PAT', 'ADMIN', 'DOCTOR', 'PATIENT'], true)) {
+                return match ($role) {
+                    'ADMIN' => 'ADM',
+                    'DOCTOR' => 'DCT',
+                    'PATIENT' => 'PAT',
+                    default => $role,
+                };
+            }
+        }
+
+        return null;
     }
 
     /**
