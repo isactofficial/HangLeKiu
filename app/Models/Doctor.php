@@ -22,6 +22,9 @@ class Doctor extends Model
         'is_active',
         'user_id',
         'email',
+        'foto_profil',
+        'ttd',
+        'estimasi_konsultasi',
         'phone_number',
         'title_prefix',
         'license_no',
@@ -36,6 +39,7 @@ class Doctor extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'estimasi_konsultasi' => 'integer',
         'str_expiry_date' => 'date',
         'sip_expiry_date' => 'date',
     ];

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -47,7 +48,14 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $attempted = $this->attemptWithLegacyFallback(
+            $credentials['email'],
+            $credentials['password'],
+            'PAT',
+            $request->boolean('remember')
+        );
+
+        if ($attempted) {
             // Halaman login user hanya untuk role PAT.
             $roleCode = Auth::user()->role?->code;
 
@@ -90,7 +98,14 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $attempted = $this->attemptWithLegacyFallback(
+            $credentials['email'],
+            $credentials['password'],
+            'DCT',
+            $request->boolean('remember')
+        );
+
+        if ($attempted) {
             if (Auth::user()->role?->code !== 'DCT') {
                 Auth::logout();
                 return back()->withErrors([
@@ -116,7 +131,14 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $attempted = $this->attemptWithLegacyFallback(
+            $credentials['email'],
+            $credentials['password'],
+            'ADM',
+            $request->boolean('remember')
+        );
+
+        if ($attempted) {
             // Kalau yang login ternyata bukan admin, tolak
             if (Auth::user()->role?->code !== 'ADM') {
                 Auth::logout();
@@ -219,5 +241,55 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    /**
+     * Try normal Auth::attempt first. If legacy plain-text passwords exist,
+     * verify once, upgrade to bcrypt, and login the user.
+     */
+    private function attemptWithLegacyFallback(string $email, string $plainPassword, string $expectedRoleCode, bool $remember): bool
+    {
+        try {
+            if (Auth::attempt(['email' => $email, 'password' => $plainPassword], $remember)) {
+                return true;
+            }
+        } catch (\RuntimeException $e) {
+            Log::warning('Password hash algorithm mismatch during login.', [
+                'email' => $email,
+                'expected_role' => $expectedRoleCode,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        $legacyUser = User::with('role')
+            ->where('email', $email)
+            ->first();
+
+        if (! $legacyUser || $legacyUser->role?->code !== $expectedRoleCode) {
+            return false;
+        }
+
+        if (! is_string($legacyUser->password) || $legacyUser->password === '') {
+            return false;
+        }
+
+        $storedPassword = $legacyUser->password;
+        $passwordInfo = password_get_info($storedPassword);
+        $isLegacyHash = ($passwordInfo['algo'] ?? null) !== null;
+
+        $verified = $isLegacyHash
+            ? password_verify($plainPassword, $storedPassword)
+            : hash_equals($storedPassword, $plainPassword);
+
+        if (! $verified) {
+            return false;
+        }
+
+        $legacyUser->password = Hash::make($plainPassword);
+        $legacyUser->save();
+
+        Auth::login($legacyUser, $remember);
+
+        return true;
     }
 }
