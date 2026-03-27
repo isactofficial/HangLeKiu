@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Route;
 
 // PUBLIC
@@ -43,7 +44,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
         Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
-        Route::get('/registration', fn() => view('admin.pages.registration'))->name('registration');
+        Route::get('/registration', [AppointmentController::class, 'registrationIndex'])->name('registration');
         Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
         Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
         Route::get('/emr',          fn() => view('admin.pages.emr'))->name('emr');
@@ -66,6 +67,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])
             ->name('settings.staff.doctor.store');
 
+        // Patient routes (admin)
+        Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
+        Route::post('/patients',        [PatientController::class, 'storeFromAdmin'])->name('patients.store');
     });
 
     // ================= USER =================

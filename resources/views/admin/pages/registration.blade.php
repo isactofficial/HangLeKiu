@@ -1,4 +1,4 @@
-﻿@extends('admin.layout.admin')
+@extends('admin.layout.admin')
 @section('title', 'Registration')
 
 @section('navbar')
@@ -7,6 +7,9 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/pages/registration.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/registration-shared.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pasien-baru.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pendaftaran-baru.css') }}">
 @endpush
 
 @section('content')
@@ -214,9 +217,30 @@
             });
         });
 
-        window.addEventListener('click', function() {
+        window.addEventListener('click', function(e) {
             customSelects.forEach(dropdown => dropdown.classList.remove('open'));
+            
+            // Close modals when clicking overlay
+            if (e.target.classList.contains('reg-modal-overlay')) {
+                closeRegModal(e.target.id);
+            }
         });
     });
+
+    // Modal Functions
+    function openRegModal(modalId) {
+        document.getElementById(modalId).classList.add('open');
+        document.body.style.overflow = 'hidden'; // prevent bg body scrolling
+    }
+    
+    function closeRegModal(modalId) {
+        document.getElementById(modalId).classList.remove('open');
+        document.body.style.overflow = '';
+    }
 </script>
+
+<!-- Include Modals -->
+@include('admin.components.pasien-baru')
+@include('admin.components.pendaftaran-baru')
+
 @endsection

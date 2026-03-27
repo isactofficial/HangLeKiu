@@ -14,6 +14,79 @@ use Illuminate\Validation\Rule;
 
 class PatientController extends Controller
 {
+	/**
+	 * POST /admin/patients
+	 * Simpan pasien baru dari admin (tidak wajib email/password).
+	 */
+	public function storeFromAdmin(Request $request): JsonResponse
+	{
+		$validated = $request->validate([
+			'full_name'    => 'required|string|max:100',
+			'date_of_birth'=> 'required|date',
+			'gender'       => 'required|in:Male,Female',
+			'blood_type'   => 'nullable|in:A,B,AB,O,unknown',
+			'rhesus'       => 'nullable|in:+,-,unknown',
+			'address'      => 'nullable|string|max:200',
+			'phone_number' => 'nullable|string|max:20',
+			'city'         => 'nullable|string|max:50',
+			'id_card_number'   => 'nullable|string|max:20',
+			'email'        => 'nullable|email|max:50|unique:patient,email',
+			'religion'     => 'nullable|string|max:50',
+			'education'    => 'nullable|string|max:50',
+			'occupation'   => 'nullable|string|max:50',
+			'marital_status' => 'nullable|string|max:50',
+			'first_chat_date'=> 'nullable|date',
+		]);
+
+		try {
+			$patient = Patient::create([
+				'id'               => (string) Str::uuid(),
+				'full_name'        => $validated['full_name'],
+				'date_of_birth'    => $validated['date_of_birth'],
+				'gender'           => $validated['gender'],
+				'blood_type'       => $validated['blood_type'] ?? null,
+				'rhesus'           => $validated['rhesus'] ?? null,
+				'address'          => $validated['address'] ?? null,
+				'phone_number'     => $validated['phone_number'] ?? null,
+				'city'             => $validated['city'] ?? null,
+				'id_card_number'   => $validated['id_card_number'] ?? null,
+				'email'            => $validated['email'] ?? null,
+				'medical_record_no'=> $this->generateMrn(),
+			]);
+
+			return response()->json([
+				'success' => true,
+				'message' => 'Pasien baru berhasil ditambahkan.',
+				'data'    => $patient,
+			], 201);
+		} catch (\Exception $e) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Gagal menyimpan data pasien.',
+				'error'   => $e->getMessage(),
+			], 500);
+		}
+	}
+
+	/**
+	 * GET /admin/patients/search?q=...
+	 * Cari pasien berdasarkan nama atau MR no (untuk AJAX di modal Pendaftaran Baru).
+	 */
+	public function search(Request $request): JsonResponse
+	{
+		$q = $request->get('q', '');
+		$patients = Patient::where('full_name', 'like', "%{$q}%")
+			->orWhere('medical_record_no', 'like', "%{$q}%")
+			->orderBy('full_name')
+			->limit(10)
+			->get(['id', 'full_name', 'medical_record_no', 'date_of_birth', 'gender', 'address', 'phone_number', 'id_card_number']);
+
+		return response()->json([
+			'success' => true,
+			'data' => $patients,
+		]);
+	}
+
 	public function store(Request $request): JsonResponse
 	{
 		$validated = $request->validate([

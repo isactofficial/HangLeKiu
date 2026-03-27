@@ -37,8 +37,8 @@
                     </svg>
                 </button>
                 <div class="navbar-dropdown-menu" id="pendaftaranMenu" style="left:0;right:auto;top:calc(100% + 4px);">
-                    <a href="{{ route('admin.registration.pendaftaran-baru') }}" class="dropdown-item">Pendaftaran Baru</a>
-                    <a href="{{ route('admin.registration.pasien-baru') }}" class="dropdown-item">Pasien Baru</a>
+                    <a href="#" onclick="openRegModal('modalPendaftaranBaru'); return false;" class="dropdown-item">Pendaftaran Baru</a>
+                    <a href="#" onclick="openRegModal('modalPasienBaru'); return false;" class="dropdown-item">Pasien Baru</a>
                 </div>
             </div>
         </div>
