@@ -11,6 +11,9 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicalProcedureController;
 use App\Http\Controllers\ProcedureController;
 use App\Http\Controllers\ProcedureItemController;
+use App\Http\Controllers\ProcedureMedicineController;
+use App\Http\Controllers\MasterProcedureController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -146,4 +149,19 @@ Route::prefix('admin/medicine')->middleware('auth:api')->group(function () {
     Route::post('/{id}/stock-in',     [MedicineController::class, 'stockIn']);
     Route::post('/{id}/stock-out',    [MedicineController::class, 'stockOut']);
     Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);
+});
+
+Route::prefix('procedure-medicine')->group(function () {
+    Route::get('/', [ProcedureMedicineController::class, 'index']);
+    Route::post('/', [ProcedureMedicineController::class, 'store']);
+    Route::get('/{id}', [ProcedureMedicineController::class, 'show']);
+    Route::delete('/{id}', [ProcedureMedicineController::class, 'destroy']);
+});
+
+Route::prefix('master-procedure')->group(function () {
+    Route::get('/', [MasterProcedureController::class, 'index']);
+    Route::post('/', [MasterProcedureController::class, 'store']);
+    Route::get('/{id}', [MasterProcedureController::class, 'show']);
+    Route::put('/{id}', [MasterProcedureController::class, 'update']);
+    Route::delete('/{id}', [MasterProcedureController::class, 'destroy']);
 });
