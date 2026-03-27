@@ -21,8 +21,8 @@ class Medicine extends Model
         'minimum_stock',
         'notes'
     ];
-    public function stockLogs()
+    public function stockMutations()
     {
-        return $this->hasMany(MedicineStockLog::class);
+    return $this->hasMany(StockMutation::class);
     }
 }
