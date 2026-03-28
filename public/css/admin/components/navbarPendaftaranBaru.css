@@ -1,4 +1,4 @@
-﻿/* ==========================================================
+/* ==========================================================
    Extracted from: resources\views\admin\components\navbarPendaftaranBaru.blade.php
    ========================================================== */
 
@@ -161,14 +161,15 @@
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: white;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
     border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(88, 44, 12, 0.15);
+    box-shadow: 0 12px 40px rgba(88, 44, 12, 0.18);
     min-width: 220px;
-    padding: 6px;
-    z-index: 100;
+    padding: 8px;
+    z-index: 1000;
     display: none;
-    border: 1px solid #E5D6C5;
+    border: 1px solid rgba(229, 214, 197, 0.8);
 }
 
 .navbar-dropdown-menu.show {
@@ -255,6 +256,13 @@
     .navbar-icon-btn { width: 32px; height: 32px; }
     .navbar-icon-btn svg { width: 18px; height: 18px; }
     .navbar-hds-logo { width: 32px; height: 32px; }
-    .navbar-dropdown-menu { right: -16px; }
-    #pendaftaranMenu { left: -16px; right: auto; }
+    .navbar-dropdown-menu { 
+        right: 0; 
+        left: auto;
+        min-width: 200px;
+    }
+    #pendaftaranMenu { 
+        left: auto; 
+        right: 0; 
+    }
 }

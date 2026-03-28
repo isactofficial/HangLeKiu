@@ -179,7 +179,15 @@
                                             @endphp
                                             <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}')">
                                                 @if ($apt)
-                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="event.stopPropagation(); openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                        data-id="{{ $apt->id }}"
+                                                        data-patient="{{ $apt->patient_name }}"
+                                                        data-mr="{{ $apt->mr_number }}"
+                                                        data-treatment="{{ $apt->treatment_name }}"
+                                                        data-time="{{ $slot }}"
+                                                        data-doctor="{{ $doc->full_name }}"
+                                                        data-status="{{ $apt->status }}"
+                                                        onclick="handleAptClick(this, event)">
                                                         <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
@@ -200,7 +208,15 @@
                                             @endphp
                                             <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
                                                 @if ($apt)
-                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="event.stopPropagation(); openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                        data-id="{{ $apt->id }}"
+                                                        data-patient="{{ $apt->patient_name }}"
+                                                        data-mr="{{ $apt->mr_number }}"
+                                                        data-treatment="{{ $apt->treatment_name }}"
+                                                        data-time="{{ $slot }}"
+                                                        data-doctor="{{ $selectedDoctor->full_name }}"
+                                                        data-status="{{ $apt->status }}"
+                                                        onclick="handleAptClick(this, event)">
                                                         <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
@@ -232,7 +248,15 @@
                                         @foreach ($doctors as $doc)
                                             @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
                                             @if ($apt)
-                                                <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                                <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                    data-id="{{ $apt->id }}"
+                                                    data-patient="{{ $apt->patient_name }}"
+                                                    data-mr="{{ $apt->mr_number }}"
+                                                    data-treatment="{{ $apt->treatment_name }}"
+                                                    data-time="{{ $slot }}"
+                                                    data-doctor="{{ $doc->full_name }}"
+                                                    data-status="{{ $apt->status }}"
+                                                    onclick="handleAptClick(this, event)">
                                                     <div class="m-card-header">
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
@@ -268,7 +292,15 @@
                                 <div class="m-cards">
                                     @if ($aptsForDate->count() > 0)
                                         @foreach ($aptsForDate as $apt)
-                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
+                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                data-id="{{ $apt->id }}"
+                                                data-patient="{{ $apt->patient_name }}"
+                                                data-mr="{{ $apt->mr_number }}"
+                                                data-treatment="{{ $apt->treatment_name }}"
+                                                data-time="{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}"
+                                                data-doctor="{{ $apt->doctor?->full_name ?? $selectedDoctor->full_name }}"
+                                                data-status="{{ $apt->status }}"
+                                                onclick="handleAptClick(this, event)">
                                                 <div class="m-card-header">
                                                     <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }} | {{ $apt->patient_name }}</div>
                                                     <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
@@ -289,64 +321,8 @@
         </div>
     </div>
 
-    {{-- Modal --}}
-    <div id="aptModal" class="modal-overlay" onclick="closeModalOutside(event)">
-        <div class="modal-box">
-            <div class="modal-head">
-                <h3 id="modalName">Update Status</h3>
-                <button onclick="closeModal()">✕</button>
-            </div>
-            <div class="modal-body">
-                <p>Pilih status baru:</p>
-                <div class="modal-btns">
-                    <button style="background:#EF4444" onclick="setStatus('pending')">Pending</button>
-                    <button style="background:#F59E0B" onclick="setStatus('confirmed')">Confirmed</button>
-                    <button style="background:#8B5CF6" onclick="setStatus('waiting')">Waiting</button>
-                    <button style="background:#3B82F6" onclick="setStatus('engaged')">Engaged</button>
-                    <button style="background:#84CC16" onclick="setStatus('succeed')">Succeed</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 <script>
-        let activeId = null;
-
-        function openModal(id, name, status) {
-            activeId = id;
-            document.getElementById('modalName').textContent = name;
-            document.getElementById('aptModal').classList.add('open');
-        }
-
-        function closeModal() {
-            document.getElementById('aptModal').classList.remove('open');
-            activeId = null;
-        }
-
-        function closeModalOutside(e) {
-            if (e.target.id === 'aptModal') closeModal();
-        }
-
-        function setStatus(status) {
-            if (!activeId) return;
-            fetch(`/admin/appointments/${activeId}/status`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        status
-                    })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        closeModal();
-                        location.reload();
-                    }
-                });
-        }
-
         // Registration Modal Functions
         function openRegModal(modalId, doctorId = null, time = null, poliId = null, date = null) {
             const modal = document.getElementById(modalId);
@@ -387,10 +363,24 @@
                 closeRegModal(e.target.id);
             }
         });
-    </script>
+        function handleAptClick(el, e) {
+        if (e) e.stopPropagation();
+        const id = el.getAttribute('data-id');
+        const patient = el.getAttribute('data-patient');
+        const mr = el.getAttribute('data-mr');
+        const treatment = el.getAttribute('data-treatment');
+        const time = el.getAttribute('data-time');
+        const doctor = el.getAttribute('data-doctor');
+        const status = el.getAttribute('data-status');
+        
+        console.log('Opening Apt Detail Modal for:', patient);
+        openApptDetailModal(id, patient, mr, treatment, time, doctor, status);
+    }
+</script>
 
     <!-- Include Registration Modals -->
     @include('admin.components.pasien-baru')
     @include('admin.components.pendaftaran-baru')
+    @include('admin.components.appointment-detail')
 
 @endsection

@@ -36,7 +36,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                     </svg>
                 </button>
-                <div class="navbar-dropdown-menu" id="pendaftaranMenu" style="left:0;right:auto;top:calc(100% + 4px);">
+                <div class="navbar-dropdown-menu" id="pendaftaranMenu">
                     <a href="#" onclick="openRegModal('modalPendaftaranBaru'); return false;" class="dropdown-item">Pendaftaran Baru</a>
                     <a href="#" onclick="openRegModal('modalPasienBaru'); return false;" class="dropdown-item">Pasien Baru</a>
                 </div>

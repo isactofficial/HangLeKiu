@@ -1,4 +1,4 @@
-﻿/* ==========================================================
+/* ==========================================================
    Extracted from: resources\views\admin\pages\registration.blade.php
    ========================================================== */
 
@@ -6,6 +6,9 @@
     .reg-container {
         padding: 0 0px 24px 0px;
         font-family: 'Instrument Sans', sans-serif;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* KUNCI FONT SIZE GLOBAL (13px) */
@@ -19,6 +22,10 @@
         justify-content: space-between;
         align-items: flex-end;
         margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .reg-header { flex-direction: column; align-items: flex-start; gap: 16px; }
     }
 
     .reg-title {
@@ -71,6 +78,12 @@
         align-items: center;
         padding: 20px 24px;
         border-bottom: 1px solid #E5D6C5;
+    }
+
+    @media (max-width: 768px) {
+        .reg-card-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
+        .reg-card-actions { width: 100%; justify-content: flex-start; overflow-x: auto; padding-bottom: 4px; }
+        .reg-filters { padding: 16px; }
     }
 
     .reg-card-title {
@@ -130,6 +143,11 @@
         display: flex;
         gap: 20px;
         align-items: flex-end;
+        min-width: 600px; /* Force some minimum width for horizontal scroll */
+    }
+
+    @media (max-width: 768px) {
+        /* .reg-filter-row { flex-direction: column; align-items: stretch; gap: 12px; } */
     }
 
     .reg-input-group {
@@ -141,6 +159,10 @@
 
     .reg-input-group label {
         color: #A38C7A;
+    }
+
+    @media (max-width: 768px) {
+        /* .reg-input-group { flex: none !important; width: 100% !important; } */
     }
 
     .reg-input {
@@ -180,6 +202,10 @@
         border: 1px solid #C58F59;
         border-radius: 4px;
         padding: 6px 12px;
+    }
+
+    @media (max-width: 768px) {
+        .reg-search-box { margin-top: 8px; }
     }
 
     .reg-search-box input {
@@ -324,6 +350,14 @@
         white-space: nowrap; 
     }
 
+    /* RESPONSIVE TABLE - REVERTED TO HORIZONTAL SCROLL BY USER REQUEST */
+    @media (max-width: 768px) {
+        /* .reg-table-wrapper handles the overflow-x: auto; */
+        .reg-table {
+            min-width: 800px; /* Give it some width to force scroll on mobile */
+        }
+    }
+
     .reg-table tr:hover td {
         background-color: #FAFAF9;
     }
@@ -339,6 +373,15 @@
         padding: 16px 24px;
         gap: 24px;
         color: #6B7280;
+    }
+
+    @media (max-width: 768px) {
+        .reg-pagination { 
+            flex-direction: column; 
+            gap: 12px; 
+            align-items: center; 
+            padding: 20px;
+        }
     }
 
     .reg-page-size select {
