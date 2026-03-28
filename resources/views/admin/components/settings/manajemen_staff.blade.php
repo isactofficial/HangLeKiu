@@ -1,5 +1,214 @@
-﻿@push('styles')
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/manajemen_staff.css') }}">
+    <style>
+        /* ==========================================================================
+           MODAL TAMBAH STAFF STYLING (Tema Cokelat/Emas)
+           ========================================================================== */
+        :root {
+            --cream-50:  #fdf9f5;
+            --cream-100: #f7f0e6;
+            --cream-200: #ecdcca;
+            --gold-300:  #d4a96a;
+            --gold-400:  #C58F59;
+            --gold-500:  #a97540;
+            --brown-600: #7a4f28;
+            --brown-700: #582C0C;
+            --text-gray: #b09a85;
+            --req-star:  #e05252;
+            --transition: 0.2s ease-in-out;
+        }
+
+        .ts-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .ts-modal-overlay.show { display: flex; }
+
+        .ts-modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 700px;
+            font-family: 'Instrument Sans', sans-serif;
+            box-shadow: 0 10px 40px rgba(88, 44, 12, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .ts-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--cream-100);
+        }
+        .ts-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--brown-700);
+        }
+        .ts-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            transition: color var(--transition);
+        }
+        .ts-close-btn:hover { color: var(--req-star); }
+
+        /* Body & Grid */
+        .ts-modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        .ts-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 24px;
+            margin-bottom: 20px;
+        }
+        @media(max-width: 640px) {
+            .ts-grid-2 { grid-template-columns: 1fr; gap: 16px; }
+        }
+
+        /* Form Groups & Inputs */
+        .ts-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .ts-form-group.full { margin-bottom: 20px; }
+        .ts-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--brown-700);
+        }
+        .ts-label span { color: var(--req-star); }
+        
+        .ts-input, .ts-select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--cream-200);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Instrument Sans', sans-serif;
+            color: var(--brown-700);
+            background: var(--white);
+            outline: none;
+            transition: border-color var(--transition);
+        }
+        .ts-input::placeholder { color: #cbbdad; }
+        .ts-input:focus, .ts-select:focus { border-color: var(--gold-400); }
+        
+        .ts-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23582C0C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            cursor: pointer;
+        }
+
+        /* Custom Checkbox & Toggle Section */
+        .ts-control-wrapper {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 8px;
+        }
+        .ts-control-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .ts-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: var(--gold-400);
+            cursor: pointer;
+        }
+        .ts-control-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .ts-control-text strong {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--brown-700);
+        }
+        .ts-control-text span {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        /* Custom Toggle Switch */
+        .ts-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .ts-toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .ts-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--cream-200);
+            transition: .3s;
+            border-radius: 34px;
+        }
+        .ts-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .ts-toggle-switch input:checked + .ts-slider { background-color: var(--gold-400); }
+        .ts-toggle-switch input:checked + .ts-slider:before { transform: translateX(20px); }
+
+        /* Footer */
+        .ts-modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--cream-100);
+            background: var(--cream-50);
+            display: flex;
+            justify-content: flex-end;
+        }
+        .ts-btn-primary {
+            background: var(--gold-400);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+        .ts-btn-primary:hover { background: var(--gold-500); }
+    </style>
 @endpush
 
 {{-- resources/views/admin/settings/manajemen_staff.blade.php --}}
@@ -10,7 +219,7 @@
     </div>
     <div class="ms-actions-row">
         <div class="ms-btn-group">
-            <button class="ms-btn-group-item active">Informasi PIC</button>
+            <button class="ms-btn-primary" id="ms-open-doctor-modal">Tambah Akun</button>
             <button class="ms-btn-group-item">Tidak Aktif</button>
         </div>
     </div>
@@ -28,197 +237,107 @@
     </div>
 @endif
 
-<div id="ms-doctor-modal" class="ms-modal-overlay" aria-hidden="true">
-    <div class="ms-modal-card" role="dialog" aria-modal="true" aria-labelledby="ms-doctor-modal-title">
-        <div class="ms-modal-header">
-            <h3 id="ms-doctor-modal-title">Tambah Staff Dokter</h3>
-            <button type="button" class="ms-modal-close" id="ms-close-doctor-modal" aria-label="Tutup">x</button>
+{{-- MODAL TAMBAH STAFF (Refactored) --}}
+<div id="ms-doctor-modal" class="ts-modal-overlay" aria-hidden="true">
+    <div class="ts-modal-content" role="dialog" aria-modal="true">
+        
+        <div class="ts-modal-header">
+            <h3>Tambah Staff</h3>
+            <button type="button" class="ts-close-btn" id="ms-close-doctor-modal" aria-label="Tutup">&times;</button>
         </div>
 
-        <form method="POST" action="{{ route('admin.settings.staff.doctor.store') }}" class="ms-modal-form" enctype="multipart/form-data" id="ms-doctor-form">
+        <form method="POST" action="{{ route('admin.settings.staff.doctor.store') }}">
             @csrf
-
-            <section class="ms-section">
-                <h4 class="ms-section-title">Akun Login (Wajib)</h4>
-                <p class="ms-section-help">Data ini dipakai dokter untuk login ke halaman dokter.</p>
-                <div class="ms-form-grid">
-                    <div class="ms-field full">
-                        <label for="full_name">Nama Lengkap *</label>
-                        <input id="full_name" name="full_name" type="text" value="{{ old('full_name') }}" placeholder="Contoh: drg. Anisa Putri" maxlength="100" required>
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="email">Email Login *</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="dokter@hanglekiu.com" maxlength="50" required>
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="password">Password Login *</label>
-                        <input id="password" name="password" type="password" placeholder="Minimal 8 karakter" minlength="8" required>
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="password_confirmation">Konfirmasi Password *</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" required>
-                    </div>
+            
+            <div class="ts-modal-body">
+                {{-- Row 1: Nama Lengkap --}}
+                <div class="ts-form-group full">
+                    <label class="ts-label" for="full_name">Nama Lengkap <span>*</span></label>
+                    <input class="ts-input" id="full_name" name="full_name" type="text" placeholder="Nama Lengkap" required>
                 </div>
-            </section>
 
-            <section class="ms-section">
-                <h4 class="ms-section-title">Profil Dokter</h4>
-                <div class="ms-form-grid">
-                    <div class="ms-field full">
-                        <label for="foto_profil">Foto Profil Dokter</label>
-                        <input id="foto_profil" name="foto_profil" type="file" accept="image/png,image/jpeg,image/jpg,image/webp">
-                        <small id="foto-profil-file-name" style="display:block;margin-top:6px;color:#8a6b52;">Belum ada foto profil dipilih.</small>
-                        <img id="foto-profil-preview" alt="Preview Foto Profil" style="display:none;margin-top:8px;max-height:120px;border:1px solid #dbc7b2;border-radius:8px;padding:4px;background:#fff;">
+                {{-- Row 2: Jabatan & Tipe Akses --}}
+                <div class="ts-grid-2">
+                    <div class="ts-form-group">
+                        <label class="ts-label" for="job_title">Jabatan <span>*</span></label>
+                        <input class="ts-input" id="job_title" name="job_title" type="text" placeholder="Jabatan" required>
                     </div>
-
-                    <div class="ms-field full">
-                        <label for="ttd">TTD Dokter</label>
-                        <input id="ttd" name="ttd" type="file" accept="image/png,image/jpeg,image/jpg,image/webp">
-                        <small id="ttd-file-name" style="display:block;margin-top:6px;color:#8a6b52;">Belum ada file TTD dipilih.</small>
-                        <img id="ttd-preview" alt="Preview TTD" style="display:none;margin-top:8px;max-height:90px;border:1px solid #dbc7b2;border-radius:8px;padding:4px;background:#fff;">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="estimasi_konsultasi">Estimasi Lama Konsultasi (Menit)</label>
-                        <input id="estimasi_konsultasi" name="estimasi_konsultasi" type="number" min="1" max="600" step="1" value="{{ old('estimasi_konsultasi') }}" placeholder="Contoh: 15">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="phone_number">Nomor HP</label>
-                        <input id="phone_number" name="phone_number" type="text" value="{{ old('phone_number') }}" placeholder="08xxxxxxxxxx" pattern="[0-9+\-\s]{8,20}" maxlength="20" title="Nomor HP hanya boleh angka/simbol + - spasi, 8-20 karakter.">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="title_prefix">Gelar Depan</label>
-                        <input id="title_prefix" name="title_prefix" type="text" value="{{ old('title_prefix') }}" placeholder="Contoh: drg.">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="specialization">Spesialisasi</label>
-                        <input id="specialization" name="specialization" type="text" value="{{ old('specialization') }}" placeholder="Contoh: Sp.Ortho">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="subspecialization">Subspesialisasi</label>
-                        <input id="subspecialization" name="subspecialization" type="text" value="{{ old('subspecialization') }}">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="job_title">Jabatan</label>
-                        <input id="job_title" name="job_title" type="text" value="{{ old('job_title') }}" placeholder="Contoh: Dokter Gigi Spesialis">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="is_active">Status</label>
-                        <select id="is_active" name="is_active">
-                            <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>Aktif</option>
-                            <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Tidak Aktif</option>
+                    <div class="ts-form-group">
+                        <label class="ts-label" for="access_type">Tipe Akses <span>*</span></label>
+                        <select class="ts-select" id="access_type" name="access_type" required>
+                            <option value="" disabled selected>Pilih Tipe Akses</option>
+                            <option value="owner">Owner</option>
+                            <option value="doctor">Doctor</option>
+                            <option value="staff">Staff</option>
                         </select>
                     </div>
                 </div>
-            </section>
 
-            <section class="ms-section">
-                <h4 class="ms-section-title">Jadwal Praktek</h4>
-                <p class="ms-section-help">Centang hari aktif, lalu isi jam mulai dan jam selesai.</p>
-                <div class="ms-form-grid">
-                    @php
-                        $days = [
-                            'monday' => 'Senin',
-                            'tuesday' => 'Selasa',
-                            'wednesday' => 'Rabu',
-                            'thursday' => 'Kamis',
-                            'friday' => 'Jumat',
-                            'saturday' => 'Sabtu',
-                            'sunday' => 'Minggu',
-                        ];
-                    @endphp
+                {{-- Row 3: Alamat Email & Nomor HP --}}
+                <div class="ts-grid-2">
+                    <div class="ts-form-group">
+                        <label class="ts-label" for="email">Alamat Email <span>*</span></label>
+                        <input class="ts-input" id="email" name="email" type="email" placeholder="Alamat Email" required>
+                    </div>
+                    <div class="ts-form-group">
+                        <label class="ts-label" for="phone">Nomor Hp <span>*</span></label>
+                        <input class="ts-input" id="phone" name="phone" type="text" placeholder="Nomor Hp" required>
+                    </div>
+                </div>
 
-                    @foreach($days as $dayKey => $dayLabel)
-                        <div class="ms-field full">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    name="schedules[{{ $dayKey }}][is_active]"
-                                    value="1"
-                                    {{ old("schedules.$dayKey.is_active") ? 'checked' : '' }}
-                                >
-                                {{ $dayLabel }}
-                            </label>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
-                                <input
-                                    type="time"
-                                    name="schedules[{{ $dayKey }}][start_time]"
-                                    value="{{ old("schedules.$dayKey.start_time") }}"
-                                    placeholder="Jam Mulai"
-                                    data-day="{{ $dayKey }}"
-                                    data-kind="start"
-                                >
-                                <input
-                                    type="time"
-                                    name="schedules[{{ $dayKey }}][end_time]"
-                                    value="{{ old("schedules.$dayKey.end_time") }}"
-                                    placeholder="Jam Selesai"
-                                    data-day="{{ $dayKey }}"
-                                    data-kind="end"
-                                >
+                {{-- Row 4: Nomor Pegawai & Catatan --}}
+                <div class="ts-grid-2">
+                    <div class="ts-form-group">
+                        <label class="ts-label" for="employee_id">Nomor Pegawai</label>
+                        <input class="ts-input" id="employee_id" name="employee_id" type="text" placeholder="Nomor Pegawai">
+                    </div>
+                    <div class="ts-form-group">
+                        <label class="ts-label" for="notes">Catatan</label>
+                        <input class="ts-input" id="notes" name="notes" type="text" placeholder="Catatan">
+                    </div>
+                </div>
+
+                {{-- Row 5: Checkbox PIC & Toggle Status Aktif --}}
+                <div class="ts-grid-2" style="margin-top: 12px; margin-bottom: 0;">
+                    
+                    {{-- Checkbox PIC --}}
+                    <label class="ts-control-wrapper" style="cursor: pointer;">
+                        <div class="ts-control-left">
+                            <input type="checkbox" class="ts-checkbox" name="is_pic" value="1">
+                            <div class="ts-control-text">
+                                <strong>Tetapkan staff sebagai PIC</strong>
+                                <span>Staff akan ditetapkan sebagai PIC</span>
                             </div>
                         </div>
-                    @endforeach
+                    </label>
+
+                    {{-- Toggle Status --}}
+                    <label class="ts-control-wrapper" style="cursor: pointer;">
+                        <div class="ts-control-left">
+                            <div class="ts-control-text">
+                                <strong>Status Staff Aktif</strong>
+                                <span>Staff dapat login dan mengakses sistem</span>
+                            </div>
+                        </div>
+                        <div class="ts-toggle-switch">
+                            <input type="checkbox" name="is_active" value="1" checked>
+                            <span class="ts-slider"></span>
+                        </div>
+                    </label>
+                    
                 </div>
-            </section>
+            </div>
 
-            <details class="ms-section ms-optional" {{ old('license_no') || old('str_number') || old('sip_number') ? 'open' : '' }}>
-                <summary class="ms-section-title">Legalitas: STR, SIP, Lisensi</summary>
-                <div class="ms-form-grid">
-                    <div class="ms-field">
-                        <label for="license_no">Nomor Lisensi</label>
-                        <input id="license_no" name="license_no" type="text" value="{{ old('license_no') }}">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="str_institution">Instansi STR</label>
-                        <input id="str_institution" name="str_institution" type="text" value="{{ old('str_institution') }}">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="str_number">Nomor STR</label>
-                        <input id="str_number" name="str_number" type="text" value="{{ old('str_number') }}">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="str_expiry_date">Tanggal Expired STR</label>
-                        <input id="str_expiry_date" name="str_expiry_date" type="date" value="{{ old('str_expiry_date') }}">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="sip_institution">Instansi SIP</label>
-                        <input id="sip_institution" name="sip_institution" type="text" value="{{ old('sip_institution') }}">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="sip_number">Nomor SIP</label>
-                        <input id="sip_number" name="sip_number" type="text" value="{{ old('sip_number') }}">
-                    </div>
-
-                    <div class="ms-field">
-                        <label for="sip_expiry_date">Tanggal Expired SIP</label>
-                        <input id="sip_expiry_date" name="sip_expiry_date" type="date" value="{{ old('sip_expiry_date') }}">
-                    </div>
-                </div>
-            </details>
-
-            <div class="ms-modal-actions">
-                <button type="button" class="ms-btn-filter" id="ms-cancel-doctor-modal">Batal</button>
-                <button type="submit" class="ms-btn-primary">Simpan Akun Dokter</button>
+            <div class="ts-modal-footer">
+                <button type="submit" class="ts-btn-primary">Simpan</button>
             </div>
         </form>
     </div>
 </div>
+{{-- END MODAL --}}
 
+
+{{-- SISA KODE BAWAAN HALAMAN (Search, Table, Pagination) --}}
 <div class="ms-actions-row">
     <div class="ms-search-box">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -231,157 +350,44 @@
 </div>
 
 <script>
-    (function () {
+    // Script Modals yang sudah disederhanakan
+    document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('ms-doctor-modal');
         const openBtn = document.getElementById('ms-open-doctor-modal');
         const closeBtn = document.getElementById('ms-close-doctor-modal');
-        const cancelBtn = document.getElementById('ms-cancel-doctor-modal');
-        const doctorForm = document.getElementById('ms-doctor-form');
-        const fotoProfilInput = document.getElementById('foto_profil');
-        const fotoProfilFileName = document.getElementById('foto-profil-file-name');
-        const fotoProfilPreview = document.getElementById('foto-profil-preview');
-        const ttdInput = document.getElementById('ttd');
-        const ttdFileName = document.getElementById('ttd-file-name');
-        const ttdPreview = document.getElementById('ttd-preview');
 
-        if (!modal || !openBtn) {
-            return;
-        }
+        if (!modal || !openBtn) return;
 
         const openModal = () => {
             modal.classList.add('show');
-            modal.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('ms-modal-open');
-            document.getElementById('full_name')?.focus();
+            document.body.style.overflow = 'hidden'; // Mencegah scroll di background
         };
 
         const closeModal = () => {
             modal.classList.remove('show');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('ms-modal-open');
-        };
-
-        const updateImagePreview = (input, fileNameEl, previewEl, emptyMessage) => {
-            if (!input || !fileNameEl || !previewEl) {
-                return;
-            }
-
-            const file = input.files && input.files[0] ? input.files[0] : null;
-
-            if (!file) {
-                fileNameEl.textContent = emptyMessage;
-                previewEl.style.display = 'none';
-                previewEl.removeAttribute('src');
-                return;
-            }
-
-            fileNameEl.textContent = `File dipilih: ${file.name}`;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                previewEl.src = String(event.target?.result ?? '');
-                previewEl.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            document.body.style.overflow = '';
         };
 
         openBtn.addEventListener('click', openModal);
-        closeBtn?.addEventListener('click', closeModal);
-        cancelBtn?.addEventListener('click', closeModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
+        // Tutup modal jika klik area luar modal (overlay)
         modal.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                closeModal();
-            }
+            if (event.target === modal) closeModal();
         });
 
+        // Tutup modal jika tekan tombol ESC
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && modal.classList.contains('show')) {
                 closeModal();
             }
         });
 
-        fotoProfilInput?.addEventListener('change', () => {
-            updateImagePreview(fotoProfilInput, fotoProfilFileName, fotoProfilPreview, 'Belum ada foto profil dipilih.');
-        });
-
-        ttdInput?.addEventListener('change', () => {
-            updateImagePreview(ttdInput, ttdFileName, ttdPreview, 'Belum ada file TTD dipilih.');
-        });
-
-        updateImagePreview(fotoProfilInput, fotoProfilFileName, fotoProfilPreview, 'Belum ada foto profil dipilih.');
-        updateImagePreview(ttdInput, ttdFileName, ttdPreview, 'Belum ada file TTD dipilih.');
-
-        const validateScheduleRows = () => {
-            if (!doctorForm) {
-                return true;
-            }
-
-            let isValid = true;
-            const dayRows = doctorForm.querySelectorAll('input[type="checkbox"][name^="schedules["]');
-
-            dayRows.forEach((checkbox) => {
-                const day = checkbox.name.match(/schedules\[(.+?)\]/)?.[1];
-                if (!day) {
-                    return;
-                }
-
-                const start = doctorForm.querySelector(`input[data-day="${day}"][data-kind="start"]`);
-                const end = doctorForm.querySelector(`input[data-day="${day}"][data-kind="end"]`);
-
-                if (!start || !end) {
-                    return;
-                }
-
-                start.setCustomValidity('');
-                end.setCustomValidity('');
-
-                if (!checkbox.checked && !start.value && !end.value) {
-                    return;
-                }
-
-                if (!start.value || !end.value) {
-                    const message = 'Lengkapi jam mulai dan jam selesai untuk hari ini.';
-                    start.setCustomValidity(message);
-                    end.setCustomValidity(message);
-                    isValid = false;
-                    return;
-                }
-
-                if (end.value <= start.value) {
-                    end.setCustomValidity('Jam selesai harus lebih besar dari jam mulai.');
-                    isValid = false;
-                }
-            });
-
-            return isValid;
-        };
-
-        if (doctorForm) {
-            doctorForm.addEventListener('submit', (event) => {
-                const scheduleValid = validateScheduleRows();
-                if (!scheduleValid || !doctorForm.checkValidity()) {
-                    event.preventDefault();
-                    doctorForm.reportValidity();
-                }
-            });
-
-            doctorForm.addEventListener('input', (event) => {
-                const target = event.target;
-                if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) {
-                    return;
-                }
-
-                if (target.name.startsWith('schedules[') || target.name === 'phone_number') {
-                    validateScheduleRows();
-                    target.setCustomValidity('');
-                }
-            });
-        }
-
+        // Tampilkan modal jika ada error saat disubmit (dari validasi Laravel)
         @if($errors->has('doctor_create') || $errors->any())
             openModal();
         @endif
-    })();
+    });
 </script>
 
 <div class="ms-table-card">

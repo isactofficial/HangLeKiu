@@ -235,43 +235,37 @@
                 <div class="rj-mobile-schedule">
                     @if ($viewMode === 'all')
                         @foreach ($timeSlots as $slot)
-                            @php
-                                $hasApt = false;
-                                foreach($doctors as $doc) {
-                                    if(isset($schedule[$doc->id][$slot])) $hasApt = true;
-                                }
-                            @endphp
                             <div class="mobile-time-group">
                                 <div class="m-time-label">{{ $slot }}</div>
                                 <div class="m-cards">
-                                    @if ($hasApt)
-                                        @foreach ($doctors as $doc)
-                                            @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
-                                            @if ($apt)
-                                                <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
-                                                    data-id="{{ $apt->id }}"
-                                                    data-patient="{{ $apt->patient_name }}"
-                                                    data-mr="{{ $apt->mr_number }}"
-                                                    data-treatment="{{ $apt->treatment_name }}"
-                                                    data-time="{{ $slot }}"
-                                                    data-doctor="{{ $doc->full_name }}"
-                                                    data-status="{{ $apt->status }}"
-                                                    onclick="handleAptClick(this, event)">
-                                                    <div class="m-card-header">
-                                                        <div class="apt-name">{{ $apt->patient_name }}</div>
-                                                        <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
-                                                    </div>
-                                                    <div class="apt-treat">{{ $apt->treatment_name }}</div>
-                                                    <div class="m-doc-name">
-                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
-                                                        {{ $doc->full_name }}
-                                                    </div>
+                                    @foreach ($doctors as $doc)
+                                        @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
+                                        @if ($apt)
+                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                data-id="{{ $apt->id }}"
+                                                data-patient="{{ $apt->patient_name }}"
+                                                data-mr="{{ $apt->mr_number }}"
+                                                data-treatment="{{ $apt->treatment_name }}"
+                                                data-time="{{ $slot }}"
+                                                data-doctor="{{ $doc->full_name }}"
+                                                data-status="{{ $apt->status }}"
+                                                onclick="handleAptClick(this, event)">
+                                                <div class="m-card-header">
+                                                    <div class="apt-name">{{ $apt->patient_name }}</div>
+                                                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                 </div>
-                                            @endif
-                                        @endforeach
-                                    @else
-                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer;">Kosong (Klik untuk Daftar)</div>
-                                    @endif
+                                                <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                                <div class="m-doc-name">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
+                                                    {{ $doc->full_name }}
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer;">
+                                                <div class="m-empty-label">Kosong ({{ $doc->full_name }})</div>
+                                            </div>
+                                        @endif
+                                    @endforeach
                                 </div>
                             </div>
                         @endforeach
@@ -309,7 +303,7 @@
                                             </div>
                                         @endforeach
                                     @else
-                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $selectedDoctor->poli_id ?? '' }}', '{{ $dc }}')" style="cursor:pointer;">Tidak ada jadwal (Klik untuk Daftar)</div>
+                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '', '{{ $selectedDoctor->poli_id ?? '' }}', '{{ $dc }}')" style="cursor:pointer;">Tidak ada jadwal (Klik untuk Daftar)</div>
                                     @endif
                                 </div>
                             </div>
