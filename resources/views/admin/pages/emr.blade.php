@@ -1,4 +1,4 @@
-﻿@extends('admin.layout.admin')
+@extends('admin.layout.admin')
 @section('title', 'Electronic Medical Record')
 
 @section('navbar')
@@ -55,9 +55,34 @@
                     <input type="hidden" name="filter_waktu" id="filterWaktuVal" value="hari_ini">
                 </div>
 
-                <div class="emr-queue-alert">
-                    Tidak ada antrean pasien
-                </div>
+                @if(isset($appointments) && $appointments->count() > 0)
+                    <div class="emr-queue-list mt-4 px-3 space-y-2 overflow-y-auto pb-6" style="max-height: calc(100vh - 150px);">
+                        @foreach($appointments as $apt)
+                            @if($apt->patient)
+                                <!-- Item Antrean -->
+                                <div class="bg-white rounded-xl p-4 shadow-sm relative emr-queue-item cursor-pointer border border-transparent hover:border-gray-200 transition-colors"
+                                    onclick="selectPatientForTesting(
+                                        {{ json_encode($apt->patient) }},
+                                        '{{ $apt->guarantorType->guarantor_type_name ?? '-' }}',
+                                        '{{ $apt->id }}',
+                                        '{{ $apt->doctor->full_name ?? '-' }}',
+                                        '{{ $apt->doctor_id ?? '' }}',
+                                        event
+                                    )">
+                                    <div class="font-bold text-gray-800">{{ $apt->patient->full_name }}</div>
+                                    <div class="text-xs text-gray-400 mt-1 flex justify-between">
+                                        <span>{{ $apt->poli ? $apt->poli->name : 'Pemeriksaan' }}</span>
+                                        <span>{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</span>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @else
+                    <div class="emr-queue-alert">
+                        Tidak ada antrean pasien
+                    </div>
+                @endif
             </div>
 
             <div class="emr-main">
@@ -182,6 +207,135 @@ function openModalOdontogram(e) {
         modal.classList.remove('hidden'); // Atau sesuaikan dengan class CSS Anda untuk menampilkan modal
     } else {
         console.error("Modal Odontogram tidak ditemukan.");
+    }
+}
+
+// ==========================================
+// FUNGSI GANTI PASIEN (UNTUK TESTING)
+// ==========================================
+function selectPatientForTesting(patient, guarantor, visitId, doctorName, doctorId, event) {
+    if(!patient || !patient.id) return;
+    
+    // Reset Form Prosedur
+    if (typeof resetProsedurForm === 'function') resetProsedurForm();
+
+    // Fetch riwayat Odontogram pasien untuk fitur Autocomplete No. Gigi di Prosedur
+    window.currentPatientTeeth = [];
+    fetch(`/api/odontogram/patient/${patient.id}`)
+        .then(r => r.json())
+        .then(res => {
+            if (res.status === 'success' && res.data) {
+                let tMap = new Map();
+                res.data.forEach(rec => {
+                    (rec.teeth || []).forEach(t => {
+                        if (!tMap.has(t.tooth_number)) {
+                            tMap.set(t.tooth_number, t);
+                        }
+                    });
+                });
+                window.currentPatientTeeth = Array.from(tMap.values());
+            }
+        }).catch(err => console.error(err));
+
+    // Inject ID ke hidden input Odontogram (atau modal lain jika butuh ID parent)
+    const odontoIdInput = document.getElementById('odontogramPatientId');
+    if (odontoIdInput) odontoIdInput.value = patient.id;
+
+    const odontoVisitInput = document.getElementById('odontogramVisitId');
+    if (odontoVisitInput) odontoVisitInput.value = visitId;
+    
+    const odontoDoctorInput = document.getElementById('odontogramExaminedBy');
+    if (odontoDoctorInput) odontoDoctorInput.value = doctorName;
+
+    // UPDATE Tampilan Tanggal & Pasien di Odontogram
+    const odontoDateDisplay = document.getElementById('odonto-date-display');
+    const odontoName = document.getElementById('odonto-patient-name');
+    const odontoPayment = document.getElementById('odonto-patient-payment');
+    const odontoMr = document.getElementById('odonto-patient-mr');
+    const odontoDemographics = document.getElementById('odonto-patient-demographics');
+
+    if (odontoDateDisplay) {
+        const todayUrl = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        odontoDateDisplay.innerText = todayUrl.toLocaleDateString('id-ID', options);
+    }
+    
+    if (odontoName) odontoName.innerText = patient.full_name || 'Tanpa Nama';
+    if (odontoPayment) odontoPayment.innerText = guarantor || '-';
+    if (odontoMr) odontoMr.innerText = patient.medical_record_number || 'Tidak Ada MR';
+
+    if (odontoDemographics) {
+        let genderStr = patient.gender === 'female' || patient.gender === 'P' ? 'Perempuan' : 'Laki-laki';
+        
+        // hitung umur kasar
+        let ageStr = '-';
+        if(patient.date_of_birth) {
+            const dob = new Date(patient.date_of_birth);
+            const ageDifMs = Date.now() - dob.getTime();
+            const ageDate = new Date(ageDifMs); 
+            const calcAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+            ageStr = calcAge + ' Tahun';
+        }
+        odontoDemographics.innerHTML = `&middot; ${genderStr} &middot; ${ageStr}`;
+
+        // == UPDATE PULA KE HEADER MODAL PROSEDUR ==
+        const prosDateDisplay = document.getElementById('prosedur-date-display');
+        const prosName = document.getElementById('prosedur-patient-name');
+        const prosPayment = document.getElementById('prosedur-patient-payment');
+        const prosDemographics = document.getElementById('prosedur-patient-demographics');
+        
+        const prosPatientId = document.getElementById('prosedur-patient-id');
+        const prosRegistrationId = document.getElementById('prosedur-registration-id');
+        const prosDoctorSelect = document.getElementById('prosedur-doctor-select');
+
+        if (prosDateDisplay && odontoDateDisplay) prosDateDisplay.innerText = odontoDateDisplay.innerText;
+        if (prosName) prosName.innerText = patient.full_name || 'Tanpa Nama';
+        if (prosPayment) prosPayment.innerText = guarantor || '-';
+        if (prosDemographics) {
+            prosDemographics.innerHTML = `${patient.medical_record_number || '-'} &middot; ${genderStr} &middot; ${ageStr}`;
+        }
+        
+        if (prosPatientId) prosPatientId.value = patient.id;
+        if (prosRegistrationId) prosRegistrationId.value = visitId;
+        if (prosDoctorSelect && doctorId) {
+            prosDoctorSelect.value = doctorId;
+        }
+    }
+
+    // Ubah Teks Header EMR
+    const titleArea = document.querySelector('.emr-title-area');
+    if (titleArea) {
+        titleArea.innerHTML = `
+            <h1 class="emr-title text-brown-600" style="color: #6C4A3A;">${patient.full_name}</h1>
+            <p class="emr-subtitle">MR: ${patient.medical_record_number || '-'} | ID: ${patient.id}</p>
+        `;
+    }
+
+    // Ubah Ilustrasi Kosong di Tengah
+    const mainArea = document.querySelector('.emr-empty-state');
+    if (mainArea) {
+        mainArea.innerHTML = `
+            <div class="text-center mt-10">
+                <h2 class="text-2xl font-bold text-brown-600 mb-2">Pasien Terpilih</h2>
+                <h3 class="text-xl text-gray-800 mb-6">${patient.full_name}</h3>
+                <p class="text-gray-500 max-w-md mx-auto">Untuk memulai, silakan tekan tombol <strong>[ 📄 ]</strong> di sudut kanan bawah dan buka <strong>Tambah Odontogram</strong>.</p>
+            </div>
+        `;
+    }
+
+    // Highlight card yang diklik
+    document.querySelectorAll('.emr-queue-list > div').forEach(el => {
+        el.style.border = "1px solid #e5e7eb";
+        el.style.backgroundColor = "#fff";
+    });
+    if(event && event.currentTarget) {
+        event.currentTarget.style.border = "2px solid #C58F59";
+        event.currentTarget.style.backgroundColor = "#FDF8F3";
+    }
+
+    // [AUTO CLEAR] Reset riwayat coretan Odontogram karena pasien telah berganti
+    if (typeof clearOdontogramState === 'function') {
+        clearOdontogramState();
     }
 }
     </script>

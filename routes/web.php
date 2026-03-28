@@ -47,7 +47,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/registration', [AppointmentController::class, 'registrationIndex'])->name('registration');
         Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
         Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
-        Route::get('/emr',          fn() => view('admin.pages.emr'))->name('emr');
+        Route::get('/emr', function(\Illuminate\Http\Request $request) {
+            $appointments = \App\Models\Appointment::with(['patient', 'poli', 'guarantorType'])
+                ->whereHas('patient')
+                ->orderBy('appointment_datetime', 'desc')
+                ->take(30)
+                ->get();
+            return view('admin.pages.emr', compact('appointments'));
+        })->name('emr');
         Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
         Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');

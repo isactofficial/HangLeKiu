@@ -13,6 +13,7 @@ use App\Http\Controllers\ProcedureController;
 use App\Http\Controllers\ProcedureItemController;
 use App\Http\Controllers\ProcedureMedicineController;
 use App\Http\Controllers\MasterProcedureController;
+use App\Http\Controllers\OdontogramController;
 
 
 /*
@@ -164,4 +165,15 @@ Route::prefix('master-procedure')->group(function () {
     Route::get('/{id}', [MasterProcedureController::class, 'show']);
     Route::put('/{id}', [MasterProcedureController::class, 'update']);
     Route::delete('/{id}', [MasterProcedureController::class, 'destroy']);
+});
+
+// ================= ODONTOGRAM =================
+Route::prefix('odontogram')->group(function () {
+    Route::post('/', [OdontogramController::class, 'store']);
+    Route::get('/patient/{patientId}', [OdontogramController::class, 'indexByPatient']);
+    Route::get('/{recordId}', [OdontogramController::class, 'show']);
+    Route::patch('/{recordId}', [OdontogramController::class, 'update']);
+    Route::delete('/{recordId}', [OdontogramController::class, 'destroy']);
+    Route::post('/{recordId}/teeth', [OdontogramController::class, 'addTooth']);
+    Route::delete('/teeth/{toothId}', [OdontogramController::class, 'deleteTooth']);
 });
