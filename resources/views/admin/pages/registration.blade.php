@@ -40,7 +40,7 @@
                         <div class="reg-input-group" style="flex: 1;">
                             <label>Tanggal Kunjungan</label>
                             <div class="reg-date-wrapper">
-                                <input type="date" class="reg-input" value="2026-02-25">
+                                <input type="date" class="reg-input" id="regDateFilter" value="">
                                 <button class="reg-btn-icon-small"><i class="fas fa-plus"></i></button>
                             </div>
                         </div>
@@ -128,37 +128,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
-                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>13:00</td>
-                                <td data-label="Tanggal Dibuat">25/02/2026,<br>19:32</td>
-                                <td data-label="No">1</td>
-                                <td data-label="Poli">Gigi</td>
-                                <td data-label="Nama Pasien">Bpk Johndoe,<br>MR000096,<br>40 Tahun</td>
-                                <td data-label="Rencana Tindakan">-</td>
-                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
-                                <td data-label="Metode Bayar">Asuransi</td>
-                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
-                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
-                            </tr>
-                            <tr>
-                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
-                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>14:00</td>
-                                <td data-label="Tanggal Dibuat">25/02/2026,<br>20:32</td>
-                                <td data-label="No">2</td>
-                                <td data-label="Poli">Gigi</td>
-                                <td data-label="Nama Pasien">Bpk Budi,<br>MR000099,<br>40 Tahun</td>
-                                <td data-label="Rencana Tindakan">-</td>
-                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
-                                <td data-label="Metode Bayar">Asuransi</td>
-                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
-                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
-                            </tr>
+                            <!-- Data will be populated by JS -->
                         </tbody>
                     </table>
                 </div>
 
                 <div class="reg-pagination">
+                                                    <!-- Modal Detail Registrasi -->
+                                                    <div id="regDetailModal" class="reg-modal-overlay" style="display:none; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.3); z-index:2000;">
+                                                        <div class="reg-modal-box" style="background:white; border-radius:12px; width:min(96vw,600px); max-height:90vh; display:flex; flex-direction:column; overflow:hidden;">
+                                                            <div class="reg-modal-head" style="background:#582C0C; color:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;">
+                                                                <span>Detail Registrasi</span>
+                                                                <button id="regDetailCloseBtn" type="button" style="background:none; border:none; color:white; font-size:22px; cursor:pointer;">&times;</button>
+                                                            </div>
+                                                            <div id="regDetailBody" class="reg-modal-body" style="padding:18px; overflow-y:auto; flex:1 1 auto; min-height:0;"></div>
+                                                        </div>
+                                                    </div>
                     <div class="reg-page-size">
                         <span>Jumlah baris perhalaman:</span>
                         <select>

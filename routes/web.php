@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\RegistrationController;
 
 // PUBLIC
 Route::get('/', fn() => view('welcome'))->name('home');
@@ -37,7 +38,15 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
         Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
+<<<<<<< Updated upstream
         Route::get('/registration', fn() => view('admin.pages.registration'))->name('registration');
+=======
+        // Legacy compatibility for older blade references.
+        Route::get('/rawat-jalan',  [AppointmentController::class, 'schedule'])->name('rawat-jalan');
+        Route::get('/registration', [AppointmentController::class, 'registrationIndex'])->name('registration');
+        Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
+        Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
+>>>>>>> Stashed changes
         Route::get('/emr',          fn() => view('admin.pages.emr'))->name('emr');
         Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
@@ -49,6 +58,30 @@ Route::middleware('auth')->group(function () {
         // Update status appointment (dipanggil dari /admin/appointments/{id}/status)
         Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
              ->name('appointments.updateStatus');
+<<<<<<< Updated upstream
+=======
+           Route::get('/appointments/{appointment}/detail', [AppointmentController::class, 'detail'])
+               ->name('appointments.detail');
+        Route::post('/appointments/{appointment}/diagnosis', [AppointmentController::class, 'addDiagnosis'])
+             ->name('appointments.addDiagnosis');
+
+        // EMR API endpoints (session auth)
+        Route::get('/api/emr/patient-data', [AppointmentController::class, 'emrPatientData'])
+            ->name('emr.patientData');
+
+        Route::get('/api/registration/appointments', [AppointmentController::class, 'getAppointmentsApi'])
+            ->name('api.appointments');
+        Route::get('/api/registration/appointments-emr', [RegistrationController::class, 'listAppointmentsEmr'])
+            ->name('api.appointments.emr');
+
+        // Create akun dokter hanya dari menu settings admin.
+        Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])
+            ->name('settings.staff.doctor.store');
+
+        // Patient routes (admin)
+        Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
+        Route::post('/patients',        [PatientController::class, 'storeFromAdmin'])->name('patients.store');
+>>>>>>> Stashed changes
     });
 
     // USER

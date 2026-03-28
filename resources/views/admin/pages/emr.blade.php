@@ -57,14 +57,52 @@
             </div>
 
             <div class="emr-main">
-                <div class="emr-empty-state">
-                    <img src="{{ asset('../images/empty-queue.png') }}" alt="Tidak ada antrean" class="emr-empty-img">
+                <!-- Info Pasien Asli -->
+                @if(isset($registration) && isset($patient))
+                <div class="emr-patient-info" style="display:flex;align-items:center;gap:24px;margin-bottom:18px;">
+                    <div style="width:80px;height:80px;background:#f3f3f3;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                        <svg width="48" height="48" fill="#bbb"><circle cx="24" cy="20" r="16"/><ellipse cx="24" cy="44" rx="18" ry="10"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:20px;font-weight:700;">{{ $patient->name ?? '-' }}</div>
+                        <div style="color:#888;">No. RM: {{ $patient->medical_record_number ?? '-' }} | {{ $patient->gender ?? '-' }} | {{ $patient->age ?? '-' }} Tahun</div>
+                        <div style="color:#888;">Alamat: {{ $patient->address ?? '-' }}</div>
+                    </div>
+                </div>
+                @endif
+                <!-- Tab -->
+                <div class="emr-tab-bar" style="display:flex;align-items:center;gap:32px;margin-bottom:8px;">
+                    <button class="emr-tab-btn emr-tab-active" id="tabTimeline" style="background:none;border:none;font-weight:700;font-size:16px;color:#C58F59;border-bottom:2px solid #C58F59;padding:8px 0;cursor:pointer;">TIMELINE</button>
+                    <button class="emr-tab-btn" id="tabRecord" style="background:none;border:none;font-weight:700;font-size:16px;color:#888;padding:8px 0;cursor:pointer;">RECORD</button>
+                    <button class="emr-tab-btn" id="tabCppt" style="background:none;border:none;font-weight:700;font-size:16px;color:#888;padding:8px 0;cursor:pointer;">CPPT</button>
+                </div>
+                <!-- Info Registrasi di Timeline -->
+                @if(isset($registration))
+                <div class="emr-info-registrasi" style="margin-top:24px;padding:18px 24px;background:#fff;border-radius:10px;border:1px solid #eee;max-width:520px;margin-left:auto;margin-right:auto;">
+                    <div style="font-weight:700;margin-bottom:8px;">INFORMASI REGISTRASI</div>
+                    <div><b>ID Registrasi:</b> {{ $registration->id ?? '-' }}</div>
+                    <div><b>Tanggal Registrasi:</b> {{ $registration->created_at ?? '-' }}</div>
+                    <div><b>Poli:</b> {{ $registration->poli_name ?? '-' }}</div>
+                    <div><b>Dokter:</b> {{ $registration->doctor_name ?? '-' }}</div>
+                    <div><b>Jenis Kunjungan:</b> {{ $registration->visit_type ?? '-' }}</div>
+                    <div><b>Jenis Penjamin:</b> {{ $registration->guarantor_type ?? '-' }}</div>
+                    <div><b>Metode Pembayaran:</b> {{ $registration->payment_method ?? '-' }}</div>
+                    <div><b>Keluhan:</b> {{ $registration->complaint ?? '-' }}</div>
+                    <div><b>Rencana Tindakan:</b> {{ $registration->plan ?? '-' }}</div>
+                </div>
+                @else
+                <div class="emr-empty-state" style="margin-top:24px;">
                     <h2 class="emr-empty-title">Tidak ada antrean pasien hari ini</h2>
                     <p class="emr-empty-desc">Gunakan search bar atau advance search pada pojok kiri atas untuk mencari pasien.</p>
                 </div>
+                @endif
             </div>
         </div>
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     </div>
 
     <style>

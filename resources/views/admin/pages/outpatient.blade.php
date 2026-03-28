@@ -30,9 +30,20 @@
             {{-- ─── SIDEBAR ─── --}}
             <div class="rj-sidebar">
                 <div class="rj-sidebar-title">Dokter</div>
+<<<<<<< Updated upstream
+=======
+                <div class="rj-mobile-doc-nav">
+                    <select class="rj-doc-select" onchange="if(this.value) window.location.href=this.value">
+                        <option value="{{ route('admin.rawat-jalan', ['date' => $date]) }}" {{ $viewMode === 'all' ? 'selected' : '' }}>Semua Dokter</option>
+                        @foreach ($doctors as $doc)
+                            <option value="{{ route('admin.rawat-jalan', ['date' => $date, 'doctor_id' => $doc->id]) }}" {{ $selectedDoctorId == $doc->id ? 'selected' : '' }}>{{ $doc->full_name }} @if($doc->specialization) - {{ $doc->specialization }} @endif</option>
+                        @endforeach
+                    </select>
+                </div>
+>>>>>>> Stashed changes
                 <ul class="rj-doctor-list">
                     <li>
-                        <a href="{{ route('admin.outpatient', ['date' => $date]) }}"
+                        <a href="{{ route('admin.rawat-jalan', ['date' => $date]) }}"
                             class="rj-doc-item {{ $viewMode === 'all' ? 'active' : '' }}">
                             <span class="rj-doc-avatar all">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -47,7 +58,7 @@
                     </li>
                     @foreach ($doctors as $doc)
                         <li>
-                            <a href="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $doc->id]) }}"
+                            <a href="{{ route('admin.rawat-jalan', ['date' => $date, 'doctor_id' => $doc->id]) }}"
                                 class="rj-doc-item {{ $selectedDoctorId == $doc->id ? 'active' : '' }}">
                                 <span class="rj-doc-avatar">{{ strtoupper(substr($doc->name, 5, 1)) }}</span>
                                 <div class="rj-doc-info">
@@ -84,25 +95,25 @@
                     <div class="rj-nav">
                         @if ($viewMode === 'all')
                             {{-- Mode all: navigasi per hari --}}
-                            <a href="{{ route('admin.outpatient', ['date' => \Carbon\Carbon::parse($date)->subDay()->toDateString()]) }}" class="rj-nav-btn">
+                            <a href="{{ route('admin.rawat-jalan', ['date' => \Carbon\Carbon::parse($date)->subDay()->toDateString()]) }}" class="rj-nav-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6" /></svg>
                             </a>
                             <div class="rj-nav-date">
                                 <span class="rj-nav-day">{{ $carbon->locale('id')->isoFormat('dddd') }}</span>
                                 <span class="rj-nav-full">{{ $carbon->locale('id')->isoFormat('D MMMM YYYY') }}</span>
                             </div>
-                            <a href="{{ route('admin.outpatient', ['date' => \Carbon\Carbon::parse($date)->addDay()->toDateString()]) }}" class="rj-nav-btn">
+                            <a href="{{ route('admin.rawat-jalan', ['date' => \Carbon\Carbon::parse($date)->addDay()->toDateString()]) }}" class="rj-nav-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" /></svg>
                             </a>
                             @if ($isToday)
                                 <span class="rj-today-btn disabled">Hari Ini</span>
                             @else
-                                <a href="{{ route('admin.outpatient') }}" class="rj-today-btn">Hari Ini</a>
+                                <a href="{{ route('admin.rawat-jalan') }}" class="rj-today-btn">Hari Ini</a>
                             @endif
                         @else
                             {{-- Mode single doctor: navigasi per minggu --}}
                             @php $offset = (int) request('offset', 0); @endphp
-                            <a href="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $selectedDoctorId, 'offset' => $offset - 1]) }}" class="rj-nav-btn">
+                            <a href="{{ route('admin.rawat-jalan', ['date' => $date, 'doctor_id' => $selectedDoctorId, 'offset' => $offset - 1]) }}" class="rj-nav-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6" /></svg>
                             </a>
                             <div class="rj-nav-date">
@@ -112,13 +123,13 @@
                                     – {{ \Carbon\Carbon::parse($dateColumns[6])->locale('id')->isoFormat('D MMM YYYY') }}
                                 </span>
                             </div>
-                            <a href="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $selectedDoctorId, 'offset' => $offset + 1]) }}" class="rj-nav-btn">
+                            <a href="{{ route('admin.rawat-jalan', ['date' => $date, 'doctor_id' => $selectedDoctorId, 'offset' => $offset + 1]) }}" class="rj-nav-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" /></svg>
                             </a>
                             @if ($offset === 0)
                                 <span class="rj-today-btn disabled">Hari Ini</span>
                             @else
-                                <a href="{{ route('admin.outpatient', ['date' => $today, 'doctor_id' => $selectedDoctorId]) }}" class="rj-today-btn">Hari Ini</a>
+                                <a href="{{ route('admin.rawat-jalan', ['date' => $today, 'doctor_id' => $selectedDoctorId]) }}" class="rj-today-btn">Hari Ini</a>
                             @endif
                         @endif
                     </div>
@@ -161,9 +172,15 @@
                                             @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
                                             <td>
                                                 @if ($apt)
+<<<<<<< Updated upstream
                                                     <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment->name }}</div>
+=======
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="event.stopPropagation(); openModal('{{ $apt->id }}')">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
+                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
+>>>>>>> Stashed changes
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 @endif
@@ -181,9 +198,15 @@
                                             @endphp
                                             <td class="{{ $isColToday ? 'col-today' : '' }}">
                                                 @if ($apt)
+<<<<<<< Updated upstream
                                                     <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment->name }}</div>
+=======
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="event.stopPropagation(); openModal('{{ $apt->id }}')">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
+                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
+>>>>>>> Stashed changes
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 @endif
@@ -195,26 +218,93 @@
                         </tbody>
                     </table>
                 </div>
+<<<<<<< Updated upstream
+=======
+
+                {{-- Mobile Cards --}}
+                <div class="rj-mobile-schedule">
+                    @if ($viewMode === 'all')
+                        @foreach ($timeSlots as $slot)
+                            @php
+                                $hasApt = false;
+                                foreach($doctors as $doc) {
+                                    if(isset($schedule[$doc->id][$slot])) $hasApt = true;
+                                }
+                            @endphp
+                            <div class="mobile-time-group">
+                                <div class="m-time-label">{{ $slot }}</div>
+                                <div class="m-cards">
+                                    @if ($hasApt)
+                                        @foreach ($doctors as $doc)
+                                            @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
+                                            @if ($apt)
+                                                <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal('{{ $apt->id }}')">
+                                                    <div class="m-card-header">
+                                                        <div class="apt-name">{{ $apt->patient_name }}</div>
+                                                        <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                    </div>
+                                                    <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                                    <div class="m-doc-name">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
+                                                        {{ $doc->full_name }}
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer;">Kosong (Klik untuk Daftar)</div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        @foreach ($dateColumns as $dc)
+                            @php 
+                                $dcCarbon = \Carbon\Carbon::parse($dc); 
+                                $aptsForDate = \App\Models\Appointment::with('patient')
+                                    ->where('doctor_id', $selectedDoctorId)
+                                    ->whereDate('appointment_datetime', $dc)
+                                    ->orderBy('appointment_datetime')
+                                    ->get();
+                            @endphp
+                            <div class="mobile-time-group">
+                                <div class="m-time-label" style="background: var(--gold); color: white;">
+                                    {{ $dcCarbon->locale('id')->isoFormat('dddd, D MMM YYYY') }}
+                                </div>
+                                <div class="m-cards">
+                                    @if ($aptsForDate->count() > 0)
+                                        @foreach ($aptsForDate as $apt)
+                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal('{{ $apt->id }}')">
+                                                <div class="m-card-header">
+                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }} | {{ $apt->patient_name }}</div>
+                                                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                </div>
+                                                <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $selectedDoctor->poli_id ?? '' }}', '{{ $dc }}')" style="cursor:pointer;">Tidak ada jadwal (Klik untuk Daftar)</div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+
+>>>>>>> Stashed changes
             </div>
         </div>
     </div>
 
     {{-- Modal --}}
     <div id="aptModal" class="modal-overlay" onclick="closeModalOutside(event)">
-        <div class="modal-box">
+        <div class="modal-box modal-box-lg">
             <div class="modal-head">
-                <h3 id="modalName">Update Status</h3>
+                <h3 id="modalName">Informasi Kunjungan</h3>
                 <button onclick="closeModal()">✕</button>
             </div>
-            <div class="modal-body">
-                <p>Pilih status baru:</p>
-                <div class="modal-btns">
-                    <button style="background:#EF4444" onclick="setStatus('pending')">Pending</button>
-                    <button style="background:#F59E0B" onclick="setStatus('confirmed')">Confirmed</button>
-                    <button style="background:#8B5CF6" onclick="setStatus('waiting')">Waiting</button>
-                    <button style="background:#3B82F6" onclick="setStatus('engaged')">Engaged</button>
-                    <button style="background:#84CC16" onclick="setStatus('succeed')">Succeed</button>
-                </div>
+            <div class="modal-body" id="modalBodyContent">
+                <p>Memuat data kunjungan...</p>
             </div>
         </div>
     </div>
@@ -497,20 +587,114 @@
 
     <script>
         let activeId = null;
+        let activeAppointment = null;
 
-        function openModal(id, name, status) {
+        function openModal(id) {
             activeId = id;
-            document.getElementById('modalName').textContent = name;
+            activeAppointment = null;
+            document.getElementById('modalName').textContent = 'Informasi Kunjungan';
             document.getElementById('aptModal').classList.add('open');
+            document.getElementById('modalBodyContent').innerHTML = '<p>Memuat data kunjungan...</p>';
+
+            fetch(`/admin/appointments/${id}/detail`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                credentials: 'include'
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (!res.success || !res.data) {
+                        throw new Error('Detail kunjungan tidak ditemukan');
+                    }
+
+                    activeAppointment = res.data;
+                    renderVisitModal(res.data);
+                })
+                .catch(() => {
+                    document.getElementById('modalBodyContent').innerHTML = '<p>Gagal memuat detail kunjungan.</p>';
+                });
         }
 
         function closeModal() {
             document.getElementById('aptModal').classList.remove('open');
             activeId = null;
+            activeAppointment = null;
         }
 
         function closeModalOutside(e) {
             if (e.target.id === 'aptModal') closeModal();
+        }
+
+        function renderVisitModal(data) {
+            const patient = data.patient || {};
+            const doctor = data.doctor || {};
+            const poli = data.poli || {};
+            const paymentMethod = data.payment_method || {};
+            const visitType = data.visit_type || {};
+            const careType = data.care_type || {};
+            const guarantorType = data.guarantor_type || {};
+            const status = data.status || '-';
+            const statusColor = data.status_color || '#999';
+            const appointmentDate = data.appointment_datetime
+                ? new Date(data.appointment_datetime).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })
+                : '-';
+            const registrationDate = data.registration_date
+                ? new Date(data.registration_date).toLocaleDateString('id-ID', { dateStyle: 'medium' })
+                : '-';
+
+            const html = `
+                <div class="visit-info-grid">
+                    <div class="visit-info-item"><span>Nama Pasien</span><strong>${patient.full_name || '-'}</strong></div>
+                    <div class="visit-info-item"><span>No. RM</span><strong>${patient.medical_record_no || '-'}</strong></div>
+                    <div class="visit-info-item"><span>Dokter</span><strong>${doctor.full_title || doctor.full_name || '-'}</strong></div>
+                    <div class="visit-info-item"><span>Poli</span><strong>${poli.name || '-'}</strong></div>
+                    <div class="visit-info-item"><span>Tanggal Registrasi</span><strong>${registrationDate}</strong></div>
+                    <div class="visit-info-item"><span>Metode Bayar</span><strong>${paymentMethod.name || '-'}</strong></div>
+                    <div class="visit-info-item"><span>Jenis Kunjungan</span><strong>${visitType.name || '-'}</strong></div>
+                    <div class="visit-info-item"><span>Jenis Perawatan</span><strong>${careType.name || '-'}</strong></div>
+                    <div class="visit-info-item"><span>Penjamin</span><strong>${guarantorType.name || '-'}</strong></div>
+                    <div class="visit-info-item full"><span>Jadwal Kunjungan</span><strong>${appointmentDate}</strong></div>
+                    <div class="visit-info-item full"><span>Kondisi Pasien</span><strong>${data.patient_condition || '-'}</strong></div>
+                    <div class="visit-info-item full"><span>Keluhan</span><strong>${data.complaint || '-'}</strong></div>
+                    <div class="visit-info-item full"><span>Rencana Prosedur</span><strong>${data.procedure_plan || '-'}</strong></div>
+                    <div class="visit-info-item full">
+                        <span>Status Saat Ini</span>
+                        <strong><span class="apt-badge" style="background:${statusColor}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></strong>
+                    </div>
+                </div>
+
+                <div class="visit-status-wrap">
+                    <label for="visitStatusSelect">Update Status</label>
+                    <select id="visitStatusSelect" class="visit-status-select">
+                        <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="confirmed" ${status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                        <option value="waiting" ${status === 'waiting' ? 'selected' : ''}>Waiting</option>
+                        <option value="engaged" ${status === 'engaged' ? 'selected' : ''}>Engaged</option>
+                        <option value="succeed" ${status === 'succeed' ? 'selected' : ''}>Succeed</option>
+                    </select>
+                </div>
+
+                <div class="visit-action-btns">
+                    <button class="visit-btn visit-btn-emr" onclick="goToEmr()">Lihat Rekam Medis</button>
+                    <button class="visit-btn visit-btn-status" onclick="updateSelectedStatus()">Simpan Status</button>
+                </div>
+            `;
+
+            document.getElementById('modalBodyContent').innerHTML = html;
+        }
+
+        function goToEmr() {
+            if (!activeId) return;
+            sessionStorage.setItem('autoSelectAppointmentId', activeId);
+            window.location.href = '/admin/emr';
+        }
+
+        function updateSelectedStatus() {
+            const select = document.getElementById('visitStatusSelect');
+            if (!select) return;
+            setStatus(select.value);
         }
 
         function setStatus(status) {
@@ -518,19 +702,32 @@
             fetch(`/admin/appointments/${activeId}/status`, {
                     method: 'PATCH',
                     headers: {
+                        'Accept': 'application/json',
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         status
                     })
                 })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) {
+                        throw new Error('Gagal update status');
+                    }
+                    return r.json();
+                })
                 .then(data => {
                     if (data.success) {
                         closeModal();
                         location.reload();
+                        return;
                     }
+
+                    throw new Error(data.message || 'Gagal update status');
+                })
+                .catch((err) => {
+                    alert(err.message || 'Gagal update status');
                 });
         }
     </script>

@@ -9,7 +9,7 @@
         ],
         // 2. Outpatient
         [
-            'route' => 'admin.outpatient',
+            'route' => 'admin.rawat-jalan',
             'filled' => true,
             'icon' => '/images/outpatient.svg',
             'is_image' => true,
