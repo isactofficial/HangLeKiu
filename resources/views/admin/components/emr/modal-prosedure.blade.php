@@ -158,8 +158,18 @@
                 </div>
               </div>
 
+              <!-- No. Gigi -->
+              <div class="w-16">
+                <label class="label-small">No. Gigi</label>
+                <input
+                  type="text"
+                  placeholder="-"
+                  class="input-underline text-center"
+                />
+              </div>
+
               <!-- Qty -->
-              <div class="w-20">
+              <div class="w-16">
                 <label class="label-small">Qty *</label>
                 <input
                   type="number"
@@ -222,7 +232,7 @@
           </div>
           <!-- AKHIR CONTAINER BARIS PROSEDUR -->
 
-          <!-- Baris Bawah: ICD 9 CM -->
+          <!-- Baris: ICD 9 CM -->
           <div class="flex items-end gap-4 w-full mt-4">
             <div class="flex-grow relative">
               <div class="relative w-full flex items-center">
@@ -253,6 +263,48 @@
             </button>
           </div>
 
+          <!-- ============================================== -->
+          <!-- CONTAINER BARIS OBAT DINAMIS -->
+          <!-- ============================================== -->
+          <div class="mt-8 border-t border-gray-100 pt-6">
+            <div id="obatContainer" class="space-y-4 w-full">
+              <!-- Baris Obat 1 (Default) -->
+              <div class="obat-row flex items-end gap-4 w-full relative">
+                <!-- Nama Obat -->
+                <div class="flex-grow">
+                  <label class="label-small text-gray-400">Obat yang dipakai</label>
+                  <div class="relative w-full flex items-center">
+                    <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    <input type="text" placeholder="Cari obat..." class="input-underline w-full" autocomplete="off" />
+                  </div>
+                </div>
+                <!-- Qty Obat -->
+                <div class="w-20">
+                  <label class="label-small text-gray-400">Qty</label>
+                  <input type="number" value="0" class="input-underline text-center w-full" />
+                </div>
+                <!-- Hapus Baris Obat -->
+                <button class="text-red-500 hover:text-red-700 mt-3 px-1 mb-1" onclick="hapusBarisObat(this)">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- TOMBOL PEMICU TAMBAH OBAT -->
+            <a
+              href="#"
+              onclick="tambahBarisObat(event)"
+              class="text-blue-500 text-xs mt-3 inline-block font-medium hover:underline"
+            >
+              + Tambah Obat
+            </a>
+          </div>
+          <!-- AKHIR CONTAINER OBAT -->
+
           <!-- Baris: Catatan -->
           <div class="mt-4">
             <label class="label-small text-gray-400 opacity-0">Catatan</label>
@@ -273,7 +325,7 @@
                 <option>drg. Ria Budiati Sp. Ortho</option>
               </select>
 
-              <!-- TOMBOL PEMICU TAMBAH BARIS -->
+              <!-- TOMBOL PEMICU TAMBAH BARIS PROSEDUR -->
               <a
                 href="#"
                 onclick="tambahBarisProsedur(event)"
@@ -348,6 +400,7 @@
       const modalMain = document.getElementById("modalTambahProsedur");
       const modalConfirm = document.getElementById("modalConfirm");
       const prosedurContainer = document.getElementById("prosedurContainer");
+      const obatContainer = document.getElementById("obatContainer");
 
       function toggleProsedureModal(show) {
         if (show) {
@@ -371,16 +424,16 @@
         alert("Data disimpan!");
       }
 
+      // =======================================================
       // FUNGSI UNTUK MENAMBAH BARIS PROSEDUR BARU
+      // =======================================================
       function tambahBarisProsedur(e) {
-        e.preventDefault(); // Mencegah browser scroll ke atas
+        e.preventDefault();
 
-        // Membuat elemen Div baru untuk baris prosedur
         const newRow = document.createElement("div");
         newRow.className =
-          "prosedur-row flex flex-wrap md:flex-nowrap items-end gap-4 w-full relative mt-4";
+          "prosedur-row flex flex-wrap md:flex-nowrap items-end gap-4 w-full relative mt-4 pt-4 border-t border-gray-100"; // Menambah pemisah antar prosedur
 
-        // HTML Template untuk baris baru (Kosongan)
         newRow.innerHTML = `
                 <!-- Nama Prosedur -->
                 <div class="flex-grow relative w-full md:w-auto">
@@ -391,8 +444,14 @@
                     </div>
                 </div>
 
+                <!-- No. Gigi -->
+                <div class="w-16">
+                    <label class="label-small text-gray-400">No. Gigi</label>
+                    <input type="text" placeholder="-" class="input-underline text-center">
+                </div>
+
                 <!-- Qty -->
-                <div class="w-20">
+                <div class="w-16">
                     <label class="label-small text-gray-400">Qty *</label>
                     <input type="number" value="0" class="input-underline text-center">
                 </div>
@@ -423,30 +482,72 @@
                 </div>
             `;
 
-        // Tambahkan baris baru ke dalam kontainer
         prosedurContainer.appendChild(newRow);
-
-        // Opsional: Scroll otomatis ke bagian paling bawah form setelah menambah baris
-        const modalBody = document.querySelector(
-          "#modalTambahProsedur .overflow-y-auto",
-        );
-        modalBody.scrollTop = modalBody.scrollHeight;
+        scrollToBottom();
       }
 
-      // FUNGSI UNTUK MENGHAPUS BARIS PROSEDUR
       function hapusBarisProsedur(buttonElement) {
         const row = buttonElement.closest(".prosedur-row");
 
-        // Cek jika ini adalah baris terakhir, jangan dihapus secara elemen (hanya dikosongkan)
         if (prosedurContainer.querySelectorAll(".prosedur-row").length > 1) {
           row.remove();
         } else {
-          // Jika cuma sisa 1 baris, reset valuenya saja
           const inputs = row.querySelectorAll("input");
-          inputs[0].value = ""; // Nama
-          inputs[1].value = "0"; // Qty
-          inputs[2].value = "Rp0"; // Harga
-          inputs[3].value = ""; // Discount
+          inputs[0].value = ""; // Nama Prosedur
+          inputs[1].value = ""; // No. Gigi
+          inputs[2].value = "0"; // Qty
+          inputs[3].value = "Rp0"; // Harga
+          inputs[4].value = ""; // Discount
         }
+      }
+
+      // =======================================================
+      // FUNGSI UNTUK MENAMBAH BARIS OBAT BARU
+      // =======================================================
+      function tambahBarisObat(e) {
+        e.preventDefault();
+
+        const newRow = document.createElement("div");
+        newRow.className = "obat-row flex items-end gap-4 w-full relative mt-4";
+
+        newRow.innerHTML = `
+                <div class="flex-grow">
+                  <div class="relative w-full flex items-center">
+                    <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    <input type="text" placeholder="Cari obat..." class="input-underline w-full" autocomplete="off" />
+                  </div>
+                </div>
+                <div class="w-20">
+                  <input type="number" value="0" class="input-underline text-center w-full" />
+                </div>
+                <button class="text-red-500 hover:text-red-700 mt-3 px-1 mb-1" onclick="hapusBarisObat(this)">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                  </svg>
+                </button>
+        `;
+
+        obatContainer.appendChild(newRow);
+        scrollToBottom();
+      }
+
+      function hapusBarisObat(buttonElement) {
+        const row = buttonElement.closest(".obat-row");
+
+        if (obatContainer.querySelectorAll(".obat-row").length > 1) {
+          row.remove();
+        } else {
+          const inputs = row.querySelectorAll("input");
+          inputs[0].value = "";
+          inputs[1].value = "0";
+        }
+      }
+
+      // FUNGSI HELPER UNTUK SCROLL KE BAWAH SAAT ITEM BARU DITAMBAHKAN
+      function scrollToBottom() {
+        const modalBody = document.querySelector("#modalTambahProsedur .overflow-y-auto");
+        modalBody.scrollTop = modalBody.scrollHeight;
       }
     </script>
