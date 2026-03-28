@@ -1,0 +1,592 @@
+/* ========================================
+   RAWAT JALAN PAGE - MAIN STYLES
+   ======================================== */
+
+:root {
+    --color-primary: #C58F59;
+    --color-danger: #ef4444;
+    --color-warning: #f59e0b;
+    --color-info: #3b82f6;
+    --color-purple: #8b5cf6;
+    --color-success: #10b981;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+}
+
+/* ========================================
+   CONTAINER & LAYOUT
+   ======================================== */
+
+.rawat-jalan-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.rawat-jalan-header {
+    margin-bottom: 2rem;
+}
+
+.rawat-jalan-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin-bottom: 0.5rem;
+}
+
+.rawat-jalan-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+}
+
+/* ========================================
+   FILTERS & CONTROLS
+   ======================================== */
+
+.filter-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: var(--color-gray-50);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-gray-200);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: white;
+    color: var(--color-gray-900);
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(197, 143, 89, 0.1);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #b8804f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(197, 143, 89, 0.3);
+}
+
+.btn-secondary {
+    background-color: var(--color-gray-200);
+    color: var(--color-gray-700);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-gray-300);
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ========================================
+   TABLE STYLES
+   ======================================== */
+
+.table-wrapper {
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-gray-200);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.appointment-table thead {
+    background-color: var(--color-gray-50);
+    border-bottom: 2px solid var(--color-gray-200);
+}
+
+.appointment-table th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.appointment-table tbody tr {
+    border-bottom: 1px solid var(--color-gray-100);
+    transition: all 0.2s ease;
+}
+
+.appointment-table tbody tr:hover {
+    background-color: var(--color-gray-50);
+    cursor: pointer;
+}
+
+.appointment-table tbody tr.active {
+    background-color: rgba(197, 143, 89, 0.05);
+}
+
+.appointment-table td {
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: var(--color-gray-700);
+}
+
+/* Column specific styles */
+
+.col-no {
+    width: 60px;
+    font-weight: 600;
+    color: var(--color-gray-500);
+}
+
+.col-time {
+    width: 100px;
+}
+
+.time-badge {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.col-patient {
+    flex: 1;
+    min-width: 200px;
+}
+
+.patient-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.patient-name {
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
+
+.patient-mr {
+    font-size: 0.75rem;
+    color: var(--color-gray-500);
+}
+
+.col-doctor {
+    flex: 1;
+    min-width: 150px;
+}
+
+.col-age {
+    width: 100px;
+    text-align: center;
+}
+
+.col-status {
+    width: 140px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    text-transform: capitalize;
+}
+
+/* Empty state */
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-gray-400);
+}
+
+.empty-state svg {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--color-gray-300);
+}
+
+.empty-state p {
+    font-size: 1rem;
+    color: var(--color-gray-500);
+}
+
+/* ========================================
+   MODAL & POPUP
+   ======================================== */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.modal-overlay.active {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 2rem;
+}
+
+.modal-content-container {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.modal-header-section h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    color: var(--color-gray-900);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.info-section {
+    margin-bottom: 2rem;
+}
+
+.info-section:last-child {
+    margin-bottom: 0;
+}
+
+.info-section h3 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-gray-100);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.info-item label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-item p {
+    font-size: 0.875rem;
+    color: var(--color-gray-900);
+    font-weight: 500;
+    margin: 0;
+    word-break: break-word;
+}
+
+/* Status form */
+
+.status-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.status-form > label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-700);
+}
+
+.status-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.status-option {
+    position: relative;
+}
+
+.status-option input[type="radio"] {
+    display: none;
+}
+
+.status-option label {
+    display: block;
+    padding: 1rem;
+    border: 2px solid var(--color-gray-200);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left-width: 4px;
+    background-color: var(--color-gray-50);
+}
+
+.status-option input[type="radio"]:checked + label {
+    background-color: rgba(197, 143, 89, 0.05);
+    border-color: var(--color-primary);
+}
+
+.radio-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    display: block;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--color-gray-200);
+    background-color: var(--color-gray-50);
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+
+.alert {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    z-index: 999;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .rawat-jalan-container {
+        padding: 1rem;
+    }
+
+    .rawat-jalan-title {
+        font-size: 1.5rem;
+    }
+
+    .filter-box {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .filter-actions {
+        grid-column: 1 / -1;
+    }
+
+    .appointment-table {
+        font-size: 0.75rem;
+    }
+
+    .appointment-table th,
+    .appointment-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .col-no {
+        width: 40px;
+    }
+
+    .col-time {
+        width: 70px;
+    }
+
+    .col-patient {
+        min-width: 150px;
+    }
+
+    .time-badge {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .modal-content-container {
+        max-width: 95%;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .status-options {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-footer {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+/* ========================================
+   SCROLLBAR STYLING
+   ======================================== */
+
+.table-wrapper::-webkit-scrollbar,
+.modal-content-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track,
+.modal-content-container::-webkit-scrollbar-track {
+    background: var(--color-gray-100);
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb,
+.modal-content-container::-webkit-scrollbar-thumb {
+    background: var(--color-gray-400);
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover,
+.modal-content-container::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-500);
+}
