@@ -69,6 +69,10 @@ body, .page-wrapper {
     padding: 32px 40px 40px;
 }
 
+@media (max-width: 768px) {
+    .form-body { padding: 24px 20px 32px; }
+}
+
 /* ── Grid Layouts ── */
 .grid-1 { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 40px; margin-bottom: 32px; }
@@ -292,6 +296,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     backdrop-filter: blur(4px);
 }
 
+@media (max-width: 768px) {
+    .reg-modal-overlay { padding: 12px; }
+}
+
 .reg-modal-overlay.open {
     display: flex;
 }
@@ -299,7 +307,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .reg-modal-content {
     width: 100%;
     max-width: 800px; /* Lebar lebih disesuaikan untuk popup (kurang dari 900px) */
-    max-height: 90vh;
+    max-height: 95vh;
     overflow-y: auto;
     background: var(--cream-50);
     border-radius: var(--radius-md);
@@ -307,6 +315,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     padding: 40px 24px 60px; /* Ditambahkan agar isinya tidak menempel batas modal */
     /* Hide scrollbar for aesthetics but keep functionality */
     scrollbar-width: none;
+}
+
+@media (max-width: 768px) {
+    .reg-modal-content { 
+        padding: 32px 16px 40px;
+        border-radius: var(--radius-sm);
+    }
 }
 
 .reg-modal-content::-webkit-scrollbar {
@@ -331,6 +346,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     transition: all var(--transition);
     z-index: 10;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .modal-close-btn { top: 12px; right: 12px; width: 32px; height: 32px; }
 }
 
 .modal-close-btn:hover {

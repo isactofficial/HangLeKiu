@@ -155,7 +155,42 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-    .search-header-row { flex-direction: column; }
-    .patient-info-card { flex-direction: column; }
-    .patient-details { grid-template-columns: 1fr; }
+    .search-header-row { 
+        flex-direction: column; 
+        align-items: stretch;
+        gap: 12px;
+    }
+    .search-group-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .search-input-box {
+        max-width: 100%;
+    }
+    .req-notice {
+        margin-top: 0;
+        text-align: right;
+        font-size: 12px;
+    }
+
+    .patient-info-card { 
+        flex-direction: column; 
+        padding: 16px;
+        align-items: center;
+        text-align: center;
+    }
+    .patient-details { 
+        grid-template-columns: 1fr; 
+        text-align: left;
+        width: 100%;
+    }
+    .patient-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    .patient-actions .btn-outline {
+        width: 100%;
+        justify-content: center;
+    }
 }
