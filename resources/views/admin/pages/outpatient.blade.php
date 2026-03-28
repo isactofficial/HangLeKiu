@@ -5,6 +5,13 @@
     @include('admin.components.navbar', ['title' => 'Rawat Jalan'])
 @endsection
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/outpatient.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/registration-shared.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pasien-baru.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pendaftaran-baru.css') }}">
+@endpush
+
 @section('content')
     @php
         $today = today()->toDateString();
@@ -30,6 +37,7 @@
             {{-- ─── SIDEBAR ─── --}}
             <div class="rj-sidebar">
                 <div class="rj-sidebar-title">Dokter</div>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
                 <div class="rj-mobile-doc-nav">
@@ -41,6 +49,16 @@
                     </select>
                 </div>
 >>>>>>> Stashed changes
+=======
+                <div class="rj-mobile-doc-nav">
+                    <select class="rj-doc-select" onchange="if(this.value) window.location.href=this.value">
+                        <option value="{{ route('admin.outpatient', ['date' => $date]) }}" {{ $viewMode === 'all' ? 'selected' : '' }}>Semua Dokter</option>
+                        @foreach ($doctors as $doc)
+                            <option value="{{ route('admin.outpatient', ['date' => $date, 'doctor_id' => $doc->id]) }}" {{ $selectedDoctorId == $doc->id ? 'selected' : '' }}>{{ $doc->full_name }} @if($doc->specialization) - {{ $doc->specialization }} @endif</option>
+                        @endforeach
+                    </select>
+                </div>
+>>>>>>> origin/main
                 <ul class="rj-doctor-list">
                     <li>
                         <a href="{{ route('admin.rawat-jalan', ['date' => $date]) }}"
@@ -60,11 +78,11 @@
                         <li>
                             <a href="{{ route('admin.rawat-jalan', ['date' => $date, 'doctor_id' => $doc->id]) }}"
                                 class="rj-doc-item {{ $selectedDoctorId == $doc->id ? 'active' : '' }}">
-                                <span class="rj-doc-avatar">{{ strtoupper(substr($doc->name, 5, 1)) }}</span>
+                                <span class="rj-doc-avatar">{{ strtoupper(substr($doc->full_name, 0, 1)) }}</span>
                                 <div class="rj-doc-info">
-                                    <span class="rj-doc-name">{{ $doc->name }}</span>
-                                    @if ($doc->practice)
-                                        <span class="rj-doc-spec">{{ $doc->practice }}</span>
+                                    <span class="rj-doc-name">{{ $doc->full_name }}</span>
+                                    @if ($doc->specialization)
+                                        <span class="rj-doc-spec">{{ $doc->specialization }}</span>
                                     @endif
                                 </div>
                             </a>
@@ -117,7 +135,7 @@
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6" /></svg>
                             </a>
                             <div class="rj-nav-date">
-                                <span class="rj-nav-day">{{ $selectedDoctor?->name }}</span>
+                                <span class="rj-nav-day">{{ $selectedDoctor?->full_name }}</span>
                                 <span class="rj-nav-full">
                                     {{ \Carbon\Carbon::parse($dateColumns[0])->locale('id')->isoFormat('D MMM') }}
                                     – {{ \Carbon\Carbon::parse($dateColumns[6])->locale('id')->isoFormat('D MMM YYYY') }}
@@ -135,8 +153,8 @@
                     </div>
                 </div>
 
-                {{-- Grid --}}
-                <div class="rj-table-wrap">
+                {{-- Grid Desktop --}}
+                <div class="rj-table-wrap desktop-table">
                     <table class="rj-table">
                         <thead>
                             <tr>
@@ -169,9 +187,13 @@
                                     <td class="td-time">{{ $slot }}</td>
                                     @if ($viewMode === 'all')
                                         @foreach ($doctors as $doc)
-                                            @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
-                                            <td>
+                                            @php 
+                                                $apt = $schedule[$doc->id][$slot] ?? null; 
+                                                $poliId = $doc->poli_id ?? ''; // Assuming doctor has poli_id relation or attribute
+                                            @endphp
+                                            <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}')">
                                                 @if ($apt)
+<<<<<<< HEAD
 <<<<<<< Updated upstream
                                                     <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
@@ -181,6 +203,19 @@
                                                         <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment_name }}</div>
 >>>>>>> Stashed changes
+=======
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                        data-id="{{ $apt->id }}"
+                                                        data-patient="{{ $apt->patient_name }}"
+                                                        data-mr="{{ $apt->mr_number }}"
+                                                        data-treatment="{{ $apt->treatment_name }}"
+                                                        data-time="{{ $slot }}"
+                                                        data-doctor="{{ $doc->full_name }}"
+                                                        data-status="{{ $apt->status }}"
+                                                        onclick="handleAptClick(this, event)">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
+                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
+>>>>>>> origin/main
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 @endif
@@ -189,15 +224,17 @@
                                     @else
                                         @foreach ($dateColumns as $dc)
                                             @php
-                                                $apt = \App\Models\Appointment::with('treatment')
+                                                $apt = \App\Models\Appointment::with('patient')
                                                     ->where('doctor_id', $selectedDoctorId)
-                                                    ->whereDate('appointment_date', $dc)
-                                                    ->where('appointment_time', $slot . ':00')
+                                                    ->whereDate('appointment_datetime', $dc)
+                                                    ->whereTime('appointment_datetime', $slot)
                                                     ->first();
                                                 $isColToday = $dc === $today;
+                                                $poliId = $selectedDoctor->poli_id ?? '';
                                             @endphp
-                                            <td class="{{ $isColToday ? 'col-today' : '' }}">
+                                            <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
                                                 @if ($apt)
+<<<<<<< HEAD
 <<<<<<< Updated upstream
                                                     <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" onclick="openModal({{ $apt->id }},'{{ addslashes($apt->patient_name) }}','{{ $apt->status }}')">
                                                         <div class="apt-name">{{ $apt->patient_name }}</div>
@@ -207,6 +244,19 @@
                                                         <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
                                                         <div class="apt-treat">{{ $apt->treatment_name }}</div>
 >>>>>>> Stashed changes
+=======
+                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                        data-id="{{ $apt->id }}"
+                                                        data-patient="{{ $apt->patient_name }}"
+                                                        data-mr="{{ $apt->mr_number }}"
+                                                        data-treatment="{{ $apt->treatment_name }}"
+                                                        data-time="{{ $slot }}"
+                                                        data-doctor="{{ $selectedDoctor->full_name }}"
+                                                        data-status="{{ $apt->status }}"
+                                                        onclick="handleAptClick(this, event)">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
+                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
+>>>>>>> origin/main
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 @endif
@@ -218,6 +268,7 @@
                         </tbody>
                     </table>
                 </div>
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 
@@ -305,216 +356,162 @@
             </div>
             <div class="modal-body" id="modalBodyContent">
                 <p>Memuat data kunjungan...</p>
+=======
+
+                {{-- Mobile Cards --}}
+                <div class="rj-mobile-schedule">
+                    @if ($viewMode === 'all')
+                        @foreach ($timeSlots as $slot)
+                            @php
+                                $hasApt = false;
+                                foreach($doctors as $doc) {
+                                    if(isset($schedule[$doc->id][$slot])) $hasApt = true;
+                                }
+                            @endphp
+                            <div class="mobile-time-group">
+                                <div class="m-time-label">{{ $slot }}</div>
+                                <div class="m-cards">
+                                    @if ($hasApt)
+                                        @foreach ($doctors as $doc)
+                                            @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
+                                            @if ($apt)
+                                                <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                    data-id="{{ $apt->id }}"
+                                                    data-patient="{{ $apt->patient_name }}"
+                                                    data-mr="{{ $apt->mr_number }}"
+                                                    data-treatment="{{ $apt->treatment_name }}"
+                                                    data-time="{{ $slot }}"
+                                                    data-doctor="{{ $doc->full_name }}"
+                                                    data-status="{{ $apt->status }}"
+                                                    onclick="handleAptClick(this, event)">
+                                                    <div class="m-card-header">
+                                                        <div class="apt-name">{{ $apt->patient_name }}</div>
+                                                        <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                    </div>
+                                                    <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                                    <div class="m-doc-name">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
+                                                        {{ $doc->full_name }}
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer;">Kosong (Klik untuk Daftar)</div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        @foreach ($dateColumns as $dc)
+                            @php 
+                                $dcCarbon = \Carbon\Carbon::parse($dc); 
+                                $aptsForDate = \App\Models\Appointment::with('patient')
+                                    ->where('doctor_id', $selectedDoctorId)
+                                    ->whereDate('appointment_datetime', $dc)
+                                    ->orderBy('appointment_datetime')
+                                    ->get();
+                            @endphp
+                            <div class="mobile-time-group">
+                                <div class="m-time-label" style="background: var(--gold); color: white;">
+                                    {{ $dcCarbon->locale('id')->isoFormat('dddd, D MMM YYYY') }}
+                                </div>
+                                <div class="m-cards">
+                                    @if ($aptsForDate->count() > 0)
+                                        @foreach ($aptsForDate as $apt)
+                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                data-id="{{ $apt->id }}"
+                                                data-patient="{{ $apt->patient_name }}"
+                                                data-mr="{{ $apt->mr_number }}"
+                                                data-treatment="{{ $apt->treatment_name }}"
+                                                data-time="{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}"
+                                                data-doctor="{{ $apt->doctor?->full_name ?? $selectedDoctor->full_name }}"
+                                                data-status="{{ $apt->status }}"
+                                                onclick="handleAptClick(this, event)">
+                                                <div class="m-card-header">
+                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }} | {{ $apt->patient_name }}</div>
+                                                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                </div>
+                                                <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $selectedDoctor->poli_id ?? '' }}', '{{ $dc }}')" style="cursor:pointer;">Tidak ada jadwal (Klik untuk Daftar)</div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+
+>>>>>>> origin/main
             </div>
         </div>
     </div>
 
-    <style>
-        :root {
-            --brown: #582C0C;
-            --gold: #C58F59;
-            --cream: #fdf8f4;
-            --border: #E5D6C5;
+
+<script>
+        // Registration Modal Functions
+        function openRegModal(modalId, doctorId = null, time = null, poliId = null, date = null) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden'; 
+
+            if (modalId === 'modalPendaftaranBaru') {
+                // Pre-fill fields in pendaftaran-baru.blade.php
+                if (doctorId) {
+                    const docSelect = document.getElementById('pb_doctor_id');
+                    if (docSelect) docSelect.value = doctorId;
+                }
+                if (time) {
+                    const timeInput = document.getElementById('pb_appointment_time');
+                    if (timeInput) timeInput.value = time;
+                }
+                if (poliId) {
+                    const poliSelect = document.getElementById('pb_poli_id');
+                    if (poliSelect) poliSelect.value = poliId;
+                }
+                if (date) {
+                    const dateInput = document.getElementById('pb_appointment_date');
+                    if (dateInput) dateInput.value = date;
+                }
+            }
         }
-
-        .rj-outer {
-            padding: 0 0px 20px 0px;
-            font-family: 'Instrument Sans', sans-serif;
-            font-size: 13px;
-        }
-
-        .rj-outer * {
-            font-size: 13px;
-        }
-
-        .rj-title,
-        .th-datenum,
-        .modal-head h3 {
-            font-size: 18.75px;
-            font-weight: 700;
-        }
-
-        .rj-wrap {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-        }
-
-        .rj-sidebar {
-            width: 220px;
-            flex-shrink: 0;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            align-self: flex-start;
-            overflow: hidden;
-        }
-
-        .rj-sidebar-title {
-            padding: 16px 18px 10px;
-            font-weight: 700;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        .rj-doctor-list {
-            list-style: none;
-            padding: 0 8px 12px;
-            margin: 0;
-        }
-
-        .rj-doc-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 9px 10px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--brown);
-            transition: background .15s;
-            cursor: pointer;
-        }
-
-        .rj-doc-item:hover { background: rgba(197, 143, 89, .08); }
-        .rj-doc-item.active { background: rgba(88, 44, 12, .08); }
-
-        .rj-doc-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--gold);
-            color: white;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .rj-doc-avatar.all { background: var(--brown); }
-
-        .rj-doc-info {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .rj-doc-name {
-            font-weight: 600;
-            color: var(--brown);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .rj-doc-spec { color: var(--gold); }
-
-        .rj-main {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-
-        .rj-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            gap: 16px;
-            flex-wrap: wrap;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .rj-header-left { flex: 1; min-width: 160px; }
-        .rj-title { color: var(--brown); margin: 0; font-size: 30px; font-weight: 700; }
-        .rj-subtitle { color: var(--gold); margin: 4px 0 0 0; font-size: 18.75px; }
-
-        .rj-legend {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .rj-leg {
-            color: #6B513E;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 500;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .rj-nav { display: flex; align-items: center; gap: 8px; }
-        .rj-nav-btn {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            border: 2px solid var(--brown);
-            background: var(--brown);
-            color: white;
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none; cursor: pointer; transition: all .2s;
-        }
-        .rj-nav-btn:hover { background: #401f08; border-color: #401f08; }
-        .rj-nav-btn.disabled { background: transparent; color: var(--brown); cursor: not-allowed; opacity: .5; pointer-events: none; }
         
-        .rj-nav-date { display: flex; flex-direction: column; align-items: center; line-height: 1.2; min-width: 130px; }
-        .rj-nav-day { font-weight: 700; color: var(--gold); }
-        .rj-nav-full { font-weight: 700; color: var(--brown); }
-
-        .rj-today-btn {
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer; text-decoration: none; transition: all .2s;
-            background: var(--brown); color: white; border: 2px solid var(--brown);
-        }
-        .rj-today-btn:hover { background: #401f08; }
-        .rj-today-btn.disabled { background: transparent; color: var(--brown); cursor: not-allowed; opacity: .6; pointer-events: none; border-color: var(--brown); }
-
-        .rj-table-wrap {
-            height: 500px;
-            overflow: auto;
-        }
-        .rj-table-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
-        .rj-table-wrap::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
-
-        .rj-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
+        function closeRegModal(modalId) {
+            document.getElementById(modalId).classList.remove('open');
+            document.body.style.overflow = '';
         }
 
-        .th-time, .td-time {
-            width: 72px;
-            position: sticky; left: 0;
-            background: white; z-index: 2;
-            border-right: 1px solid var(--border);
-            text-align: center;
-            color: var(--brown);
-            font-weight: 600;
-        }
+        // Close registration modals when clicking overlay
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('reg-modal-overlay')) {
+                closeRegModal(e.target.id);
+            }
+        });
+        function handleAptClick(el, e) {
+        if (e) e.stopPropagation();
+        const id = el.getAttribute('data-id');
+        const patient = el.getAttribute('data-patient');
+        const mr = el.getAttribute('data-mr');
+        const treatment = el.getAttribute('data-treatment');
+        const time = el.getAttribute('data-time');
+        const doctor = el.getAttribute('data-doctor');
+        const status = el.getAttribute('data-status');
+        
+        console.log('Opening Apt Detail Modal for:', patient);
+        openApptDetailModal(id, patient, mr, treatment, time, doctor, status);
+    }
+</script>
 
-        .rj-table th {
-            background: var(--brown);
-            color: white;
-            font-weight: 600;
-            padding: 10px 8px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, .1);
-            position: sticky; top: 0; z-index: 1;
-        }
+    <!-- Include Registration Modals -->
+    @include('admin.components.pasien-baru')
+    @include('admin.components.pendaftaran-baru')
+    @include('admin.components.appointment-detail')
 
+<<<<<<< HEAD
         .rj-table th.th-time { z-index: 3; }
         .rj-table th.th-today { background: #401f08; }
 
@@ -731,4 +728,6 @@
                 });
         }
     </script>
+=======
+>>>>>>> origin/main
 @endsection

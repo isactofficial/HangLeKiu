@@ -1,69 +1,22 @@
+﻿@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/components/settings/hak_akses.css') }}">
+@endpush
+
 {{-- resources/views/admin/settings/hak_akses.blade.php --}}
-
-<style>
-    .ha-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 12px; }
-    .ha-title    { font-size: 18.75px; font-weight: 700; color: #582C0C; margin: 0; }
-    .ha-subtitle { font-size: 13px; color: #6B513E; margin: 4px 0 20px; }
-
-    .ha-btn-primary {
-        background: #C58F59; color: #fff; border: none; padding: 9px 16px; border-radius: 6px;
-        font-size: 13px; font-weight: 600; cursor: pointer;
-        display: inline-flex; align-items: center; gap: 6px;
-        font-family: inherit; white-space: nowrap; transition: background .2s;
-    }
-    .ha-btn-primary:hover { background: #b07d4a; }
-
-    .ha-table-card { background: #fff; border: 1px solid #E5D6C5; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(88,44,12,.05); }
-    .ha-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .ha-table th {
-        background: #fdf8f4; color: #582C0C; font-size: 13px; font-weight: 600;
-        padding: 12px 20px; border-bottom: 2px solid #E5D6C5; white-space: nowrap;
-    }
-    .ha-table td { padding: 16px 20px; font-size: 13px; color: #374151; border-bottom: 1px solid #F3EDE6; vertical-align: top; }
-    .ha-table tr:last-child td { border-bottom: none; }
-    .ha-table tr:hover td { background: rgba(253,248,244,.7); }
-    .ha-table .col-tipe { width: 140px; color: #582C0C; font-weight: 500; white-space: nowrap; }
-    .ha-table .col-fitur { color: #6B513E; line-height: 1.8; }
-    .ha-table .col-actions { width: 80px; white-space: nowrap; }
-
-    .ha-view-more { color: #C58F59; font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 4px; }
-    .ha-view-more:hover { text-decoration: underline; }
-
-    .ha-action-row { display: flex; align-items: center; gap: 8px; }
-    .ha-icon-btn {
-        width: 30px; height: 30px; border-radius: 6px;
-        border: 1.5px solid #E5D6C5; background: #fff;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: #6B513E; transition: all .2s;
-    }
-    .ha-icon-btn:hover { border-color: #C58F59; color: #C58F59; }
-    .ha-icon-btn.del { border-color: #FEE2E2; color: #FCA5A5; }
-    .ha-icon-btn.del:hover { border-color: #EF4444; color: #EF4444; }
-
-    .ha-pagination { display: flex; justify-content: flex-end; align-items: center; padding: 12px 20px; gap: 20px; border-top: 1px solid #E5D6C5; }
-    .ha-page-size { display: flex; align-items: center; gap: 6px; color: #6B513E; }
-    .ha-page-size select { border: none; outline: none; font-weight: 600; color: #582C0C; font-size: 13px; cursor: pointer; background: transparent; font-family: inherit; }
-    .ha-page-info { color: #6B513E; }
-    .ha-page-controls { display: flex; gap: 4px; }
-    .ha-page-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 0; }
-    .ha-page-btn:not([disabled]):hover { color: #582C0C; background: #fdf8f4; }
-    .ha-page-btn[disabled] { opacity: .4; cursor: default; pointer-events: none; }
-</style>
-
 <div class="ha-header-row">
     <div>
         <h2 class="ha-title">Hak Akses</h2>
         <p class="ha-subtitle">Last Update: Data belum pernah di update</p>
     </div>
     <button class="ha-btn-primary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         + Tambah Tipe Akses
     </button>
 </div>
 
 <div class="ha-table-card">
-    <table class="ha-table">
-        <thead>
+    <div class="ha-table-wrapper">
+        <table class="ha-table">
+            <thead>
             <tr>
                 <th>Tipe Akses</th>
                 <th>Fitur</th>
@@ -98,7 +51,8 @@
                 </tr>
             @endforeach
         </tbody>
-    </table>
+        </table>
+    </div>
     <div class="ha-pagination">
         <div class="ha-page-size">Jumlah baris per halaman: <select><option>5</option><option>10</option></select></div>
         <div class="ha-page-info">1–5 dari 7 data</div>

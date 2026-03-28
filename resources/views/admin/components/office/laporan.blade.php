@@ -1,40 +1,9 @@
+﻿@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/components/office/laporan.css') }}">
+@endpush
+
 {{-- resources/views/admin/office/laporan.blade.php --}}
 @php $tab = request('tab', 'operasional'); @endphp
-
-<style>
-    .lap-tabs { display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap; }
-    .lap-tab {
-        padding: 8px 22px; border-radius: 6px;
-        font-size: 13px; font-weight: 600;
-        border: none; cursor: pointer; font-family: inherit;
-        text-decoration: none; display: inline-block; transition: all .15s;
-    }
-    .lap-tab.active   { background: #C58F59; color: #fff; }
-    .lap-tab.inactive { background: #F3EDE6; color: #6B513E; }
-    .lap-tab.inactive:hover { background: #E5D6C5; color: #582C0C; }
-
-    .lap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-
-    .lap-item {
-        display: flex; flex-direction: column; gap: 5px;
-        padding: 16px 20px; border-bottom: 1px solid #E5D6C5;
-        text-decoration: none; cursor: pointer;
-        transition: background .15s;
-        position: relative;
-    }
-    .lap-item:nth-child(odd)  { border-right: 1px solid #E5D6C5; }
-    .lap-item:hover { background: rgba(197,143,89,.04); }
-    .lap-item:hover .lap-item-title { color: #582C0C; }
-
-    .lap-item-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .lap-item-title {
-        font-size: 13px; font-weight: 700; color: #C58F59;
-        transition: color .15s; margin: 0; flex: 1; padding-right: 8px;
-    }
-    .lap-item-arrow { color: #C58F59; flex-shrink: 0; margin-top: 1px; }
-    .lap-item-desc  { font-size: 13px; color: #6B513E; margin: 0; }
-</style>
-
 <div class="lap-tabs">
     @foreach (['operasional'=>'Operasional','keuangan'=>'Keuangan','bpjs'=>'BPJS','grafik'=>'Grafik'] as $key=>$label)
         <a href="?menu=laporan&tab={{ $key }}" class="lap-tab {{ $tab===$key ? 'active' : 'inactive' }}">{{ $label }}</a>

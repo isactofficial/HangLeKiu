@@ -4,15 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Treatment extends Model
 {
-    protected $fillable = ['name', 'duration_minutes', 'price', 'is_active'];
+    use SoftDeletes;
+
+    protected $table = 'master_procedure';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
+    protected $fillable = ['id', 'procedure_name', 'base_price', 'is_active'];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'price'     => 'decimal:2',
+        'base_price' => 'decimal:2',
     ];
+
+    // Kompatibilitas untuk view lama yang masih memanggil $t->name
+    public function getNameAttribute(): ?string
+    {
+        return $this->procedure_name;
+    }
 
     public function appointments(): HasMany
     {

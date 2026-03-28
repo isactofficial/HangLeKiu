@@ -4,26 +4,32 @@
 @props(['title' => ''])
 
 <header class="admin-navbar">
-<<<<<<< HEAD
-    {{-- Hamburger Button (Mobile Only) --}}
-    <button class="navbar-hamburger" onclick="toggleAdminSidebar()" aria-label="Toggle Menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-=======
 
     {{-- Hamburger — inline, hanya mobile --}}
     <button id="sidebarToggle" class="sidebar-hamburger" type="button" aria-label="Toggle menu">
         <span></span><span></span><span></span>
->>>>>>> origin/database_schema
     </button>
 
     {{-- Right: Actions --}}
-    <div class="navbar-right">
-        {{-- HDS Logo --}}
-        <div class="navbar-hds-logo">
-            <img src="/images/logo-hds.png" alt="HDS">
+    <div class="navbar-right w-full flex align-center w-[100%] justify-between md:justify-end">
+        
+        {{-- Left Items (Mobile) --}}
+        <div class="navbar-left flex items-center md:hidden">
+            <button class="navbar-hamburger-btn" onclick="toggleSidebar()" title="Toggle Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
         </div>
+
+        {{-- Right Items --}}
+        <div class="navbar-actions flex items-center gap-2">
+            {{-- HDS Logo --}}
+            <div class="navbar-hds-logo hidden md:flex">
+                <img src="/images/logo-hds.png" alt="HDS">
+            </div>
 
         {{-- Clinic Dropdown --}}
         <div class="navbar-dropdown" id="clinicDropdown">
@@ -88,212 +94,9 @@
                 <button type="submit" class="dropdown-item dropdown-logout">Logout</button>
             </form>
         </div>
+        </div>
     </div>
 </header>
-
-<style>
-    /* ===== NAVBAR ===== */
-    .admin-navbar {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        padding: 20px 32px;
-        margin: -28px -32px 24px -32px;
-        background: white;
-        box-shadow: 0 1px 4px rgba(88, 44, 12, 0.06);
-        border-bottom: 1px solid #E5D6C5;
-        gap: 8px;
-    }
-
-    .navbar-right {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        position: relative;
-    }
-
-    /* Hamburger — inline, hidden desktop */
-    .sidebar-hamburger {
-        display: none;
-        flex-direction: column;
-        gap: 5px;
-        cursor: pointer;
-        background: white;
-        border: 1px solid #E5D6C5;
-        border-radius: 8px;
-        padding: 7px;
-        width: 36px;
-        height: 36px;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        box-shadow: 0 1px 4px rgba(88,44,12,0.10);
-        transition: opacity 0.2s;
-        margin-right: auto; /* dorong ke kiri */
-    }
-    .sidebar-hamburger span {
-        display: block;
-        width: 18px;
-        height: 2px;
-        background: #582C0C;
-        border-radius: 2px;
-    }
-
-    /* HDS Logo */
-    .navbar-hds-logo {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #582C0C;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .navbar-hds-logo img {
-        width: 20px;
-        height: auto;
-        filter: brightness(0) invert(1);
-    }
-
-    /* Dropdown button */
-    .navbar-dropdown { position: relative; }
-
-    .navbar-dropdown-btn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        background: #582C0C;
-        color: #F7F7F7;
-        border: none;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        font-family: 'Instrument Sans', sans-serif;
-        cursor: pointer;
-        transition: all 0.2s;
-        white-space: nowrap;
-    }
-    .navbar-dropdown-btn:hover { box-shadow: 0 4px 12px rgba(197,143,89,0.3); }
-    .navbar-dropdown-btn svg { flex-shrink: 0; }
-
-    /* Dropdown menu */
-    .navbar-dropdown-menu {
-        position: absolute;
-        top: calc(100% + 8px);
-        right: 0;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(88,44,12,0.15);
-        min-width: 220px;
-        padding: 6px;
-        z-index: 100;
-        display: none;
-        border: 1px solid #E5D6C5;
-    }
-    .navbar-dropdown-menu.show {
-        display: block;
-        animation: dropdownFade 0.15s ease;
-    }
-    @keyframes dropdownFade {
-        from { opacity: 0; transform: translateY(-4px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .dropdown-item {
-        display: block;
-        width: 100%;
-        padding: 10px 14px;
-        font-size: 13px;
-        font-family: 'Instrument Sans', sans-serif;
-        color: #6B513E;
-        text-decoration: none;
-        border-radius: 8px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        text-align: left;
-        transition: background 0.15s;
-    }
-    .dropdown-item:hover { background: rgba(197,143,89,0.1); }
-    .dropdown-item.active { background: rgba(197,143,89,0.15); color: #582C0C; font-weight: 600; }
-
-    .dropdown-header {
-        padding: 12px 14px;
-        border-bottom: 1px solid #E5D6C5;
-        margin-bottom: 4px;
-    }
-    .dropdown-header strong { display: block; font-size: 14px; color: #582C0C; }
-    .dropdown-header small  { display: block; font-size: 12px; color: #C58F59; margin-top: 2px; }
-
-    .dropdown-divider { height: 1px; background: #E5D6C5; margin: 4px 0; }
-    .dropdown-logout { color: #dc2626 !important; }
-    .dropdown-logout:hover { background: rgba(220,38,38,0.08) !important; }
-
-    /* Divider */
-    .navbar-divider { width: 1px; height: 24px; background: #E5D6C5; margin: 0 4px; }
-
-    /* Icon buttons */
-    .navbar-icon-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #6B513E;
-        transition: all 0.2s;
-    }
-    .navbar-icon-btn:hover { background: rgba(197,143,89,0.1); color: #582C0C; }
-    .navbar-icon-btn svg { width: 20px; height: 20px; }
-
-    .navbar-profile-menu { top: 48px; right: 0; }
-
-    /* ===== MOBILE ===== */
-    @media (max-width: 768px) {
-        .admin-navbar {
-            padding: 12px 16px;
-            margin: -16px -16px 16px -16px;
-            width: calc(100% + 32px);
-            max-width: calc(100% + 32px);
-            justify-content: flex-start;
-        }
-
-        /* Tampilkan hamburger */
-        .sidebar-hamburger { display: flex; }
-
-        .navbar-right {
-            gap: 6px;
-            margin-left: auto;
-        }
-
-        .navbar-dropdown-btn {
-            padding: 7px 12px;
-            font-size: 12px;
-            border-radius: 16px;
-        }
-        .navbar-dropdown-btn span {
-            max-width: 80px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .navbar-dropdown-btn svg { width: 13px; height: 13px; }
-
-        .navbar-divider { margin: 0 2px; }
-
-        .navbar-icon-btn { width: 34px; height: 34px; }
-        .navbar-icon-btn svg { width: 20px; height: 20px; }
-
-        .navbar-hds-logo { width: 34px; height: 34px; }
-
-        .navbar-dropdown-menu { right: -8px; }
-    }
-</style>
-
 <script>
     function toggleDropdown(menuId) {
         const menu = document.getElementById(menuId);

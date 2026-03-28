@@ -17,7 +17,7 @@
     <main class="flex-grow pt-[100px]"> {{-- Padding top untuk kompensasi navbar fixed --}}
         
         {{-- Header Section --}}
-        <div class="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-10 text-center">
+        <div class="max-w-7xl mx-auto px-6 md:px-10 py-10 text-center">
             <h1 class="text-3xl md:text-[48px] font-bold text-[#582C0C] mb-2 leading-tight">
                 Artikel
             </h1>
@@ -27,7 +27,7 @@
         </div>
 
         {{-- Filter Section --}}
-        <div class="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 mb-10 flex flex-col lg:flex-row justify-between items-center gap-6">
+        <div class="max-w-7xl mx-auto px-6 md:px-10 mb-10 flex flex-col lg:flex-row justify-between items-center gap-6">
             <div class="flex flex-wrap justify-center lg:justify-start gap-2">
                 @php
                     $filters = ['Semua', 'Estetika', 'Spesialis', 'Teknologi', 'Gigi Anak', 'Tips and Trick'];
@@ -54,7 +54,7 @@
         </div>
 
         {{-- Grid Artikel --}}
-        <div class="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 pb-24">
+        <div class="max-w-7xl mx-auto px-6 md:px-10 pb-24">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-[40px]">
                 
                 @forelse ($articles as $article)
@@ -89,7 +89,6 @@
                 </article>
                 @empty
                 <div class="col-span-full py-20 text-center flex flex-col items-center justify-center">
-                    <svg class="w-16 h-16 text-[#C58F59]/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <h3 class="text-2xl font-bold text-[#582C0C] mb-2">Artikel Tidak Ditemukan</h3>
                     <p class="text-[#6B513E]">Silakan coba kata kunci atau kategori lain.</p>
                 </div>
@@ -147,11 +146,31 @@
             @endif
 
         </div>
-        </div>
     </main>
 
     {{-- Footer --}}
     @include('user.components.footerWelcome')
 
+    {{-- Script untuk auto-reset pencarian --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[name="search"]');
+            let resetTimer;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    // Batalkan timer jika ada input yang terjadi
+                    clearTimeout(resetTimer);
+                    
+                    // Jika input telah dikosongkan secara sadar dan dibiarkan (debounce 800ms)
+                    if (this.value.trim() === '') {
+                        resetTimer = setTimeout(() => {
+                            window.location.href = "{{ route('artikel') }}";
+                        }, 800);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

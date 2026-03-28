@@ -15,11 +15,6 @@
             <h1 class="text-3xl font-bold text-gray-800 mb-4">User Dashboard</h1>
             <p class="text-gray-600 mb-8">Welcome, {{ Auth::user()->name }}! You are logged in as a User.</p>
 
-            <a href="{{ route('appointments.create') }}"
-                class="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 px-6 rounded-lg transition duration-300 inline-block">
-                + Daftar Kunjungan
-            </a>
-
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"

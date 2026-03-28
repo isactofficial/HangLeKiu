@@ -1,0 +1,115 @@
+﻿/* ==========================================================
+   Extracted from: resources\views\admin\components\office\keuangan.blade.php
+   ========================================================== */
+
+/* ── shared ── */
+    .keu-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .keu-tab {
+        padding: 8px 20px; border-radius: 6px;
+        font-size: 13px; font-weight: 600;
+        border: none; cursor: pointer; font-family: inherit;
+        text-decoration: none; display: inline-block;
+        transition: all .15s;
+    }
+    .keu-tab.active   { background: #C58F59; color: #fff; }
+    .keu-tab.inactive { background: #F3EDE6; color: #6B513E; }
+    .keu-tab.inactive:hover { background: #E5D6C5; color: #582C0C; }
+
+    /* date + filter row */
+    .keu-filter-row { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+    .keu-date-input {
+        border: none; border-bottom: 1.5px solid #E5D6C5;
+        padding: 4px 0; font-size: 13px; color: #582C0C; font-weight: 600;
+        outline: none; background: transparent; width: 110px; font-family: inherit;
+    }
+    .keu-date-input:focus { border-color: #C58F59; }
+    .keu-sep { color: #6B513E; }
+    .keu-btn-filter {
+        background: #E5D6C5; color: #582C0C;
+        border: none; padding: 7px 18px; border-radius: 5px;
+        font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+        transition: background .2s;
+    }
+    .keu-btn-filter:hover { background: #d4c3b0; }
+    .keu-btn-refresh {
+        width: 32px; height: 32px;
+        border: 1.5px solid #E5D6C5; border-radius: 5px;
+        background: #fff; color: #C58F59;
+        display: inline-flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all .2s;
+    }
+    .keu-btn-refresh:hover { border-color: #C58F59; }
+
+    /* section label */
+    .keu-section-label {
+        font-size: 13px; font-weight: 700; color: #582C0C;
+        padding-bottom: 8px; border-bottom: 1.5px solid #E5D6C5;
+        margin: 0 0 14px;
+    }
+
+    /* stat grid */
+    .keu-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 14px; }
+    .keu-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 14px; }
+    .keu-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 14px; }
+
+    .keu-stat {
+        background: #fff; border: 1px solid #E5D6C5; border-radius: 8px;
+        padding: 18px 20px; box-shadow: 0 1px 3px rgba(88,44,12,.05);
+        display: flex; flex-direction: column; gap: 6px;
+    }
+    .keu-stat-label { font-size: 13px; font-weight: 600; color: #582C0C; margin: 0; }
+    .keu-stat-amount { font-size: 18.75px; font-weight: 700; margin: 0; }
+    .keu-stat-amount.plus  { color: #10B981; }
+    .keu-stat-amount.minus { color: #EF4444; }
+    .keu-stat-sub { font-size: 13px; color: #6B513E; margin: 0; }
+
+    .keu-stat-arrow {
+        width: 32px; height: 32px; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        align-self: flex-end;
+    }
+    .keu-stat-arrow.green  { background: #ECFDF5; color: #10B981; }
+    .keu-stat-arrow.red    { background: #FEF2F2; color: #EF4444; }
+
+    /* show more card */
+    .keu-show-more {
+        background: #fff; border: 1px solid #E5D6C5; border-radius: 8px;
+        padding: 18px 20px; box-shadow: 0 1px 3px rgba(88,44,12,.05);
+        display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between;
+        cursor: pointer; transition: border-color .2s;
+    }
+    .keu-show-more:hover { border-color: #C58F59; }
+    .keu-show-more-label { font-size: 13px; font-weight: 600; color: #582C0C; }
+    .keu-show-more-arrow { font-size: 22px; color: #6B513E; margin-top: 8px; }
+
+    /* table */
+    .keu-card { background:#fff; border:1px solid #E5D6C5; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(88,44,12,.05); }
+    .keu-card-header { padding:14px 18px; border-bottom:1px solid #E5D6C5; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .keu-card-title { font-size:18.75px; font-weight:700; color:#C58F59; margin:0; }
+    .keu-search-box { display:flex; align-items:center; border:1px solid #E5D6C5; border-radius:5px; padding:7px 10px; gap:7px; background:#fff; }
+    .keu-search-box:focus-within { border-color:#C58F59; }
+    .keu-search-box input { border:none; outline:none; font-size:13px; color:#582C0C; background:transparent; width:200px; font-family:inherit; }
+    .keu-search-box input::placeholder { color:#b09a88; }
+    .keu-btn-export { background:#582C0C; color:#fff; border:none; padding:8px 14px; border-radius:5px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; white-space:nowrap; transition:background .2s; }
+    .keu-btn-export:hover { background:#401f08; }
+    .keu-table-wrapper { width:100%; overflow-x:auto; }
+    .keu-table-wrapper::-webkit-scrollbar { height:6px; }
+    .keu-table-wrapper::-webkit-scrollbar-thumb { background:#C58F59; border-radius:3px; }
+    .keu-table { width:100%; border-collapse:collapse; text-align:left; }
+    .keu-table th { background:#fdf8f4; color:#582C0C; font-size:13px; font-weight:600; padding:11px 16px; border-bottom:2px solid #E5D6C5; white-space:nowrap; }
+    .keu-table td { padding:11px 16px; font-size:13px; color:#374151; border-bottom:1px solid #F3EDE6; white-space:nowrap; }
+    .keu-table tr:last-child td { border-bottom:none; }
+    .keu-table tr:hover td { background:rgba(253,248,244,.7); }
+    .keu-badge { display:inline-block; padding:3px 9px; border-radius:20px; font-size:13px; font-weight:600; }
+    .keu-badge-ok      { background:#D1FAE5; color:#065F46; }
+    .keu-badge-warning { background:#FEF3C7; color:#92400E; }
+    .keu-badge-danger  { background:#FEE2E2; color:#991B1B; }
+    .keu-pagination { display:flex; justify-content:flex-end; align-items:center; padding:12px 18px; gap:20px; border-top:1px solid #E5D6C5; }
+    .keu-page-size { display:flex; align-items:center; gap:6px; color:#6B513E; }
+    .keu-page-size select { border:none; outline:none; font-weight:600; color:#582C0C; font-size:13px; cursor:pointer; background:transparent; font-family:inherit; }
+    .keu-page-info { color:#6B513E; }
+    .keu-page-controls { display:flex; gap:4px; }
+    .keu-page-btn { background:none; border:none; color:#9CA3AF; cursor:pointer; padding:4px 6px; border-radius:4px; line-height:0; }
+    .keu-page-btn:not([disabled]):hover { color:#582C0C; background:#fdf8f4; }
+    .keu-page-btn[disabled] { opacity:.4; cursor:default; pointer-events:none; }
+

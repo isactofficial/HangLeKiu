@@ -204,6 +204,7 @@ class RegistrationController extends Controller
             'data'        => $appointment->load(['patient', 'doctor']),
         ], 201);
     }
+<<<<<<< HEAD
 
     // ─────────────────────────────────────────────
     // GET /api/registration/appointments
@@ -317,4 +318,6 @@ class RegistrationController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+=======
+>>>>>>> origin/main
 }

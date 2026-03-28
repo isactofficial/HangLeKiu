@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\RegistrationController;
 
@@ -17,10 +19,13 @@ Route::get('/daftar',        [AppointmentController::class, 'create'])->name('ap
 Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
 
+// ADMIN AUTH
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
 Route::get('/admin/register', [AuthController::class, 'showAdminRegister'])->name('admin.register');
 Route::post('/admin/register',[AuthController::class, 'adminRegister'])->name('admin.register.post');
+Route::get('/doctor/login', [AuthController::class, 'showDoctorLogin'])->name('doctor.login');
+Route::post('/doctor/login', [AuthController::class, 'doctorLogin'])->name('doctor.login.post');
 
 // GUEST ONLY
 Route::middleware('guest')->group(function () {
@@ -32,12 +37,15 @@ Route::middleware('guest')->group(function () {
 
 // AUTH
 Route::middleware('auth')->group(function () {
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // ADMIN
-    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+    // ================= ADMIN =================
+    Route::middleware('role:ADM')->prefix('admin')->name('admin.')->group(function () {
+
         Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
         Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         Route::get('/registration', fn() => view('admin.pages.registration'))->name('registration');
 =======
@@ -47,6 +55,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
         Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
 >>>>>>> Stashed changes
+=======
+        Route::get('/registration', [AppointmentController::class, 'registrationIndex'])->name('registration');
+        Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
+        Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
+>>>>>>> origin/main
         Route::get('/emr',          fn() => view('admin.pages.emr'))->name('emr');
         Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
@@ -55,9 +68,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
         Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
 
-        // Update status appointment (dipanggil dari /admin/appointments/{id}/status)
+        // Tambahan Yusmia (PENDAFTARAN BACKEND)
+        Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])
+            ->name('appointments.create');
+        Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])
+            ->name('appointments.store');
         Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
              ->name('appointments.updateStatus');
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
            Route::get('/appointments/{appointment}/detail', [AppointmentController::class, 'detail'])
@@ -73,6 +91,8 @@ Route::middleware('auth')->group(function () {
             ->name('api.appointments');
         Route::get('/api/registration/appointments-emr', [RegistrationController::class, 'listAppointmentsEmr'])
             ->name('api.appointments.emr');
+=======
+>>>>>>> origin/main
 
         // Create akun dokter hanya dari menu settings admin.
         Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])
@@ -81,15 +101,19 @@ Route::middleware('auth')->group(function () {
         // Patient routes (admin)
         Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
         Route::post('/patients',        [PatientController::class, 'storeFromAdmin'])->name('patients.store');
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> origin/main
     });
 
-    // USER
-    Route::middleware('role:user')->prefix('user')->name('user.')->group(function () {
+    // ================= USER =================
+    Route::middleware('role:PAT')->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', fn() => view('user.pages.dashboard'))->name('dashboard');
     });
 
-    Route::post('/registration/store', function () {
-        return back()->withErrors(['(dummy) Belum disambungkan ke database.']);
-    })->name('registration.store');
+    // DOCTOR
+    Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
+        Route::get('/dashboard', fn() => view('doctor.pages.dashboard'))->name('dashboard');
+    });
 });

@@ -1,9 +1,9 @@
 <footer class="w-full bg-[#E5D6C5]">
     <div class="max-w-7xl mx-auto p-[32px]">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 text-center md:text-left">
 
             {{-- Column 1: Logo & Social Media --}}
-            <div>
+            <div class="flex flex-col items-center md:items-start">
                 <div class="mb-4">
                     <img src="{{ asset('images/logo-hds.png') }}" alt="Hanglekiu Dental Specialist"
                         class="h-25 object-contain">
@@ -11,7 +11,7 @@
                 <p class="text-[16px] font-medium text-[#582C0C] mb-6">Hanglekiu dental specialist</p>
 
                 {{-- Social Media Icons --}}
-                <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center md:justify-start gap-3">
                     <a href="#"
                         class="w-10 h-10 bg-[#582C0C] rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
                         <svg class="w-5 h-5 text-[#E5D6C5]" fill="currentColor" viewBox="0 0 24 24">
@@ -44,7 +44,7 @@
             </div>
 
             {{-- Column 2: Navigasi --}}
-            <div class="text-center">
+            <div class="text-center md:text-left">
                 <h3 class="text-[24px] font-bold text-[#582C0C] mb-6">Navigasi</h3>
                 <ul class="space-y-3">
                     <li><a href="{{ url('/') }}"
@@ -56,7 +56,6 @@
                     <li><a href="{{ route('klinik') }}"
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Klinik</a>
                     </li>
-                    {{-- Menu Artikel Baru Ditambahkan di Footer --}}
                     <li><a href="{{ route('artikel') }}"
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Artikel</a>
                     </li>
@@ -67,12 +66,12 @@
             </div>
 
             {{-- Column 3: Contact Us --}}
-            <div>
+            <div class="flex flex-col items-center md:items-start">
                 <h3 class="text-[24px] font-bold text-[#582C0C] mb-6">Contact Us</h3>
 
                 {{-- Konsultasi Langsung Button --}}
                 <a href="https://wa.me/6281234567890" target="_blank" rel="noopener"
-                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#C58F59] text-white text-[16px] font-medium rounded-full hover:bg-[#582C0C]/90 transition-all duration-200 mb-6">
+                    class="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#26C240] text-white text-[16px] font-medium rounded-full hover:bg-[#582C0C]/90 transition-all duration-200 mb-6">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -81,7 +80,7 @@
                 </a>
 
                 {{-- Address --}}
-                <p class="text-[16px] font-normal text-[#582C0C] leading-relaxed">
+                <p class="text-[16px] font-normal text-[#582C0C] leading-relaxed max-w-[280px] md:max-w-none text-center md:text-left">
                     Jl. Hang Lekiu V No.8, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, 12120
                 </p>
             </div>
@@ -92,7 +91,7 @@
     {{-- Copyright Bar --}}
     <div class="w-full border-t border-[#582C0C]/20 bg-[#C58F59]">
         <div class="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-5">
-            <p class="text-center text-[16px] font-normal italic text-[#582C0C]">
+            <p class="text-center text-[9x] md:text-[16px] font-normal italic text-[#582C0C]">
                 Copyright &copy; 2026 Hanglekiu Dental Specialist. All Rights Reserved.
             </p>
         </div>

@@ -277,6 +277,7 @@
             align-items: center; justify-content: center;
         }
         .modal-overlay.open { display: flex; }
+<<<<<<< HEAD
         .modal-box {
             background: white;
             border-radius: 16px;
@@ -306,6 +307,12 @@
             flex: 1 1 auto;
             min-height: 0;
         }
+=======
+        .modal-box { background: white; border-radius: 16px; width: 340px; overflow: hidden; box-shadow: 0 8px 40px rgba(88, 44, 12, .2); }
+        .modal-head { background: var(--brown); color: white; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-head button { background: none; border: none; color: white; cursor: pointer; opacity: .8; }
+        .modal-body { padding: 16px; }
+>>>>>>> origin/main
         .modal-body p { color: #6B513E; margin: 0 0 12px; }
         .modal-btns { display: flex; flex-direction: column; gap: 7px; }
         .modal-btns button {
@@ -315,6 +322,7 @@
         }
         .modal-btns button:hover { opacity: .85; }
 
+<<<<<<< HEAD
         .visit-info-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -382,6 +390,8 @@
         .visit-btn-status { background: var(--gold); }
         .visit-btn:hover { opacity: .9; }
 
+=======
+>>>>>>> origin/main
         .rj-mobile-doc-nav { display: none; padding: 0 16px 16px; }
         .rj-doc-select {
             width: 100%; padding: 10px 14px; border-radius: 8px;
@@ -411,6 +421,7 @@
                 flex-direction: column;
             }
 
+<<<<<<< HEAD
             .visit-info-grid {
                 grid-template-columns: 1fr;
             }
@@ -419,6 +430,8 @@
                 flex-direction: column;
             }
 
+=======
+>>>>>>> origin/main
             .rj-sidebar {
                 width: 100%;
             }

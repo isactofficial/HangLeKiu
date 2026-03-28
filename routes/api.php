@@ -107,6 +107,7 @@ Route::prefix('registration')->middleware('auth:api')->group(function () {
     // GET /api/registration/search-patient?q=budi
     Route::get('/search-patient', [RegistrationController::class, 'searchPatient']);
 
+<<<<<<< HEAD
     // List appointments dengan filter
     // GET /api/registration/appointments?date=2026-03-26&poli_id=xxx&doctor_id=xxx
     Route::get('/appointments',   [RegistrationController::class, 'listAppointments']);
@@ -115,11 +116,14 @@ Route::prefix('registration')->middleware('auth:api')->group(function () {
     // GET /api/registration/appointments-emr?filter_waktu=hari_ini
     Route::get('/appointments-emr', [RegistrationController::class, 'listAppointmentsEmr']);
 
+=======
+>>>>>>> origin/main
     // Simpan pendaftaran baru
     // POST /api/registration
     Route::post('/',              [RegistrationController::class, 'store']);
 });
 
+<<<<<<< HEAD
 // ================= TEST ENDPOINT (NO AUTH) =================
 Route::prefix('test')->group(function () {
     Route::get('/appointments', function () {
@@ -153,6 +157,8 @@ Route::prefix('test')->group(function () {
     });
 });
 
+=======
+>>>>>>> origin/main
 // ================= APPOINTMENTS (ADMIN) =================
 Route::prefix('admin')->middleware('auth:api')->group(function () {
     Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus']);
@@ -172,13 +178,20 @@ Route::prefix('medicine')->group(function () {
 });
 
 // ================= ADMIN REGISTRATION =================
+<<<<<<< HEAD
 Route::prefix('admin/registration')->middleware('auth')->group(function () {
+=======
+Route::prefix('admin/registration')->middleware('auth:api')->group(function () {
+>>>>>>> origin/main
     Route::get('/master-data',    [RegistrationController::class, 'masterData']);
     Route::get('/doctors',        [RegistrationController::class, 'doctors']);
     Route::get('/slots',          [RegistrationController::class, 'availableSlots']);
     Route::get('/search-patient', [RegistrationController::class, 'searchPatient']);
+<<<<<<< HEAD
     Route::get('/appointments',   [RegistrationController::class, 'listAppointments']);
     Route::get('/appointments-emr', [RegistrationController::class, 'listAppointmentsEmr']);
+=======
+>>>>>>> origin/main
     Route::post('/',              [RegistrationController::class, 'store']);
 });
 

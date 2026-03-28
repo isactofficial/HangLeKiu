@@ -1,54 +1,11 @@
 @push('styles')
-    @vite('resources/css/pharmacy/obat.css')
+    <link rel="stylesheet" href="{{ asset('css/admin/components/pharmacy/obat.css') }}">
+    <!-- Pastikan Tailwind CSS terload untuk utilitas class modal -->
+    <script src="https://cdn.tailwindcss.com"></script>
 @endpush
 
-<style>
-    .apt-card { background: #fff; border-radius: 8px; border: 1px solid #E5D6C5; box-shadow: 0 1px 3px rgba(88,44,12,.06); }
-    .apt-card-header { padding: 18px 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px; border-bottom: 1px solid #E5D6C5; }
-    .apt-card-title    { font-size: 18.75px; font-weight: 700; color: #C58F59; margin: 0 0 2px; line-height: 1; }
-    .apt-card-subtitle { font-size: 13px; color: #6B513E; margin: 0; }
-    .apt-card-actions  { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .apt-search-box { display: flex; align-items: center; border: 1px solid #E5D6C5; border-radius: 5px; padding: 7px 10px; gap: 7px; background: #fff; }
-    .apt-search-box:focus-within { border-color: #C58F59; }
-    .apt-search-box input { border: none; outline: none; font-size: 13px; color: #582C0C; background: transparent; width: 240px; }
-    .apt-search-box input::placeholder { color: #b09a88; }
-    .apt-btn-primary   { background: #C58F59; color: #fff; border: none; padding: 8px 14px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-    .apt-btn-primary:hover { background: #b07d4a; }
-    .apt-btn-secondary { background: #582C0C; color: #fff; border: none; padding: 8px 14px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-    .apt-btn-secondary:hover { background: #401f08; }
-    .apt-btn-outline   { background: #fff; color: #582C0C; border: 1px solid #E5D6C5; padding: 5px 10px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all .2s; }
-    .apt-btn-outline:hover { border-color: #C58F59; color: #C58F59; }
-    .apt-dropdown { position: relative; }
-    .apt-dropdown-menu { display: none; position: absolute; top: calc(100% + 4px); right: 0; background: #fdf8f4; border: 1px solid #E5D6C5; border-radius: 8px; min-width: 200px; box-shadow: 0 6px 18px rgba(88,44,12,.10); z-index: 50; overflow: hidden; }
-    .apt-dropdown-menu.open { display: block; }
-    .apt-dropdown-item { padding: 11px 16px; font-size: 13px; color: #582C0C; cursor: pointer; border-bottom: 1px solid #E5D6C5; transition: background .15s; }
-    .apt-dropdown-item:last-child { border-bottom: none; }
-    .apt-dropdown-item:hover { background: #f0e8df; }
-    .apt-dropdown-item.active { font-weight: 700; }
-    .apt-table-wrapper { width: 100%; overflow-x: auto; }
-    .apt-table-wrapper::-webkit-scrollbar { height: 6px; }
-    .apt-table-wrapper::-webkit-scrollbar-thumb { background: #C58F59; border-radius: 3px; }
-    .apt-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .apt-table th { background: #fdf8f4; color: #582C0C; font-size: 13px; font-weight: 600; padding: 11px 16px; border-top: 1px solid #E5D6C5; border-bottom: 2px solid #E5D6C5; white-space: nowrap; }
-    .apt-table td { padding: 11px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #F3EDE6; white-space: nowrap; }
-    .apt-table tr:last-child td { border-bottom: none; }
-    .apt-table tr:hover td { background: rgba(253,248,244,.7); }
-    .apt-info-icon { color: #9CA3AF; margin-left: 3px; cursor: help; vertical-align: middle; }
-    .apt-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 13px; font-weight: 600; }
-    .apt-badge-danger { background: #FEE2E2; color: #991B1B; }
-    .apt-pagination { display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px; gap: 20px; border-top: 1px solid #E5D6C5; }
-    .apt-page-size { display: flex; align-items: center; gap: 6px; color: #6B513E; }
-    .apt-page-size select { border: none; outline: none; font-weight: 600; color: #582C0C; font-size: 13px; cursor: pointer; background: transparent; }
-    .apt-page-info { color: #6B513E; }
-    .apt-page-controls { display: flex; gap: 8px; align-items: center; }
-    .apt-page-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 4px 6px; border-radius: 4px; line-height: 0; }
-    .apt-page-btn:hover { color: #582C0C; background: #fdf8f4; }
-    .apt-page-btn[disabled] { opacity: .4; cursor: default; pointer-events: none; }
-
-</style>
-
-<div class="apt-card">
-
+<div class="apt-card" style="margin-top:16px;">
+    <!-- Header Tabel -->
     <div class="apt-card-header">
         <div>
             <h2 class="apt-card-title">Data Stok Obat</h2>
@@ -59,10 +16,13 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cari kode, nama obat atau kategori">
             </div>
-            <button class="apt-btn-primary">
+            
+            <!-- Tombol Trigger Modal -->
+            <button class="apt-btn-primary" id="btnTambahObat">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
                 Tambah Data Obat
             </button>
+
             <div class="apt-dropdown">
                 <button class="apt-btn-secondary" data-dropdown-trigger>
                     Export Excel
@@ -78,6 +38,7 @@
         </div>
     </div>
 
+    <!-- Tabel Data -->
     <div class="apt-table-wrapper">
         <table class="apt-table" style="min-width:1100px;">
             <thead>
@@ -97,6 +58,7 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Contoh Data Row -->
                 <tr>
                     <td>OBT-001</td>
                     <td>Amoxicillin 500mg</td>
@@ -109,68 +71,19 @@
                     <td>Rp 3.200</td>
                     <td>Rp 6.000</td>
                     <td>56%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
+                    <td>
+                        <div style="display:flex;gap:6px;">
+                            <button class="apt-btn-outline">Edit</button>
+                            <button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button>
+                        </div>
+                    </td>
                 </tr>
-                <tr>
-                    <td>OBT-002</td>
-                    <td>Paracetamol 500mg</td>
-                    <td>Kalbe Farma</td>
-                    <td>Tablet</td>
-                    <td>Analgesik</td>
-                    <td><span class="apt-badge apt-badge-danger">4</span></td>
-                    <td>Rp 2.000</td>
-                    <td>Rp 1.100</td>
-                    <td>Rp 1.100</td>
-                    <td>Rp 2.500</td>
-                    <td>82%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
-                <tr>
-                    <td>OBT-003</td>
-                    <td>Ibuprofen 400mg</td>
-                    <td>Dexa Medica</td>
-                    <td>Tablet</td>
-                    <td>Analgesik</td>
-                    <td>180</td>
-                    <td>Rp 4.500</td>
-                    <td>Rp 2.800</td>
-                    <td>Rp 2.800</td>
-                    <td>Rp 5.000</td>
-                    <td>61%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
-                <tr>
-                    <td>OBT-004</td>
-                    <td>Chlorhexidine 0.2%</td>
-                    <td>Guardian Pharma</td>
-                    <td>Cairan</td>
-                    <td>Antiseptik</td>
-                    <td>60</td>
-                    <td>Rp 18.000</td>
-                    <td>Rp 11.000</td>
-                    <td>Rp 11.000</td>
-                    <td>Rp 20.000</td>
-                    <td>64%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
-                <tr>
-                    <td>OBT-005</td>
-                    <td>Lidocaine 2%</td>
-                    <td>Kimia Farma</td>
-                    <td>Injeksi</td>
-                    <td>Anestesi</td>
-                    <td>95</td>
-                    <td>Rp 25.000</td>
-                    <td>Rp 15.000</td>
-                    <td>Rp 15.000</td>
-                    <td>Rp 28.000</td>
-                    <td>67%</td>
-                    <td><div style="display:flex;gap:6px;"><button class="apt-btn-outline">Edit</button><button class="apt-btn-outline" style="color:#EF4444;border-color:#FEE2E2;">Hapus</button></div></td>
-                </tr>
+                <!-- Tambahkan row lainnya di sini -->
             </tbody>
         </table>
     </div>
 
+    <!-- Pagination -->
     <div class="apt-pagination">
         <div class="apt-page-size">Jumlah baris per halaman: <select><option>10</option><option>25</option><option>50</option></select></div>
         <div class="apt-page-controls">
@@ -179,5 +92,127 @@
             <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
         </div>
     </div>
-
 </div>
+
+<!-- ====MODAL POP-UP (TAMBAH DATA OBAT) === -->
+
+<div id="modalTambahObat" class="modal-overlay">
+    <div class="modal-container">
+        
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <h3 class="modal-title">Tambah Data Obat Baru</h3>
+            <button id="btnCloseX" class="modal-close-btn" type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Modal Form Body -->
+        <form class="modal-form" id="formTambahObat">
+            <div class="form-grid">
+                
+                <div class="form-group">
+                    <label class="form-label">Kode Obat</label>
+                    <input type="text" name="kode" placeholder="Contoh: OBT-006" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nama Obat</label>
+                    <input type="text" name="nama" placeholder="Nama Lengkap & Dosis" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Farmasi</label>
+                    <input type="text" name="farmasi" placeholder="Nama Produsen" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Jenis</label>
+                    <select name="jenis" class="form-select">
+                        <option value="Tablet">Tablet</option>
+                        <option value="Kapsul">Kapsul</option>
+                        <option value="Cairan">Cairan</option>
+                        <option value="Injeksi">Injeksi</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kategori</label>
+                    <select name="kategori" class="form-select">
+                        <option value="Antibiotik">Antibiotik</option>
+                        <option value="Analgesik">Analgesik</option>
+                        <option value="Antiseptik">Antiseptik</option>
+                        <option value="Anestesi">Anestesi</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Stok Awal</label>
+                    <input type="number" name="stok" value="0" min="0" class="form-input">
+                </div>
+
+                <div class="form-divider">
+                    <span class="form-divider-text">Informasi Harga (Rp)</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Harga Beli</label>
+                    <input type="number" name="harga_beli" placeholder="Rp 0" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Harga Umum</label>
+                    <input type="number" name="harga_umum" placeholder="Rp 0" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Harga OTC</label>
+                    <input type="number" name="harga_otc" placeholder="Rp 0" class="form-input">
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="modal-footer">
+                <button type="button" id="btnBatal" class="modal-btn modal-btn-cancel">Batal</button>
+                <button type="submit" class="modal-btn modal-btn-submit">Simpan Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript Logic -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('modalTambahObat');
+        const btnTambah = document.getElementById('btnTambahObat');
+        const btnBatal = document.getElementById('btnBatal');
+        const btnCloseX = document.getElementById('btnCloseX');
+        const form = document.getElementById('formTambahObat');
+
+        // Fungsi Membuka Modal
+        const openModal = () => {
+            modal.classList.add('open');
+        };
+
+        // Fungsi Menutup Modal
+        const closeModal = () => {
+            modal.classList.remove('open');
+            form.reset();
+        };
+
+        // Event Listeners
+        btnTambah.addEventListener('click', openModal);
+        btnBatal.addEventListener('click', closeModal);
+        btnCloseX.addEventListener('click', closeModal);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // Handle Submit Form
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            closeModal();
+        });
+    });
+</script>

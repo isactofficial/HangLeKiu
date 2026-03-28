@@ -4,28 +4,75 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Doctor extends Model
 {
-    protected $fillable = ['name', 'specialization', 'is_active'];
+    use SoftDeletes;
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $table = 'doctor';
+
+    // 🔥 WAJIB kalau pakai ID string (D001, dll)
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'id',
+        'full_name',
+        'specialization',
+        'subspecialization',
+        'is_active',
+        'user_id',
+        'email',
+        'foto_profil',
+        'ttd',
+        'estimasi_konsultasi',
+        'phone_number',
+        'title_prefix',
+        'license_no',
+        'str_institution',
+        'str_number',
+        'str_expiry_date',
+        'sip_institution',
+        'sip_number',
+        'sip_expiry_date',
+        'job_title'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'estimasi_konsultasi' => 'integer',
+        'str_expiry_date' => 'date',
+        'sip_expiry_date' => 'date',
+        'deleted_at' => 'datetime',
+    ];
+
+    // ================= RELATION =================
 
     public function appointments(): HasMany
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasMany(Appointment::class, 'doctor_id');
     }
 
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(DoctorSchedule::class, 'doctor_id');
+    }
+
+    // ================= ACCESSOR =================
+
     /**
-     * Nama lengkap dengan gelar & spesialisasi
      * Contoh: "drg. Jane Doe Sp.Ortho"
      */
     public function getFullTitleAttribute(): string
     {
         return $this->specialization
-            ? "{$this->name} {$this->specialization}"
-            : $this->name;
+            ? "{$this->full_name} {$this->specialization}"
+            : $this->full_name;
     }
+
+    // ================= SCOPE =================
 
     public function scopeActive($query)
     {

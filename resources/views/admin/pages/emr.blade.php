@@ -1,13 +1,17 @@
-@extends('admin.layout.admin')
+﻿@extends('admin.layout.admin')
 @section('title', 'Electronic Medical Record')
 
 @section('navbar')
     @include('admin.components.navbarSearch', ['title' => 'Electronic Medical Record'])
 @endsection
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/emr.css') }}">
+@endpush
+
 @section('content')
     <div class="emr-container">
-        
+
         <div class="emr-header">
             <div class="emr-title-area">
                 <h1 class="emr-title">Electronic Medical Record</h1>
@@ -34,7 +38,7 @@
 
         <div class="emr-layout">
             <div class="emr-sidebar">
-                
+
                 <div class="emr-filter-box" id="customFilterDropdown">
                     <div class="emr-select-trigger">
                         <span class="emr-select-text">Hari Ini</span>
@@ -99,272 +103,41 @@
             </div>
         </div>
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 
 >>>>>>> Stashed changes
+=======
+        <div class="emr-fab-container" id="fabContainer">
+        <!-- Menu Popup -->
+        <div class="emr-fab-menu" id="fabMenu">
+            <div class="emr-fab-search-box">
+                <input type="text" id="fabSearchInput" placeholder="Cari fitur" class="emr-fab-search-input">
+            </div>
+            <ul class="emr-fab-list" id="fabList">
+                <li><a href="#" class="emr-fab-item" onclick="toggleProsedureModal(true)">Tambah Prosedur</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Organ</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Dokter</a></li>
+                <li><a href="#" class="emr-fab-item" onclick="toggleOdontogramModal(true)">Tambah Odontogram</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Asuhan Keperawatan</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Obgyn</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Obstetri</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan KB</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Rekam Medis Tubuh</a></li>
+                <li><a href="#" class="emr-fab-item">Tambah Catatan Awal Kehamilan</a></li>
+            </ul>
+        </div>
+        <!-- Tombol Utama Biru -->
+        <button class="emr-fab-btn" id="fabBtn">📄</button>
+</div>
+<!-- END: Floating Action Button -->
+
+>>>>>>> origin/main
     </div>
 
-    <style>
-        .emr-container {
-            padding: 0 0px 24px 0px;
-            position: relative;
-            min-height: calc(100vh - 100px);
-            font-family: 'Instrument Sans', sans-serif;
-        }
 
-        .emr-container * {
-            font-size: 13px;
-        }
-
-        /* ===== HEADER AREA ===== */
-        .emr-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .emr-title {
-            font-size: 30px !important;
-            font-weight: 700;
-            color: #582C0C;
-            margin: 0;
-            line-height: 1.1;
-        }
-
-        .emr-subtitle {
-            font-size: 18.75px;
-            color: #C58F59;
-        }
-
-        .emr-status-legend {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .emr-status-item {
-            color: #6B513E;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-        }
-
-        .emr-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        /* ===== TOMBOL AKSI KANAN ATAS ===== */
-        .emr-header-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .emr-icon-btn {
-            background: white;
-            border: 1.5px solid #E5D6C5;
-            color: #C58F59;
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .emr-action-icon {
-            width: 18px;
-            height: 18px;
-        }
-
-        .emr-icon-btn:hover {
-            background: rgba(197, 143, 89, 0.05);
-            border-color: #C58F59;
-        }
-
-        /* ===== LAYOUT & SIDEBAR ===== */
-        .emr-layout {
-            display: flex;
-            gap: 24px;
-        }
-
-        .emr-sidebar {
-            width: 250px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* ===== CUSTOM DROPDOWN CSS ===== */
-        .emr-filter-box {
-            position: relative;
-            width: 100%;
-        }
-
-        .emr-select-trigger {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 12px 16px;
-            background-color: white;
-            border: 1px solid #E5D6C5;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .emr-select-trigger:hover {
-            border-color: #C58F59;
-        }
-
-        .emr-option.is-selected {
-            background-color: rgba(197, 143, 89, 0.15);
-            color: #582C0C;
-            font-weight: 700;
-        }
-
-        .emr-filter-box.open .emr-select-trigger {
-            border-color: #C58F59;
-            box-shadow: 0 0 0 3px rgba(197, 143, 89, 0.15); 
-        }
-
-        .emr-select-text {
-            font-weight: 600;
-            color: #582C0C;
-        }
-
-        .emr-select-icon {
-            width: 16px;
-            height: 16px;
-            transition: transform 0.3s ease;
-        }
-
-        .emr-filter-box.open .emr-select-icon {
-            transform: rotate(180deg);
-        }
-
-        .emr-options {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #E5D6C5;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(88, 44, 12, 0.08);
-            padding: 6px;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-        }
-
-        .emr-filter-box.open .emr-options {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .emr-option {
-            padding: 10px 14px;
-            font-weight: 500;
-            color: #6B513E;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 2px;
-        }
-
-        .emr-option:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Warna Cream pas dihover */
-        .emr-option:hover {
-            background-color: #FDF8F4; 
-            color: #582C0C;
-            font-weight: 600;
-        }
-
-        /* ===== ALERT ANTREAN ===== */
-        .emr-queue-alert {
-            background: white;
-            border: 1px solid #E5D6C5;
-            border-left: 4px solid #EF4444;
-            color: #EF4444;
-            padding: 14px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            box-shadow: 0 1px 3px rgba(88, 44, 12, 0.04);
-        }
-
-        /* ===== MAIN AREA (EMPTY STATE) ===== */
-        .emr-main {
-            flex: 1;
-            background: #FCFAF8;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 400px;
-            border: 1px dashed #C58F59;
-        }
-
-        .emr-empty-state {
-            text-align: center;
-            max-width: 400px;
-            padding: 20px;
-        }
-
-        .emr-empty-img {
-            width: 500px;
-            height: auto;
-            margin: 0 auto 24px;
-        }
-
-        .emr-empty-title {
-            font-size: 18.75px; 
-            font-weight: 700;
-            color: #582C0C;
-            margin: 0 0 8px 0;
-            line-height: 1.2;
-        }
-
-        .emr-empty-desc {
-            color: #6B513E;
-            line-height: 1.5;
-            margin: 0;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .emr-layout {
-                flex-direction: column;
-            }
-
-            .emr-sidebar {
-                width: 100%;
-            }
-
-            .emr-status-legend {
-                flex-wrap: wrap;
-            }
-        }
-    </style>
-
-    {{-- SCRIPT CUSTOM DROPDOWN --}}
+{{-- SCRIPT CUSTOM DROPDOWN --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const dropdown = document.getElementById('customFilterDropdown');
@@ -381,12 +154,12 @@
             options.forEach(option => {
                 option.addEventListener('click', function() {
                     options.forEach(opt => opt.classList.remove('is-selected'));
-                    
+
                     this.classList.add('is-selected');
-                    
+
                     textDisplay.textContent = this.textContent;
                     hiddenInput.value = this.dataset.value;
-                    
+
                     dropdown.classList.remove('open');
                 });
             });
@@ -397,5 +170,64 @@
                 }
             });
         });
+
+        // --- SCRIPT FLOATING ACTION BUTTON ---
+const fabBtn = document.getElementById('fabBtn');
+const fabMenu = document.getElementById('fabMenu');
+const fabSearchInput = document.getElementById('fabSearchInput');
+const fabListItems = document.querySelectorAll('.emr-fab-item');
+
+// Toggle menu saat FAB diklik
+fabBtn.addEventListener('click', function(e) {
+    e.stopPropagation(); // Mencegah event merambat ke window
+    fabMenu.classList.toggle('active');
+
+    // Auto-focus ke input pencarian jika menu dibuka
+    if(fabMenu.classList.contains('active')) {
+        setTimeout(() => fabSearchInput.focus(), 100);
+    }
+});
+
+// Tutup menu jika klik di luar elemen FAB
+window.addEventListener('click', function(e) {
+    const fabContainer = document.getElementById('fabContainer');
+    if (!fabContainer.contains(e.target)) {
+        fabMenu.classList.remove('active');
+    }
+});
+
+// Fitur Pencarian Realtime
+fabSearchInput.addEventListener('input', function(e) {
+    const filterText = e.target.value.toLowerCase();
+
+    fabListItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        // Sembunyikan item yang tidak cocok dengan kata kunci
+        if (text.includes(filterText)) {
+            item.parentElement.style.display = 'block';
+        } else {
+            item.parentElement.style.display = 'none';
+        }
+    });
+});
+
+// Fungsi untuk membuka Modal Odontogram dari Menu FAB
+function openModalOdontogram(e) {
+    e.preventDefault(); // Mencegah scroll ke atas karena tag <a>
+    fabMenu.classList.remove('active'); // Tutup menu FAB
+
+    // Pastikan di file modal-odontogram.blade.php yang dibuat sebelumnya,
+    // div pembungkus overlay modalnya memiliki id="modalOdontogramOverlay" (atau sesuaikan)
+    const modal = document.getElementById('modalOdontogramOverlay');
+    if(modal) {
+        modal.classList.remove('hidden'); // Atau sesuaikan dengan class CSS Anda untuk menampilkan modal
+    } else {
+        console.error("Modal Odontogram tidak ditemukan.");
+    }
+}
     </script>
 @endsection
+
+
+@include('admin.components.emr.modal-odontogram')
+@include('admin.components.emr.modal-prosedure')
