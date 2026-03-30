@@ -5,24 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes; 
 
 class Appointment extends Model
 {
+    use SoftDeletes; 
+
     protected $table = 'registration';
 
+    // ⚠️ PERHATIAN BOSS: 
+    // HANYA aktifkan dua baris di bawah ini JIKA kolom 'id' bertipe Varchar/String/UUID.
+    // Jika 'id' bertipe angka Auto Increment (1, 2, 3...), HAPUS / BIARKAN di-comment!
     protected $keyType = 'string';
-
     public $incrementing = false;
 
-    public $timestamps = false;
+    // public $timestamps = false; // <-- INI SUDAH DIHAPUS BIAR created_at OTOMATIS JALAN!
 
+    // Sudah dibersihkan dari duplikat
     protected $fillable = [
-        'id',
+        'id', // Hapus ini dari fillable jika 'id' Auto Increment
         'patient_id',
         'doctor_id',
-        'payment_method_id',
-        'registration_date',
-        'appointment_datetime',
         'admin_id',
         'poli_id',
         'guarantor_type_id',
@@ -71,7 +74,7 @@ class Appointment extends Model
 
     public function admin(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'admin_id');
+        return $this->belongsTo(User::class, 'admin_id'); // Pastikan model User sudah di-import di atas jika tidak se-folder
     }
 
     public function poli(): BelongsTo
@@ -116,12 +119,12 @@ class Appointment extends Model
     public function getStatusBadgeClass(): string
     {
         return match($this->status) {
-            'pending' => 'badge-pending',
+            'pending'   => 'badge-pending',
             'confirmed' => 'badge-confirmed',
-            'waiting' => 'badge-waiting',
-            'engaged' => 'badge-engaged',
-            'succeed' => 'badge-succeed',
-            default => 'badge-default'
+            'waiting'   => 'badge-waiting',
+            'engaged'   => 'badge-engaged',
+            'succeed'   => 'badge-succeed',
+            default     => 'badge-default'
         };
     }
 

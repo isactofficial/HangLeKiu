@@ -16,11 +16,12 @@
         ],
         // 3. Registration
         [
-            'route' => 'admin.registration',
+            'route' => 'admin.registration.index', 
             'filled' => false,
             'icon' => '/images/register.svg',
             'is_image' => true,
         ],
+        
         // 4. EMR
         [
             'route' => 'admin.emr',

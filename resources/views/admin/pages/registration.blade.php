@@ -45,10 +45,32 @@
                 <div class="reg-filters">
                     <div class="reg-filter-row">
                         <div class="reg-input-group" style="flex: 1;">
-                            <label>Tanggal Kunjungan</label>
-                            <div class="reg-date-wrapper">
-                                <input type="date" class="reg-input" value="2026-02-25">
-                                <button class="reg-btn-icon-small"><i class="fas fa-plus"></i></button>
+                            {{-- Tambahkan for="filter_date" agar label hanya fokus ke input --}}
+                            <label for="filter_date">Tanggal Kunjungan</label>
+                            
+                            {{-- Gunakan display: flex agar kotak dan tombol sejajar rapi & tidak tumpang tindih --}}
+                            <div class="reg-date-wrapper" style="display: flex; align-items: center; gap: 10px;">
+                                
+                                <input type="date" id="filter_date" class="reg-input" value="{{ request('date') }}" onchange="applyFilter()" style="flex: 1; cursor: pointer;">
+
+                                {{-- Tambahkan event.stopPropagation() dan z-index --}}
+                                <button type="button" onclick="event.stopPropagation(); clearDateFilter();" title="Hapus Tanggal" 
+                                    style="
+                                        color: #C58F59; /* Coklat tua ikon HDS */
+                                        background-color: transparent;
+                                        border: 1px solid #C58F59;
+                                        border-radius: 4px;
+                                        width: 35px;
+                                        height: 35px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        cursor: pointer;
+                                        position: relative;
+                                        z-index: 10; /* Memastikan tombol berada di lapisan paling atas */
+                                    ">
+                                    <i class="fas fa-minus"></i>
+                                </button>
                             </div>
                         </div>
                         
@@ -56,15 +78,23 @@
                             <label>Poli *</label>
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
-                                    <span class="reg-select-text">Semua Poli</span>
+                                    @php
+                                        $selectedPoliName = 'Semua Poli';
+                                        if(request('filter_poli') && request('filter_poli') !== 'semua') {
+                                            $selectedPoli = $polis->firstWhere('id', request('filter_poli'));
+                                            if($selectedPoli) $selectedPoliName = $selectedPoli->name;
+                                        }
+                                    @endphp
+                                    <span class="reg-select-text">{{ $selectedPoliName }}</span>
                                     <svg class="reg-select-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C58F59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </div>
                                 <div class="reg-options">
-                                    <div class="reg-option is-selected" data-value="semua">Semua Poli</div>
-                                    <div class="reg-option" data-value="gigi">Poli Gigi</div>
-                                    <div class="reg-option" data-value="umum">Poli Umum</div>
+                                    <div class="reg-option {{ request('filter_poli', 'semua') === 'semua' ? 'is-selected' : '' }}" data-value="semua">Semua Poli</div>
+                                    @foreach($polis as $p)
+                                        <div class="reg-option {{ request('filter_poli') == $p->id ? 'is-selected' : '' }}" data-value="{{ $p->id }}">{{ $p->name }}</div>
+                                    @endforeach
                                 </div>
-                                <input type="hidden" name="filter_poli" value="semua">
+                                <input type="hidden" id="filter_poli" value="{{ request('filter_poli', 'semua') }}">
                             </div>
                         </div>
                     </div>
@@ -74,19 +104,23 @@
                             <label>Tenaga Medis *</label>
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
-                                    <span class="reg-select-text">Semua Tenaga Medis</span>
+                                    @php
+                                        $selectedDoctorName = 'Semua Tenaga Medis';
+                                        if(request('filter_dokter') && request('filter_dokter') !== 'semua') {
+                                            $selectedDoctor = $doctors->firstWhere('id', request('filter_dokter'));
+                                            if($selectedDoctor) $selectedDoctorName = $selectedDoctor->full_name;
+                                        }
+                                    @endphp
+                                    <span class="reg-select-text">{{ $selectedDoctorName }}</span>
                                     <svg class="reg-select-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C58F59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </div>
                                 <div class="reg-options">
-                                    <div class="reg-option is-selected" data-value="semua">Semua Tenaga Medis</div>
-                                    <div class="reg-option" data-value="dinda">drg. Dinda Tegar Jelita Sp.Ortho</div>
-                                    <div class="reg-option" data-value="ria">drg. Ria Budiati Sp. Ortho</div>
-                                    <div class="reg-option" data-value="wenny">DR. drg. Wenny Yulvie Sp.BM</div>
-                                    <div class="reg-option" data-value="aditya">drg. Aditya Putra</div>
-                                    <div class="reg-option" data-value="may">drg . MAY Lewerissa Sp.Perio</div>
-                                    <div class="reg-option" data-value="fanny">drg. Fanny Arditya M. Sp.Prost</div>
+                                    <div class="reg-option {{ request('filter_dokter', 'semua') === 'semua' ? 'is-selected' : '' }}" data-value="semua">Semua Tenaga Medis</div>
+                                    @foreach($doctors as $d)
+                                        <div class="reg-option {{ request('filter_dokter') == $d->id ? 'is-selected' : '' }}" data-value="{{ $d->id }}">{{ $d->full_name }}</div>
+                                    @endforeach
                                 </div>
-                                <input type="hidden" name="filter_dokter" value="semua">
+                                <input type="hidden" id="filter_dokter" value="{{ request('filter_dokter', 'semua') }}">
                             </div>
                         </div>
                         
@@ -94,23 +128,30 @@
                             <label>Metode Pembayaran *</label>
                             <div class="reg-custom-select">
                                 <div class="reg-select-trigger">
-                                    <span class="reg-select-text">Semua Metode Pembayaran</span>
+                                    @php
+                                        $selectedPaymentName = 'Semua Metode Pembayaran';
+                                        if(request('filter_bayar') && request('filter_bayar') !== 'semua') {
+                                            $selectedPayment = $paymentMethods->firstWhere('id', request('filter_bayar'));
+                                            if($selectedPayment) $selectedPaymentName = $selectedPayment->name;
+                                        }
+                                    @endphp
+                                    <span class="reg-select-text">{{ $selectedPaymentName }}</span>
                                     <svg class="reg-select-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C58F59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </div>
                                 <div class="reg-options">
-                                    <div class="reg-option is-selected" data-value="semua">Semua Metode Pembayaran</div>
-                                    <div class="reg-option" data-value="umum">Umum / Tunai</div>
-                                    <div class="reg-option" data-value="asuransi">Asuransi</div>
-                                    <div class="reg-option" data-value="bpjs">BPJS Kesehatan</div>
+                                    <div class="reg-option {{ request('filter_bayar', 'semua') === 'semua' ? 'is-selected' : '' }}" data-value="semua">Semua Metode Pembayaran</div>
+                                    @foreach($paymentMethods as $pm)
+                                        <div class="reg-option {{ request('filter_bayar') == $pm->id ? 'is-selected' : '' }}" data-value="{{ $pm->id }}">{{ $pm->name }}</div>
+                                    @endforeach
                                 </div>
-                                <input type="hidden" name="filter_bayar" value="semua">
+                                <input type="hidden" id="filter_bayar" value="{{ request('filter_bayar', 'semua') }}">
                             </div>
                         </div>
                         
                         <div class="reg-input-group" style="flex: 1.5; justify-content: flex-end;">
                             <div class="reg-search-box">
-                                <input type="text" placeholder="Nama Pasien, Nomor MR">
-                                <i class="fas fa-search"></i>
+                                <input type="text" id="filter_search" placeholder="Nama Pasien, Nomor MR" value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') applyFilter()">
+                                <i class="fas fa-search" style="cursor: pointer;" onclick="applyFilter()"></i>
                             </div>
                         </div>
                     </div>
@@ -121,10 +162,11 @@
                     <table class="reg-table">
                         <thead>
                             <tr>
+                                <th>No</th>
                                 <th>Status</th>
                                 <th>Tanggal<br>Kunjungan</th>
                                 <th>Tanggal<br>Dibuat</th>
-                                <th>No</th>
+                                
                                 <th>Poli</th>
                                 <th>Nama Pasien</th>
                                 <th>Rencana<br>Tindakan</th>
@@ -135,51 +177,79 @@
                             </tr>
                         </thead>
                         <tbody>
+                        {{-- Looping data dari variabel $appointments --}}
+                        @forelse($appointments as $index => $app)
                             <tr>
-                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
-                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>13:00</td>
-                                <td data-label="Tanggal Dibuat">25/02/2026,<br>19:32</td>
-                                <td data-label="No">1</td>
-                                <td data-label="Poli">Gigi</td>
-                                <td data-label="Nama Pasien">Bpk Johndoe,<br>MR000096,<br>40 Tahun</td>
-                                <td data-label="Rencana Tindakan">-</td>
-                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
-                                <td data-label="Metode Bayar">Asuransi</td>
-                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
-                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
+                                 <td data-label="No">{{ $appointments->firstItem() + $index }}</td>
+                                <td data-label="Status">
+                                    <span class="reg-status {{ strtolower($app->status) }}">
+                                        {{ ucfirst($app->status) }}
+                                    </span>
+                                </td>
+                                
+                                <td data-label="Tanggal Kunjungan">
+                                    {{ \Carbon\Carbon::parse($app->appointment_datetime)->format('d/m/Y') }},<br>
+                                    {{ \Carbon\Carbon::parse($app->appointment_datetime)->format('H:i') }}
+                                </td>
+                                
+                                <td data-label="Tanggal Dibuat">
+                                    @if($app->created_at)
+                                        {{ \Carbon\Carbon::parse($app->created_at)->format('d/m/Y') }},<br>
+                                        {{ \Carbon\Carbon::parse($app->created_at)->format('H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                
+                               
+                                
+                                <td data-label="Poli">{{ $app->poli->name ?? '-' }}</td>
+                                
+                                <td data-label="Nama Pasien">
+                                    <strong>{{ $app->patient->full_name ?? 'Pasien Baru' }}</strong><br>
+                                    {{ $app->patient->medical_record_no ?? '-' }}
+                                </td>
+                                
+                                <td data-label="Rencana Tindakan">{{ $app->procedure_plan ?? '-' }}</td>
+                                
+                                <td data-label="Dokter Pemeriksa">{{ $app->doctor->full_name ?? '-' }}</td>
+                                
+                                <td data-label="Metode Bayar">{{ $app->paymentMethod->name ?? 'Umum' }}</td>
+                                
+                                <td data-label="Catatan Medis">{{ \Illuminate\Support\Str::limit($app->complaint ?? '-', 40) }}</td>
+                                
+                                <td data-label="Aksi">
+                                    <button class="reg-btn-outline" style="padding: 4px 8px;" onclick="openDetail('{{ $app->id }}')">Detail</button>
+                                </td>
                             </tr>
+                        @empty
                             <tr>
-                                <td data-label="Status"><span class="reg-status succeed">Succeed</span></td>
-                                <td data-label="Tanggal Kunjungan">25/02/2026,<br>14:00</td>
-                                <td data-label="Tanggal Dibuat">25/02/2026,<br>20:32</td>
-                                <td data-label="No">2</td>
-                                <td data-label="Poli">Gigi</td>
-                                <td data-label="Nama Pasien">Bpk Budi,<br>MR000099,<br>40 Tahun</td>
-                                <td data-label="Rencana Tindakan">-</td>
-                                <td data-label="Dokter Pemeriksa">drg. Hanglekiu</td>
-                                <td data-label="Metode Bayar">Asuransi</td>
-                                <td data-label="Catatan Medis">Pembersihan Karang Gigi</td>
-                                <td data-label="Aksi"><button class="reg-btn-outline" style="padding: 4px 8px;">Detail</button></td>
+                                <td colspan="11" style="text-align: center; padding: 30px; color: #666;">
+                                    <i class="fas fa-search" style="font-size: 24px; color: #ccc; margin-bottom: 10px; display: block;"></i>
+                                    Data pendaftaran tidak ditemukan.
+                                </td>
                             </tr>
-                        </tbody>
+                        @endforelse
+                    </tbody>
                     </table>
                 </div>
 
                 <div class="reg-pagination">
                     <div class="reg-page-size">
-                        <span>Jumlah baris perhalaman:</span>
-                        <select>
-                            <option>8</option>
-                            <option>15</option>
-                            <option>50</option>
-                        </select>
-                    </div>
-                    <div class="reg-page-info">
-                        1-2 Dari 2 Data
+                        <span>Menampilkan {{ $appointments->firstItem() ?? 0 }}-{{ $appointments->lastItem() ?? 0 }} dari {{ $appointments->total() }} Data</span>
                     </div>
                     <div class="reg-page-controls">
-                        <button class="reg-page-btn" disabled><i class="fas fa-chevron-left"></i></button>
-                        <button class="reg-page-btn" disabled><i class="fas fa-chevron-right"></i></button>
+                        @if ($appointments->onFirstPage())
+                            <button class="reg-page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                        @else
+                            <a href="{{ $appointments->previousPageUrl() }}" class="reg-page-btn"><i class="fas fa-chevron-left"></i></a>
+                        @endif
+
+                        @if ($appointments->hasMorePages())
+                            <a href="{{ $appointments->nextPageUrl() }}" class="reg-page-btn"><i class="fas fa-chevron-right"></i></a>
+                        @else
+                            <button class="reg-page-btn" disabled><i class="fas fa-chevron-right"></i></button>
+                        @endif
                     </div>
                 </div>
 
@@ -187,6 +257,7 @@
         </div>
     </div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const customSelects = document.querySelectorAll('.reg-custom-select');
@@ -211,7 +282,11 @@
                     options.forEach(opt => opt.classList.remove('is-selected'));
                     this.classList.add('is-selected');
                     textDisplay.textContent = this.textContent;
-                    if (hiddenInput) hiddenInput.value = this.dataset.value;
+                    
+                    if (hiddenInput) {
+                        hiddenInput.value = this.dataset.value;
+                        applyFilter(); // PENTING: Panggil filter setelah dipilih
+                    }
                     dropdown.classList.remove('open');
                 });
             });
@@ -222,24 +297,56 @@
             
             // Close modals when clicking overlay
             if (e.target.classList.contains('reg-modal-overlay')) {
-                closeRegModal(e.target.id);
+                if(typeof closeRegModal === "function") closeRegModal(e.target.id);
             }
         });
     });
 
     // Modal Functions
     function openRegModal(modalId) {
-        document.getElementById(modalId).classList.add('open');
-        document.body.style.overflow = 'hidden'; // prevent bg body scrolling
+        let modal = document.getElementById(modalId);
+        if(modal) {
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden'; 
+        }
     }
     
     function closeRegModal(modalId) {
-        document.getElementById(modalId).classList.remove('open');
-        document.body.style.overflow = '';
+        let modal = document.getElementById(modalId);
+        if(modal) {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // FUNGSI UNTUK REFRESH HALAMAN DENGAN FILTER
+    function applyFilter() {
+        const date = document.getElementById('filter_date') ? document.getElementById('filter_date').value : '';
+        const poli = document.getElementById('filter_poli') ? document.getElementById('filter_poli').value : 'semua';
+        const dokter = document.getElementById('filter_dokter') ? document.getElementById('filter_dokter').value : 'semua';
+        const bayar = document.getElementById('filter_bayar') ? document.getElementById('filter_bayar').value : 'semua';
+        const search = document.getElementById('filter_search') ? document.getElementById('filter_search').value : '';
+
+        let url = new URL(window.location.href);
+        
+        if(date) url.searchParams.set('date', date); else url.searchParams.delete('date');
+        if(poli !== 'semua') url.searchParams.set('filter_poli', poli); else url.searchParams.delete('filter_poli');
+        if(dokter !== 'semua') url.searchParams.set('filter_dokter', dokter); else url.searchParams.delete('filter_dokter');
+        if(bayar !== 'semua') url.searchParams.set('filter_bayar', bayar); else url.searchParams.delete('filter_bayar');
+        if(search) url.searchParams.set('search', search); else url.searchParams.delete('search');
+
+        window.location.href = url.toString();
+    }
+    // FUNGSI UNTUK MENGHAPUS KHUSUS FILTER TANGGAL
+    function clearDateFilter() {
+        const dateInput = document.getElementById('filter_date');
+        if (dateInput) {
+            dateInput.value = ''; // Kosongkan kotak tanggal
+            applyFilter();        // Refresh halaman dengan tanggal kosong
+        }
     }
 </script>
 
-<!-- Include Modals -->
 @include('admin.components.pasien-baru')
 @include('admin.components.pendaftaran-baru')
 

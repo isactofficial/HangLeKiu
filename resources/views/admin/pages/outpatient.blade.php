@@ -196,35 +196,32 @@
                                             </td>
                                         @endforeach
                                     @else
-                                        @foreach ($dateColumns as $dc)
-                                            @php
-                                                $apt = \App\Models\Appointment::with('patient')
-                                                    ->where('doctor_id', $selectedDoctorId)
-                                                    ->whereDate('appointment_datetime', $dc)
-                                                    ->whereTime('appointment_datetime', $slot)
-                                                    ->first();
-                                                $isColToday = $dc === $today;
-                                                $poliId = $selectedDoctor->poli_id ?? '';
-                                            @endphp
-                                            <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
-                                                @if ($apt)
-                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" 
-                                                        data-id="{{ $apt->id }}"
-                                                        data-patient="{{ $apt->patient_name }}"
-                                                        data-mr="{{ $apt->mr_number }}"
-                                                        data-treatment="{{ $apt->treatment_name }}"
-                                                        data-time="{{ $slot }}"
-                                                        data-doctor="{{ $selectedDoctor->full_name }}"
-                                                        data-status="{{ $apt->status }}"
-                                                        onclick="handleAptClick(this, event)">
-                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
-                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
-                                                        <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        @endforeach
-                                    @endif
+    {{-- Mode Per Dokter (Mingguan) --}}
+    @foreach ($dateColumns as $dc)
+        @php
+            // JANGAN PAKAI QUERY DATABASE LAGI DISINI BOSS!
+            // Ambil langsung dari $schedule yang sudah kita bulatkan di Controller
+            $apt = $schedule[$dc][$slot] ?? null; 
+            
+            $isColToday = $dc === $today;
+            $poliId = $selectedDoctor->poli_id ?? '';
+        @endphp
+        
+        <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
+            @if ($apt)
+                <div class="apt-card" style="border-left: 4px solid {{ $apt->status_color }}" 
+                    data-id="{{ $apt->id }}"
+                    data-patient="{{ $apt->patient_name }}"
+                    onclick="handleAptClick(this, event)">
+                    <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">
+                        {{ $apt->patient_name }}
+                    </div>
+                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                </div>
+            @endif
+        </td>
+    @endforeach
+@endif
                                 </tr>
                             @endforeach
                         </tbody>

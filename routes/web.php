@@ -5,28 +5,29 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\EmrController; // 1. Tambahkan Import ini
 use Illuminate\Support\Facades\Route;
 
-// PUBLIC
+// ================= PUBLIC =================
 Route::get('/', fn() => view('welcome'))->name('home');
 Route::get('/klinik', fn() => view('user.pages.klinik'))->name('klinik');
 Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
 Route::get('/artikel/{id}', [ArticleController::class, 'show'])->name('artikel.show');
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
-Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
-Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
+Route::get('/daftar',         [AppointmentController::class, 'create'])->name('appointments.create');
+Route::post('/daftar',        [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
 
-// ADMIN AUTH
+// ================= ADMIN & DOCTOR AUTH =================
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
 Route::get('/admin/register', [AuthController::class, 'showAdminRegister'])->name('admin.register');
 Route::post('/admin/register',[AuthController::class, 'adminRegister'])->name('admin.register.post');
-Route::get('/doctor/login', [AuthController::class, 'showDoctorLogin'])->name('doctor.login');
-Route::post('/doctor/login', [AuthController::class, 'doctorLogin'])->name('doctor.login.post');
+Route::get('/doctor/login',   [AuthController::class, 'showDoctorLogin'])->name('doctor.login');
+Route::post('/doctor/login',  [AuthController::class, 'doctorLogin'])->name('doctor.login.post');
 
-// GUEST ONLY
+// ================= GUEST ONLY =================
 Route::middleware('guest')->group(function () {
     Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login',   [AuthController::class, 'login']);
@@ -34,20 +35,26 @@ Route::middleware('guest')->group(function () {
     Route::post('/register',[AuthController::class, 'register']);
 });
 
-// AUTH
+// ================= AUTH REQUIRED =================
 Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // ================= ADMIN =================
+    // ================= ADMIN AREA =================
     Route::middleware('role:ADM')->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
         Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
-        Route::get('/registration', [AppointmentController::class, 'registrationIndex'])->name('registration');
+        Route::get('/registration', [AppointmentController::class, 'index'])->name('registration.index');
+        
+        // 2. Route EMR Sekarang Memanggil Controller (Bukan View Mentah)
+        Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
+        Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
+        
+        // Lain-lain
         Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
         Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
-        Route::get('/emr',          fn() => view('admin.pages.emr'))->name('emr');
+        
         Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
         Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
@@ -55,29 +62,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
         Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
 
-        // Tambahan Yusmia (PENDAFTARAN BACKEND)
-        Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])
-            ->name('appointments.create');
-        Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])
-            ->name('appointments.store');
-        Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])
-             ->name('appointments.updateStatus');
+        // Pendaftaran Backend (Admin)
+        Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
+        Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])->name('appointments.store');
+        Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
 
-        // Create akun dokter hanya dari menu settings admin.
-        Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])
-            ->name('settings.staff.doctor.store');
-
-        // Patient routes (admin)
+        // Manajemen Staff & Pasien
+        Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])->name('settings.staff.doctor.store');
         Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
-        Route::post('/patients',        [PatientController::class, 'storeFromAdmin'])->name('patients.store');
+        Route::post('/patients',         [PatientController::class, 'storeFromAdmin'])->name('patients.store');
     });
 
-    // ================= USER =================
+    // ================= USER AREA =================
     Route::middleware('role:PAT')->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', fn() => view('user.pages.dashboard'))->name('dashboard');
     });
 
-    // DOCTOR
+    // ================= DOCTOR AREA =================
     Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', fn() => view('doctor.pages.dashboard'))->name('dashboard');
     });

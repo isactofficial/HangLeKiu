@@ -31,10 +31,18 @@ class Patient extends Model
         'city',
         'id_card_number',
         'allergy_history',
+        
+        // --- TAMBAHAN BARU SESUAI FORM ---
+        'religion',
+        'education',
+        'occupation',
+        'marital_status',
+        'first_chat_date',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
+        'first_chat_date' => 'date', // Sekalian di-cast biar format tanggalnya aman
     ];
 
     public function user(): BelongsTo
