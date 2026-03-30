@@ -5,7 +5,9 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
-use App\Http\Controllers\EmrController; // 1. Tambahkan Import ini
+use App\Http\Controllers\EmrController;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\PenggunaanObatController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
@@ -15,8 +17,8 @@ Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
 Route::get('/artikel/{id}', [ArticleController::class, 'show'])->name('artikel.show');
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
-Route::get('/daftar',         [AppointmentController::class, 'create'])->name('appointments.create');
-Route::post('/daftar',        [AppointmentController::class, 'store'])->name('appointments.store');
+Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
+Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
 
 // ================= ADMIN & DOCTOR AUTH =================
@@ -47,7 +49,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
         Route::get('/registration', [AppointmentController::class, 'index'])->name('registration.index');
         
-        // 2. Route EMR Sekarang Memanggil Controller (Bukan View Mentah)
+        // Route EMR Memanggil Controller
         Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
         Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
         
@@ -71,6 +73,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])->name('settings.staff.doctor.store');
         Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
         Route::post('/patients',         [PatientController::class, 'storeFromAdmin'])->name('patients.store');
+        
+        // ================= PHARMACY AREA (Sub-group Admin) =================
+        Route::prefix('pharmacy')->name('pharmacy.')->group(function () {    
+            Route::get('/medicine', [MedicineController::class, 'index'])->name('medicine.index');
+            Route::post('/medicine', [MedicineController::class, 'store'])->name('medicine.store');   
+            Route::get('/medicine/{id}', [MedicineController::class, 'show'])->name('medicine.show');
+            Route::put('/medicine/{id}', [MedicineController::class, 'update'])->name('medicine.update');    
+            Route::delete('/medicine/{id}', [MedicineController::class, 'destroy'])->name('medicine.destroy');    
+            Route::post('/medicine/{id}/stock-in', [MedicineController::class, 'stockIn'])->name('medicine.stockIn');
+            
+            Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
+        });
     });
 
     // ================= USER AREA =================

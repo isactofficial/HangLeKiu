@@ -1,0 +1,7 @@
+@media print {
+    body * { visibility: hidden; }
+    #nota-cetak, #nota-cetak * { visibility: visible; }
+    #nota-cetak { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+    .no-print { display: none !important; }
+    @page { size: A5 landscape; margin: 0; }
+}

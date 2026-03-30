@@ -2,30 +2,35 @@
     <link rel="stylesheet" href="{{ asset('css/admin/components/pharmacy/penggunaan-obat.css') }}">
 @endpush
 
-
 <div class="apt-card">
     <div class="apt-card-header">
         <div>
             <h2 class="apt-card-title">Penggunaan Obat</h2>
-            <p class="apt-card-subtitle">Last Update: 05/03/2026 08:00</p>
+            <p class="apt-card-subtitle" id="subtitleUpdate">Memuat data...</p>
         </div>
         <div class="apt-card-actions">
             <div class="apt-date-input">
                 <label>Dari Tanggal</label>
-                <input type="date" value="2026-03-01">
+                <input type="date" id="inputDari" value="{{ now()->startOfMonth()->toDateString() }}">
             </div>
             <div class="apt-date-input">
                 <label>Sampai Tanggal</label>
-                <input type="date" value="2026-03-05">
+                <input type="date" id="inputSampai" value="{{ now()->toDateString() }}">
             </div>
             <div class="apt-search-box">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cari nama obat">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <input type="text" id="inputSearch" placeholder="Cari nama obat">
             </div>
-            <button class="apt-btn-primary">Filter</button>
-            <button class="apt-btn-secondary">Export</button>
-            <button class="apt-btn-outline" title="Cetak">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <button class="apt-btn-primary" id="btnFilter">Filter</button>
+            <button class="apt-btn-secondary" id="btnExport">Export</button>
+            <button class="apt-btn-outline" title="Cetak" onclick="window.print()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 6 2 18 2 18 9"/>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                    <rect x="6" y="14" width="12" height="8"/>
+                </svg>
             </button>
         </div>
     </div>
@@ -34,67 +39,162 @@
         <table class="apt-table" style="min-width:800px;">
             <thead>
                 <tr>
-                    <th>Nama Obat ↑</th>
+                    <th>Nama Obat</th>
                     <th>Penggunaan Obat Umum</th>
                     <th>Nominal Obat Umum</th>
-                    <th>Penggunaan Obat BPJS —</th>
+                    <th>Penggunaan Obat BPJS</th>
                     <th>Nominal Obat BPJS</th>
                     <th>Sisa Obat</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tabel-penggunaan-obat">
                 <tr>
-                    <td>Amoxicillin 500mg</td>
-                    <td>42</td>
-                    <td>Rp 210.000</td>
-                    <td>18</td>
-                    <td>Rp 90.000</td>
-                    <td>190</td>
-                </tr>
-                <tr>
-                    <td>Chlorhexidine 0.2%</td>
-                    <td>15</td>
-                    <td>Rp 270.000</td>
-                    <td>0</td>
-                    <td>Rp 0</td>
-                    <td>45</td>
-                </tr>
-                <tr>
-                    <td>Ibuprofen 400mg</td>
-                    <td>30</td>
-                    <td>Rp 135.000</td>
-                    <td>12</td>
-                    <td>Rp 54.000</td>
-                    <td>138</td>
-                </tr>
-                <tr>
-                    <td>Lidocaine 2%</td>
-                    <td>28</td>
-                    <td>Rp 700.000</td>
-                    <td>10</td>
-                    <td>Rp 250.000</td>
-                    <td>57</td>
-                </tr>
-                <tr>
-                    <td>Paracetamol 500mg</td>
-                    <td>60</td>
-                    <td>Rp 120.000</td>
-                    <td>20</td>
-                    <td>Rp 40.000</td>
-                    <td>120</td>
+                    <td colspan="6" style="text-align:center;padding:24px;color:#9CA3AF">Memuat data...</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <div class="apt-pagination">
-        <div class="apt-page-size">Jumlah baris per halaman: <select><option>5</option><option>10</option><option>25</option></select></div>
-        <div class="apt-page-info">1–5 dari 5 data</div>
+        <div class="apt-page-size">
+            Jumlah baris per halaman:
+            <select id="pageSizePO">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+            </select>
+        </div>
         <div class="apt-page-controls">
-            <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
-            <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
-            <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
-            <button class="apt-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg></button>
+            <button class="apt-page-btn" id="btnPrevPO" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <div class="apt-page-info" id="pageInfoPO">0 data</div>
+            <button class="apt-page-btn" id="btnNextPO" disabled>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    const CSRF      = document.querySelector('meta[name="csrf-token"]').content;
+    let currentPage = 1;
+    let pageSize    = 10;
+
+    // ─── LOAD DATA ───────────────────────────────────────────
+    async function loadPenggunaanObat(page = 1) {
+        const dari   = document.getElementById('inputDari').value;
+        const sampai = document.getElementById('inputSampai').value;
+        const search = document.getElementById('inputSearch').value.trim();
+
+        const params = new URLSearchParams({
+            dari, sampai, per_page: pageSize, page
+        });
+        if (search) params.append('search', search);
+
+        const tbody = document.getElementById('tabel-penggunaan-obat');
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#9CA3AF">Memuat data...</td></tr>`;
+
+        try {
+            const res  = await fetch(`/admin/pharmacy/penggunaan-obat?${params}`, {
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+            });
+            const json = await res.json();
+
+            if (!json.success) throw new Error(json.message ?? 'Gagal memuat data');
+
+            const paginatedData = json.data;
+            const rows          = paginatedData.data ?? [];
+            const total         = paginatedData.total ?? 0;
+            const from          = paginatedData.from  ?? 0;
+            const to            = paginatedData.to    ?? 0;
+            const lastPage      = paginatedData.last_page ?? 1;
+
+            renderTabel(rows);
+            renderPagination(from, to, total, page, lastPage, dari, sampai, search);
+
+            // Update subtitle
+            const subtitle = document.getElementById('subtitleUpdate');
+            if (subtitle) subtitle.textContent = `Data periode ${dari} s/d ${sampai}`;
+
+        } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#EF4444">
+                Gagal memuat data: ${err.message}</td></tr>`;
+        }
+    }
+
+    // ─── RENDER TABEL ────────────────────────────────────────
+    function renderTabel(data) {
+        const tbody = document.getElementById('tabel-penggunaan-obat');
+
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#9CA3AF">
+                Tidak ada data penggunaan obat pada periode ini.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = data.map(o => `
+            <tr>
+                <td>${o.medicine_name ?? '-'}</td>
+                <td>${o.qty_umum ?? 0}</td>
+                <td>${rp(o.nominal_umum)}</td>
+                <td>${o.qty_bpjs ?? 0}</td>
+                <td>${rp(o.nominal_bpjs)}</td>
+                <td>${o.current_stock ?? 0}</td>
+            </tr>
+        `).join('');
+    }
+
+    // ─── RENDER PAGINATION ───────────────────────────────────
+    function renderPagination(from, to, total, page, lastPage, dari, sampai, search) {
+        const info    = document.getElementById('pageInfoPO');
+        const btnPrev = document.getElementById('btnPrevPO');
+        const btnNext = document.getElementById('btnNextPO');
+
+        if (info) info.textContent = `${from}–${to} dari ${total} data`;
+
+        if (btnPrev) {
+            btnPrev.disabled = page <= 1;
+            btnPrev.onclick  = () => loadPenggunaanObat(page - 1);
+        }
+        if (btnNext) {
+            btnNext.disabled = page >= lastPage;
+            btnNext.onclick  = () => loadPenggunaanObat(page + 1);
+        }
+    }
+
+    // ─── HELPER RUPIAH ───────────────────────────────────────
+    function rp(angka) {
+        if (angka == null) return 'Rp 0';
+        return 'Rp ' + Number(angka).toLocaleString('id-ID');
+    }
+
+    // ─── INIT ────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        loadPenggunaanObat();
+
+        // Tombol filter
+        document.getElementById('btnFilter')?.addEventListener('click', () => {
+            loadPenggunaanObat(1);
+        });
+
+        // Search enter
+        document.getElementById('inputSearch')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadPenggunaanObat(1);
+        });
+
+        // Page size
+        document.getElementById('pageSizePO')?.addEventListener('change', (e) => {
+            pageSize = Number(e.target.value);
+            loadPenggunaanObat(1);
+        });
+    });
+})();
+</script>
+@endpush

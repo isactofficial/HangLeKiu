@@ -118,40 +118,48 @@
                 <div class="emr-patient-list" id="emrPatientList">
                     @php $statusColors = ['pending'=>'#EF4444','confirmed'=>'#F59E0B','waiting'=>'#8B5CF6','engaged'=>'#3B82F6','succeed'=>'#84CC16']; @endphp
 
+                    {{-- LIST HARI INI --}}
                     <div id="list-hari-ini" class="js-patient-list-section">
-                        @forelse($todayPatients as $apt)
-                            <a href="{{ route('admin.emr.show', $apt->id) }}" class="js-emr-patient-link">
-                                <div class="patient-card">
-                                    <div class="p-card-top">
-                                        <span class="p-name">{{ $apt->patient->full_name }}</span>
-                                        <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</span>
+                        @if(isset($todayPatients) && count($todayPatients) > 0)
+                            @foreach($todayPatients as $apt)
+                                <a href="{{ route('admin.emr.show', $apt->id) }}" class="js-emr-patient-link">
+                                    <div class="patient-card">
+                                        <div class="p-card-top">
+                                            <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
+                                            <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</span>
+                                        </div>
+                                        <div class="p-card-bottom">
+                                            <span class="p-mr">{{ $apt->patient->medical_record_no ?? '-' }}</span>
+                                            <span class="status-badge" style="background-color: {{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
+                                        </div>
                                     </div>
-                                    <div class="p-card-bottom">
-                                        <span class="p-mr">{{ $apt->patient->medical_record_no }}</span>
-                                        <span class="status-badge" style="background-color: {{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
-                                    </div>
-                                </div>
-                            </a>
-                        @empty
-                            <div class="emr-queue-alert">Tidak ada antrean hari ini</div>
-                        @endforelse
+                                </a>
+                            @endforeach
+                        @else
+                            <div class="emr-queue-alert" style="text-align:center; padding:20px; color:#888;">Tidak ada antrean hari ini</div>
+                        @endif
                     </div>
 
+                    {{-- LIST SEMUA --}}
                     <div id="list-semua" class="hidden js-patient-list-section">
-                        @foreach($allPatients as $apt)
-                            <a href="{{ route('admin.emr.show', $apt->id) }}" class="js-emr-patient-link">
-                                <div class="patient-card">
-                                    <div class="p-card-top">
-                                        <span class="p-name">{{ $apt->patient->full_name }}</span>
-                                        <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('d/m/y H:i') }}</span>
+                        @if(isset($allPatients) && count($allPatients) > 0)
+                            @foreach($allPatients as $apt)
+                                <a href="{{ route('admin.emr.show', $apt->id) }}" class="js-emr-patient-link">
+                                    <div class="patient-card">
+                                        <div class="p-card-top">
+                                            <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
+                                            <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('d/m/y H:i') }}</span>
+                                        </div>
+                                        <div class="p-card-bottom">
+                                            <span class="p-mr">{{ $apt->patient->medical_record_no ?? '-' }}</span>
+                                            <span class="status-badge" style="background-color: {{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
+                                        </div>
                                     </div>
-                                    <div class="p-card-bottom">
-                                        <span class="p-mr">{{ $apt->patient->medical_record_no }}</span>
-                                        <span class="status-badge" style="background-color: {{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
-                                    </div>
-                                </div>
-                            </a>
-                        @endforeach
+                                </a>
+                            @endforeach
+                        @else
+                             <div class="emr-queue-alert" style="text-align:center; padding:20px; color:#888;">Data pasien tidak ditemukan</div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -170,7 +178,7 @@
                     <span style="color:#C58F59; font-weight:600;">Memuat data...</span>
                 </div>
 
-                {{-- View Detail Dinamis --}}
+                {{-- View Detail Dinamis (Diisi via AJAX) --}}
                 <div id="emr-detail-view" class="hidden"></div>
             </div>
         </div>
@@ -178,59 +186,89 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ================= 1. FILTER & SEARCH SIDEBAR =================
             const dropdown = document.getElementById('customFilterDropdown');
             const listHariIni = document.getElementById('list-hari-ini');
             const listSemua = document.getElementById('list-semua');
+            const searchInput = document.getElementById('js-sidebar-search');
 
-            // --- 1. DROPDOWN FILTER ---
-            dropdown.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-            dropdown.querySelectorAll('.emr-option').forEach(opt => {
-                opt.addEventListener('click', function() {
-                    dropdown.querySelector('.emr-select-text').textContent = this.textContent;
-                    if(this.dataset.value === 'hari_ini') {
-                        listHariIni.classList.remove('hidden'); listSemua.classList.add('hidden');
-                    } else {
-                        listHariIni.classList.add('hidden'); listSemua.classList.remove('hidden');
-                    }
+            if(dropdown) {
+                dropdown.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+                dropdown.querySelectorAll('.emr-option').forEach(opt => {
+                    opt.addEventListener('click', function() {
+                        dropdown.querySelector('.emr-select-text').textContent = this.textContent;
+                        if(this.dataset.value === 'hari_ini') {
+                            listHariIni.classList.remove('hidden'); listSemua.classList.add('hidden');
+                        } else {
+                            listHariIni.classList.add('hidden'); listSemua.classList.remove('hidden');
+                        }
+                    });
                 });
-            });
+            }
 
-            // --- 2. SEARCH SIDEBAR ---
-            document.getElementById('js-sidebar-search').addEventListener('input', function(e) {
-                const term = e.target.value.toLowerCase();
-                const activeSection = listHariIni.classList.contains('hidden') ? listSemua : listHariIni;
-                activeSection.querySelectorAll('.js-emr-patient-link').forEach(link => {
-                    link.style.display = link.textContent.toLowerCase().includes(term) ? "block" : "none";
+            if(searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const term = e.target.value.toLowerCase();
+                    const activeSection = listHariIni.classList.contains('hidden') ? listSemua : listHariIni;
+                    activeSection.querySelectorAll('.js-emr-patient-link').forEach(link => {
+                        link.style.display = link.textContent.toLowerCase().includes(term) ? "block" : "none";
+                    });
                 });
-            });
+            }
 
-            // --- 3. AJAX LOADER ---
+            // ================= 2. AJAX LOADER (RIWAYAT MEDIS) =================
             const patientLinks = document.querySelectorAll('.js-emr-patient-link');
             patientLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
+                    
+                    // Tandai menu sidebar aktif
                     patientLinks.forEach(l => l.querySelector('.patient-card').classList.remove('active'));
                     this.querySelector('.patient-card').classList.add('active');
 
+                    // Ganti UI ke Loading
                     document.getElementById('emr-empty-view').classList.add('hidden');
                     document.getElementById('emr-detail-view').classList.add('hidden');
                     document.getElementById('emr-loading').classList.remove('hidden');
 
+                    // Ambil HTML dari controller via AJAX
                     fetch(this.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                         .then(res => res.text())
                         .then(html => {
                             document.getElementById('emr-loading').classList.add('hidden');
                             document.getElementById('emr-detail-view').classList.remove('hidden');
                             document.getElementById('emr-detail-view').innerHTML = html;
+                            
+                            // Eksekusi fungsi setup UI setelah HTML masuk
                             bindTabEvents();
+                            setupFABEvents(); // Pasang ulang event untuk FAB karena HTML baru
+                        })
+                        .catch(err => {
+                            alert('Gagal memuat data pasien.');
+                            console.error(err);
+                            document.getElementById('emr-loading').classList.add('hidden');
                         });
                 });
             });
 
-            window.addEventListener('click', () => dropdown.classList.remove('open'));
+            // Tutup semua dropdown jika klik di luar
+            window.addEventListener('click', function(e) {
+                if (dropdown && !dropdown.contains(e.target)) dropdown.classList.remove('open');
+                
+                const diagMenu = document.getElementById('diagnosa-menu');
+                if(diagMenu && !diagMenu.contains(e.target) && !e.target.closest('button[onclick="toggleDiagnosaMenu(event)"]')) {
+                    diagMenu.classList.add('hidden');
+                }
+
+                const fabContainer = document.getElementById('fabContainer');
+                const fabMenu = document.getElementById('fabMenu');
+                if (fabContainer && fabMenu && !fabContainer.contains(e.target)) {
+                    fabMenu.classList.remove('active');
+                }
+            });
         });
 
-        // --- FUNGSI GLOBAL ---
+        // ================= 3. FUNGSI GLOBAL (DIPANGGIL SETELAH AJAX) =================
         function bindTabEvents() {
             document.querySelectorAll('.tab-item').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -240,6 +278,7 @@
             });
         }
 
+        // Dropdown Tambah Diagnosa
         function toggleDiagnosaMenu(e) {
             e.preventDefault(); e.stopPropagation();
             const menu = document.getElementById('diagnosa-menu');
@@ -256,10 +295,49 @@
             });
         }
 
-        window.addEventListener('click', () => {
-            const diagMenu = document.getElementById('diagnosa-menu');
-            if(diagMenu) diagMenu.classList.add('hidden');
-        });
+        // Setup Floating Action Button (FAB)
+        function setupFABEvents() {
+            const fabBtn = document.getElementById('fabBtn');
+            const fabMenu = document.getElementById('fabMenu');
+            const fabSearchInput = document.getElementById('fabSearchInput');
+            const fabListItems = document.querySelectorAll('.emr-fab-item');
+
+            if(fabBtn && fabMenu) {
+                fabBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fabMenu.classList.toggle('active');
+                    if(fabMenu.classList.contains('active') && fabSearchInput) {
+                        setTimeout(() => fabSearchInput.focus(), 100);
+                    }
+                });
+            }
+
+            if(fabSearchInput) {
+                fabSearchInput.addEventListener('input', function(e) {
+                    const filterText = e.target.value.toLowerCase();
+                    fabListItems.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        if (item.parentElement) { // Pastikan parent ada
+                           item.parentElement.style.display = text.includes(filterText) ? 'block' : 'none';
+                        }
+                    });
+                });
+            }
+        }
+
+        // Buka Modal Odontogram via FAB
+        function openModalOdontogram(e) {
+            e.preventDefault();
+            const fabMenu = document.getElementById('fabMenu');
+            if(fabMenu) fabMenu.classList.remove('active');
+
+            const modal = document.getElementById('modalOdontogramOverlay');
+            if(modal) {
+                modal.classList.remove('hidden');
+            } else {
+                console.error("Modal Odontogram tidak ditemukan di halaman ini.");
+            }
+        }
     </script>
 @endsection
 
