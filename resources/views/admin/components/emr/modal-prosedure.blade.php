@@ -439,13 +439,32 @@
       const prosedurContainer = document.getElementById("prosedurContainer");
       const obatContainer = document.getElementById("obatContainer");
 
-      function toggleProsedureModal(show) {
-        if (show) {
-          modalMain.classList.remove("hidden");
-        } else {
-          modalMain.classList.add("hidden");
+      // Tambahkan parameter 'patientData' di sebelah 'show'
+    function toggleProsedureModal(show, patientData = null) {
+      if (show) {
+        // 1. Tembak data pasien ke dalam modal JIKA datanya dikirim dari partial
+        if (patientData) {
+            document.getElementById('prosedur-patient-name').innerText = patientData.name || '-';
+            document.getElementById('prosedur-patient-demographics').innerHTML = 
+                `${patientData.rm || '-'} &middot; ${patientData.gender || '-'} &middot; ${patientData.age || '-'}`;
+            document.getElementById('prosedur-patient-payment').innerText = patientData.payment || 'Tunai/Umum';
+            
+            // Input hidden ini SUPER PENTING biar pas disave masuk ke database yang benar!
+            document.getElementById('prosedur-patient-id').value = patientData.patient_id || '';
+            document.getElementById('prosedur-registration-id').value = patientData.registration_id || '';
         }
+
+        // 2. Set tanggal hari ini secara otomatis (biar nggak statis)
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('prosedur-date-display').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
+
+        // 3. Tampilkan modal
+        modalMain.classList.remove("hidden");
+      } else {
+        // Sembunyikan modal
+        modalMain.classList.add("hidden");
       }
+    }
 
       function toggleConfirmModal(show) {
         if (show) {

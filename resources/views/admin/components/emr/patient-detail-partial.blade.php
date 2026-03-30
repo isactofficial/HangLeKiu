@@ -186,21 +186,31 @@
                             <i class="fa fa-eye icon-action"></i>
                             
                             <div class="status-container">
+                              {{-- TOMBOL TETAP SESUAI LAYOUT--}}
                                 <button class="btn-status-toggle" 
                                         style="background-color: {{ $appointment->status_color ?? '#3B82F6' }}" 
                                         onclick="event.stopPropagation(); document.getElementById('status-menu-dynamic').classList.toggle('hidden')">
-                                    <span>{{ strtoupper($appointment->status) }}</span>
+                                    <span class="status-current-text">{{ strtoupper($appointment->status) }}</span>
                                     <i class="fa fa-chevron-down"></i>
                                 </button>
-                                
-                                {{-- Dropdown diratakan ke kanan (right: 0) agar tidak meluber keluar card --}}
+
+                                {{-- DROPDOWN MENU DENGAN LOGIKA UPDATE STATUS --}}
                                 <ul class="status-menu hidden" id="status-menu-dynamic" style="position:absolute; bottom:115%; left:0; background:white; border:1px solid #eee; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.1); list-style:none; padding:5px 0; min-width:150px; z-index:999;">
-                                    <li><a href="javascript:void(0)" onclick="processUpdateStatus('{{ route('admin.appointments.updateStatus', $appointment->id) }}', 'pending')" style="display:block; padding:10px 15px; font-size:12px; color:#444; text-decoration:none; font-weight:600;">PENDING</a></li>
-                                    <li><a href="javascript:void(0)" onclick="processUpdateStatus('{{ route('admin.appointments.updateStatus', $appointment->id) }}', 'confirmed')" style="display:block; padding:10px 15px; font-size:12px; color:#444; text-decoration:none; font-weight:600;">CONFIRMED</a></li>
-                                    <li><a href="javascript:void(0)" onclick="processUpdateStatus('{{ route('admin.appointments.updateStatus', $appointment->id) }}', 'waiting')" style="display:block; padding:10px 15px; font-size:12px; color:#444; text-decoration:none; font-weight:600;">WAITING</a></li>
-                                    <li><a href="javascript:void(0)" onclick="processUpdateStatus('{{ route('admin.appointments.updateStatus', $appointment->id) }}', 'engaged')" style="display:block; padding:10px 15px; font-size:12px; color:#444; text-decoration:none; font-weight:600;">ENGAGED</a></li>
-                                    <li><a href="javascript:void(0)" onclick="processUpdateStatus('{{ route('admin.appointments.updateStatus', $appointment->id) }}', 'succeed')" style="display:block; padding:10px 15px; font-size:12px; color:#444; text-decoration:none; font-weight:600;">SUCCEED</a></li>
+                                    @php 
+                                        $statuses = ['pending', 'confirmed', 'waiting', 'engaged', 'succeed'];
+                                    @endphp
+
+                                    @foreach($statuses as $st)
+                                    <li>
+                                        <a href="javascript:void(0)" 
+                                        onclick="processUpdateStatus('{{ route('admin.appointments.updateStatus', $appointment->id) }}', '{{ $st }}')" 
+                                        style="display:block; padding:10px 15px; font-size:12px; color:#444; text-decoration:none; font-weight:600; text-transform: uppercase;">
+                                        {{ $st }}
+                                        </a>
+                                    </li>
+                                    @endforeach
                                 </ul>
+                               
                             </div>
                         </div>
                     </div>
@@ -229,10 +239,28 @@
                 <div class="diagnosa-dropdown hidden" id="diagnosa-menu">
                     <input type="text" id="diagSearchInput" onkeyup="filterDiagnosaList()" placeholder="Cari fitur medis..." class="diag-search-input">
                     <ul class="diag-list" id="diagList">
-                        <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleProsedureModal(true)">Tambah Prosedur</a></li>
+                        <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleProsedureModal(true, {
+                                name: '{{ $appointment->patient->full_name ?? '-' }}',
+                                rm: '{{ $appointment->patient->medical_record_no ?? '-' }}',
+                                gender: '{{ ($appointment->patient->gender ?? '') == 'Male' ? 'Laki-laki' : 'Perempuan' }}',
+                                age: '{{ \Carbon\Carbon::parse($appointment->patient->date_of_birth)->age ?? 0 }} Tahun',
+                                payment: '{{ $appointment->guarantorType->name ?? 'Tunai' }}',
+                                patient_id: '{{ $appointment->patient_id ?? '' }}',
+                                registration_id: '{{ $appointment->id ?? '' }}'
+                            })">
+                                Tambah Prosedur
+                            </a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Catatan Organ</a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Catatan Dokter</a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleOdontogramModal(true)">Tambah Odontogram</a></li>
+                        <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleOdontogramModal(true, {
+                                    name: '{{ $appointment->patient->full_name ?? '-' }}',
+                                    rm: '{{ $appointment->patient->medical_record_no ?? '-' }}',
+                                    gender: '{{ ($appointment->patient->gender ?? '') == 'Male' ? 'Laki-laki' : 'Perempuan' }}',
+                                    age: '{{ \Carbon\Carbon::parse($appointment->patient->date_of_birth)->age ?? 0 }} Tahun',
+                                    payment: '{{ $appointment->guarantorType->name ?? 'Tunai' }}',
+                                    patient_id: '{{ $appointment->patient_id ?? '' }}',
+                                    registration_id: '{{ $appointment->id ?? '' }}'
+                                })">Tambah Odontogram</a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Asuhan Keperawatan</a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Obgyn</a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Catatan KB</a></li>

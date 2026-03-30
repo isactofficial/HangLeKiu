@@ -521,10 +521,29 @@
       // ==========================================
       // FUNGSI UNTUK BUKA/TUTUP MODAL UTAMA
       // ==========================================
-      function toggleOdontogramModal(show) {
+      // Tambahkan parameter patientData
+      function toggleOdontogramModal(show, patientData = null) {
         const modal = document.getElementById("modalOdontogramOverlay");
-        const toolbar = document.getElementById("toolbar"); // Tutup toolbar sekalian
+        const toolbar = document.getElementById("toolbar");
+
         if (show) {
+          // 1. Tembak data pasien ke dalam modal jika datanya dikirim
+          if (patientData) {
+              document.getElementById('odonto-patient-name').innerText = patientData.name || '-';
+              document.getElementById('odonto-patient-mr').innerText = patientData.rm || '-';
+              document.getElementById('odonto-patient-demographics').innerHTML = 
+                  `&middot; ${patientData.gender || '-'} &middot; ${patientData.age || '-'}`;
+              document.getElementById('odonto-patient-payment').innerText = patientData.payment || 'Umum';
+              
+              // Input hidden untuk proses simpan ke database
+              document.getElementById('odontogramPatientId').value = patientData.patient_id || '';
+              document.getElementById('odontogramVisitId').value = patientData.registration_id || '';
+          }
+
+          // 2. Set tanggal hari ini
+          const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          document.getElementById('odonto-date-display').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
+
           modal.classList.remove("hidden");
         } else {
           modal.classList.add("hidden");

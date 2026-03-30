@@ -207,4 +207,10 @@ class Appointment extends Model
     {
         return $query->whereNotIn('status', ['succeed']);
     }
+
+    public function medicalProcedures()
+    {
+    // Sesuaikan 'appointment_id' jika nama kolom foreign key di tabel prosedur berbeda
+        return $this->hasMany(MedicalProcedure::class, 'registration_id'); 
+    }
 }

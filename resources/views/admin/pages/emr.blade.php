@@ -338,6 +338,90 @@
                 console.error("Modal Odontogram tidak ditemukan di halaman ini.");
             }
         }
+async function processUpdateStatus(url, newStatus) {
+    // 1. Langsung sembunyikan menu dropdown setelah diklik
+    const dropdown = document.getElementById('status-menu-dynamic');
+    if (dropdown) dropdown.classList.add('hidden');
+
+    try {
+        const response = await fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+
+            
+            
+            // Atau jika boss ingin cara instant tanpa request server lagi:
+            const activeCardStatus = document.querySelector('.patient-card.active .status-badge');
+            if (activeCardStatus) {
+                activeCardStatus.innerText = newStatus.toUpperCase();
+                const colors = {'pending':'#EF4444','confirmed':'#F59E0B','waiting':'#8B5CF6','engaged':'#3B82F6','succeed':'#84CC16'};
+                activeCardStatus.style.backgroundColor = colors[newStatus];
+            }
+
+            // 2. Buat notifikasi (Toast) yang cantik
+            const toast = document.createElement('div');
+            
+            // Styling notifikasi (Hijau, melayang di atas)
+            toast.className = 'fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-8 py-4 rounded-xl shadow-2xl z-[99999] text-center animate-bounce';
+            
+            let message = `Status pasien berhasil diubah ke ${newStatus.toUpperCase()}`;
+            
+            // 3. LOGIKA NOTIF KE KASIR: Muncul jika status diubah ke 'succeed'
+            if (newStatus === 'succeed') {
+                message = `
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="font-bold">PASIEN SELESAI DIPERIKSA</span>
+                        <span class="text-xs bg-white text-green-700 px-3 py-1 rounded-full mt-2 font-black shadow-sm">
+                            <i class="fa fa-arrow-right mr-1"></i> SILAKAN LANJUT KE HALAMAN CASHIER
+                        </span>
+                    </div>
+                `;
+            }
+
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+
+            // 4. Update tampilan tombol secara realtime (Warna & Teks)
+            const currentLabel = document.querySelector('.status-current-text');
+            const btnToggle = document.querySelector('.btn-status-toggle');
+            
+            if (currentLabel) currentLabel.innerText = newStatus.toUpperCase();
+            
+            // Sinkronkan warna tombol sesuai status baru
+            const statusColors = {
+                'pending': '#EF4444', 'confirmed': '#F59E0B', 'waiting': '#8B5CF6', 
+                'engaged': '#3B82F6', 'succeed': '#84CC16'
+            };
+            if (btnToggle && statusColors[newStatus]) {
+                btnToggle.style.backgroundColor = statusColors[newStatus];
+            }
+
+            // 5. Hilangkan notifikasi otomatis setelah 3.5 detik
+            setTimeout(() => {
+                toast.style.transition = 'all 0.5s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, -20px)';
+                setTimeout(() => toast.remove(), 500);
+            }, 3500);
+
+        } else {
+            throw new Error(data.message || 'Gagal sinkronisasi dengan database');
+        }
+    } catch (error) {
+        console.error('Error updating status:', error);
+        alert('Gagal mengubah status pasien. Silakan coba lagi.');
+    }
+}
     </script>
 @endsection
 

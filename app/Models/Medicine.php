@@ -33,4 +33,8 @@ class Medicine extends Model
     {
         return $this->hasMany(StockMutation::class);
     }
+    public function items()
+    {
+        return $this->hasMany(ProcedureItem::class, 'procedure_id');
+    }
 }

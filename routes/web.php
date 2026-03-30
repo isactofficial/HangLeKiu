@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
         Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
 
+        Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
         // Pendaftaran Backend (Admin)
         Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
         Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])->name('appointments.store');

@@ -48,4 +48,6 @@ class ProcedureItem extends Model
     {
         return $this->belongsTo(Treatment::class, 'master_procedure_id');
     }
+    
+    
 }

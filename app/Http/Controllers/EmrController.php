@@ -54,4 +54,17 @@ class EmrController extends Controller
     return redirect()->route('admin.emr');
 }
 
+public function indexCashier()
+{
+    // Ambil semua janji temu yang statusnya 'succeed' (siap bayar) 
+    // atau yang sudah ada record di tabel medical_procedures (asumsi kita simpan pembayaran di sana)
+    // Coba panggil relasi satu per satu
+    $appointments = \App\Models\Appointment::with(['patient', 'doctor', 'medicalProcedures'])
+        ->whereIn('status', ['succeed', 'finished'])
+        ->orderBy('appointment_datetime', 'desc')
+        ->get();
+
+    return view('admin.pages.cashier', compact('appointments'));
+}
+
 }
