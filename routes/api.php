@@ -15,6 +15,8 @@ use App\Http\Controllers\ProcedureMedicineController;
 use App\Http\Controllers\MasterProcedureController;
 use App\Http\Controllers\MasterPoliController;
 use App\Http\Controllers\MasterGuarantorTypeController;
+use App\Http\Controllers\MasterVisitTypeController;
+use App\Http\Controllers\MasterCareTypeController;
 use App\Http\Controllers\OdontogramController;
 
 
@@ -184,6 +186,22 @@ Route::prefix('master-guarantor')->group(function () {
     Route::get('/{id}', [MasterGuarantorTypeController::class, 'show']);
     Route::put('/{id}', [MasterGuarantorTypeController::class, 'update']);
     Route::delete('/{id}', [MasterGuarantorTypeController::class, 'destroy']);
+});
+
+Route::prefix('master-visit-type')->group(function () {
+    Route::get('/', [MasterVisitTypeController::class, 'index']);
+    Route::post('/', [MasterVisitTypeController::class, 'store']);
+    Route::get('/{id}', [MasterVisitTypeController::class, 'show']);
+    Route::put('/{id}', [MasterVisitTypeController::class, 'update']);
+    Route::delete('/{id}', [MasterVisitTypeController::class, 'destroy']);
+});
+
+Route::prefix('master-care-type')->group(function () {
+    Route::get('/', [MasterCareTypeController::class, 'index']);
+    Route::post('/', [MasterCareTypeController::class, 'store']);
+    Route::get('/{id}', [MasterCareTypeController::class, 'show']);
+    Route::put('/{id}', [MasterCareTypeController::class, 'update']);
+    Route::delete('/{id}', [MasterCareTypeController::class, 'destroy']);
 });
 
 // ================= ODONTOGRAM =================
