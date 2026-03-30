@@ -177,8 +177,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 tooltip: { enabled: true }
             },
             scales: {
-                y: { beginAtZero: true, grid: { color: gridColor } },
-                x: { grid: { display: false } }
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor },
+                    border: { display: true, color: primaryColor, width: 2 }
+                },
+                x: { 
+                    grid: { display: false },
+                    border: { display: true, color: primaryColor, width: 2 }
+                }
             }
         }
     });
@@ -192,6 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 data: {!! json_encode(array_values($educationStats)) !!},
                 backgroundColor: secondaryColor,
+                hoverBackgroundColor: secondaryColor,
                 borderRadius: 4
             }]
         },
@@ -200,8 +208,15 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, grid: { color: gridColor } },
-                x: { grid: { display: false } }
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor },
+                    border: { display: true, color: secondaryColor, width: 2 }
+                },
+                x: { 
+                    grid: { display: false },
+                    border: { display: true, color: secondaryColor, width: 2 }
+                }
             }
         }
     });
