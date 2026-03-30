@@ -20,6 +20,7 @@ abstract class BaseMasterController extends Controller
         $this->resourceName = $resourceName;
     }
 
+    // get and search
     public function index(Request $request)
     {
         $query = $this->model::query();
@@ -41,6 +42,7 @@ abstract class BaseMasterController extends Controller
         ]);
     }
 
+    // show detail
     public function show($id)
     {
         $item = $this->model::findOrFail($id);
@@ -51,6 +53,7 @@ abstract class BaseMasterController extends Controller
         ]);
     }
 
+    // store
     public function store(Request $request)
     {
         $request->validate($this->validationRules);
@@ -68,6 +71,7 @@ abstract class BaseMasterController extends Controller
         ], 201);
     }
 
+    // update
     public function update(Request $request, $id)
     {
         $item = $this->model::findOrFail($id);
@@ -85,6 +89,7 @@ abstract class BaseMasterController extends Controller
         ]);
     }
 
+    // delete
     public function destroy($id)
     {
         $item = $this->model::findOrFail($id);
