@@ -5,6 +5,8 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\PenggunaanObatController;
 use Illuminate\Support\Facades\Route;
 
 // PUBLIC
@@ -61,6 +63,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
         Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
         Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
+       
 
         // Tambahan Yusmia (PENDAFTARAN BACKEND)
         Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])
@@ -77,6 +80,17 @@ Route::middleware('auth')->group(function () {
         // Patient routes (admin)
         Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
         Route::post('/patients',        [PatientController::class, 'storeFromAdmin'])->name('patients.store');
+        
+        Route::prefix('pharmacy')->name('pharmacy.')->group(function () {    
+            Route::get('/medicine', [MedicineController::class, 'index'])->name('medicine.index');
+            Route::post('/medicine', [MedicineController::class, 'store'])->name('medicine.store');   
+            Route::get('/medicine/{id}', [MedicineController::class, 'show'])->name('medicine.show');
+            Route::put('/medicine/{id}', [MedicineController::class, 'update'])->name('medicine.update');    
+            Route::delete('/medicine/{id}', [MedicineController::class, 'destroy'])->name('medicine.destroy');    
+            Route::post('/medicine/{id}/stock-in', [MedicineController::class, 'stockIn'])->name('medicine.stockIn');
+            
+            Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
+});
     });
 
     // ================= USER =================
