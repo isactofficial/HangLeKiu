@@ -396,7 +396,7 @@
         <div class="px-6 py-4 border-t flex justify-end">
           <button
             onclick="submitOdontogram()"
-            class="bg-amber-950 hover:bg-amber-800 text-white px-6 py-2 rounded font-medium shadow-sm transition-colors"
+            class="bg-[#3b331e] hover:bg-slate-900 text-white font-medium py-2.5 px-8 rounded text-sm shadow transition-colors"
           >
             SIMPAN
           </button>
@@ -527,18 +527,27 @@
         const toolbar = document.getElementById("toolbar");
 
         if (show) {
-          // 1. Tembak data pasien ke dalam modal jika datanya dikirim
-          if (patientData) {
-              document.getElementById('odonto-patient-name').innerText = patientData.name || '-';
-              document.getElementById('odonto-patient-mr').innerText = patientData.rm || '-';
-              document.getElementById('odonto-patient-demographics').innerHTML = 
-                  `&middot; ${patientData.gender || '-'} &middot; ${patientData.age || '-'}`;
-              document.getElementById('odonto-patient-payment').innerText = patientData.payment || 'Umum';
+            // Tembak data pasien ke dalam modal jika datanya dikirim
+            if (patientData) {
+                // Simpan data pasien secara global agar bisa dipakai saat pindah ke modal prosedur
+                window.lastOdontoPatientData = patientData;
+
+                document.getElementById('odonto-patient-name').innerText = patientData.name || '-';
+                document.getElementById('odonto-patient-mr').innerText = patientData.rm || '-';
+                document.getElementById('odonto-patient-demographics').innerHTML = 
+                    `&middot; ${patientData.gender || '-'} &middot; ${patientData.age || '-'}`;
+                document.getElementById('odonto-patient-payment').innerText = patientData.payment || 'Umum';
+                
+                // Input hidden untuk proses simpan ke database
+                document.getElementById('odontogramPatientId').value = patientData.patient_id || '';
+                document.getElementById('odontogramVisitId').value = patientData.registration_id || '';
               
-              // Input hidden untuk proses simpan ke database
-              document.getElementById('odontogramPatientId').value = patientData.patient_id || '';
-              document.getElementById('odontogramVisitId').value = patientData.registration_id || '';
-          }
+              // Set dokter otomatis (Nama Dokter)
+              if (patientData.doctor_name) {
+                  const exInp = document.getElementById('odontogramExaminedBy');
+                  if (exInp) exInp.value = patientData.doctor_name;
+              }
+            }
 
           // 2. Set tanggal hari ini
           const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -852,10 +861,17 @@
           const palatum = document.querySelector('select[name="palatum"]')?.value || '-';
           const anomali = document.querySelector('input[name="anomali"]')?.value || '-';
           
-          const dVal = document.querySelector('input[name="odonto_d"]')?.value || '0';
-          const mVal = document.querySelector('input[name="odonto_m"]')?.value || '0';
-          const fVal = document.querySelector('input[name="odonto_f"]')?.value || '0';
-          const mainNotes = document.querySelector('textarea[name="odonto_notes"]')?.value || '';
+          const dValEl = document.querySelector('input[name="odonto_d"]');
+          const dVal = dValEl ? dValEl.value : '0';
+          
+          const mValEl = document.querySelector('input[name="odonto_m"]');
+          const mVal = mValEl ? mValEl.value : '0';
+          
+          const fValEl = document.querySelector('input[name="odonto_f"]');
+          const fVal = fValEl ? fValEl.value : '0';
+          
+          const mainNotesEl = document.querySelector('textarea[name="odonto_notes"]');
+          const mainNotes = mainNotesEl ? mainNotesEl.value : '';
 
           const extraNotesTemplate = `Occlusi: ${occlusi}\nTorus Palatinus: ${torusP}\nDiastema: ${diastema}\nTorus Mandibularis: ${torusM}\nPalatum: ${palatum}\nGigi Anomali: ${anomali}\nD: ${dVal}, M: ${mVal}, F: ${fVal}\n\nCatatan Tambahan:\n${mainNotes}`;
 
@@ -875,10 +891,13 @@
               }
           });
 
+          const visitIdEl = document.getElementById('odontogramVisitId');
+          const examinedByEl = document.getElementById('odontogramExaminedBy');
+
           const payload = {
               patient_id: patientId,
-              visit_id: document.getElementById('odontogramVisitId')?.value || null,
-              examined_by: document.getElementById('odontogramExaminedBy')?.value || null,
+              visit_id: visitIdEl ? visitIdEl.value : null,
+              examined_by: examinedByEl ? examinedByEl.value : null,
               notes: extraNotesTemplate,
               teeth: teethArray
           };
@@ -896,30 +915,25 @@
                   toggleOdontogramModal(false);
 
                   if (ask && typeof toggleProsedureModal === "function") {
-                      // Buka modal prosedur
-                      toggleProsedureModal(true);
+                      // Buka modal prosedur dengan membawa data pasien & dokter dari odontogram
+                      toggleProsedureModal(true, window.lastOdontoPatientData);
 
                       setTimeout(() => {
-                          // Ambil nomor gigi unik yang ada catatannya / kondisinya
-                          // Parsing array objek gigi dari respon JSON
-                          let savedTeeth = [];
+                          let savedTeethNumbers = [];
                           if (data.data && data.data.teeth) {
-                              // Buang duplikasi jika satu gigi disubmit banyak kondisi
-                              const uniqueTeeth = new Set(data.data.teeth.map(t => t.tooth_number));
-                              savedTeeth = Array.from(uniqueTeeth);
+                              const uniqueTeeth = new Set(data.data.teeth.map(function(t) { return t.tooth_number; }));
+                              savedTeethNumbers = Array.from(uniqueTeeth);
                           }
-                          if (savedTeeth.length === 0) return;
                           
-                          const prosedurRows = document.querySelectorAll('.prosedur-row');
-                          if (prosedurRows.length === 0) return;
+                          if (savedTeethNumbers.length === 0) return;
 
-                          let lastRow = prosedurRows[prosedurRows.length - 1];
-                          const searchInput = lastRow.querySelector('.search-prosedur');
-                          const noGigiInput = lastRow.querySelector('.input-no-gigi');
+                          const toothNumbersStr = savedTeethNumbers.join(', ');
+                          const noGigiInput = document.querySelector('.input-no-gigi');
                           if (noGigiInput) {
-                              noGigiInput.value = savedTeeth.join(', ');
+                              noGigiInput.value = toothNumbersStr;
+                              if (typeof hitungTotalHarga === "function") hitungTotalHarga();
                           }
-                      }, 200);
+                      }, 300);
                   }
                   
                   // Reset form Odontogram usai sukses submit
