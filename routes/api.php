@@ -13,6 +13,8 @@ use App\Http\Controllers\ProcedureController;
 use App\Http\Controllers\ProcedureItemController;
 use App\Http\Controllers\ProcedureMedicineController;
 use App\Http\Controllers\MasterProcedureController;
+use App\Http\Controllers\MasterPoliController;
+use App\Http\Controllers\MasterGuarantorTypeController;
 use App\Http\Controllers\OdontogramController;
 
 
@@ -165,6 +167,23 @@ Route::prefix('master-procedure')->group(function () {
     Route::get('/{id}', [MasterProcedureController::class, 'show']);
     Route::put('/{id}', [MasterProcedureController::class, 'update']);
     Route::delete('/{id}', [MasterProcedureController::class, 'destroy']);
+});
+
+// ================= ADMIN MASTER SETTINGS =================
+Route::prefix('master-poli')->group(function () {
+    Route::get('/', [MasterPoliController::class, 'index']);
+    Route::post('/', [MasterPoliController::class, 'store']);
+    Route::get('/{id}', [MasterPoliController::class, 'show']);
+    Route::put('/{id}', [MasterPoliController::class, 'update']);
+    Route::delete('/{id}', [MasterPoliController::class, 'destroy']);
+});
+
+Route::prefix('master-guarantor')->group(function () {
+    Route::get('/', [MasterGuarantorTypeController::class, 'index']);
+    Route::post('/', [MasterGuarantorTypeController::class, 'store']);
+    Route::get('/{id}', [MasterGuarantorTypeController::class, 'show']);
+    Route::put('/{id}', [MasterGuarantorTypeController::class, 'update']);
+    Route::delete('/{id}', [MasterGuarantorTypeController::class, 'destroy']);
 });
 
 // ================= ODONTOGRAM =================
