@@ -46,16 +46,22 @@ class MasterProcedureController extends Controller
     // ✅ STORE
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:150',
-            'is_active'      => 'nullable|boolean',
+        $validated = $request->validate([
+            'name'          => 'required|string|max:150',
+            'care_type_id'  => 'nullable|exists:master_care_type,id',
+            'price'         => 'nullable|numeric|min:0',
+            'description'   => 'nullable|string|max:255',
+            'is_active'     => 'nullable|boolean',
         ]);
 
         $procedure = MasterProcedure::create([
             'id'             => Str::uuid(),
-            'procedure_name' => $request->name,
+            'procedure_name' => $validated['name'],
+            'care_type_id'   => $validated['care_type_id'],
+            'price'          => $validated['price'] ?? 0,
+            'description'    => $validated['description'] ?? '',
             'base_price'     => 0,
-            'is_active'      => $request->is_active ?? true,
+            'is_active'      => $validated['is_active'] ?? true,
         ]);
         $procedure->name = $procedure->procedure_name;
 
@@ -71,15 +77,20 @@ class MasterProcedureController extends Controller
     {
         $procedure = MasterProcedure::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:150',
-            'is_active'      => 'nullable|boolean',
+        $validated = $request->validate([
+            'name'          => 'required|string|max:150',
+            'care_type_id'  => 'nullable|exists:master_care_type,id',
+            'price'         => 'nullable|numeric|min:0',
+            'description'   => 'nullable|string|max:255',
+            'is_active'     => 'nullable|boolean',
         ]);
 
         $procedure->update([
-            'procedure_name' => $request->name,
-            'base_price'     => $procedure->base_price, // keep existing
-            'is_active'      => $request->is_active ?? $procedure->is_active,
+            'procedure_name' => $validated['name'],
+            'care_type_id'   => $validated['care_type_id'] ?? $procedure->care_type_id,
+            'price'          => $validated['price'] ?? $procedure->price,
+            'description'    => $validated['description'] ?? $procedure->description,
+            'is_active'      => $validated['is_active'] ?? $procedure->is_active,
         ]);
         $procedure->refresh();
         $procedure->name = $procedure->procedure_name;
