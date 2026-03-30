@@ -10,6 +10,12 @@
     @include('admin.components.settings.poli')
 @elseif ($submenu == 'Guarantor')
     @include('admin.components.settings.guarantor')
+@elseif ($submenu == 'Visit')
+    @include('admin.components.settings.visit')
+@elseif ($submenu == 'Care')
+    @include('admin.components.settings.care')
+@elseif ($submenu == 'Procedure')
+    @include('admin.components.settings.procedure')
 @else
     <h2 class="gs-title">General Settings</h2>
 
@@ -18,8 +24,8 @@
             'Poli',
             'Guarantor',
             'Payment Method',
-            'Visit Type',
-            'Care Type',
+            'Visit',
+            'Care',
             'Procedure',
             'Apotek',
             'Kasir',
@@ -33,7 +39,7 @@
             'Manajemen Password',
         ] as $item)
             @php
-                $isImplemented = in_array($item, ['Poli', 'Guarantor']);
+                $isImplemented = in_array($item, ['Poli', 'Guarantor', 'Visit', 'Care', 'Procedure']);
                 $href = $isImplemented ? "?menu=general-settings&submenu=$item" : "#";
             @endphp
             <a href="{{ $href }}" class="gs-item">

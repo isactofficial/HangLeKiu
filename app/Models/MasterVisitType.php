@@ -10,7 +10,7 @@ class MasterVisitType extends Model
     protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = false;
-    protected $fillable = ['id', 'name', 'is_active'];
+    protected $fillable = ['id', 'name', 'description', 'is_active'];
     protected $casts = ['is_active' => 'boolean'];
 
     public function scopeActive($query) {
