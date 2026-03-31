@@ -15,8 +15,10 @@ class ConsumableRestock extends Model
     protected $fillable = [
         'id',
         'bhp_id',
+        'supplier_id',
         'restock_type',
         'quantity_added',
+        'quantity_returned',  
         'purchase_price',
         'expiry_date',
         'batch_number',
@@ -25,15 +27,17 @@ class ConsumableRestock extends Model
     ];
 
     protected $casts = [
-        'quantity_added' => 'integer',
-        'purchase_price' => 'float',
-        'expiry_date'    => 'date:Y-m-d',
-        'created_at'     => 'datetime',
+        'quantity_added'    => 'integer',
+        'quantity_returned' => 'integer',  
+        'purchase_price'    => 'float',
+        'expiry_date'       => 'date:Y-m-d',
+        'created_at'        => 'datetime',
     ];
 
     protected static function boot()
     {
         parent::boot();
+
         static::creating(function ($model) {
             if (empty($model->id)) {
                 $model->id = (string) Str::uuid();
@@ -43,29 +47,38 @@ class ConsumableRestock extends Model
             }
         });
 
-        // Tambah stok saat restock dibuat
         static::created(function ($model) {
             $item = ConsumableItem::find($model->bhp_id);
             if (!$item) return;
 
-            $item->increment('current_stock', $model->quantity_added);
+            if ($model->restock_type === 'restock') {
+                // Tambah stok
+                $item->increment('current_stock', $model->quantity_added);
 
-            // Hitung ulang avg_hpp jika ada purchase_price baru
-            if ($model->purchase_price > 0) {
-                $totalRestocks = ConsumableRestock::where('bhp_id', $model->bhp_id)
-                    ->where('purchase_price', '>', 0)
-                    ->count();
-                $avgHpp = ConsumableRestock::where('bhp_id', $model->bhp_id)
-                    ->where('purchase_price', '>', 0)
-                    ->avg('purchase_price');
-                $item->update(['avg_hpp' => round($avgHpp, 2)]);
+                // Hitung ulang avg_hpp
+                if ($model->purchase_price > 0) {
+                    $avgHpp = ConsumableRestock::where('bhp_id', $model->bhp_id)
+                        ->where('restock_type', 'restock')
+                        ->where('purchase_price', '>', 0)
+                        ->avg('purchase_price');
+                    $item->update(['avg_hpp' => round($avgHpp, 2)]);
+                }
+            } elseif ($model->restock_type === 'return') {
+                // Kurangi stok
+                $item->decrement('current_stock', $model->quantity_returned);
             }
         });
 
-        // Kurangi stok kembali jika restock dibatalkan / dihapus
         static::deleted(function ($model) {
-            ConsumableItem::where('id', $model->bhp_id)
-                ->decrement('current_stock', $model->quantity_added);
+            $item = ConsumableItem::find($model->bhp_id);
+            if (!$item) return;
+
+            // Balik stok sesuai tipe transaksi
+            if ($model->restock_type === 'restock') {
+                $item->decrement('current_stock', $model->quantity_added);
+            } elseif ($model->restock_type === 'return') {
+                $item->increment('current_stock', $model->quantity_returned);
+            }
         });
     }
 

@@ -50,21 +50,40 @@ class ConsumableRestockController extends Controller
     // POST /api/admin/bhp/restock
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'bhp_id'         => 'required|string|exists:consumable_items,id',
-            'restock_type'   => 'required|in:restock,return',
-            'quantity_added' => 'required|integer|min:1',
-            'purchase_price' => 'required|numeric|min:0',
-            'expiry_date'    => 'nullable|date',
-            'batch_number'   => 'nullable|string|max:100',
-            'notes'          => 'nullable|string',
-        ]);
+        $rules = [
+            'bhp_id'       => 'required|string|exists:consumable_items,id',
+            'restock_type' => 'required|in:restock,return',
+            'batch_number' => 'nullable|string|max:100',
+            'supplier_id'  => 'nullable|string',
+            'notes'        => 'nullable|string',
+        ];
+
+        if ($request->restock_type === 'restock') {
+            $rules['quantity_added']    = 'required|integer|min:1';
+            $rules['quantity_returned'] = 'nullable|integer|min:0';
+            $rules['purchase_price']    = 'required|numeric|min:0';
+            $rules['expiry_date']       = 'nullable|date';
+        } else {
+            // return
+            $rules['quantity_returned'] = 'required|integer|min:1';
+            $rules['quantity_added']    = 'nullable|integer|min:0';
+            $rules['purchase_price']    = 'nullable|numeric|min:0';
+            $rules['expiry_date']       = 'nullable|date';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $restock = ConsumableRestock::create($validator->validated());
+        $validated = $validator->validated();
+
+        // Set default value supaya tidak null di database
+        $validated['quantity_added']    = $validated['quantity_added'] ?? 0;
+        $validated['quantity_returned'] = $validated['quantity_returned'] ?? 0;
+
+        $restock = ConsumableRestock::create($validated);
 
         return response()->json([
             'success' => true,
@@ -82,12 +101,24 @@ class ConsumableRestockController extends Controller
             return response()->json(['success' => false, 'message' => 'Data restock tidak ditemukan'], 404);
         }
 
-        // Cek stok tidak jadi minus setelah dibatalkan
         $item = ConsumableItem::find($restock->bhp_id);
-        if ($item->current_stock < $restock->quantity_added) {
+
+        if (!$item) {
+            return response()->json(['success' => false, 'message' => 'Item BHP tidak ditemukan'], 404);
+        }
+
+        // Validasi stok sesuai tipe transaksi
+        if ($restock->restock_type === 'restock' && $item->current_stock < $restock->quantity_added) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tidak bisa membatalkan restock. Stok saat ini lebih kecil dari jumlah restock.',
+            ], 422);
+        }
+
+        if ($restock->restock_type === 'return' && $item->current_stock < $restock->quantity_returned) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak bisa membatalkan return. Stok saat ini lebih kecil dari jumlah return.',
             ], 422);
         }
 
