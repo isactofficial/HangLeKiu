@@ -112,7 +112,7 @@
                             <div class="emr-option" data-value="semua">Semua</div>
                         </div>
                     </div>
-                    <input type="text" id="js-sidebar-search" placeholder="Cari nama pasien atau No RM..." class="emr-sidebar-search-input">
+                    
                 </div>
 
                 <div class="emr-patient-list" id="emrPatientList">
@@ -185,7 +185,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
             // ================= 1. FILTER & SEARCH SIDEBAR =================
             const dropdown = document.getElementById('customFilterDropdown');
             const listHariIni = document.getElementById('list-hari-ini');
@@ -240,8 +240,8 @@
                             document.getElementById('emr-detail-view').innerHTML = html;
                             
                             // Eksekusi fungsi setup UI setelah HTML masuk
-                            bindTabEvents();
-                            setupFABEvents(); // Pasang ulang event untuk FAB karena HTML baru
+                            if(typeof bindTabEvents === 'function') bindTabEvents();
+                            if(typeof setupFABEvents === 'function') setupFABEvents(); // Pasang ulang event untuk FAB karena HTML baru
                         })
                         .catch(err => {
                             alert('Gagal memuat data pasien.');
@@ -251,21 +251,70 @@
                 });
             });
 
-            // Tutup semua dropdown jika klik di luar
-            window.addEventListener('click', function(e) {
-                if (dropdown && !dropdown.contains(e.target)) dropdown.classList.remove('open');
-                
-                const diagMenu = document.getElementById('diagnosa-menu');
-                if(diagMenu && !diagMenu.contains(e.target) && !e.target.closest('button[onclick="toggleDiagnosaMenu(event)"]')) {
-                    diagMenu.classList.add('hidden');
-                }
+            // ================= 3. AUTO-LOAD PASIEN DARI URL PARAMETER =================
+            const urlParams = new URLSearchParams(window.location.search);
+            const openApptId = urlParams.get('open'); // Menangkap ID dari URL ?open=123
 
-                const fabContainer = document.getElementById('fabContainer');
-                const fabMenu = document.getElementById('fabMenu');
-                if (fabContainer && fabMenu && !fabContainer.contains(e.target)) {
-                    fabMenu.classList.remove('active');
-                }
-            });
+            if (openApptId) {
+                // 1. Ganti UI langsung ke Loading
+                document.getElementById('emr-empty-view').classList.add('hidden');
+                document.getElementById('emr-detail-view').classList.add('hidden');
+                document.getElementById('emr-loading').classList.remove('hidden');
+
+                // 2. URL endpoint untuk AJAX (Asumsi route detail EMR adalah /admin/emr/{id})
+                const fetchUrl = `/admin/emr/${openApptId}`;
+
+                // 3. Tembak AJAX Langsung menggunakan ID
+                fetch(fetchUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Data tidak ditemukan / Gagal memuat');
+                        return res.text();
+                    })
+                    .then(html => {
+                        // Sembunyikan loading, tampilkan hasil HTML di Main Content
+                        document.getElementById('emr-loading').classList.add('hidden');
+                        document.getElementById('emr-detail-view').classList.remove('hidden');
+                        document.getElementById('emr-detail-view').innerHTML = html;
+                        
+                        // Eksekusi fungsi setup UI EMR (Tabs, tombol, dll)
+                        if(typeof bindTabEvents === 'function') bindTabEvents();
+                        if(typeof setupFABEvents === 'function') setupFABEvents();
+
+                        // 4. (Opsional & Estetika) Cari link di sidebar untuk di-highlight aktif
+                        const targetLink = Array.from(patientLinks).find(link => link.href.includes(`/${openApptId}`));
+                        if (targetLink) {
+                            // Hapus aktif dari semua, tambahkan ke yang ketemu
+                            patientLinks.forEach(l => {
+                                const card = l.querySelector('.patient-card');
+                                if(card) card.classList.remove('active');
+                            });
+                            
+                            const activeCard = targetLink.querySelector('.patient-card');
+                            if(activeCard) activeCard.classList.add('active');
+                            
+                            // Jika ada di tab "Semua", pindahkan filternya agar kelihatan
+                            const parentListId = targetLink.closest('ul')?.id;
+                            if (parentListId === 'list-semua' && dropdown) {
+                                const optionSemua = dropdown.querySelector('.emr-option[data-value="semua"]');
+                                if (optionSemua) {
+                                    dropdown.querySelector('.emr-select-text').textContent = optionSemua.textContent;
+                                    listHariIni.classList.add('hidden'); 
+                                    listSemua.classList.remove('hidden');
+                                }
+                            }
+                        }
+                        
+                        // 5. Bersihkan URL dari '?open=123' agar kalau di-refresh tidak ngeload ulang terus
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    })
+                    .catch(err => {
+                        console.error('Error AJAX EMR:', err);
+                        alert('Gagal memuat rekam medis pasien.');
+                        // Kembalikan ke tampilan empty jika gagal
+                        document.getElementById('emr-loading').classList.add('hidden');
+                        document.getElementById('emr-empty-view').classList.remove('hidden'); 
+                    });
+            }
         });
 
         // ================= 3. FUNGSI GLOBAL (DIPANGGIL SETELAH AJAX) =================

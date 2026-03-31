@@ -80,15 +80,16 @@ class EmrController extends Controller
         ]);
     }
 
-    public function storePayment(Request $request)
+public function storePayment(Request $request)
     {
-        // Validasi data input dari frontend
+        // 1. Tambahkan validasi untuk 'status'
         $request->validate([
             'registration_id' => 'required',
             'payment_method'  => 'required',
             'amount_paid'     => 'required|numeric',
             'change_amount'   => 'required|numeric',
             'debt_amount'     => 'required|numeric',
+            'status'          => 'required|in:paid,partial,unpaid', // Validasi status dari JS
         ]);
 
         DB::beginTransaction();
@@ -103,7 +104,7 @@ class EmrController extends Controller
             $invoiceNumber = 'INV-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
             $receiptNumber = 'REC-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
 
-            // Simpan data transaksi ke tabel invoices
+            // 2. Simpan data transaksi ke tabel invoices, TERMASUK status
             $invoice = Invoice::create([
                 'registration_id' => $request->registration_id,
                 'admin_id'        => Auth::id() ?? '49f9ad75-bd0b-43ca-8a19-a9adebfd0c5f', // Menggunakan fallback ID admin jika auth kosong
@@ -114,6 +115,7 @@ class EmrController extends Controller
                 'amount_paid'     => $request->amount_paid,
                 'change_amount'   => $request->change_amount,
                 'debt_amount'     => $request->debt_amount,
+                'status'          => $request->status, // <--- INI KUNCI AGAR SAAT REFRESH TOMBOLNYA BERUBAH
                 'rounding'        => 0,
                 'notes'           => $request->notes,
             ]);

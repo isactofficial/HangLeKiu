@@ -7,7 +7,6 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/pages/cashier.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin/components/cashier/nota.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .badge-lunas-hijau {
@@ -18,6 +17,49 @@
             font-size: 12px;
             font-weight: 700;
             margin-right: 8px;
+        }
+        .badge-belum-lunas {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        /* =========================================
+           CSS KHUSUS CETAK NOTA (ANTI BLANK PAGE)
+           ========================================= */
+        
+        /* 1. Di Layar Monitor: Sembunyikan Nota */
+        @media screen {
+            #nota-cetak {
+                display: none !important;
+            }
+        }
+
+        /* 2. Saat Di-Print: Tampilkan Nota, Sembunyikan Dashboard */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .no-print {
+                display: none !important;
+            }
+            #nota-cetak, #nota-cetak * {
+                visibility: visible !important;
+            }
+            #nota-cetak {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: block !important;
+                background: white;
+            }
+            @page { margin: 0; }
+            body, html { margin: 0 !important; padding: 0 !important; background: white !important; }
         }
     </style>
 @endpush
@@ -62,37 +104,90 @@
                         <tbody id="cashier-tbody">
                             @forelse($appointments as $apt)
                                 @php
-                                    // 1. Ambil data billing (medical_procedure)
-                                    $medicalProcedure = $apt->medicalProcedures->first(); 
-                                    
-                                    // 2. Kumpulkan semua nama tindakan dari procedure_item
-                                    $listTindakan = [];
-                                    if ($medicalProcedure && $medicalProcedure->items->count() > 0) {
+                                // 1. Ambil Prosedur Medis Utama
+                                $medicalProcedure = $apt->medicalProcedures->first(); 
+                                
+                                $arrTindakan = []; $arrHarga = []; $arrQty = []; $arrDiskon = []; $arrSubtotal = []; $arrGigi = [];
+                                $gigiStr = '-'; 
+                                
+                                // 2. Ambil data Odontogram (Nomor Gigi)
+                                $recordOdontogram = \Illuminate\Support\Facades\DB::table('odontogram_records')
+                                    ->where('patient_id', $apt->patient_id)
+                                    ->where('visit_id', $apt->id) 
+                                    ->orderBy('created_at', 'desc')
+                                    ->first();
+
+                                if ($recordOdontogram) {
+                                    $gigiList = \Illuminate\Support\Facades\DB::table('odontogram_teeth')
+                                        ->where('odontogram_record_id', $recordOdontogram->id)
+                                        ->pluck('tooth_number')
+                                        ->toArray();
+                                    if (count($gigiList) > 0) $gigiStr = implode(', ', $gigiList);
+                                }
+
+                                // 3. Loop Item Prosedur & Obat-obatan untuk Array JS
+                                if ($medicalProcedure) {
+                                    // Items Tindakan
+                                    if ($medicalProcedure->items->count() > 0) {
                                         foreach ($medicalProcedure->items as $item) {
-                                            if ($item->masterProcedure) {
-                                                $listTindakan[] = $item->masterProcedure->procedure_name;
-                                            }
+                                            $arrTindakan[] = $item->masterProcedure->procedure_name ?? 'Tindakan';
+                                            $arrHarga[] = (float) $item->unit_price;
+                                            $arrQty[] = (int) $item->quantity;
+                                            $arrDiskon[] = (float) $item->discount_value;
+                                            $arrSubtotal[] = (float) $item->subtotal;
+                                            $arrGigi[] = $gigiStr;
                                         }
                                     }
-                                    
-                                    // 3. Gabungkan nama tindakan untuk parameter JS
-                                    $tindakanDisplay = count($listTindakan) > 0 
-                                        ? implode(', ', $listTindakan) 
-                                        : 'Konsultasi/Pemeriksaan Umum';
 
-                                    // 4. Ambil total tagihan
-                                    $totalHarga = $medicalProcedure ? (float) $medicalProcedure->total_amount : 0;
-                                    
-                                    // 5. Buat Nomor Invoice
-                                    $tglInvoice = \Carbon\Carbon::parse($apt->appointment_datetime)->format('Ymd');
-                                    $invoiceNo = 'INV' . $tglInvoice . str_pad($apt->id, 3, '0', STR_PAD_LEFT);
-                                    
-                                    // 6. Ambil Nama Metode Bayar
-                                    $metodeBayar = $apt->paymentMethod->name ?? 'Belum Ditentukan';
-                                @endphp
+                                    // Gabungkan Obat
+                                    $medicines = \Illuminate\Support\Facades\DB::table('procedure_medicine')
+                                        ->join('medicine', 'procedure_medicine.medicine_id', '=', 'medicine.id')
+                                        ->where('procedure_medicine.procedure_id', $medicalProcedure->id)
+                                        ->select('medicine.medicine_name', 'medicine.selling_price_general', 'procedure_medicine.quantity_used')
+                                        ->get();
+
+                                    foreach ($medicines as $med) {
+                                        $arrTindakan[] = $med->medicine_name;
+                                        $medPrice = (float) $med->selling_price_general;
+                                        $medQty = (int) $med->quantity_used;
+                                        
+                                        $arrHarga[] = $medPrice;
+                                        $arrQty[] = $medQty;
+                                        $arrDiskon[] = 0; 
+                                        $arrSubtotal[] = $medPrice * $medQty;
+                                        $arrGigi[] = '-'; 
+                                    }
+                                }
+                                
+                                // 4. CEK DATA DI TABEL INVOICE (Data Permanen setelah Refresh)
+                                $invoice = \Illuminate\Support\Facades\DB::table('invoices')
+                                    ->where('registration_id', $apt->id)
+                                    ->first();
+                                
+                                // Status Invoice: paid, partial, atau unpaid
+                                $invoiceStatus = $invoice ? ($invoice->status ?? 'paid') : 'unpaid'; 
+                                
+                                // Ambil data pembayaran ASLI dari database (Penting!)
+                                $amtPaid = $invoice ? (float) $invoice->amount_paid : 0;
+                                $amtChange = $invoice ? (float) $invoice->change_amount : 0;
+                                $amtDebt = $invoice ? (float) $invoice->debt_amount : 0;
+                                
+                                // 5. Variabel Display & Data JS
+                                $invoiceNo = $invoice ? $invoice->invoice_number : 'INV' . \Carbon\Carbon::parse($apt->appointment_datetime)->format('Ymd') . str_pad($apt->id, 3, '0', STR_PAD_LEFT);
+                                $metodeBayar = $invoice ? $invoice->payment_method : ($apt->paymentMethod->name ?? 'Belum Ditentukan');
+                                $catatanInvoice = $invoice ? ($invoice->notes ?? '-') : '-';
+                                $tglInputStr = \Carbon\Carbon::parse($apt->appointment_datetime)->format('d-m-Y H:i').' WIB';
+
+                                $dataPasien = [
+                                    'nama' => $apt->patient->full_name ?? 'Pasien',
+                                    'id' => $apt->patient->medical_record_no ?? '-',
+                                    'usia' => $apt->patient->date_of_birth ? \Carbon\Carbon::parse($apt->patient->date_of_birth)->age . ' Thn' : '-',
+                                    'hp' => $apt->patient->phone_number ?? '-',
+                                    'dokter' => $apt->doctor->full_name ?? '-'
+                                ];
+                            @endphp
                                 
                                 <tr id="row-{{ $apt->id }}" class="patient-row">
-                                    {{-- Kolom Invoice --}}
                                     <td style="vertical-align: top; padding: 15px 10px;">
                                         <div class="invoice-date" style="font-size: 11px; color: #6B513E;">
                                             {{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('d M Y') }}
@@ -102,26 +197,22 @@
                                         </div>
                                     </td>
 
-                                    {{-- Kolom Nama Pasien --}}
                                     <td class="patient-name" style="vertical-align: top; padding: 15px 10px; font-weight: 700; color: #6B513E;">
                                         {{ $apt->patient->full_name ?? 'Pasien Tidak Dikenal' }}
                                     </td>
 
-                                    {{-- Kolom Keterangan Medis --}}
                                     <td style="vertical-align: top; padding: 15px 10px;">
                                         <div class="keterangan-grid" style="display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; align-items: start;">
-                                            {{-- Baris Dokter --}}
                                             <span class="ket-label" style="font-size: 11px; color: #6B513E; text-transform: uppercase; font-weight: 700; margin-top: 2px;">Dokter</span>
                                             <span class="ket-value" style="font-size: 13px; color: #6B513E; font-weight: 600;">
                                                 {{ $apt->doctor->full_name ?? 'Dokter Klinik' }}
                                             </span>
 
-                                            {{-- Baris Tindakan --}}
                                             <span class="ket-label" style="font-size: 11px; color: #6B513E; text-transform: uppercase; font-weight: 700; margin-top: 2px;">Tindakan</span>
                                             <div class="ket-value">
-                                                @if(count($listTindakan) > 0)
+                                                @if(count($arrTindakan) > 0)
                                                     <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px;">
-                                                        @foreach($listTindakan as $tindakan)
+                                                        @foreach($arrTindakan as $tindakan)
                                                             <li style="font-size: 12px; color: #C58F59; display: flex; align-items: center; gap: 6px;">
                                                                 <i class="fa fa-caret-right" style="color: #C58F59; font-size: 10px;"></i>
                                                                 {{ $tindakan }}
@@ -133,7 +224,6 @@
                                                 @endif
                                             </div>
 
-                                            {{-- Baris Metode --}}
                                             <span class="ket-label" style="font-size: 11px; color: #6B513E; text-transform: uppercase; font-weight: 700; margin-top: 4px;">Metode Bayar</span>
                                             <span class="ket-value">
                                                 <span style="color: #C58F59; font-weight: 800; font-size: 11px; background: #fdfaf8; padding: 2px 10px; border-radius: 4px; border: 1px solid #f0e6dd; display: inline-block; letter-spacing: 0.5px;">
@@ -143,84 +233,40 @@
                                         </div>
                                     </td>
 
-                                    {{-- Kolom Action --}}
                                     <td style="vertical-align: top; text-align: center; padding: 15px 10px;" id="action-{{ $apt->id }}">
-                                    @if($apt->status === 'succeed')
-                                        @php
-                                        $arrTindakan = []; $arrHarga = []; $arrQty = []; $arrSubtotal = []; $arrGigi = [];
-                                        $medicalProcedure = $apt->medicalProcedures->first();
-
-                                        // ====================================================================
-                                        // 1. CARI DATA GIGI DARI ODONTOGRAM RECORD BERDASARKAN PASIEN & VISIT
-                                        // ====================================================================
-                                        $gigiStr = '-'; // Default jika tidak ada gigi
-                                        
-                                        // Cari record odontogram milik pasien ini di kunjungan (registrasi) ini
-                                        $recordOdontogram = \Illuminate\Support\Facades\DB::table('odontogram_records')
-                                            ->where('patient_id', $apt->patient_id)
-                                            ->where('visit_id', $apt->id) // $apt->id adalah ID dari tabel registration
-                                            ->orderBy('created_at', 'desc')
-                                            ->first();
-
-                                        if ($recordOdontogram) {
-                                            // Jika record ketemu, ambil semua nomor gigi dari tabel odontogram_teeth
-                                            $gigiList = \Illuminate\Support\Facades\DB::table('odontogram_teeth')
-                                                ->where('odontogram_record_id', $recordOdontogram->id)
-                                                ->pluck('tooth_number')
-                                                ->toArray();
-                                                
-                                            if (count($gigiList) > 0) {
-                                                // Gabungkan nomor gigi jadi satu string, misal: "11, 21, 44"
-                                                $gigiStr = implode(', ', $gigiList);
-                                            }
-                                        }
-                                        // ====================================================================
-
-                                        // 2. MASUKKAN DATA TINDAKAN & GIGI KE DALAM ARRAY UNTUK MODAL
-                                        if ($medicalProcedure && $medicalProcedure->items->count() > 0) {
-                                            foreach ($medicalProcedure->items as $item) {
-                                                $arrTindakan[] = $item->masterProcedure->procedure_name ?? 'Tindakan';
-                                                $arrHarga[] = (float) $item->unit_price;
-                                                $arrQty[] = (int) $item->quantity;
-                                                $arrSubtotal[] = (float) $item->subtotal;
-                                                
-                                                // Masukkan data gigi yang sudah dicari di atas ke setiap baris tindakan
-                                                $arrGigi[] = $gigiStr;
-                                            }
-                                        }
-
-                                        // 3. DATA PASIEN
-                                        $dataPasien = [
-                                            'nama' => $apt->patient->full_name ?? '-',
-                                            'id' => $apt->patient->medical_record_no ?? '-',
-                                            'usia' => $apt->patient->date_of_birth ? \Carbon\Carbon::parse($apt->patient->date_of_birth)->age . ' Thn' : '-',
-                                            'hp' => $apt->patient->phone_number ?? '-',
-                                            'dokter' => $apt->doctor->full_name ?? '-'
-                                        ];
-                                        $tglInput = \Carbon\Carbon::parse($apt->appointment_datetime)->format('d-m-Y H:i').' WIB';
-                                    @endphp
-
-                            
-                                    <div class="flex justify-center w-full">
-                                        <button class="btn-bayar-tabel text-white bg-[#A67C52] px-4 py-2 rounded shadow-sm font-bold text-xs hover:bg-[#8e6a45] transition-colors flex items-center" 
-                                            onclick='openPayment(
-                                                "{{ $invoiceNo }}", 
-                                                @json($dataPasien), 
-                                                @json($arrTindakan), 
-                                                @json($arrHarga), 
-                                                @json($arrQty), 
-                                                @json($arrSubtotal), 
-                                                @json($arrGigi),
-                                                "{{ $tglInput }}",
-                                                "{{ $apt->id }}"
-                                            )'>
-                                            <i class="fa fa-wallet mr-1.5"></i> Bayar Sekarang
-                                        </button>
-                                    </div>
-
-                                    @else
+                                    @if($invoiceStatus === 'paid' || $invoiceStatus === 'partial')
+                                        {{-- JIKA SUDAH ADA DATA DI TABEL INVOICE (SUDAH PERNAH BAYAR) --}}
                                         <div class="flex items-center justify-center gap-2">
-                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold text-xs uppercase">Lunas</span>
+                                            @if($invoiceStatus === 'paid')
+                                                <span class="badge-lunas-hijau">Lunas</span>
+                                            @else
+                                                <span class="badge-belum-lunas">Belum Lunas</span>
+                                            @endif
+
+                                            {{-- Tombol Nota tetap muncul untuk print ulang --}}
+                                            <button class="text-white bg-[#8e6a45] px-3 py-1.5 rounded shadow-sm font-bold text-xs hover:bg-[#7a5938] transition-colors flex items-center" 
+                                                onclick='prepareAndPrint(@json($invoiceNo), @json($apt->patient->full_name ?? "Pasien"), @json($apt->doctor->full_name ?? "-"), @json($arrTindakan), @json($arrHarga), @json($arrQty), @json($arrDiskon), @json($arrSubtotal), @json($arrGigi), @json($metodeBayar), @json($tglInputStr), @json($catatanInvoice), @json($invoiceStatus), {{ $amtPaid }}, {{ $amtChange }}, {{ $amtDebt }})'>
+                                                <i class="fa fa-print mr-1"></i> Nota
+                                            </button>
+                                        </div>
+                                    @elseif($apt->status === 'succeed')
+                                        {{-- JIKA BELUM ADA DI TABEL INVOICE SAMA SEKALI --}}
+                                        <div class="flex justify-center w-full">
+                                            <button class="btn-bayar-tabel text-white bg-[#A67C52] px-4 py-2 rounded shadow-sm font-bold text-xs hover:bg-[#8e6a45] transition-colors flex items-center" 
+                                                onclick='openPayment(
+                                                    @json($invoiceNo), 
+                                                    @json($dataPasien), 
+                                                    @json($arrTindakan), 
+                                                    @json($arrHarga), 
+                                                    @json($arrQty), 
+                                                    @json($arrDiskon), 
+                                                    @json($arrSubtotal), 
+                                                    @json($arrGigi),
+                                                    @json($tglInputStr),
+                                                    @json($apt->id)
+                                                )'>
+                                                <i class="fa fa-wallet mr-1.5"></i> Bayar Sekarang
+                                            </button>
                                         </div>
                                     @endif
                                 </td>
@@ -240,31 +286,38 @@
     </div>
 </div>
 
+{{-- INCLUDE PENTING! MEMANGGIL MODAL --}}
 @include('admin.components.cashier.modal-payment')
 @include('admin.components.cashier.nota')
+
 
 <script>
     let activeData = {};
     let currentGrandTotal = 0;
 
-    function openPayment(inv, dataPasien, tindakanArray, pricesArray, qtyArray, subtotalArray, gigiArray, tanggalInput, appointmentId) {
-        // Pastikan bentuknya array
+    function openPayment(inv, dataPasien, tindakanArray, pricesArray, qtyArray, diskonArray, subtotalArray, gigiArray, tanggalInput, appointmentId) {
         const listTindakan = Array.isArray(tindakanArray) ? tindakanArray : [];
         const listHarga = Array.isArray(pricesArray) ? pricesArray : [];
         const listQty = Array.isArray(qtyArray) ? qtyArray : [];
+        const listDiskon = Array.isArray(diskonArray) ? diskonArray : [];
         const listSubtotal = Array.isArray(subtotalArray) ? subtotalArray : [];
         const listGigi = Array.isArray(gigiArray) ? gigiArray : [];
 
-        // Simpan data ke variabel global untuk dipakai saat print nanti
         activeData = { 
             inv: inv, 
             appointmentId: appointmentId,
             nama: dataPasien.nama || '-',
-            tindakan: listTindakan.length > 0 ? listTindakan.join(', ') : 'Konsultasi Umum',
-            total: 0 // Akan diupdate di bawah
+            dokter: dataPasien.dokter || '-',
+            tindakanArray: listTindakan,
+            pricesArray: listHarga,
+            qtyArray: listQty,
+            diskonArray: listDiskon,
+            subtotalArray: listSubtotal,
+            gigiArray: listGigi,
+            total: 0,
+            tglInput: tanggalInput
         };
         
-        // Set Header Info Pasien
         document.getElementById('m-inv-no').innerText = inv;
         document.getElementById('m-pasien-nama').innerText = dataPasien.nama || '-';
         document.getElementById('m-pasien-id').innerText = dataPasien.id || '-';
@@ -273,17 +326,17 @@
         document.getElementById('m-pasien-dokter').innerText = dataPasien.dokter || '-';
         document.getElementById('m-input-pembayar').value = (dataPasien.nama || '') + ' (Pribadi)';
 
-        // Render Tabel Tindakan
         let htmlItems = '';
         currentGrandTotal = 0;
 
         listTindakan.forEach((tindakan, index) => {
             const harga = parseFloat(listHarga[index]) || 0;
             const qty = parseInt(listQty[index]) || 1;
-            const subtotal = parseFloat(listSubtotal[index]) || (harga * qty);
+            const diskon = parseFloat(listDiskon[index]) || 0;
+            const subtotal = parseFloat(listSubtotal[index]) || 0;
             
-            // Cek index. Kalau baris pertama (index 0), tampilkan nomor gigi. Kalau baris kedua dst, kosongkan saja.
-            const noGigi = (index === 0) ? (listGigi[index] || '-') : '-';
+            // Cek index supaya gigi tidak tampil berulang
+            const noGigi = (index === 0 && listGigi[0] && listGigi[0] !== '-') ? listGigi[0] : '-';
             
             currentGrandTotal += subtotal;
 
@@ -298,7 +351,7 @@
                     <td class="p-3 text-right text-[#A67C52] font-medium">Rp${Number(harga).toLocaleString('id-ID')}</td>
                     <td class="p-3 text-right">
                         <div class="flex justify-end gap-1">
-                            <input type="text" value="0" readonly class="w-16 border border-[#A67C52]/30 rounded p-1 text-xs text-right bg-white outline-none text-[#A67C52]/50 font-medium">
+                            <input type="text" value="${Number(diskon).toLocaleString('id-ID')}" readonly class="w-20 border border-[#A67C52]/30 rounded p-1 text-xs text-right bg-white outline-none text-[#A67C52]/50 font-medium">
                         </div>
                     </td>
                     <td class="p-3 text-right text-[#A67C52] font-black">Rp${Number(subtotal).toLocaleString('id-ID')}</td>
@@ -308,32 +361,26 @@
                 </tr>`;
         });
 
-        // Update Total
         activeData.total = currentGrandTotal;
 
         document.getElementById('m-items').innerHTML = htmlItems;
         document.getElementById('m-grand-total').innerText = 'Rp' + Number(currentGrandTotal).toLocaleString('id-ID');
         document.getElementById('m-input-bayar').value = currentGrandTotal; 
         
-        // Kalau ada fungsi hitung kembalian
         if(typeof hitungKembalian === 'function') hitungKembalian(); 
 
-        // Buka Modal
         document.getElementById('modalPayment').classList.remove('hidden');
         document.getElementById('modalPayment').style.display = 'flex';
     }
 
-    // Fungsi Hitung Kembalian Otomatis
     function hitungKembalian() {
         let inputBayar = document.getElementById('m-input-bayar').value;
-        // Bersihkan titik ribuan jika kasir mengetik manual (misal: 1.000.000 -> 1000000)
         inputBayar = inputBayar.replace(/\./g, '');
         let bayar = parseFloat(inputBayar) || 0;
         
         let kembalian = bayar - currentGrandTotal;
         let hutang = currentGrandTotal - bayar;
 
-        // Tampilkan di UI
         if (kembalian > 0) {
             document.getElementById('m-kembalian').innerText = 'Rp' + Number(kembalian).toLocaleString('id-ID');
             document.getElementById('m-hutang').innerText = 'Rp0';
@@ -356,24 +403,19 @@
         const appointmentId = activeData.appointmentId;
         const btnSimpan = document.querySelector('button[onclick="prosesDone()"]');
         
-        // Ambil nominal yang diketik kasir dan hapus format titik
         const inputBayarRaw = document.getElementById('m-input-bayar').value.replace(/[^0-9]/g, '');
         const amountPaid = parseFloat(inputBayarRaw) || 0;
         
-        // Validasi input
         if (amountPaid <= 0) {
-            alert('Silakan masukkan jumlah uang yang diterima terlebih dahulu.');
+            alert('Silakan masukkan nominal uang yang diterima terlebih dahulu.');
+            document.getElementById('m-input-bayar').focus();
             return;
         }
-      
-        // Ambil nilai dari textarea menggunakan ID
-        const notes = document.getElementById('m-notes').value;
 
-        // Ambil ID dari dropdown (Value di tag select metode pembayaran)
         const paymentMethodSelect = document.getElementById('m-metode');
-        const paymentMethodName = paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text;
+        const paymentMethodName = paymentMethodSelect ? paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text : 'Tunai';
+        const notes = document.getElementById('m-notes')?.value || '-';
 
-        // Kalkulasi kembalian dan hutang
         let changeAmount = 0;
         let debtAmount = 0;
 
@@ -383,12 +425,14 @@
             debtAmount = currentGrandTotal - amountPaid;
         }
 
+        // PENENTUAN STATUS (LUNAS / BELUM LUNAS)
+        const statusKasir = debtAmount > 0 ? 'partial' : 'paid';
+
         const originalText = btnSimpan.innerHTML;
         btnSimpan.innerHTML = '<i class="fa fa-spinner fa-spin text-lg"></i> Memproses...';
         btnSimpan.disabled = true;
 
         try {
-            // Tembak request ke EmrController@storePayment
             const response = await fetch('/admin/cashier/store-payment', {
                 method: 'POST',
                 headers: {
@@ -397,11 +441,12 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ 
-                    registration_id: appointmentId,
+                    registration_id: appointmentId, 
                     payment_method: paymentMethodName,
                     amount_paid: amountPaid,
                     change_amount: changeAmount,
                     debt_amount: debtAmount,
+                    status: statusKasir, 
                     notes: notes
                 }) 
             });
@@ -409,29 +454,14 @@
             const result = await response.json();
 
             if (result.success) {
-                // 1. Tutup Modal
+                // Sembunyikan modal
                 closePayment();
-                alert("✓ Pembayaran Berhasil Disimpan!\nNomor Invoice: " + result.invoice_number);
                 
-                // 2. Ubah Tampilan Baris Menjadi "Lunas" dan Tambah Tombol "Nota" (Tanpa Refresh)
-                const actionCell = document.getElementById(`action-${appointmentId}`);
-                if (actionCell) {
-                    // Escape quotes untuk mencegah error syntax JS di atribut onclick
-                    const safeName = activeData.nama.replace(/'/g, "\\'");
-                    const safeTindakan = activeData.tindakan.replace(/'/g, "\\'");
+                // Tampilkan notifikasi sukses
+                alert("✓ Pembayaran Berhasil Disimpan!\nNomor Invoice: " + result.invoice_number);
 
-                    actionCell.innerHTML = `
-                        <div class="flex items-center justify-center gap-2">
-                            <span class="badge-lunas-hijau">Lunas</span>
-                            <button class="text-white bg-[#8e6a45] px-3 py-1.5 rounded shadow-sm font-bold text-xs hover:bg-[#7a5938] transition-colors flex items-center" 
-                                onclick="prepareAndPrint('${result.invoice_number}', '${safeName}', '${safeTindakan}', ${activeData.total}, 0, '${paymentMethodName}')">
-                                <i class="fa fa-print mr-1"></i> Nota
-                            </button>
-                        </div>`;
-                }
-
-                // 3. Otomatis Trigger Print Nota
-                prepareAndPrint(result.invoice_number, activeData.nama, activeData.tindakan, activeData.total, 0, paymentMethodName);
+                // REFRESH HALAMAN AGAR BARIS TABEL BERUBAH STATUSNYA
+                window.location.reload(); 
 
             } else {
                 alert("Gagal: " + result.message);
@@ -446,26 +476,102 @@
         }
     }
 
-    function prepareAndPrint(inv, nama, tindakan, total, disc, metode) {
-        document.getElementById('print-invoice').innerText = inv;
-        document.getElementById('print-nama').innerText = nama;
-        document.getElementById('print-metode').innerText = metode;
-        document.getElementById('print-total').innerText = "Rp " + Number(total).toLocaleString('id-ID');
+    // PARAMETER DITAMBAH: statusInv, amtPaid, amtChange, amtDebt
+    function prepareAndPrint(inv, nama, dokter, tindakanArray, pricesArray, qtyArray, diskonArray, subtotalArray, gigiArray, metode, tglApt, catatan, statusInv, amtPaid, amtChange, amtDebt) {
+        const setHtml = (id, html) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
+        };
+
+        const formatRp = (angka) => 'Rp' + Number(angka).toLocaleString('id-ID');
+
+        // Pastikan berbentuk Array
+        const listTindakan = Array.isArray(tindakanArray) ? tindakanArray : [tindakanArray];
+        const listHarga = Array.isArray(pricesArray) ? pricesArray : [pricesArray];
+        const listQty = Array.isArray(qtyArray) ? qtyArray : [qtyArray];
+        const listDiskon = Array.isArray(diskonArray) ? diskonArray : [diskonArray];
+        const listSubtotal = Array.isArray(subtotalArray) ? subtotalArray : [subtotalArray];
+        const listGigi = Array.isArray(gigiArray) ? gigiArray : [gigiArray];
+
+        // 1. Info Header
+        setHtml('print-invoice', inv);
+        setHtml('print-kwitansi', inv.replace('INV', 'KWI'));
+        setHtml('print-nama', nama);
+        setHtml('print-dokter', dokter); 
+        setHtml('print-metode-atas', metode); 
+        setHtml('print-tanggal-appointment', tglApt || '-');
+        setHtml('print-catatan', catatan || '-');
+        
+        let totalSeluruhSubtotal = 0;
+        let totalSeluruhDiskon = 0;
+        let itemsHtml = '';
+
+        // 2. Info Item & Gigi
+        listTindakan.forEach((tindakan, index) => {
+            const harga = parseFloat(listHarga[index]) || 0;
+            const qty = parseInt(listQty[index]) || 1;
+            const diskon = parseFloat(listDiskon[index]) || 0;
+            const subtotal = parseFloat(listSubtotal[index]) || 0;
+            
+            const noGigi = (index === 0 && listGigi[0] && listGigi[0] !== '-') ? listGigi[0] : '-'; 
+
+            totalSeluruhSubtotal += subtotal;
+            totalSeluruhDiskon += diskon;
+
+            let diskonLabel = '';
+            if (diskon > 0) {
+                diskonLabel = `<br><span style="color: #888; font-size: 9px;">Disc: ${formatRp(diskon)}</span>`;
+            }
+
+            itemsHtml += `
+            <tr>
+                <td style="border: 1px solid #000; padding: 6px; vertical-align: middle;">
+                    ${tindakan}
+                </td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle;">${noGigi}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle;">x${qty}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right; vertical-align: middle;">${formatRp(harga)}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right; vertical-align: middle;">${formatRp(diskon)}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold; vertical-align: middle;">${formatRp(subtotal)}</td>
+            </tr>`;
+        });
 
         const itemContainer = document.getElementById('print-items-list');
-        if (itemContainer) {
-            itemContainer.innerHTML = `
-            <tr>
-                <td style="border: 1px solid #000; padding: 8px;">${tindakan}</td>
-                <td style="border: 1px solid #000; padding: 8px; text-align: center;">1</td>
-                <td style="border: 1px solid #000; padding: 8px; text-align: right;">${(Number(total) + Number(disc)).toLocaleString('id-ID')}</td>
-                <td style="border: 1px solid #000; padding: 8px; text-align: right;">${Number(disc).toLocaleString('id-ID')}</td>
-                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">${Number(total).toLocaleString('id-ID')}</td>
-            </tr>`;
-        }
+        if (itemContainer) itemContainer.innerHTML = itemsHtml;
+
+        // 3. Info Harga Footer (Terapkan Pembayaran, Kembalian, Hutang)
+        setHtml('print-harga-awal', formatRp(totalSeluruhSubtotal + totalSeluruhDiskon));
+        setHtml('print-diskon', formatRp(totalSeluruhDiskon));
+        setHtml('print-total', formatRp(totalSeluruhSubtotal));
+        setHtml('print-label-transfer', `Dibayar (${metode})`);
         
-        // Munculkan dialog print browser
-        window.print();
+        // Gunakan parameter amount yang di-passing, jika kosong / undefined (kasus nota lama), gunakan totalSeluruhSubtotal
+        let finalPaid = amtPaid !== undefined ? amtPaid : totalSeluruhSubtotal;
+        let finalChange = amtChange !== undefined ? amtChange : 0;
+        let finalDebt = amtDebt !== undefined ? amtDebt : 0;
+
+        setHtml('print-dibayar', formatRp(finalPaid));
+        setHtml('print-kembali', formatRp(finalChange));
+
+        const rowHutang = document.getElementById('row-print-hutang');
+        if(statusInv === 'partial' || finalDebt > 0) {
+            setHtml('print-hutang', formatRp(finalDebt));
+            rowHutang.style.display = 'table-row';
+        } else {
+            rowHutang.style.display = 'none';
+        }
+
+        // Tampilkan Nota -> Print -> Sembunyikan
+        const notaEl = document.getElementById('nota-cetak');
+        if (notaEl) {
+            notaEl.style.display = 'block'; 
+            setTimeout(() => {
+                window.print();
+                notaEl.style.display = 'none'; 
+            }, 300);
+        } else {
+            console.error("Elemen #nota-cetak tidak ditemukan di halaman.");
+        }
     }
 
     document.getElementById('cashierSearch').addEventListener('input', function(e) {
@@ -478,5 +584,4 @@
         });
     });
 </script>
-
 @endsection
