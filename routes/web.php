@@ -59,13 +59,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
         
         Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
-        Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
         Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
         Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
-        Route::get('/office',       [OfficeController::class, 'index'])->name('office');
-        Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
-
+        Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
+        
+        // Settings & Doctor
+        Route::get('/settings', [DoctorController::class, 'index'])->name('settings');
+        Route::get('/settings/doctor/{id}', [App\Http\Controllers\DoctorController::class, 'showJson'])->name('settings.doctor.show_json'); 
+        Route::put('/settings/doctor/{id}', [DoctorController::class, 'update'])->name('settings.doctor.update');
+        Route::delete('/settings/doctor/{id}', [DoctorController::class, 'destroy'])->name('settings.doctor.destroy');
+        
+        // Cashier
         Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
+        Route::post('/cashier/store-payment', [EmrController::class, 'storePayment'])->name('cashier.storePayment');
+        
         // Pendaftaran Backend (Admin)
         Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
         Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])->name('appointments.store');
@@ -88,6 +95,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
         });
     });
+
 
     // ================= USER AREA =================
     Route::middleware('role:PAT')->prefix('user')->name('user.')->group(function () {

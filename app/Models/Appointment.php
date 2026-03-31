@@ -12,10 +12,6 @@ class Appointment extends Model
     use SoftDeletes; 
 
     protected $table = 'registration';
-
-    // ⚠️ PERHATIAN BOSS: 
-    // HANYA aktifkan dua baris di bawah ini JIKA kolom 'id' bertipe Varchar/String/UUID.
-    // Jika 'id' bertipe angka Auto Increment (1, 2, 3...), HAPUS / BIARKAN di-comment!
     protected $keyType = 'string';
     public $incrementing = false;
 
@@ -213,4 +209,6 @@ class Appointment extends Model
     // Sesuaikan 'appointment_id' jika nama kolom foreign key di tabel prosedur berbeda
         return $this->hasMany(MedicalProcedure::class, 'registration_id'); 
     }
+
+
 }

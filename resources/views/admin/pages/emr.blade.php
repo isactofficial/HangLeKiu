@@ -359,8 +359,7 @@ async function processUpdateStatus(url, newStatus) {
         if (response.ok && data.success) {
 
             
-            
-            // Atau jika boss ingin cara instant tanpa request server lagi:
+        
             const activeCardStatus = document.querySelector('.patient-card.active .status-badge');
             if (activeCardStatus) {
                 activeCardStatus.innerText = newStatus.toUpperCase();

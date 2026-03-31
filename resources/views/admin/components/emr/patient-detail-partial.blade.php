@@ -314,7 +314,7 @@
                     activePatientCard.parentElement.click(); 
                 }
             } else {
-                alert("Gagal update status boss!");
+                alert("Gagal update status!");
             }
         })
         .catch(err => {

@@ -27,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('patient', function (Blueprint $table) {
-            // Menghapus kolom jika sewaktu-waktu boss melakukan rollback
+            
             $table->dropColumn([
                 'religion',
                 'education',
