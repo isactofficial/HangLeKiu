@@ -14,6 +14,7 @@ use App\Http\Controllers\ProcedureItemController;
 use App\Http\Controllers\ProcedureMedicineController;
 use App\Http\Controllers\MasterProcedureController;
 use App\Http\Controllers\MasterPoliController;
+use App\Http\Controllers\MasterPaymentMethodController;
 use App\Http\Controllers\MasterGuarantorTypeController;
 use App\Http\Controllers\OdontogramController;
 
@@ -184,6 +185,14 @@ Route::prefix('master-guarantor')->group(function () {
     Route::get('/{id}', [MasterGuarantorTypeController::class, 'show']);
     Route::put('/{id}', [MasterGuarantorTypeController::class, 'update']);
     Route::delete('/{id}', [MasterGuarantorTypeController::class, 'destroy']);
+});
+
+Route::prefix('master-payment')->group(function () {
+    Route::get('/', [MasterPaymentMethodController::class, 'index']);
+    Route::post('/', [MasterPaymentMethodController::class, 'store']);
+    Route::get('/{id}', [MasterPaymentMethodController::class, 'show']);
+    Route::put('/{id}', [MasterPaymentMethodController::class, 'update']);
+    Route::delete('/{id}', [MasterPaymentMethodController::class, 'destroy']);
 });
 
 // ================= ODONTOGRAM =================
