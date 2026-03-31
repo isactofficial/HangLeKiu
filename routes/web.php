@@ -9,6 +9,8 @@ use App\Http\Controllers\EmrController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PenggunaanObatController;
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\ConsumableItemController;
+use App\Http\Controllers\ConsumableUsageController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
@@ -86,6 +88,19 @@ Route::middleware('auth')->group(function () {
             Route::post('/medicine/{id}/stock-in', [MedicineController::class, 'stockIn'])->name('medicine.stockIn');
             
             Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
+   
+            // BPH
+            Route::get('/bhp/items', [ConsumableItemController::class, 'index']);    
+            Route::post('/bhp/items', [ConsumableItemController::class, 'store']);    
+            Route::get('/bhp/items/{id}', [ConsumableItemController::class, 'show']);    
+            Route::put('/bhp/items/{id}', [ConsumableItemController::class, 'update']);    
+            Route::delete('/bhp/items/{id}', [ConsumableItemController::class, 'destroy']);
+
+            Route::get('/bhp/usage',          [ConsumableUsageController::class, 'index']);
+            Route::post('/bhp/usage',         [ConsumableUsageController::class, 'store']);
+            Route::get('/bhp/usage/{id}',     [ConsumableUsageController::class, 'show']);
+            Route::delete('/bhp/usage/{id}',  [ConsumableUsageController::class, 'destroy']);
+        });
         });
     });
 
@@ -98,4 +113,3 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', fn() => view('doctor.pages.dashboard'))->name('dashboard');
     });
-});

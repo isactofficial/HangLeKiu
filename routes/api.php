@@ -17,6 +17,10 @@ use App\Http\Controllers\MasterPoliController;
 use App\Http\Controllers\MasterPaymentMethodController;
 use App\Http\Controllers\MasterGuarantorTypeController;
 use App\Http\Controllers\OdontogramController;
+use App\Http\Controllers\ConsumableItemController;
+use App\Http\Controllers\ConsumableUsageController;
+use App\Http\Controllers\ConsumableRestockController;
+use App\Http\Controllers\ConsumableExpiryLogController;
 
 
 /*
@@ -205,3 +209,29 @@ Route::prefix('odontogram')->group(function () {
     Route::post('/{recordId}/teeth', [OdontogramController::class, 'addTooth']);
     Route::delete('/teeth/{toothId}', [OdontogramController::class, 'deleteTooth']);
 });
+
+// ================= ADMIN BHP (Bahan Habis Pakai) =================
+Route::prefix('bhp')->group(function () {
+    Route::get('/items',          [ConsumableItemController::class, 'index']);
+    Route::post('/items',         [ConsumableItemController::class, 'store']);
+    Route::get('/items/{id}',     [ConsumableItemController::class, 'show']);
+    Route::put('/items/{id}',     [ConsumableItemController::class, 'update']);
+    Route::delete('/items/{id}',  [ConsumableItemController::class, 'destroy']);
+
+    Route::get('/usage',          [ConsumableUsageController::class, 'index']);
+    Route::post('/usage',         [ConsumableUsageController::class, 'store']);
+    Route::get('/usage/{id}',     [ConsumableUsageController::class, 'show']);
+    Route::delete('/usage/{id}',  [ConsumableUsageController::class, 'destroy']);
+
+    Route::get('/restock',        [ConsumableRestockController::class, 'index']);
+    Route::post('/restock',       [ConsumableRestockController::class, 'store']);
+    Route::get('/restock/{id}',   [ConsumableRestockController::class, 'show']);
+    Route::delete('/restock/{id}',[ConsumableRestockController::class, 'destroy']);
+
+    Route::get('/expiry',         [ConsumableExpiryLogController::class, 'index']);
+    Route::post('/expiry',        [ConsumableExpiryLogController::class, 'store']);
+    Route::get('/expiry/{id}',    [ConsumableExpiryLogController::class, 'show']);
+    Route::delete('/expiry/{id}', [ConsumableExpiryLogController::class, 'destroy']);
+
+});
+
