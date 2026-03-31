@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DoctorController;
@@ -61,7 +62,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
         Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
         Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
-        Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
+
+        Route::get('/office',       [OfficeController::class, 'index'])->name('office');
         Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
 
         Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
