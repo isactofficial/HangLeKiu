@@ -3,7 +3,7 @@
     'subtitle'          => 'Kelola tipe Guarantor di sistem hanglekiu',
     'itemLabel'         => 'Guarantor',
     'apiUrl'            => '/api/master-guarantor',
-    'searchPlaceholder' => 'Cari nama penjamin...',
+    'searchPlaceholder' => 'Cari nama guarantor...',
     'inputLabel'        => 'Nama Penjamin',
-    'inputPlaceholder'  => 'Masukkan nama penjamin',
+    'inputPlaceholder'  => 'Masukkan nama guarantor',
 ])
