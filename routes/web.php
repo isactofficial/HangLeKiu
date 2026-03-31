@@ -9,7 +9,6 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\EmrController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PenggunaanObatController;
-use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\ConsumableItemController;
 use App\Http\Controllers\ConsumableUsageController;
 use Illuminate\Support\Facades\Route;
@@ -65,7 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
         Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
         Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
-        Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
+        Route::get('/office', [OfficeController::class, 'index'])->name('office');
         Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
 
         Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
