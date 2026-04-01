@@ -21,7 +21,7 @@ use App\Http\Controllers\ConsumableItemController;
 use App\Http\Controllers\ConsumableUsageController;
 use App\Http\Controllers\ConsumableRestockController;
 use App\Http\Controllers\ConsumableExpiryLogController;
-
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -234,4 +234,17 @@ Route::prefix('bhp')->group(function () {
     Route::delete('/expiry/{id}', [ConsumableExpiryLogController::class, 'destroy']);
 
 });
+
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::get('/master/visit-types', fn() =>
+        response()->json(DB::table('master_visit_type')->select('id', 'name')->get())
+    );
+    Route::get('/master/poli', fn() =>
+        response()->json(DB::table('master_poli')->select('id', 'name')->get())
+    );
+});
+
+
 
