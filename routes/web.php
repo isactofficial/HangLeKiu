@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\DoctorController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\EmrController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PenggunaanObatController;
+use App\Http\Controllers\ConsumableItemController;
+use App\Http\Controllers\ConsumableUsageController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
@@ -58,13 +61,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
         
         Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
-        Route::get('/cashier',      fn() => view('admin.pages.cashier'))->name('cashier');
         Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
         Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
-        Route::get('/office',       fn() => view('admin.layout.office'))->name('office');
-        Route::get('/settings',     fn() => view('admin.layout.settings'))->name('settings');
-
+        Route::get('/office',       [OfficeController::class, 'index'])->name('office');
+        
+        // Settings & Doctor Management
+        Route::get('/settings', [DoctorController::class, 'index'])->name('settings');
+        Route::get('/settings/doctor/{id}', [DoctorController::class, 'showJson'])->name('settings.doctor.show_json'); 
+        Route::put('/settings/doctor/{id}', [DoctorController::class, 'update'])->name('settings.doctor.update');
+        Route::delete('/settings/doctor/{id}', [DoctorController::class, 'destroy'])->name('settings.doctor.destroy');
+        
+        // Cashier
         Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
+        Route::post('/cashier/store-payment', [EmrController::class, 'storePayment'])->name('cashier.storePayment');
+        
         // Pendaftaran Backend (Admin)
         Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
         Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])->name('appointments.store');
@@ -85,6 +95,18 @@ Route::middleware('auth')->group(function () {
             Route::post('/medicine/{id}/stock-in', [MedicineController::class, 'stockIn'])->name('medicine.stockIn');
             
             Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
+
+            // BHP (Bahan Habis Pakai)
+            Route::get('/bhp/items', [ConsumableItemController::class, 'index']);    
+            Route::post('/bhp/items', [ConsumableItemController::class, 'store']);    
+            Route::get('/bhp/items/{id}', [ConsumableItemController::class, 'show']);    
+            Route::put('/bhp/items/{id}', [ConsumableItemController::class, 'update']);    
+            Route::delete('/bhp/items/{id}', [ConsumableItemController::class, 'destroy']);
+
+            Route::get('/bhp/usage',          [ConsumableUsageController::class, 'index']);
+            Route::post('/bhp/usage',         [ConsumableUsageController::class, 'store']);
+            Route::get('/bhp/usage/{id}',     [ConsumableUsageController::class, 'show']);
+            Route::delete('/bhp/usage/{id}',  [ConsumableUsageController::class, 'destroy']);
         });
     });
 

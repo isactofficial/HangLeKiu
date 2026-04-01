@@ -171,14 +171,29 @@
                             @foreach ($timeSlots as $slot)
                                 <tr>
                                     <td class="td-time">{{ $slot }}</td>
+                                    
                                     @if ($viewMode === 'all')
+                                        {{-- ====== MODE SEMUA DOKTER ====== --}}
                                         @foreach ($doctors as $doc)
-                                            @php 
+                                           @php 
                                                 $apt = $schedule[$doc->id][$slot] ?? null; 
-                                                $poliId = $doc->poli_id ?? ''; // Assuming doctor has poli_id relation or attribute
+                                                $poliId = $doc->poli_id ?? ''; 
+                                                
+                                                // Ambil nama hari dalam bahasa Inggris huruf kecil
+                                                $dayName = strtolower(\Carbon\Carbon::parse($date)->locale('en')->dayName);
+                                                
+                                                // Query ke tabel doctor_schedule (Kembalikan ke logika awal yang pas)
+                                                $isPracticing = \Illuminate\Support\Facades\DB::table('doctor_schedule')
+                                                    ->where('doctor_id', $doc->id)
+                                                    ->where('day', $dayName)
+                                                    ->where('is_active', 1)
+                                                    ->where('start_time', '<=', $slot . ':00')
+                                                    ->where('end_time', '>', $slot . ':00') 
+                                                    ->exists();
                                             @endphp
-                                            <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}')">
-                                                @if ($apt)
+                                            
+                                            @if ($apt)
+                                                <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}')">
                                                     <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" 
                                                         data-id="{{ $apt->id }}"
                                                         data-patient="{{ $apt->patient_name }}"
@@ -192,36 +207,66 @@
                                                         <div class="apt-treat">{{ $apt->treatment_name }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
-                                                @endif
-                                            </td>
+                                                </td>
+                                            @elseif ($isPracticing)
+                                                {{-- Sel Kosong TAPI Dokter Sedang Praktek (Hanya Teks) --}}
+                                               <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}', '{{ $date }}')" class="cursor-pointer hover:bg-[#fdfaf8] transition-colors" style="text-align: center; vertical-align: middle;">
+                                                    <span style="color: #A67C52; font-size: 11px; font-weight: 700;">Tambah Pasien</span>
+                                                </td>
+                                            @else
+                                                {{-- Sel Kosong DAN Diluar Jam Praktek / Terlalu Mepek Jam Selesai --}}
+                                                <td style="background-color: #f9fafb; cursor: not-allowed; text-align: center; vertical-align: middle;">
+                                                    <span style="color: #d1d5db; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Tidak Ada Praktek</span>
+                                                </td>
+                                            @endif
                                         @endforeach
                                     @else
-    {{-- Mode Per Dokter (Mingguan) --}}
-    @foreach ($dateColumns as $dc)
-        @php
-            // JANGAN PAKAI QUERY DATABASE LAGI DISINI BOSS!
-            // Ambil langsung dari $schedule yang sudah kita bulatkan di Controller
-            $apt = $schedule[$dc][$slot] ?? null; 
-            
-            $isColToday = $dc === $today;
-            $poliId = $selectedDoctor->poli_id ?? '';
-        @endphp
-        
-        <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
-            @if ($apt)
-                <div class="apt-card" style="border-left: 4px solid {{ $apt->status_color }}" 
-                    data-id="{{ $apt->id }}"
-                    data-patient="{{ $apt->patient_name }}"
-                    onclick="handleAptClick(this, event)">
-                    <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">
-                        {{ $apt->patient_name }}
-                    </div>
-                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
-                </div>
-            @endif
-        </td>
-    @endforeach
-@endif
+                                        {{-- ====== MODE SATU DOKTER ====== --}}
+                                        @foreach ($dateColumns as $dc)
+                                          
+                                                @php 
+                                                $apt = $schedule[$dc][$slot] ?? null; 
+                                                $isColToday = $dc === $today;
+                                                $poliId = $selectedDoctor->poli_id ?? '';
+
+                                                // Ambil nama hari dalam bahasa Inggris huruf kecil
+                                                $dayName = strtolower(\Carbon\Carbon::parse($dc)->locale('en')->dayName);
+                                                
+                                                // Query ke tabel doctor_schedule
+                                                $isPracticing = \Illuminate\Support\Facades\DB::table('doctor_schedule')
+                                                    ->where('doctor_id', $selectedDoctorId)
+                                                    ->where('day', $dayName)
+                                                    ->where('is_active', 1)
+                                                    ->where('start_time', '<=', $slot . ':00')
+                                                    ->where('end_time', '>', $slot . ':00') // 15:45 bisa, 16:00 mati
+                                                    ->exists();
+                                            @endphp
+                                            
+                                            @if ($apt)
+                                                <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
+                                                    <div class="apt-card" style="border-left: 4px solid {{ $apt->status_color }}" 
+                                                        data-id="{{ $apt->id }}"
+                                                        data-patient="{{ $apt->patient_name }}"
+                                                        onclick="handleAptClick(this, event)">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">
+                                                            {{ $apt->patient_name }}
+                                                        </div>
+                                                        <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                    </div>
+                                                </td>
+                                            @elseif ($isPracticing)
+                                                {{-- Sel Kosong TAPI Dokter Sedang Praktek (Hanya Teks) --}}
+                                                <td class="{{ $isColToday ? 'col-today' : '' }} cursor-pointer hover:bg-[#fdfaf8] transition-colors" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')" style="text-align: center; vertical-align: middle;">
+                                                    <span style="color: #A67C52; font-size: 11px; font-weight: 700;">Tambah Pasien</span>
+                                                </td>
+                                            @else
+                                                {{-- Sel Kosong DAN Diluar Jam Praktek / Terlalu Mepek Jam Selesai --}}
+                                                <td class="{{ $isColToday ? 'col-today' : '' }}" style="background-color: #f9fafb; cursor: not-allowed; text-align: center; vertical-align: middle;">
+                                                    <span style="color: #d1d5db; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Tidak Ada Praktek</span>
+                                                </td>
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -236,7 +281,19 @@
                                 <div class="m-time-label">{{ $slot }}</div>
                                 <div class="m-cards">
                                     @foreach ($doctors as $doc)
-                                        @php $apt = $schedule[$doc->id][$slot] ?? null; @endphp
+                                        @php 
+                                            $apt = $schedule[$doc->id][$slot] ?? null; 
+                                            $dayName = strtolower(\Carbon\Carbon::parse($date)->locale('en')->dayName);
+                                            
+                                            $isPracticing = \Illuminate\Support\Facades\DB::table('doctor_schedule')
+                                                ->where('doctor_id', $doc->id)
+                                                ->where('day', $dayName)
+                                                ->where('is_active', 1)
+                                                ->where('start_time', '<=', $slot . ':00')
+                                                ->where('end_time', '>', $slot . ':00')
+                                                ->exists();
+                                        @endphp
+
                                         @if ($apt)
                                             <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
                                                 data-id="{{ $apt->id }}"
@@ -257,9 +314,13 @@
                                                     {{ $doc->full_name }}
                                                 </div>
                                             </div>
+                                        @elseif ($isPracticing)
+                                            <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer; border: 1px dashed #A67C52;">
+                                                <div class="m-empty-label text-[#A67C52]"><i class="fa fa-plus"></i> Tambah Pasien ({{ $doc->full_name }})</div>
+                                            </div>
                                         @else
-                                            <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer;">
-                                                <div class="m-empty-label">Kosong ({{ $doc->full_name }})</div>
+                                            <div class="m-empty-slot" style="background:#f9fafb; cursor:not-allowed; border: 1px dashed #e5e7eb;">
+                                                <div class="m-empty-label" style="color:#d1d5db;">Tidak Ada Praktek ({{ $doc->full_name }})</div>
                                             </div>
                                         @endif
                                     @endforeach
@@ -270,6 +331,7 @@
                         @foreach ($dateColumns as $dc)
                             @php 
                                 $dcCarbon = \Carbon\Carbon::parse($dc); 
+                                
                                 $aptsForDate = \App\Models\Appointment::with('patient')
                                     ->where('doctor_id', $selectedDoctorId)
                                     ->whereDate('appointment_datetime', $dc)
@@ -300,7 +362,9 @@
                                             </div>
                                         @endforeach
                                     @else
-                                        <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '', '{{ $selectedDoctor->poli_id ?? '' }}', '{{ $dc }}')" style="cursor:pointer;">Tidak ada jadwal (Klik untuk Daftar)</div>
+                                        <div class="m-empty-slot" style="background:#f9fafb; border: 1px dashed #e5e7eb; cursor:not-allowed;">
+                                            <div class="m-empty-label" style="color:#d1d5db;">Tidak ada jadwal di hari ini</div>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -311,7 +375,6 @@
             </div>
         </div>
     </div>
-
 
 <script>
         // Registration Modal Functions
@@ -354,22 +417,22 @@
                 closeRegModal(e.target.id);
             }
         });
-        function handleAptClick(el, e) {
-        if (e) e.stopPropagation();
-        const id = el.getAttribute('data-id');
-        const patient = el.getAttribute('data-patient');
-        const mr = el.getAttribute('data-mr');
-        const treatment = el.getAttribute('data-treatment');
-        const time = el.getAttribute('data-time');
-        const doctor = el.getAttribute('data-doctor');
-        const status = el.getAttribute('data-status');
         
-        console.log('Opening Apt Detail Modal for:', patient);
-        openApptDetailModal(id, patient, mr, treatment, time, doctor, status);
-    }
+        function handleAptClick(el, e) {
+            if (e) e.stopPropagation();
+            const id = el.getAttribute('data-id');
+            const patient = el.getAttribute('data-patient');
+            const mr = el.getAttribute('data-mr');
+            const treatment = el.getAttribute('data-treatment');
+            const time = el.getAttribute('data-time');
+            const doctor = el.getAttribute('data-doctor');
+            const status = el.getAttribute('data-status');
+            
+            console.log('Opening Apt Detail Modal for:', patient);
+            openApptDetailModal(id, patient, mr, treatment, time, doctor, status);
+        }
 </script>
 
-    <!-- Include Registration Modals -->
     @include('admin.components.pasien-baru')
     @include('admin.components.pendaftaran-baru')
     @include('admin.components.appointment-detail')

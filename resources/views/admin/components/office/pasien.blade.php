@@ -1,8 +1,18 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/office/pasien.css') }}">
+    <style>
+        .pas-chart-full {
+            background: #fff; border: 1px solid #E5D6C5; border-radius: 8px;
+            padding: 20px; box-shadow: 0 1px 3px rgba(88,44,12,.05);
+            margin-bottom: 20px;
+        }
+        .pas-chart-container { height: 250px; position: relative; }
+        .pas-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (max-width: 768px) { .pas-row { grid-template-columns: 1fr; } }
+    </style>
 @endpush
 
-{{-- resources/views/admin/office/pasien.blade.php --}}
+{{-- resources/views/admin/components/office/pasien.blade.php --}}
 @php $tab = request('tab', 'summary'); @endphp
 <div class="pas-tabs">
     <a href="?menu=pasien&tab=summary" class="pas-tab {{ $tab === 'summary' ? 'active' : 'inactive' }}">Summary</a>
@@ -15,83 +25,65 @@
     <div class="pas-stat-grid">
         <div class="pas-stat">
             <p class="pas-stat-label">Pasien Terdaftar</p>
-            <p class="pas-stat-number">385</p>
+            <p class="pas-stat-number">{{ number_format($totalPatients ?? 0) }}</p>
             <p style="font-size:13px;color:#6B513E;margin:6px 0 0;">Pasien</p>
         </div>
         <div class="pas-stat">
             <p class="pas-stat-label">Pasien Baru Bulan Ini</p>
-            <p class="pas-stat-number">2</p>
+            <p class="pas-stat-number">{{ number_format($newPatientsThisMonth ?? 0) }}</p>
             <p style="font-size:13px;color:#6B513E;margin:6px 0 0;">Pasien</p>
         </div>
         <div class="pas-stat">
             <p class="pas-stat-label">Pasien Walk-in Hari Ini</p>
-            <p class="pas-stat-number">4</p>
+            <p class="pas-stat-number">{{ number_format($walkInToday ?? 0) }}</p>
             <p style="font-size:13px;color:#6B513E;margin:6px 0 0;">Pasien</p>
         </div>
     </div>
 
-    <div class="pas-bday-section">
-        <p class="pas-bday-label">Upcoming Birthdays</p>
+        <div class="pas-bday-section">
+        <p class="pas-bday-label">Upcoming Birthdays (7 Hari ke depan)</p>
         <div class="pas-bday-row">
-            <div class="pas-bday-card">Adinda, Tanggal Lahir: 08-03-2005</div>
-            <div class="pas-bday-card">Adinda Salsabila, Tanggal Lahir: 08-03-2005</div>
-            <div class="pas-bday-card">Farrah, Tanggal Lahir: 06-03-2003</div>
+            @forelse ($upcomingBirthdays ?? [] as $bday)
+                <div class="pas-bday-card">
+                    <strong>{{ $bday->full_name }}</strong>, 
+                    Tanggal Lahir: {{ $bday->date_of_birth->format('d-m-Y') }}
+                </div>
+            @empty
+                <div class="pas-bday-card" style="opacity: 0.6;">Tidak ada ulang tahun dalam waktu dekat.</div>
+            @endforelse
         </div>
     </div>
 
-    <div class="pas-chart-grid">
-        @foreach (['Agama', 'Golongan darah', 'Pendidikan terakhir', 'Pekerjaan', 'Status'] as $chartTitle)
-            <div class="pas-chart-card"
-                style="{{ $loop->last && $loop->count % 2 !== 0 ? 'grid-column:span 2; max-width:50%;' : '' }}">
-                <p class="pas-chart-title">{{ $chartTitle }}</p>
-                <div class="pas-chart-inner">
-                    <div class="pas-y-axis">
-                        <span class="pas-y-tick">0</span>
-                        <span class="pas-y-tick">95</span>
-                        <span class="pas-y-tick">190</span>
-                        <span class="pas-y-tick">285</span>
-                        <span class="pas-y-tick">380</span>
-                    </div>
-                    <div style="flex:1;">
-                        <div class="pas-chart-border">
-                            <div class="pas-bar-wrap">
-                                <div class="pas-bar-col">
-                                    <div class="pas-bar" style="height:{{ $chartTitle === 'Agama' ? '90%' : '95%' }};">
-                                    </div>
-                                    <span
-                                        class="pas-bar-label">{{ $chartTitle === 'Agama' ? 'Tidak Tahu' : 'Tidak Tahu' }}</span>
-                                </div>
-                                @if ($chartTitle === 'Agama')
-                                    <div class="pas-bar-col">
-                                        <div class="pas-bar" style="height:20%;"></div>
-                                        <span class="pas-bar-label">Islam</span>
-                                    </div>
-                                @else
-                                    <div class="pas-bar-col">
-                                        <div class="pas-bar" style="height:5%;"></div>
-                                        <span class="pas-bar-label">Lainnya</span>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="pas-row">
+        <div class="pas-chart-card">
+            <p class="pas-chart-title">Distribusi Golongan Darah</p>
+            <div class="pas-chart-container">
+                <canvas id="bloodTypeChart"></canvas>
             </div>
-        @endforeach
+        </div>
+        <div class="pas-chart-card">
+            <p class="pas-chart-title">Pendidikan Terakhir</p>
+            <div class="pas-chart-container">
+                <canvas id="educationChart"></canvas>
+            </div>
+        </div>
     </div>
+
 @else
     <div class="pas-card">
         <div class="pas-card-header">
             <h2 class="pas-card-title">Data Pasien</h2>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                <div class="pas-search-box">
+                <form action="{{ url()->current() }}" method="GET" class="pas-search-box">
+                    <input type="hidden" name="menu" value="pasien">
+                    <input type="hidden" name="tab" value="data-pasien">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E"
                         stroke-width="2">
                         <circle cx="11" cy="11" r="8" />
                         <path d="M21 21l-4.35-4.35" />
                     </svg>
-                    <input type="text" placeholder="Cari nama, No MR, No KTP...">
-                </div>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, No MR, No KTP...">
+                </form>
                 <button class="pas-btn-export">Export</button>
             </div>
         </div>
@@ -109,80 +101,126 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td style="color:#C58F59;font-weight:600;">MR-00385</td>
-                        <td>Rina Wulandari</td>
-                        <td>12/05/1995</td>
-                        <td>3573012345678901</td>
-                        <td>0812-3456-7890</td>
-                        <td><span class="pas-badge pas-badge-ok">Umum</span></td>
-                        <td>05/03/2026</td>
-                    </tr>
-                    <tr>
-                        <td style="color:#C58F59;font-weight:600;">MR-00384</td>
-                        <td>Budi Santoso</td>
-                        <td>08/11/1988</td>
-                        <td>3573019876543210</td>
-                        <td>0813-9876-5432</td>
-                        <td><span class="pas-badge pas-badge-ok">Umum</span></td>
-                        <td>05/03/2026</td>
-                    </tr>
-                    <tr>
-                        <td style="color:#C58F59;font-weight:600;">MR-00383</td>
-                        <td>Sari Melati</td>
-                        <td>25/03/2000</td>
-                        <td>3573011122334455</td>
-                        <td>0814-1122-3344</td>
-                        <td><span class="pas-badge pas-badge-warning">BPJS</span></td>
-                        <td>06/03/2026</td>
-                    </tr>
-                    <tr>
-                        <td style="color:#C58F59;font-weight:600;">MR-00382</td>
-                        <td>Hendra Gunawan</td>
-                        <td>17/07/1982</td>
-                        <td>3573015566778899</td>
-                        <td>0815-5566-7788</td>
-                        <td><span class="pas-badge pas-badge-ok">Umum</span></td>
-                        <td>06/03/2026</td>
-                    </tr>
-                    <tr>
-                        <td style="color:#C58F59;font-weight:600;">MR-00381</td>
-                        <td>Dewi Kusuma</td>
-                        <td>30/01/1993</td>
-                        <td>3573016677889900</td>
-                        <td>0816-6677-8899</td>
-                        <td><span class="pas-badge pas-badge-warning">BPJS</span></td>
-                        <td>02/03/2026</td>
-                    </tr>
+                    @forelse ($patients ?? [] as $p)
+                        <tr>
+                            <td style="color:#C58F59;font-weight:600;">{{ $p->medical_record_no }}</td>
+                            <td>{{ $p->full_name }}</td>
+                            <td>{{ $p->date_of_birth ? $p->date_of_birth->format('d/m/Y') : '-' }}</td>
+                            <td>{{ $p->id_card_number ?: '-' }}</td>
+                            <td>{{ $p->phone_number ?: '-' }}</td>
+                            <td>
+                                @php
+                                    $guarantor = $p->latestAppointment?->guarantorType?->name ?? 'Umum';
+                                    $badgeClass = ($guarantor === 'BPJS') ? 'pas-badge-warning' : 'pas-badge-ok';
+                                @endphp
+                                <span class="pas-badge {{ $badgeClass }}">{{ $guarantor }}</span>
+                            </td>
+                            <td>{{ $p->latestAppointment ? $p->latestAppointment->appointment_datetime->format('d/m/Y') : '-' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" style="text-align:center;padding:40px;color:#999;">Belum ada data pasien.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
         <div class="pas-pagination">
-            <div class="pas-page-size">Jumlah baris per halaman: <select>
-                    <option>10</option>
-                    <option>25</option>
-                    <option>50</option>
-                </select></div>
-            <div class="pas-page-info">1–5 dari 385 data</div>
+            <div class="pas-page-size">
+                Showing {{ $patients->firstItem() ?? 0 }} to {{ $patients->lastItem() ?? 0 }} of {{ $patients->total() ?? 0 }} entries
+            </div>
+            
             <div class="pas-page-controls">
-                <button class="pas-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
-                    </svg></button>
-                <button class="pas-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M15 18l-6-6 6-6" />
-                    </svg></button>
-                <button class="pas-page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5">
-                        <path d="M9 18l6-6-6-6" />
-                    </svg></button>
-                <button class="pas-page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2.5">
-                        <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
-                    </svg></button>
+                @if ($patients->onFirstPage())
+                    <button class="pas-page-btn" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6" /></svg></button>
+                @else
+                    <a href="{{ $patients->previousPageUrl() }}" class="pas-page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6" /></svg></a>
+                @endif
+
+                @if ($patients->hasMorePages())
+                    <a href="{{ $patients->nextPageUrl() }}" class="pas-page-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" /></svg></a>
+                @endif
             </div>
         </div>
     </div>
 
 @endif
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    @if ($tab === 'summary')
+    // Color Palette
+    const primaryColor = '#C58F59';
+    const secondaryColor = '#582C0C';
+    const gridColor = '#F3EDE6';
+
+    // 1. Blood Type Chart (Bar)
+    const bloodCtx = document.getElementById('bloodTypeChart').getContext('2d');
+    new Chart(bloodCtx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode(array_keys($bloodTypeStats)) !!},
+            datasets: [{
+                data: {!! json_encode(array_values($bloodTypeStats)) !!},
+                backgroundColor: primaryColor,
+                hoverBackgroundColor: primaryColor, // Disable hover color change
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor },
+                    border: { display: true, color: primaryColor, width: 2 }
+                },
+                x: { 
+                    grid: { display: false },
+                    border: { display: true, color: primaryColor, width: 2 }
+                }
+            }
+        }
+    });
+
+    // 2. Education Chart (Bar)
+    const eduCtx = document.getElementById('educationChart').getContext('2d');
+    new Chart(eduCtx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode(array_keys($educationStats)) !!},
+            datasets: [{
+                data: {!! json_encode(array_values($educationStats)) !!},
+                backgroundColor: secondaryColor,
+                hoverBackgroundColor: secondaryColor,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor },
+                    border: { display: true, color: secondaryColor, width: 2 }
+                },
+                x: { 
+                    grid: { display: false },
+                    border: { display: true, color: secondaryColor, width: 2 }
+                }
+            }
+        }
+    });
+    @endif
+});
+</script>
+@endpush

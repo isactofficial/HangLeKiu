@@ -1,4 +1,4 @@
-﻿/* ==========================================================
+/* ==========================================================
    Extracted from: resources\views\admin\components\office\pasien.blade.php
    ========================================================== */
 
@@ -43,14 +43,23 @@
     .pas-chart-area  { position: relative; height: 150px; }
 
     /* simple bar chart drawn with CSS */
-    .pas-bar-wrap { display: flex; align-items: flex-end; gap: 16px; height: 130px; padding: 0 10px; }
+    .pas-bar-wrap { 
+        display: flex; align-items: flex-end; gap: 16px; height: 130px; padding: 0 10px; 
+        position: relative;
+        background-image: linear-gradient(to top, #F3EDE6 1px, transparent 1px);
+        background-size: 100% 25%; /* 4 sections */
+    }
     .pas-bar-col  { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-    .pas-bar      { width: 100%; background: #f4a4a4; border-radius: 4px 4px 0 0; }
+    .pas-bar      { width: 100%; background: #C58F59; border-radius: 4px 4px 0 0; transition: background 0.2s; }
+    .pas-bar:hover { background: #582C0C; }
     .pas-bar-label { font-size: 13px; color: #6B513E; text-align: center; }
     .pas-y-axis   { display: flex; flex-direction: column-reverse; justify-content: space-between; height: 130px; padding: 0; }
     .pas-y-tick   { font-size: 13px; color: #9CA3AF; }
-    .pas-chart-inner { display: flex; gap: 6px; }
-    .pas-chart-border { border: 1px solid #E5D6C5; border-radius: 4px; padding: 6px 8px; }
+    .pas-chart-inner { display: flex; gap: 10px; }
+    .pas-chart-border { 
+        border: 1px solid #E5D6C5; border-left: 2px solid #C58F59; border-bottom: 2px solid #C58F59;
+        border-radius: 0; padding: 0; position: relative; 
+    }
 
     /* data pasien table */
     .pas-card { background:#fff; border:1px solid #E5D6C5; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(88,44,12,.05); }

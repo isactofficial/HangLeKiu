@@ -90,19 +90,26 @@
     /* ================= 5. RIGHT ACTIONS ================= */
     .emr-side-actions { flex: 0 0 280px; width: 280px; display: flex; flex-direction: column; gap: 15px; }
     .diagnosa-container { position: relative; width: 100%; }
-    .btn-primary-blue { 
-        background: #2563eb; color: #fff; border: none; padding: 15px 18px; 
+    .btn-primary-brown { 
+        background: #3b331e; color: #fff; border: none; padding: 15px 18px; 
         border-radius: 10px; font-weight: 700; font-size: 13px; width: 100%; 
         cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        box-shadow: 0 4px 12px rgba(59, 51, 30, 0.2);
+        transition: 0.3s;
+    }
+    .btn-primary-brown:hover:not(:disabled) { background: #2a2415; }
+    .btn-primary-brown:disabled { 
+        background: #cbd5e0; color: #718096; cursor: not-allowed; 
+        box-shadow: none; 
     }
     .diagnosa-dropdown { position: absolute; top: 105%; left: 0; width: 100%; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 200; padding: 12px; }
     .diag-search-input { width: 100%; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: #f8fafc; margin-bottom: 12px; box-sizing: border-box; outline: none; }
     .diag-list { max-height: 250px; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
     .diagnosa-item { display: block; padding: 12px 15px; font-size: 13px; font-weight: 600; color: #4a5568; text-decoration: none; border-radius: 8px; }
-    .diagnosa-item:hover { background-color: #f0f7ff; color: #2563eb; }
+    .diagnosa-item:hover { background-color: #f5f5f5; color: #3b331e; }
 
-    .btn-outline-blue { background: #fff; color: #2563eb; border: 2px solid #2563eb; padding: 15px 18px; border-radius: 10px; font-weight: 700; font-size: 13px; width: 100%; cursor: pointer; }
+    .btn-outline-brown { background: #fff; color: #3b331e; border: 2px solid #3b331e; padding: 15px 18px; border-radius: 10px; font-weight: 700; font-size: 13px; width: 100%; cursor: pointer; transition: 0.3s; }
+    .btn-outline-brown:hover { background: #3b331e; color: #fff; }
     .riwayat-accordion { margin-top: 15px; padding: 15px 0; border-top: 1px solid #edf2f7; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 14px; font-weight: 800; color: #2d3748; }
     
     .hidden { display: none !important; }
@@ -182,6 +189,11 @@
                         </div>
                         
                         <div class="card-actions-row">
+                            @if($appointment->status == 'succeed')
+                                <a href="{{ route('admin.cashier') }}" class="btn-ke-kasir" style="background: #10b981; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; text-decoration: none; display: flex; align-items: center; gap: 5px; margin-right: 5px;">
+                                    <i class="fa fa-wallet"></i> KE KASIR
+                                </a>
+                            @endif
                             <i class="fa fa-print icon-action"></i>
                             <i class="fa fa-eye icon-action"></i>
                             
@@ -232,7 +244,7 @@
         {{-- KANAN: ACTIONS --}}
         <div class="emr-side-actions">
             <div class="diagnosa-container">
-                <button class="btn-primary-blue" onclick="toggleDiagnosaMenu(event)">
+                <button class="btn-primary-brown" onclick="toggleDiagnosaMenu(event)" {{ ($appointment->status ?? '') !== 'engaged' ? 'disabled' : '' }}>
                     <span>+ TAMBAH DIAGNOSA</span>
                     <i class="fa fa-chevron-down"></i>
                 </button>
@@ -246,12 +258,12 @@
                                 age: '{{ \Carbon\Carbon::parse($appointment->patient->date_of_birth)->age ?? 0 }} Tahun',
                                 payment: '{{ $appointment->guarantorType->name ?? 'Tunai' }}',
                                 patient_id: '{{ $appointment->patient_id ?? '' }}',
-                                registration_id: '{{ $appointment->id ?? '' }}'
+                                registration_id: '{{ $appointment->id ?? '' }}',
+                                doctor_id: '{{ $appointment->doctor_id ?? '' }}',
+                                doctor_name: '{{ $appointment->doctor->full_name ?? '' }}'
                             })">
                                 Tambah Prosedur
                             </a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Catatan Organ</a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Catatan Dokter</a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleOdontogramModal(true, {
                                     name: '{{ $appointment->patient->full_name ?? '-' }}',
                                     rm: '{{ $appointment->patient->medical_record_no ?? '-' }}',
@@ -259,17 +271,15 @@
                                     age: '{{ \Carbon\Carbon::parse($appointment->patient->date_of_birth)->age ?? 0 }} Tahun',
                                     payment: '{{ $appointment->guarantorType->name ?? 'Tunai' }}',
                                     patient_id: '{{ $appointment->patient_id ?? '' }}',
-                                    registration_id: '{{ $appointment->id ?? '' }}'
+                                    registration_id: '{{ $appointment->id ?? '' }}',
+                                    doctor_id: '{{ $appointment->doctor_id ?? '' }}',
+                                    doctor_name: '{{ $appointment->doctor->full_name ?? '' }}'
                                 })">Tambah Odontogram</a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Asuhan Keperawatan</a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Obgyn</a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Catatan KB</a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item">Tambah Rekam Medis Tubuh</a></li>
                     </ul>
                 </div>
             </div>
             
-            <button class="btn-outline-blue">PRINT REKAM MEDIS</button>
+            <button class="btn-outline-brown">PRINT REKAM MEDIS</button>
             
             <div class="riwayat-accordion">
                 <span>RIWAYAT PENYAKIT</span>
@@ -304,7 +314,7 @@
                     activePatientCard.parentElement.click(); 
                 }
             } else {
-                alert("Gagal update status boss!");
+                alert("Gagal update status!");
             }
         })
         .catch(err => {

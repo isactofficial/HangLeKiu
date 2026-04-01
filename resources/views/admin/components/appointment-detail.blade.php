@@ -1,11 +1,10 @@
-{{-- Modal Detail Janji Temu --}}
 <style>
     /* ==========================================================================
        MODAL CONTAINER (Lebih halus & premium)
        ========================================================================== */
     .ad-modal-content {
         background: var(--white);
-        border-radius: 8px; /* Radius dikurangi agar tidak terlalu membulat */
+        border-radius: 8px;
         border: 1px solid var(--cream-200);
         width: 100%;
         max-width: 440px;
@@ -145,7 +144,7 @@
         color: #9e8e7d;
         padding-left: 20px;
         font-weight: 400;
-        line-height: 1.6; /* Tambahan jarak baca */
+        line-height: 1.6;
     }
 
     /* ==========================================================================
@@ -166,7 +165,7 @@
 
     .ad-schedule-text {
         font-size: 14px;
-        line-height: 1.8; /* Jarak antar baris diperlebar */
+        line-height: 1.8;
         color: var(--brown-600);
     }
     .ad-schedule-text strong {
@@ -189,7 +188,7 @@
 
     .ad-meta-info {
         font-size: 13px;
-        line-height: 1.8; /* Jarak antar baris diperlebar */
+        line-height: 1.8;
         color: #9e8e7d;
     }
     .ad-meta-info span {
@@ -252,7 +251,6 @@
         background: var(--cream-50);
     }
 
-    /* Wrapper untuk Dropdown agar posisinya relatif terhadap tombol */
     .ad-status-wrapper {
         position: relative;
         display: inline-block;
@@ -282,8 +280,8 @@
     .ad-status-dropdown-menu {
         display: none;
         position: absolute;
-        bottom: calc(100% + 8px); /* Selalu menempel 8px di atas tombol */
-        right: 0;                 /* Rata ke sebelah kanan tombol */
+        bottom: calc(100% + 8px);
+        right: 0;
         background: var(--white);
         border-radius: 8px;
         box-shadow: 0 10px 25px rgba(88, 44, 12, 0.1);
@@ -315,7 +313,7 @@
 <div id="modalAppointmentDetail" class="reg-modal-overlay">
     <div class="ad-modal-content">
 
-        {{-- Top Bar (Sejajar Kiri - Kanan) --}}
+        {{-- Top Bar --}}
         <div class="ad-top-bar">
             <div class="ad-top-left">
                 <span class="ad-code-badge">Code: SQKR9Y</span>
@@ -390,7 +388,8 @@
 
         {{-- Footer Section --}}
         <div class="ad-footer">
-            <button type="button" class="ad-btn-medical">Lihat Rekam Medis</button>
+            {{-- TAMBAHKAN ID DI SINI AGAR BISA DIPANGGIL JS --}}
+            <button type="button" class="ad-btn-medical" id="btn_goto_emr">Lihat Rekam Medis</button>
 
             {{-- Wrapper Dropdown --}}
             <div class="ad-status-wrapper">
@@ -433,6 +432,15 @@
             const btnStatusText = document.getElementById('ad_btn_status_text');
             if (statusText) statusText.textContent = statusCapitalized;
             if (btnStatusText) btnStatusText.textContent = statusCapitalized;
+        }
+
+        // TAMBAHKAN LOGIKA REDIRECT KE EMR DI SINI
+        const btnEmr = document.getElementById('btn_goto_emr');
+        if (btnEmr) {
+            btnEmr.onclick = function() {
+                // Pindah ke halaman EMR dengan membawa parameter 'open' di URL
+                window.location.href = '/admin/emr?open=' + id;
+            };
         }
         
         openRegModal('modalAppointmentDetail');

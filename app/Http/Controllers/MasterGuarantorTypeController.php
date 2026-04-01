@@ -8,6 +8,6 @@ class MasterGuarantorTypeController extends BaseMasterController
 {
     public function __construct()
     {
-        parent::__construct(MasterGuarantorType::class, 'Tipe Penjamin');
+        parent::__construct(MasterGuarantorType::class, 'Guarantor');
     }
 }

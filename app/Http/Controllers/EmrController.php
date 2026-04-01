@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment; 
+use App\Models\OndotogramTooth;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class EmrController extends Controller
@@ -39,32 +43,102 @@ class EmrController extends Controller
         return view('admin.pages.emr', compact('todayPatients', 'allPatients', 'search'));
     }
 
-    // Fungsi untuk melihat detail EMR (nanti kita isi isinya)
     public function show(Request $request, $id)
-{
-    // Ambil data pendaftaran beserta relasi pasien dan dokternya
-    $appointment = \App\Models\Appointment::with(['patient', 'doctor'])->findOrFail($id);
+    {
+        // Ambil data pendaftaran beserta relasi pasien dan dokternya
+        $appointment = Appointment::with(['patient', 'doctor'])->findOrFail($id);
 
-    // Jika request datang dari AJAX (klik sidebar), kirimkan isi tengah saja
-    if ($request->ajax()) {
-        return view('admin.components.emr.patient-detail-partial', compact('appointment'))->render();
+        // Jika request datang dari AJAX (klik sidebar), kirimkan isi tengah saja
+        if ($request->ajax()) {
+            return view('admin.components.emr.patient-detail-partial', compact('appointment'))->render();
+        }
+
+        return redirect()->route('admin.emr');
     }
 
-    // Fallback jika diakses manual lewat URL (opsional)
-    return redirect()->route('admin.emr');
-}
-
-public function indexCashier()
-{
-    // Ambil semua janji temu yang statusnya 'succeed' (siap bayar) 
-    // atau yang sudah ada record di tabel medical_procedures (asumsi kita simpan pembayaran di sana)
-    // Coba panggil relasi satu per satu
-    $appointments = \App\Models\Appointment::with(['patient', 'doctor', 'medicalProcedures'])
-        ->whereIn('status', ['succeed', 'finished'])
+    public function indexCashier(Request $request)
+    {
+        // Mengambil antrean yang statusnya 'succeed' dari EMR
+        $appointments = Appointment::with([
+            'patient', 
+            'doctor', 
+            'paymentMethod', 
+            'medicalProcedures.items.masterProcedure'
+        ])
+        ->where('status', 'succeed') 
         ->orderBy('appointment_datetime', 'desc')
         ->get();
 
-    return view('admin.pages.cashier', compact('appointments'));
-}
+        // Mengambil data metode pembayaran (Tunai, QRIS, dll)
+        $paymentMethods = DB::table('master_payment_method')
+            ->where('is_active', 1)
+            ->get();
 
+        return view('admin.pages.cashier', [
+            'appointments' => $appointments,
+            'paymentMethods' => $paymentMethods
+        ]);
+    }
+
+public function storePayment(Request $request)
+    {
+        // 1. Tambahkan validasi untuk 'status'
+        $request->validate([
+            'registration_id' => 'required',
+            'payment_method'  => 'required',
+            'amount_paid'     => 'required|numeric',
+            'change_amount'   => 'required|numeric',
+            'debt_amount'     => 'required|numeric',
+            'status'          => 'required|in:paid,partial,unpaid', // Validasi status dari JS
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Generate Nomor Invoice Otomatis (Format: INV-YYYYMMDD-0001)
+            $datePrefix = date('Ymd');
+            $lastInvoice = Invoice::where('invoice_number', 'like', 'INV-' . $datePrefix . '-%')
+                                  ->orderBy('invoice_number', 'desc')
+                                  ->first();
+                                  
+            $nextSeq = $lastInvoice ? ((int) substr($lastInvoice->invoice_number, -4)) + 1 : 1;
+            $invoiceNumber = 'INV-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+            $receiptNumber = 'REC-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+
+            // 2. Simpan data transaksi ke tabel invoices, TERMASUK status
+            $invoice = Invoice::create([
+                'registration_id' => $request->registration_id,
+                'admin_id'        => Auth::id() ?? '49f9ad75-bd0b-43ca-8a19-a9adebfd0c5f', // Menggunakan fallback ID admin jika auth kosong
+                'invoice_number'  => $invoiceNumber,
+                'receipt_number'  => $receiptNumber,
+                'payment_type'    => 'Langsung', 
+                'payment_method'  => $request->payment_method,
+                'amount_paid'     => $request->amount_paid,
+                'change_amount'   => $request->change_amount,
+                'debt_amount'     => $request->debt_amount,
+                'status'          => $request->status, // <--- INI KUNCI AGAR SAAT REFRESH TOMBOLNYA BERUBAH
+                'rounding'        => 0,
+                'notes'           => $request->notes,
+            ]);
+
+            // Update status pendaftaran menjadi 'succeed' atau status selesai lainnya
+            Appointment::where('id', $request->registration_id)->update([
+                'status' => 'succeed'
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success'        => true,
+                'message'        => 'Pembayaran berhasil disimpan!',
+                'invoice_number' => $invoiceNumber
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
