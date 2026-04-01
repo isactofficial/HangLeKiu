@@ -58,8 +58,8 @@
                     <input type="text" id="procedure-name" class="mc-input" placeholder="Masukkan nama prosedur" required>
                 </div>
                 <div class="mc-form-group">
-                    <label class="mc-label">Jenis Perawatan</label>
-                    <select id="procedure-care-type" class="mc-input">
+                    <label class="mc-label">Jenis Perawatan <span style="color:red">*</span></label>
+                    <select id="procedure-care-type" class="mc-input" required>
                         <option value="">-- Pilih Jenis Perawatan --</option>
                     </select>
                 </div>
@@ -99,14 +99,20 @@
             .then(r => r.json())
             .then(data => {
                 const select = document.getElementById('procedure-care-type');
+                console.log('DEBUG - loaded care types:', data.data.data);
                 select.innerHTML = '<option value="">-- Pilih Jenis Perawatan --</option>';
                 data.data.data.forEach(care => {
+                    console.log('DEBUG - adding care type option:', care.id, care.name);
                     const opt = document.createElement('option');
                     opt.value = care.id;
                     opt.textContent = care.name;
                     select.appendChild(opt);
                     careTypeMap[care.id] = care.name;
                 });
+                console.log('DEBUG - careTypeMap:', careTypeMap);
+            })
+            .catch(err => {
+                console.error('ERROR loading care types:', err);
             });
     }
 
@@ -226,17 +232,33 @@
 
     window.saveProcedureData = function(e) {
         e.preventDefault();
+        
+        // Validate that care type is selected (required field)
+        const careTypeSelect = document.getElementById('procedure-care-type');
+        if (!careTypeSelect.value) {
+            alert('Silakan pilih Jenis Perawatan terlebih dahulu');
+            careTypeSelect.focus();
+            return;
+        }
+
         const id = document.getElementById('procedure-id').value;
         const method = id ? 'PUT' : 'POST';
         const url = id ? `${PROCEDURE_API}/${id}` : PROCEDURE_API;
 
+        const careTypeValue = careTypeSelect.value;
+        
+        console.log('DEBUG - care_type select value:', careTypeValue);
+        console.log('DEBUG - care_type select displayed text:', careTypeSelect.options[careTypeSelect.selectedIndex]?.text);
+
         const data = {
             name: document.getElementById('procedure-name').value,
-            care_type_id: document.getElementById('procedure-care-type').value || null,
+            care_type_id: careTypeValue,
             price: parseFloat(document.getElementById('procedure-price').value) || 0,
             description: document.getElementById('procedure-description').value,
             is_active: document.getElementById('procedure-active').value === "1"
         };
+
+        console.log('DEBUG - data being sent:', JSON.stringify(data, null, 2));
 
         fetch(url, {
             method: method,
@@ -247,13 +269,23 @@
             if (!r.ok) {
                 return r.text().then(text => {
                     console.error('Error response:', r.status, text);
-                    throw new Error(`HTTP ${r.status}: ${text.substring(0, 200)}`);
+                    try {
+                        const errorData = JSON.parse(text);
+                        const errorMessage = errorData.message || Object.values(errorData.errors || {})?.flat()?.join(', ') || text.substring(0, 200);
+                        throw new Error(errorMessage);
+                    } catch (e) {
+                        throw new Error(`HTTP ${r.status}: ${text.substring(0, 200)}`);
+                    }
                 });
             }
             return r.json();
         })
         .then(res => {
-            if (res.success) { closeProcedureModal(); fetchProcedureData(procedureCurrentPage); }
+            console.log('DEBUG - response:', res);
+            if (res.success) { 
+                closeProcedureModal(); 
+                fetchProcedureData(procedureCurrentPage); 
+            }
             else alert(res.message || 'Gagal menyimpan data');
         })
         .catch(err => {

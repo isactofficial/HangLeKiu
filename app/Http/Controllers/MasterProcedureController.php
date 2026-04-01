@@ -12,7 +12,7 @@ class MasterProcedureController extends Controller
     // ✅ GET semua data + search
     public function index(Request $request)
     {
-        $query = MasterProcedure::select('id', 'procedure_name', 'base_price', 'is_active', DB::raw('procedure_name as name'));
+        $query = MasterProcedure::select('id', 'procedure_name', 'base_price', 'price', 'care_type_id', 'description', 'is_active', DB::raw('procedure_name as name'));
 
         if ($request->search) {
             $query->where('procedure_name', 'like', '%' . $request->search . '%');
@@ -48,7 +48,7 @@ class MasterProcedureController extends Controller
     {
         $validated = $request->validate([
             'name'          => 'required|string|max:150',
-            'care_type_id'  => 'nullable|exists:master_care_type,id',
+            'care_type_id'  => 'required|exists:master_care_type,id',
             'price'         => 'nullable|numeric|min:0',
             'description'   => 'nullable|string|max:255',
             'is_active'     => 'nullable|boolean',
