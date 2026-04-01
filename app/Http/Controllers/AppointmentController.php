@@ -224,7 +224,7 @@ class AppointmentController extends Controller
             'procedure_plan'       => $validated['procedure_plan'] ?? null,
         ]);
 
-        // CEK: Apakah form registrasi boss menggunakan AJAX atau Form Biasa?
+        // CEK: Apakah form registrasi  menggunakan AJAX atau Form Biasa?
         // Jika form HTML biasa, aktifkan kode di bawah ini:
         // return redirect()->back()->with('success', 'Pendaftaran berhasil disimpan!');
 

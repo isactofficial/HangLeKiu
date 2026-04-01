@@ -11,8 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Ingat boss, kalau di database namanya pakai akhiran 's' (registrations), 
-        // tambahkan huruf 's' nya ya. Kalau pas 'registration', biarkan begini.
         Schema::table('registration', function (Blueprint $table) {
             $table->timestamps();   // Nambahin created_at & updated_at
             $table->softDeletes();  // Nambahin deleted_at

@@ -47,7 +47,7 @@
                             <div class="grid-line" style="bottom: 75%"></div>
                             <div class="grid-line" style="bottom: 100%"></div>
                             
-                            {{-- Bars (Warna diganti ke tema cokelat) --}}
+                            {{-- Bars --}}
                             <div class="bar-group"><div class="bar" style="height: 100%;"></div><span>Jan</span></div>
                             <div class="bar-group"><div class="bar" style="height: 75%;"></div><span>Feb</span></div>
                             <div class="bar-group"><div class="bar" style="height: 0%;"></div><span>Mar</span></div>
@@ -94,7 +94,7 @@
 
                 {{-- Wrapper Card Finansial --}}
                 <div class="dash-finance-wrapper">
-                    <div class="dash-card dash-stat-card">
+                    <div class="dash-card dash-stat-card" data-stat="income">
                         <div class="stat-header">
                             <i class="fas fa-wallet stat-icon"></i> <i class="fas fa-info-circle info-icon"></i>
                         </div>
@@ -106,7 +106,7 @@
                         <p class="stat-desc">dari Februari</p>
                     </div>
                     
-                    <div class="dash-card dash-stat-card">
+                    <div class="dash-card dash-stat-card" data-stat="expense">
                         <div class="stat-header">
                             <i class="fas fa-money-bill-wave stat-icon"></i> <i class="fas fa-info-circle info-icon"></i>
                         </div>
@@ -121,12 +121,12 @@
             </div>
         </div>
 
-        {{-- KOLOM KANAN (Statistik Kecil & Tabel Antrian) --}}
+        {{-- KOLOM KANAN --}}
         <div class="dash-right-col">
             
-            {{-- Grid Statistik (4 Card Atas) --}}
+            {{-- Grid Statistik (Mini Cards) --}}
             <div class="dash-stats-grid">
-                <div class="dash-card dash-mini-card">
+                <div class="dash-card dash-mini-card" data-stat="avg-wait">
                     <div class="stat-header"><i class="fas fa-clock stat-icon"></i></div>
                     <p class="stat-title">Rata-Rata Waktu Tunggu Dokter</p>
                     <div class="stat-value-row">
@@ -135,7 +135,7 @@
                     </div>
                 </div>
 
-                <div class="dash-card dash-mini-card">
+                <div class="dash-card dash-mini-card" data-stat="new-patients">
                     <div class="stat-header"><i class="fas fa-user-plus stat-icon"></i></div>
                     <p class="stat-title">Pasien Baru</p>
                     <div class="stat-value-row">
@@ -144,7 +144,7 @@
                     </div>
                 </div>
 
-                <div class="dash-card dash-mini-card">
+                <div class="dash-card dash-mini-card" data-stat="total-patients">
                     <div class="stat-header"><i class="fas fa-file-medical stat-icon"></i></div>
                     <p class="stat-title">Pasien Terdaftar</p>
                     <div class="stat-value-row">
@@ -153,7 +153,7 @@
                     </div>
                 </div>
 
-                <div class="dash-card dash-mini-card">
+                <div class="dash-card dash-mini-card" data-stat="avg-consult">
                     <div class="stat-header"><i class="fas fa-stopwatch stat-icon"></i></div>
                     <p class="stat-title">Rata-Rata Waktu Konsultasi</p>
                     <div class="stat-value-row">
@@ -162,8 +162,7 @@
                     </div>
                 </div>
 
-                {{-- 2 Card Bawah --}}
-                <div class="dash-card dash-mini-card">
+                <div class="dash-card dash-mini-card" data-stat="low-stock">
                     <div class="stat-header"><i class="fas fa-pills stat-icon"></i></div>
                     <p class="stat-title">Stok Menipis</p>
                     <div class="stat-value-row">
@@ -204,7 +203,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- State Kosong --}}
                             <tr>
                                 <td colspan="4" class="empty-state">Belum ada pasien antrian</td>
                             </tr>
@@ -226,3 +224,173 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+const API = '/api/admin/dashboard';
+let filters = {
+    month: new Date().getMonth() + 1,
+    year:  new Date().getFullYear(),
+    visit_type: '',
+    poli_id: '',
+};
+
+// ── Fetch utama ───────────────────────────────────────────────────────────
+async function fetchDashboard() {
+    const params = new URLSearchParams(
+        Object.fromEntries(Object.entries(filters).filter(([,v]) => v !== ''))
+    );
+    try {
+        const res  = await fetch(`${API}?${params}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        });
+        const data = await res.json();
+
+        renderBarChart(data.bar_chart);
+        renderDonut(data.donut);
+        renderStats(data.stats);
+        renderFinancial(data.financial);
+        renderQueue(data.queue);
+    } catch (e) {
+        console.error('Dashboard fetch error:', e);
+    }
+}
+
+// ── Bar Chart ─────────────────────────────────────────────────────────────
+function renderBarChart(chart) {
+    const maxVal = Math.max(...chart.data.map(d => d.total), 1);
+    document.querySelectorAll('.bar-group').forEach((group, i) => {
+        const bar = group.querySelector('.bar');
+        const pct = (chart.data[i].total / maxVal) * 100;
+        bar.style.height = pct + '%';
+        bar.title = chart.data[i].total + ' kunjungan';
+    });
+
+    document.querySelector('.dash-chart-number').textContent = chart.current_total;
+
+    const trendEl = document.querySelector('.dash-chart-stats .dash-trend');
+    const isDown  = chart.trend_percent < 0;
+    trendEl.className = `dash-trend ${isDown ? 'trend-down' : 'trend-up'}`;
+    trendEl.innerHTML = `<i class="fas fa-arrow-${isDown ? 'down' : 'up'}"></i>
+                         ${Math.abs(chart.trend_percent)}%
+                         <small>dari Bulan lalu</small>`;
+}
+
+// ── Donut ─────────────────────────────────────────────────────────────────
+function renderDonut(donut) {
+    document.querySelector('.donut-number').textContent = donut.total;
+
+    const typeMap = {};
+    donut.breakdown.forEach(b => typeMap[b.visit_type] = b.total);
+
+    const order = ['Rawat Jalan', 'Rawat Inap', 'Kunjungan Sehat', 'Apotek'];
+    document.querySelectorAll('.legend-item').forEach((el, i) => {
+        const strong = el.querySelector('strong');
+        if (strong) strong.textContent = typeMap[order[i]] ?? 0;
+    });
+}
+
+// ── Stats Cards ───────────────────────────────────────────────────────────
+function renderStats(stats) {
+    setCard('new-patients',   stats.new_patients.value,   stats.new_patients.trend);
+    setCard('total-patients', stats.total_patients.value, stats.total_patients.trend);
+    setCard('low-stock',      stats.low_stock);
+    setCard('avg-wait',       formatSeconds(stats.avg_wait_seconds));
+    setCard('avg-consult',    formatSeconds(stats.avg_consult_seconds));
+}
+
+// ── Financial ─────────────────────────────────────────────────────────────
+function renderFinancial(financial) {
+    setCard('income',  financial.income.value,  financial.income.trend,  true);
+    setCard('expense', financial.expense.value, financial.expense.trend, true);
+}
+
+// ── Queue Table ───────────────────────────────────────────────────────────
+function renderQueue(queue) {
+    const tbody = document.querySelector('.dash-table tbody');
+    if (!queue.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Belum ada pasien antrian</td></tr>';
+        return;
+    }
+    const statusLabel = {
+        pending:   'Menunggu',
+        confirmed: 'Terkonfirmasi',
+        waiting:   'Menunggu Dokter',
+        engaged:   'Sedang Diperiksa',
+    };
+    tbody.innerHTML = queue.map(q => `
+        <tr>
+            <td>${q.patient_name}</td>
+            <td>${q.doctor_name}</td>
+            <td>${q.schedule ?? '-'}</td>
+            <td><span class="badge-status status-${q.status}">
+                ${statusLabel[q.status] ?? q.status}
+            </span></td>
+        </tr>
+    `).join('');
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function formatSeconds(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m} m ${s} s`;
+}
+
+function setCard(key, value, trend = null, isCurrency = false) {
+    const card = document.querySelector(`[data-stat="${key}"]`);
+    if (!card) return;
+    const valEl   = card.querySelector('.stat-value');
+    const trendEl = card.querySelector('.dash-trend');
+    if (valEl) valEl.textContent = isCurrency
+        ? 'Rp' + Number(value).toLocaleString('id-ID')
+        : value;
+    if (trendEl && trend !== null) {
+        const isDown = trend < 0;
+        trendEl.className = `dash-trend ${isDown ? 'trend-down' : 'trend-up'}`;
+        trendEl.innerHTML = `<i class="fas fa-arrow-${isDown ? 'down' : 'up'}"></i> ${Math.abs(trend)}%`;
+    }
+}
+
+// ── Load dropdown filter ──────────────────────────────────────────────────
+async function loadFilters() {
+    const [vtRes, poliRes] = await Promise.all([
+        fetch('/api/admin/master/visit-types'),
+        fetch('/api/admin/master/poli'),
+    ]);
+    const visitTypes = await vtRes.json();
+    const polis      = await poliRes.json();
+
+    const vtSelect   = document.querySelectorAll('.dash-select')[0];
+    const poliSelect = document.querySelectorAll('.dash-select')[1];
+
+    visitTypes.forEach(vt => {
+        const opt = new Option(vt.name, vt.id);
+        vtSelect.add(opt);
+    });
+    polis.forEach(p => {
+        const opt = new Option(p.name, p.id);
+        poliSelect.add(opt);
+    });
+
+    vtSelect.addEventListener('change', e => {
+        filters.visit_type = e.target.value;
+        fetchDashboard();
+    });
+    poliSelect.addEventListener('change', e => {
+        filters.poli_id = e.target.value;
+        fetchDashboard();
+    });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadFilters();
+    fetchDashboard();
+    setInterval(fetchDashboard, 60_000);
+});
+</script>
+@endpush

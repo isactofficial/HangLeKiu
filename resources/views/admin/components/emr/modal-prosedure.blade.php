@@ -261,37 +261,6 @@
           </div>
           <!-- AKHIR CONTAINER BARIS PROSEDUR -->
 
-          <!-- Baris: ICD 9 CM -->
-          <div class="flex items-end gap-4 w-full mt-4">
-            <div class="flex-grow relative">
-              <div class="relative w-full flex items-center">
-                <svg
-                  class="w-4 h-4 text-gray-400 mr-2 left-0 bottom-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  ></path>
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Cari ICD 9 CM"
-                  class="input-underline pl-6 text-sm"
-                />
-              </div>
-            </div>
-            <button
-              class="border border-blue-400 text-blue-500 rounded px-3 py-1 text-xs font-semibold hover:bg-blue-50 flex items-center space-x-1"
-            >
-              <span>✨ AI</span>
-            </button>
-          </div>
-
           <!-- ============================================== -->
           <!-- CONTAINER BARIS OBAT DINAMIS -->
           <!-- ============================================== -->
@@ -343,6 +312,7 @@
             <label class="label-small text-gray-400 opacity-0">Catatan</label>
             <input
               type="text"
+              id="prosedur-notes"
               placeholder="Catatan"
               class="input-underline text-sm placeholder-gray-400"
             />
@@ -452,6 +422,24 @@
             // Input hidden ini SUPER PENTING biar pas disave masuk ke database yang benar!
             document.getElementById('prosedur-patient-id').value = patientData.patient_id || '';
             document.getElementById('prosedur-registration-id').value = patientData.registration_id || '';
+            
+            // Set dokter otomatis dari data yang diterima
+            const docSelect = document.getElementById('prosedur-doctor-select');
+            if (docSelect) {
+                // Coba set via doctor_id dulu
+                if (patientData.doctor_id) {
+                    docSelect.value = patientData.doctor_id;
+                }
+                // Jika doctor_id tidak ada (misal dari Odontogram), cari berdasarkan doctor_name
+                if ((!patientData.doctor_id || docSelect.value !== patientData.doctor_id) && patientData.doctor_name) {
+                    for (let i = 0; i < docSelect.options.length; i++) {
+                        if (docSelect.options[i].text === patientData.doctor_name) {
+                            docSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         // 2. Set tanggal hari ini secara otomatis (biar nggak statis)
@@ -494,6 +482,18 @@
                 }
             });
 
+            // Hitung biaya obat dan tambahkan ke totalAmount
+            const allObatRows = document.querySelectorAll('.obat-row');
+            allObatRows.forEach(function(row) {
+                const inputObat = row.querySelector('.search-obat');
+                if (inputObat && inputObat.dataset.medicineId) {
+                    const price = parseFloat(inputObat.dataset.price || 0);
+                    const qtyObat = row.querySelector('input[type="number"]');
+                    const qty = parseInt(qtyObat ? qtyObat.value : 0) || 0;
+                    totalAmount += (price * qty);
+                }
+            });
+
             // 1. Simpan Parent Medical Procedure
             const payloadParent = {
                 'registration_id': document.getElementById('prosedur-registration-id').value,
@@ -501,7 +501,8 @@
                 'doctor_id': document.getElementById('prosedur-doctor-select').value,
                 'discount_type': 'none',
                 'discount_value': 0,
-                'total_amount': totalAmount > 0 ? totalAmount : 0
+                'total_amount': totalAmount > 0 ? totalAmount : 0,
+                'notes': document.getElementById('prosedur-notes').value
             };
 
             const resParent = await fetch('/api/medical-procedures', {
@@ -525,6 +526,7 @@
                 
                 const qtyInput = row.querySelectorAll('input[type="number"]')[0];
                 const diskonInput = row.querySelector('.input-diskon');
+                const gigiInp = row.querySelector('.input-no-gigi');
                 
                 const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
                 const basePrice = parseFloat(inputProsedur.dataset.basePrice || 0);
@@ -533,6 +535,7 @@
                 const payloadItem = {
                     'procedure_id': procedureId,
                     'master_procedure_id': masterId,
+                    'tooth_numbers': gigiInp ? gigiInp.value : null,
                     'quantity': qty,
                     'unit_price': basePrice,
                     'discount_type': diskonVal > 0 ? 'fix' : 'none',
@@ -730,6 +733,18 @@
                   if (subtotal < 0) subtotal = 0;
                   
                   total += subtotal;
+              }
+          });
+          
+          // Tambahkan biaya obat
+          const semuaObatRows = document.querySelectorAll('.obat-row');
+          semuaObatRows.forEach(function(row) {
+              const inputObat = row.querySelector('.search-obat');
+              if (inputObat && inputObat.dataset.medicineId) {
+                  const price = parseFloat(inputObat.dataset.price || 0);
+                  const qtyInput = row.querySelector('input[type="number"]');
+                  const qty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
+                  total += (price * qty);
               }
           });
           
@@ -966,54 +981,73 @@
                 return;
             }
 
-            // Ganti URL sesuai route Anda
-            fetch(`/api/medicine?search=${query}`)
-                .then(res => res.json())
-                .then(res => {
-                    const items = res.data.data; // Mengikuti struktur pagination Laravel
+            const medicineUrl = '{{ url("/api/medicine") }}' + '?search=' + encodeURIComponent(query);
+            fetch(medicineUrl, { headers: { 'Accept': 'application/json' } })
+                .then(function(res) {
+                    if (!res.ok) throw new Error('HTTP error: ' + res.status);
+                    return res.json();
+                })
+                .then(function(res) {
+                    const items = (res.data && res.data.data) ? res.data.data : (res.data ? res.data : []);
                     let html = '';
 
                     if (items && items.length > 0) {
-                        items.forEach(item => {
-                            html += `
-                                <div class="res-item hover:bg-f3f4f6 p-2 cursor-pointer border-b text-sm" data-id="${item.id}" data-nama="${item.medicine_name}">
-                                    <div class="font-medium">${item.medicine_name}</div>
-                                    <div class="text-xs text-gray-500">Stok: ${item.current_stock} ${item.unit || ''}</div>
-                                </div>
-                            `;
+                        items.forEach(function(item) {
+                            const harga = item.selling_price_general || 0;
+                            const stockColor = item.current_stock > 0 ? 'text-green-600' : 'text-red-600';
+                            html += '<div class="res-item medicine-suggestion-item hover:bg-gray-50 p-2 cursor-pointer border-b text-sm"' +
+                                ' data-id="' + item.id + '"' +
+                                ' data-nama="' + item.medicine_name + '"' +
+                                ' data-price="' + harga + '">' +
+                                '<div class="flex justify-between items-center">' +
+                                '<div>' +
+                                '<div class="font-bold text-gray-800">' + item.medicine_name + '</div>' +
+                                '<div class="text-[10px] text-gray-500">' + (item.medicine_code || '') + ' &middot; ' + (item.category || 'Obat') + '</div>' +
+                                '<div class="text-xs text-blue-600 font-bold">Rp' + new Intl.NumberFormat('id-ID').format(harga) + '</div>' +
+                                '</div>' +
+                                '<div class="text-right">' +
+                                '<div class="text-xs font-bold ' + stockColor + '">Stok: ' + (item.current_stock || 0) + '</div>' +
+                                '<div class="text-[10px] text-gray-400">' + (item.unit || '') + '</div>' +
+                                '</div></div></div>';
                         });
                     } else {
-                        html = '<div class="p-3 text-xs text-gray-400">Obat tidak ditemukan</div>';
+                        html = '<div class="p-4 text-xs text-center text-gray-400 italic">Obat tidak ditemukan</div>';
                     }
 
                     container.innerHTML = html;
                     container.classList.remove('hidden');
                 })
-                .catch(err => console.error('Error fetching medicine:', err));
+                .catch(function(err) { console.error('Error fetching medicine:', err); });
         }
     }));
 
     // Handle klik pada hasil pencarian
     document.addEventListener('click', function(e) {
         // --- KLIK HASIL PENCARIAN OBAT ---
-        const itemObat = e.target.closest('.obat-row .res-item');
+        const itemObat = e.target.closest('.medicine-suggestion-item');
         if (itemObat) {
             const row = itemObat.closest('.obat-row');
+            if (!row) return;
             const inputName = row.querySelector('.search-obat');
-            const container = itemObat.closest('.res-container');
+            const container = inputName.closest('.relative').querySelector('.res-container');
             const inputQty = row.querySelector('input[type="number"]');
 
-            // Set value ke input dan simpan dataset ID
+            // Set nama, ID, dan harga obat yang dipilih
             inputName.value = itemObat.dataset.nama;
             inputName.dataset.medicineId = itemObat.dataset.id;
+            inputName.dataset.price = itemObat.dataset.price;
             
-            // Set qty to 1 automatically if empty or 0
-            if (inputQty && (!inputQty.value || inputQty.value === "0" || inputQty.value === "")) {
+            // Set qty ke 1 jika masih 0 atau kosong
+            if (inputQty && (!inputQty.value || inputQty.value === '0' || inputQty.value === '')) {
                 inputQty.value = 1;
             }
 
+            // Hitung ulang total setelah obat dipilih
+            hitungTotalHarga();
+
             // Sembunyikan dropdown
-            container.classList.add('hidden');
+            if (container) container.classList.add('hidden');
+            return;
         }
 
         // --- KLIK HASIL PENCARIAN PROSEDUR ---
@@ -1058,7 +1092,10 @@
 
     // EVENT LISTENER UNTUK PERUBAHAN QTY/DISKON (HITUNG TOTAL OTOMATIS)
     document.addEventListener('input', function(e) {
-        if (e.target.closest('.prosedur-row') && (e.target.type === 'number' || e.target.classList.contains('input-diskon'))) {
+        // Hitung ulang total saat qty prosedur, diskon, atau qty obat berubah
+        const inProsedurRow = e.target.closest('.prosedur-row');
+        const inObatRow = e.target.closest('.obat-row');
+        if ((inProsedurRow || inObatRow) && (e.target.type === 'number' || e.target.classList.contains('input-diskon'))) {
             hitungTotalHarga();
         }
     });

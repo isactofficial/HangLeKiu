@@ -1,7 +1,32 @@
+/* public/css/admin/components/cashier/nota.css */
 @media print {
-    body * { visibility: hidden; }
-    #nota-cetak, #nota-cetak * { visibility: visible; }
-    #nota-cetak { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
-    .no-print { display: none !important; }
-    @page { size: A5 landscape; margin: 0; }
+    /* Sembunyikan semua elemen di layar kecuali nota */
+    body * { 
+        visibility: hidden; 
+    }
+    
+    /* Tampilkan elemen nota */
+    #nota-cetak, #nota-cetak * { 
+        visibility: visible; 
+    }
+    
+    /* Posisikan nota di pojok kiri atas kertas */
+    #nota-cetak { 
+        display: block !important; 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+    }
+    
+    /* Sembunyikan elemen yang punya class no-print */
+    .no-print { 
+        display: none !important; 
+    }
+    
+    /* UBAH DI SINI: Atur ukuran kertas ke A5 Portrait */
+    @page { 
+        size: A5 portrait; 
+        margin: 1cm; /* Beri sedikit margin agar tidak terlalu mepet tepi kertas */
+    }
 }

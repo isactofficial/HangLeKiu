@@ -14,11 +14,16 @@ use App\Http\Controllers\ProcedureItemController;
 use App\Http\Controllers\ProcedureMedicineController;
 use App\Http\Controllers\MasterProcedureController;
 use App\Http\Controllers\MasterPoliController;
+use App\Http\Controllers\MasterPaymentMethodController;
 use App\Http\Controllers\MasterGuarantorTypeController;
 use App\Http\Controllers\MasterVisitTypeController;
 use App\Http\Controllers\MasterCareTypeController;
 use App\Http\Controllers\OdontogramController;
-
+use App\Http\Controllers\ConsumableItemController;
+use App\Http\Controllers\ConsumableUsageController;
+use App\Http\Controllers\ConsumableRestockController;
+use App\Http\Controllers\ConsumableExpiryLogController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -204,6 +209,14 @@ Route::prefix('master-care-type')->group(function () {
     Route::delete('/{id}', [MasterCareTypeController::class, 'destroy']);
 });
 
+Route::prefix('master-payment')->group(function () {
+    Route::get('/', [MasterPaymentMethodController::class, 'index']);
+    Route::post('/', [MasterPaymentMethodController::class, 'store']);
+    Route::get('/{id}', [MasterPaymentMethodController::class, 'show']);
+    Route::put('/{id}', [MasterPaymentMethodController::class, 'update']);
+    Route::delete('/{id}', [MasterPaymentMethodController::class, 'destroy']);
+});
+
 // ================= ODONTOGRAM =================
 Route::prefix('odontogram')->group(function () {
     Route::post('/', [OdontogramController::class, 'store']);
@@ -214,3 +227,42 @@ Route::prefix('odontogram')->group(function () {
     Route::post('/{recordId}/teeth', [OdontogramController::class, 'addTooth']);
     Route::delete('/teeth/{toothId}', [OdontogramController::class, 'deleteTooth']);
 });
+
+// ================= ADMIN BHP (Bahan Habis Pakai) =================
+Route::prefix('bhp')->group(function () {
+    Route::get('/items',          [ConsumableItemController::class, 'index']);
+    Route::post('/items',         [ConsumableItemController::class, 'store']);
+    Route::get('/items/{id}',     [ConsumableItemController::class, 'show']);
+    Route::put('/items/{id}',     [ConsumableItemController::class, 'update']);
+    Route::delete('/items/{id}',  [ConsumableItemController::class, 'destroy']);
+
+    Route::get('/usage',          [ConsumableUsageController::class, 'index']);
+    Route::post('/usage',         [ConsumableUsageController::class, 'store']);
+    Route::get('/usage/{id}',     [ConsumableUsageController::class, 'show']);
+    Route::delete('/usage/{id}',  [ConsumableUsageController::class, 'destroy']);
+
+    Route::get('/restock',        [ConsumableRestockController::class, 'index']);
+    Route::post('/restock',       [ConsumableRestockController::class, 'store']);
+    Route::get('/restock/{id}',   [ConsumableRestockController::class, 'show']);
+    Route::delete('/restock/{id}',[ConsumableRestockController::class, 'destroy']);
+
+    Route::get('/expiry',         [ConsumableExpiryLogController::class, 'index']);
+    Route::post('/expiry',        [ConsumableExpiryLogController::class, 'store']);
+    Route::get('/expiry/{id}',    [ConsumableExpiryLogController::class, 'show']);
+    Route::delete('/expiry/{id}', [ConsumableExpiryLogController::class, 'destroy']);
+
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::get('/master/visit-types', fn() =>
+        response()->json(DB::table('master_visit_type')->select('id', 'name')->get())
+    );
+    Route::get('/master/poli', fn() =>
+        response()->json(DB::table('master_poli')->select('id', 'name')->get())
+    );
+});
+
+
+
