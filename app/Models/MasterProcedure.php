@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\MasterCareType;
+use App\Models\ProcedureItem;
 
 class MasterProcedure extends Model
 {
@@ -23,9 +25,9 @@ class MasterProcedure extends Model
     ];
 
     protected $casts = [
+        'is_active' => 'boolean',
         'price' => 'decimal:2',
         'base_price' => 'decimal:2',
-        'is_active' => 'boolean',
     ];
 
     public function procedureItems()

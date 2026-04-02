@@ -18,7 +18,6 @@ use App\Http\Controllers\MasterPaymentMethodController;
 use App\Http\Controllers\MasterGuarantorTypeController;
 use App\Http\Controllers\MasterVisitTypeController;
 use App\Http\Controllers\MasterCareTypeController;
-use App\Http\Controllers\MasterProcedureDetailController;
 use App\Http\Controllers\OdontogramController;
 use App\Http\Controllers\ConsumableItemController;
 use App\Http\Controllers\ConsumableUsageController;
@@ -201,14 +200,6 @@ Route::prefix('master-guarantor')->group(function () {
     Route::delete('/{id}', [MasterGuarantorTypeController::class, 'destroy']);
 });
 
-Route::prefix('master-payment')->group(function () {
-    Route::get('/', [MasterPaymentMethodController::class, 'index']);
-    Route::post('/', [MasterPaymentMethodController::class, 'store']);
-    Route::get('/{id}', [MasterPaymentMethodController::class, 'show']);
-    Route::put('/{id}', [MasterPaymentMethodController::class, 'update']);
-    Route::delete('/{id}', [MasterPaymentMethodController::class, 'destroy']);
-});
-
 Route::prefix('master-visit-type')->group(function () {
     Route::get('/', [MasterVisitTypeController::class, 'index']);
     Route::post('/', [MasterVisitTypeController::class, 'store']);
@@ -225,15 +216,14 @@ Route::prefix('master-care-type')->group(function () {
     Route::delete('/{id}', [MasterCareTypeController::class, 'destroy']);
 });
 
-Route::prefix('master-procedure-detail')->group(function () {
-    Route::get('/', [MasterProcedureDetailController::class, 'index']);
-    Route::post('/', [MasterProcedureDetailController::class, 'store']);
-    Route::get('/{id}', [MasterProcedureDetailController::class, 'show']);
-    Route::put('/{id}', [MasterProcedureDetailController::class, 'update']);
-    Route::delete('/{id}', [MasterProcedureDetailController::class, 'destroy']);
+Route::prefix('master-payment')->group(function () {
+    Route::get('/', [MasterPaymentMethodController::class, 'index']);
+    Route::post('/', [MasterPaymentMethodController::class, 'store']);
+    Route::get('/{id}', [MasterPaymentMethodController::class, 'show']);
+    Route::put('/{id}', [MasterPaymentMethodController::class, 'update']);
+    Route::delete('/{id}', [MasterPaymentMethodController::class, 'destroy']);
 });
 
-// ================= ODONTOGRAM =================
 Route::prefix('odontogram')->group(function () {
     Route::post('/', [OdontogramController::class, 'store']);
     Route::get('/patient/{patientId}', [OdontogramController::class, 'indexByPatient']);
@@ -265,7 +255,7 @@ Route::prefix('bhp')->group(function () {
     Route::get('/expiry',         [ConsumableExpiryLogController::class, 'index']);
     Route::post('/expiry',        [ConsumableExpiryLogController::class, 'store']);
     Route::get('/expiry/{id}',    [ConsumableExpiryLogController::class, 'show']);
-    Route::delete('/expiry/{id}', [ConsumableExpiryLogController::class, 'destroy']);
+    Route::delete('/{id}', [ConsumableExpiryLogController::class, 'destroy']);
 
 });
 
@@ -279,6 +269,3 @@ Route::prefix('admin')->group(function () {
         response()->json(DB::table('master_poli')->select('id', 'name')->get())
     );
 });
-
-
-

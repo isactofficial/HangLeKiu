@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MasterProcedure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MasterProcedureController extends Controller
@@ -11,7 +12,7 @@ class MasterProcedureController extends Controller
     // ✅ GET semua data + search
     public function index(Request $request)
     {
-        $query = MasterProcedure::query();
+        $query = MasterProcedure::select('id', 'procedure_name', 'base_price', 'price', 'care_type_id', 'description', 'is_active', DB::raw('procedure_name as name'));
 
         if ($request->search) {
             $query->where('procedure_name', 'like', '%' . $request->search . '%');
@@ -34,6 +35,7 @@ class MasterProcedureController extends Controller
     public function show($id)
     {
         $procedure = MasterProcedure::findOrFail($id);
+        $procedure->name = $procedure->procedure_name;
 
         return response()->json([
             'success' => true,
@@ -44,18 +46,24 @@ class MasterProcedureController extends Controller
     // ✅ STORE
     public function store(Request $request)
     {
-        $request->validate([
-            'procedure_name' => 'required|string|max:150',
-            'base_price'     => 'required|numeric|min:0',
-            'is_active'      => 'nullable|boolean',
+        $validated = $request->validate([
+            'name'          => 'required|string|max:150',
+            'care_type_id'  => 'required|exists:master_care_type,id',
+            'price'         => 'nullable|numeric|min:0',
+            'description'   => 'nullable|string|max:255',
+            'is_active'     => 'nullable|boolean',
         ]);
 
         $procedure = MasterProcedure::create([
             'id'             => Str::uuid(),
-            'procedure_name' => $request->procedure_name,
-            'base_price'     => $request->base_price,
-            'is_active'      => $request->is_active ?? true,
+            'procedure_name' => $validated['name'],
+            'care_type_id'   => $validated['care_type_id'],
+            'price'          => $validated['price'] ?? 0,
+            'description'    => $validated['description'] ?? '',
+            'base_price'     => 0,
+            'is_active'      => $validated['is_active'] ?? true,
         ]);
+        $procedure->name = $procedure->procedure_name;
 
         return response()->json([
             'success' => true,
@@ -69,17 +77,23 @@ class MasterProcedureController extends Controller
     {
         $procedure = MasterProcedure::findOrFail($id);
 
-        $request->validate([
-            'procedure_name' => 'required|string|max:150',
-            'base_price'     => 'required|numeric|min:0',
-            'is_active'      => 'nullable|boolean',
+        $validated = $request->validate([
+            'name'          => 'required|string|max:150',
+            'care_type_id'  => 'nullable|exists:master_care_type,id',
+            'price'         => 'nullable|numeric|min:0',
+            'description'   => 'nullable|string|max:255',
+            'is_active'     => 'nullable|boolean',
         ]);
 
         $procedure->update([
-            'procedure_name' => $request->procedure_name,
-            'base_price'     => $request->base_price,
-            'is_active'      => $request->is_active ?? $procedure->is_active,
+            'procedure_name' => $validated['name'],
+            'care_type_id'   => $validated['care_type_id'] ?? $procedure->care_type_id,
+            'price'          => $validated['price'] ?? $procedure->price,
+            'description'    => $validated['description'] ?? $procedure->description,
+            'is_active'      => $validated['is_active'] ?? $procedure->is_active,
         ]);
+        $procedure->refresh();
+        $procedure->name = $procedure->procedure_name;
 
         return response()->json([
             'success' => true,

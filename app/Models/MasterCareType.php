@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MasterCareType extends Model
 {
-     protected $table = 'master_care_type';
+    protected $table = 'master_care_type';
     protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = false;

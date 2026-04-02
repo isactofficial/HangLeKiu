@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MasterVisitType extends Model
 {
-     protected $table = 'master_visit_type';
+    protected $table = 'master_visit_type';
     protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = false;

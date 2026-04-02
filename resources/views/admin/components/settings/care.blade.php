@@ -9,7 +9,7 @@
         </a>
         <div>
             <h2 class="mc-title">Manajemen Jenis Perawatan</h2>
-            <p class="mc-subtitle">Kelola data jenis perawatan dan tarif di sistem hanglekiu</p>
+            <p class="mc-subtitle">Kelola data jenis perawatan dengan tarif di sistem hanglekiu</p>
         </div>
     </div>
     <button class="mc-btn-primary" onclick="openCareModal()">+ Tambah Jenis Perawatan</button>
@@ -21,7 +21,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <path d="M21 21l-4.35-4.35"></path>
         </svg>
-        <input type="text" id="care-search" placeholder="Cari jenis perawatan..." onkeyup="fetchCareData()">
+        <input type="text" id="search-care" placeholder="Cari jenis perawatan..." onkeyup="fetchCareData()">
     </div>
 </div>
 
@@ -42,31 +42,31 @@
     <div class="mc-pagination" id="care-pagination"></div>
 </div>
 
-<!-- Modal Care Type -->
+<!-- Modal Form -->
 <div id="care-modal" class="mc-modal-overlay">
     <div class="mc-modal-content">
         <div class="mc-modal-header">
             <h3 id="care-modal-title">Tambah Jenis Perawatan</h3>
             <button class="mc-modal-close" onclick="closeCareModal()">&times;</button>
         </div>
-        <form id="care-form" onsubmit="saveCarelData(event)">
+        <form id="care-form" onsubmit="saveCareData(event)">
             <input type="hidden" id="care-id">
             <div class="mc-modal-body">
                 <div class="mc-form-group">
-                    <label class="mc-label">Nama Jenis Perawatan</label>
-                    <input type="text" id="care-input-name" class="mc-input" placeholder="Masukkan nama jenis perawatan" required>
+                    <label class="mc-label">Nama Jenis Perawatan <span style="color:red">*</span></label>
+                    <input type="text" id="care-name" class="mc-input" placeholder="Masukkan nama jenis perawatan" required>
                 </div>
                 <div class="mc-form-group">
-                    <label class="mc-label">Harga (Rp)</label>
-                    <input type="number" id="care-input-price" class="mc-input" placeholder="Masukkan harga" min="0" step="0.01" required>
+                    <label class="mc-label">Harga <span style="color:red">*</span></label>
+                    <input type="number" id="care-price" class="mc-input" placeholder="0" step="0.01" min="0" required>
                 </div>
                 <div class="mc-form-group">
-                    <label class="mc-label">Deskripsi (Opsional)</label>
-                    <textarea id="care-input-description" class="mc-input" placeholder="Masukkan deskripsi" rows="3"></textarea>
+                    <label class="mc-label">Deskripsi</label>
+                    <textarea id="care-description" class="mc-input" placeholder="Deskripsi jenis perawatan" style="resize:vertical; min-height:80px;"></textarea>
                 </div>
                 <div class="mc-form-group">
-                    <label class="mc-label">Status Aktif</label>
-                    <select id="care-input-active" class="mc-input">
+                    <label class="mc-label">Status</label>
+                    <select id="care-active" class="mc-input">
                         <option value="1">Aktif</option>
                         <option value="0">Tidak Aktif</option>
                     </select>
@@ -81,150 +81,169 @@
 </div>
 
 <script>
-    (function() {
-        let currentPage = 1;
-        const apiUrl = '/api/master-care-type';
+    const CARE_API = '/api/master-care-type';
+    let careCurrentPage = 1;
 
-        window.fetchCareData = function(page = 1) {
-            currentPage = page;
-            const search = document.getElementById('care-search').value;
-            const url = `${apiUrl}?page=${page}&search=${search}`;
+    window.fetchCareData = function(page = 1) {
+        careCurrentPage = page;
+        const search = document.getElementById('search-care').value;
+        const url = `${CARE_API}?page=${page}&search=${search}`;
 
-            fetch(url)
+        fetch(url)
+            .then(r => r.json())
+            .then(data => renderCareTable(data.data))
+            .catch(() => alert('Gagal memuat data'));
+    };
+
+    function formatCurrency(num) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+    }
+
+    function renderCareTable(data) {
+        const tbody = document.getElementById('care-table-body');
+        tbody.innerHTML = '';
+
+        if (!data.data || data.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#9CA3AF">Data tidak ditemukan</td></tr>';
+            return;
+        }
+
+        data.data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${item.name}</strong></td>
+                <td style="color:#2563EB; font-weight:600">${formatCurrency(item.price || 0)}</td>
+                <td>
+                    <span class="mc-badge ${item.is_active ? 'mc-badge-active' : 'mc-badge-inactive'}">
+                        ${item.is_active ? 'Aktif' : 'Tidak Aktif'}
+                    </span>
+                </td>
+                <td>
+                    <div class="mc-action-btns">
+                        <button class="mc-btn-icon" onclick="openCareModal('${item.id}')" title="Edit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="mc-btn-icon delete" onclick="deleteCareData('${item.id}')" title="Hapus">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        renderPaginationCare(data);
+    }
+
+    function renderPaginationCare(data) {
+        const pag = document.getElementById('care-pagination');
+        pag.innerHTML = `<span>Menampilkan ${data.from || 0}–${data.to || 0} dari ${data.total} data</span>`;
+
+        if (data.last_page <= 1) return;
+
+        const controls = document.createElement('div');
+        controls.className = 'mc-pagination-controls';
+
+        if (data.current_page > 1) {
+            const prev = document.createElement('button');
+            prev.className = 'mc-page-btn';
+            prev.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>';
+            prev.onclick = () => fetchCareData(data.current_page - 1);
+            controls.appendChild(prev);
+        }
+
+        for (let i = Math.max(1, data.current_page - 2); i <= Math.min(data.last_page, data.current_page + 2); i++) {
+            const btn = document.createElement('button');
+            btn.className = `mc-page-btn ${i === data.current_page ? 'active' : ''}`;
+            btn.textContent = i;
+            btn.onclick = () => fetchCareData(i);
+            controls.appendChild(btn);
+        }
+
+        if (data.current_page < data.last_page) {
+            const next = document.createElement('button');
+            next.className = 'mc-page-btn';
+            next.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>';
+            next.onclick = () => fetchCareData(data.current_page + 1);
+            controls.appendChild(next);
+        }
+
+        pag.appendChild(controls);
+    }
+
+    window.openCareModal = function(id = null) {
+        const modal = document.getElementById('care-modal');
+        document.getElementById('care-form').reset();
+        document.getElementById('care-id').value = '';
+        document.getElementById('care-modal-title').textContent = id ? 'Edit Jenis Perawatan' : 'Tambah Jenis Perawatan';
+
+        if (id) {
+            fetch(`${CARE_API}/${id}`)
                 .then(r => r.json())
-                .then(data => {
-                    const tbody = document.getElementById('care-table-body');
-                    tbody.innerHTML = '';
-
-                    if (data.data.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Data tidak ditemukan</td></tr>';
-                    } else {
-                        data.data.data.forEach(item => {
-                            const tr = document.createElement('tr');
-                            const price = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price);
-                            tr.innerHTML = `
-                                <td>${item.name}</td>
-                                <td>${price}</td>
-                                <td>
-                                    <span class="mc-badge ${item.is_active ? 'mc-badge-active' : 'mc-badge-inactive'}">
-                                        ${item.is_active ? 'Aktif' : 'Tidak Aktif'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="mc-action-btns">
-                                        <button class="mc-btn-icon" onclick="openCareModal('${item.id}')" title="Edit">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                        </button>
-                                        <button class="mc-btn-icon delete" onclick="deleteCarelData('${item.id}')" title="Hapus">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                        </button>
-                                    </div>
-                                </td>
-                            `;
-                            tbody.appendChild(tr);
-                        });
-                    }
-
-                    const pagination = document.getElementById('care-pagination');
-                    pagination.innerHTML = `<span>Menampilkan ${data.data.from || 0}–${data.data.to || 0} dari ${data.data.total} data</span>`;
-                    if (data.data.last_page > 1) {
-                        pagination.appendChild(renderCarePagination(data.data, fetchCareData));
-                    }
+                .then(res => {
+                    document.getElementById('care-id').value = res.data.id;
+                    document.getElementById('care-name').value = res.data.name;
+                    document.getElementById('care-price').value = res.data.price || 0;
+                    document.getElementById('care-description').value = res.data.description || '';
+                    document.getElementById('care-active').value = res.data.is_active ? "1" : "0";
                 });
+        }
+        modal.classList.add('show');
+    };
+
+    window.closeCareModal = function() {
+        document.getElementById('care-modal').classList.remove('show');
+    };
+
+    window.saveCareData = function(e) {
+        e.preventDefault();
+        const id = document.getElementById('care-id').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${CARE_API}/${id}` : CARE_API;
+
+        const data = {
+            name: document.getElementById('care-name').value,
+            price: parseFloat(document.getElementById('care-price').value) || 0,
+            description: document.getElementById('care-description').value,
+            is_active: document.getElementById('care-active').value === "1"
         };
 
-        window.openCareModal = function(id = null) {
-            const modal = document.getElementById('care-modal');
-            const form = document.getElementById('care-form');
-            form.reset();
-            document.getElementById('care-id').value = '';
-            document.getElementById('care-modal-title').innerText = id ? 'Edit Jenis Perawatan' : 'Tambah Jenis Perawatan';
-            
-            if (id) {
-                fetch(`${apiUrl}/${id}`)
-                    .then(r => r.json())
-                    .then(res => {
-                        const data = res.data;
-                        document.getElementById('care-id').value = data.id;
-                        document.getElementById('care-input-name').value = data.name;
-                        document.getElementById('care-input-price').value = data.price;
-                        document.getElementById('care-input-description').value = data.description || '';
-                        document.getElementById('care-input-active').value = data.is_active ? "1" : "0";
-                    });
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify(data)
+        })
+        .then(r => {
+            if (!r.ok) {
+                return r.text().then(text => {
+                    console.error('Error response:', r.status, text);
+                    throw new Error(`HTTP ${r.status}: ${text.substring(0, 200)}`);
+                });
             }
-            modal.classList.add('show');
-        };
+            return r.json();
+        })
+        .then(res => {
+            if (res.success) { closeCareModal(); fetchCareData(careCurrentPage); }
+            else alert(res.message || 'Gagal menyimpan data');
+        })
+        .catch(err => {
+            console.error('Save error:', err);
+            alert('Gagal menyimpan: ' + err.message);
+        });
+    };
 
-        window.closeCareModal = function() {
-            document.getElementById('care-modal').classList.remove('show');
-        };
-
-        window.saveCarelData = function(e) {
-            e.preventDefault();
-            const id = document.getElementById('care-id').value;
-            const method = id ? 'PUT' : 'POST';
-            const url = id ? `${apiUrl}/${id}` : apiUrl;
-
-            fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify({
-                    name: document.getElementById('care-input-name').value,
-                    price: parseFloat(document.getElementById('care-input-price').value),
-                    description: document.getElementById('care-input-description').value,
-                    is_active: document.getElementById('care-input-active').value === "1"
-                })
+    window.deleteCareData = function(id) {
+        if (confirm('Yakin ingin menghapus data ini?')) {
+            fetch(`${CARE_API}/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
             .then(r => r.json())
-            .then(data => {
-                if (data.success) { closeCareModal(); fetchCareData(currentPage); }
-                else alert('Gagal menyimpan data');
-            });
-        };
-
-        window.deleteCarelData = function(id) {
-            if (confirm('Yakin ingin menghapus data ini?')) {
-                fetch(`${apiUrl}/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-                })
-                .then(r => r.json())
-                .then(data => { if (data.success) fetchCareData(currentPage); else alert('Gagal menghapus'); });
-            }
-        };
-
-        function createPageBtn(html, disabled, onclick, active = false) {
-            const btn = document.createElement('button');
-            btn.className = `mc-page-btn ${active ? 'active' : ''}`;
-            btn.disabled = disabled;
-            btn.innerHTML = html;
-            btn.onclick = onclick;
-            return btn;
+            .then(res => { if (res.success) fetchCareData(careCurrentPage); else alert('Gagal menghapus'); })
+            .catch(() => alert('Terjadi kesalahan'));
         }
+    };
 
-        function renderCarePagination(data, callback) {
-            const controls = document.createElement('div');
-            controls.className = 'mc-pagination-controls';
-            
-            const prevBtn = createPageBtn('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>', data.current_page === 1, () => callback(data.current_page - 1));
-            controls.appendChild(prevBtn);
-
-            let start = Math.max(1, data.current_page - 2);
-            let end = Math.min(data.last_page, start + 4);
-            if (end - start < 4) start = Math.max(1, end - 4);
-
-            for (let i = start; i <= end; i++) {
-                const btn = createPageBtn(i, false, () => callback(i), i === data.current_page);
-                controls.appendChild(btn);
-            }
-
-            const nextBtn = createPageBtn('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>', data.current_page === data.last_page, () => callback(data.current_page + 1));
-            controls.appendChild(nextBtn);
-
-            return controls;
-        }
-
-        // Load data on page init
-        fetchCareData();
-    })();
+    // Load data on page load
+    fetchCareData();
 </script>

@@ -134,12 +134,12 @@
     function renderPaginationVisit(data) {
         const pag = document.getElementById('visit-pagination');
         pag.innerHTML = `<span>Menampilkan ${data.from || 0}–${data.to || 0} dari ${data.total} data</span>`;
-
+        
         if (data.last_page <= 1) return;
 
         const controls = document.createElement('div');
         controls.className = 'mc-pagination-controls';
-
+        
         if (data.current_page > 1) {
             const prev = document.createElement('button');
             prev.className = 'mc-page-btn';
@@ -172,7 +172,7 @@
         document.getElementById('visit-form').reset();
         document.getElementById('visit-id').value = '';
         document.getElementById('visit-modal-title').textContent = id ? 'Edit Jenis Kunjungan' : 'Tambah Jenis Kunjungan';
-
+        
         if (id) {
             fetch(`${VISIT_API}/${id}`)
                 .then(r => r.json())
@@ -207,27 +207,12 @@
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             body: JSON.stringify(data)
         })
-        .then(r => {
-            if (!r.ok) {
-                return r.text().then(text => {
-                    console.error('Error response:', r.status, text);
-                    throw new Error(`HTTP ${r.status}: ${text.substring(0, 200)}`);
-                });
-            }
-            return r.json();
-        })
+        .then(r => r.json())
         .then(res => {
-            if (res.success) {
-                closeVisitModal();
-                fetchVisitData(visitCurrentPage);
-            } else {
-                alert(res.message || 'Gagal menyimpan data');
-            }
+            if (res.success) { closeVisitModal(); fetchVisitData(visitCurrentPage); }
+            else alert(res.message || 'Gagal menyimpan data');
         })
-        .catch(err => {
-            console.error('Save error:', err);
-            alert('Gagal menyimpan: ' + err.message);
-        });
+        .catch(() => alert('Terjadi kesalahan'));
     };
 
     window.deleteVisitData = function(id) {

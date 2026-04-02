@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MasterCareType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -9,25 +10,24 @@ class MasterCareTypeController extends BaseMasterController
 {
     public function __construct()
     {
-        parent::__construct('App\Models\MasterCareType', 'Care Type');
-        $this->validationRules = [
-            'name'        => 'required|string|max:50',
-            'price'       => 'required|numeric|min:0',
-            'description' => 'nullable|string',
-            'is_active'   => 'nullable|boolean',
-        ];
+        parent::__construct(MasterCareType::class, 'Jenis Perawatan');
     }
 
     public function store(Request $request)
     {
-        $request->validate($this->validationRules);
+        $validated = $request->validate([
+            'name'        => 'required|string|max:50',
+            'price'       => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:255',
+            'is_active'   => 'nullable|boolean',
+        ]);
 
-        $item = $this->model::create([
+        $item = MasterCareType::create([
             'id'          => (string) Str::uuid(),
-            'name'        => $request->name,
-            'price'       => $request->price,
-            'description' => $request->description,
-            'is_active'   => $request->is_active ?? true,
+            'name'        => $validated['name'],
+            'price'       => $validated['price'],
+            'description' => $validated['description'] ?? '',
+            'is_active'   => $validated['is_active'] ?? true,
         ]);
 
         return response()->json([
@@ -39,14 +39,20 @@ class MasterCareTypeController extends BaseMasterController
 
     public function update(Request $request, $id)
     {
-        $item = $this->model::findOrFail($id);
-        $request->validate($this->validationRules);
+        $item = MasterCareType::findOrFail($id);
+
+        $validated = $request->validate([
+            'name'        => 'required|string|max:50',
+            'price'       => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:255',
+            'is_active'   => 'nullable|boolean',
+        ]);
 
         $item->update([
-            'name'        => $request->name,
-            'price'       => $request->price,
-            'description' => $request->description,
-            'is_active'   => $request->is_active ?? $item->is_active,
+            'name'        => $validated['name'],
+            'price'       => $validated['price'],
+            'description' => $validated['description'] ?? $item->description,
+            'is_active'   => $validated['is_active'] ?? $item->is_active,
         ]);
 
         return response()->json([
@@ -56,3 +62,4 @@ class MasterCareTypeController extends BaseMasterController
         ]);
     }
 }
+
