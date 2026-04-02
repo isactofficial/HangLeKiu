@@ -81,6 +81,8 @@ Route::middleware('auth')->group(function () {
         Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
 
         // Manajemen Staff & Pasien
+        Route::post('/settings/manajemen-staff/account', [DoctorController::class, 'storeStaffAccountFromAdmin'])->name('settings.staff.account.store');
+        Route::patch('/settings/manajemen-staff/account/{id}/toggle-status', [DoctorController::class, 'toggleStaffAccountStatus'])->name('settings.staff.account.toggle-status');
         Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])->name('settings.staff.doctor.store');
         Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
         Route::post('/patients',         [PatientController::class, 'storeFromAdmin'])->name('patients.store');
