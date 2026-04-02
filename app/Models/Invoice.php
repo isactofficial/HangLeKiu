@@ -41,7 +41,7 @@ class Invoice extends Model
 
     public function registration()
     {
-        return $this->belongsTo(Registration::class, 'registration_id');
+        return $this->belongsTo(Appointment::class, 'registration_id');
     }
 
     public function admin()
