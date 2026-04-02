@@ -13,6 +13,37 @@ class MasterCareTypeController extends BaseMasterController
         parent::__construct(MasterCareType::class, 'Jenis Perawatan');
     }
 
+    public function index(Request $request)
+    {
+        $query = MasterCareType::query();
+
+        if ($request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        $data = $query->orderBy('name')->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Data {$this->resourceName} berhasil diambil",
+            'data'    => $data
+        ]);
+    }
+
+    public function show($id)
+    {
+        $item = MasterCareType::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $item
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -27,7 +58,7 @@ class MasterCareTypeController extends BaseMasterController
             'name'        => $validated['name'],
             'price'       => $validated['price'],
             'description' => $validated['description'] ?? '',
-            'is_active'   => $validated['is_active'] ?? true,
+            'is_active'   => isset($validated['is_active']) ? (bool) $validated['is_active'] : true,
         ]);
 
         return response()->json([
@@ -52,7 +83,7 @@ class MasterCareTypeController extends BaseMasterController
             'name'        => $validated['name'],
             'price'       => $validated['price'],
             'description' => $validated['description'] ?? $item->description,
-            'is_active'   => $validated['is_active'] ?? $item->is_active,
+            'is_active'   => isset($validated['is_active']) ? (bool) $validated['is_active'] : $item->is_active,
         ]);
 
         return response()->json([
@@ -61,5 +92,15 @@ class MasterCareTypeController extends BaseMasterController
             'data'    => $item
         ]);
     }
-}
 
+    public function destroy($id)
+    {
+        $item = MasterCareType::findOrFail($id);
+        $item->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$this->resourceName} berhasil dihapus"
+        ]);
+    }
+}

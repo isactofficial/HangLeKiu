@@ -138,12 +138,12 @@
     function renderPaginationCare(data) {
         const pag = document.getElementById('care-pagination');
         pag.innerHTML = `<span>Menampilkan ${data.from || 0}–${data.to || 0} dari ${data.total} data</span>`;
-
+        
         if (data.last_page <= 1) return;
 
         const controls = document.createElement('div');
         controls.className = 'mc-pagination-controls';
-
+        
         if (data.current_page > 1) {
             const prev = document.createElement('button');
             prev.className = 'mc-page-btn';
@@ -176,7 +176,7 @@
         document.getElementById('care-form').reset();
         document.getElementById('care-id').value = '';
         document.getElementById('care-modal-title').textContent = id ? 'Edit Jenis Perawatan' : 'Tambah Jenis Perawatan';
-
+        
         if (id) {
             fetch(`${CARE_API}/${id}`)
                 .then(r => r.json())

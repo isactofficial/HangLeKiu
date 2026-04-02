@@ -101,24 +101,10 @@ Route::prefix('procedure-items')->group(function () {
 
 // ================= REGISTRATION (ADMIN) =================
 Route::prefix('registration')->middleware('auth:api')->group(function () {
-
-    // Dropdown / master data
     Route::get('/master-data',    [RegistrationController::class, 'masterData']);
-
-    // Dokter aktif + jadwal hari ini
-    // GET /api/registration/doctors?date=2026-03-26
     Route::get('/doctors',        [RegistrationController::class, 'doctors']);
-
-    // Slot tersedia per dokter per tanggal
-    // GET /api/registration/slots?doctor_id=xxx&date=2026-03-26
     Route::get('/slots',          [RegistrationController::class, 'availableSlots']);
-
-    // Cari pasien (autocomplete)
-    // GET /api/registration/search-patient?q=budi
     Route::get('/search-patient', [RegistrationController::class, 'searchPatient']);
-
-    // Simpan pendaftaran baru
-    // POST /api/registration
     Route::post('/',              [RegistrationController::class, 'store']);
 });
 
@@ -141,7 +127,6 @@ Route::prefix('medicine')->group(function () {
     Route::put('/{id}', [MedicineController::class, 'update']);
     Route::delete('/{id}', [MedicineController::class, 'destroy']);
 
-     // stok
     Route::post('/{id}/stock-in', [MedicineController::class, 'stockIn']);
     Route::post('/{id}/stock-out', [MedicineController::class, 'stockOut']);
     Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);
@@ -224,6 +209,7 @@ Route::prefix('master-payment')->group(function () {
     Route::delete('/{id}', [MasterPaymentMethodController::class, 'destroy']);
 });
 
+// ================= ODONTOGRAM =================
 Route::prefix('odontogram')->group(function () {
     Route::post('/', [OdontogramController::class, 'store']);
     Route::get('/patient/{patientId}', [OdontogramController::class, 'indexByPatient']);
@@ -255,8 +241,7 @@ Route::prefix('bhp')->group(function () {
     Route::get('/expiry',         [ConsumableExpiryLogController::class, 'index']);
     Route::post('/expiry',        [ConsumableExpiryLogController::class, 'store']);
     Route::get('/expiry/{id}',    [ConsumableExpiryLogController::class, 'show']);
-    Route::delete('/{id}', [ConsumableExpiryLogController::class, 'destroy']);
-
+    Route::delete('/expiry/{id}', [ConsumableExpiryLogController::class, 'destroy']);
 });
 
 Route::prefix('admin')->group(function () {
