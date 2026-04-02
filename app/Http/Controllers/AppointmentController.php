@@ -49,13 +49,13 @@ class AppointmentController extends Controller
         $treatment = Treatment::query()->find($validated['treatment_id']);
 
         Appointment::create([
-            'id' => (string) Str::ulid(),
-            'doctor_id' => $validated['doctor_id'],
-            'registration_date' => $validated['appointment_date'],
+            'id'                   => (string) Str::ulid(),
+            'doctor_id'            => $validated['doctor_id'],
+            'registration_date'    => $validated['appointment_date'],
             'appointment_datetime' => $appointmentDateTime,
-            'status' => 'pending',
-            'procedure_plan' => $treatment?->procedure_name,
-            'complaint' => trim("Nama: {$validated['patient_name']}\nWhatsApp: {$validated['patient_phone']}\nCatatan: " . ($validated['notes'] ?? '-')),
+            'status'               => 'pending',
+            'procedure_plan'       => $treatment?->procedure_name,
+            'complaint'            => trim("Nama: {$validated['patient_name']}\nWhatsApp: {$validated['patient_phone']}\nCatatan: " . ($validated['notes'] ?? '-')),
         ]);
 
         return redirect()->route('appointments.success')
@@ -77,25 +77,25 @@ class AppointmentController extends Controller
     {
         // 1. Ambil Parameter
         $dateParam = $request->get('date', now()->toDateString());
-        $doctorId = $request->get('doctor_id');
-        $viewMode = $doctorId ? 'single' : 'all';
+        $doctorId  = $request->get('doctor_id');
+        $viewMode  = $doctorId ? 'single' : 'all';
 
         // 2. Tentukan Range Tanggal (Harian vs 7 Hari Mingguan)
         if ($viewMode === 'single') {
-            $startDate = \Carbon\Carbon::parse($dateParam)->startOfDay();
-            $endDate = $startDate->copy()->addDays(6)->endOfDay();
+            $startDate = Carbon::parse($dateParam)->startOfDay();
+            $endDate   = $startDate->copy()->addDays(6)->endOfDay();
         } else {
-            $startDate = \Carbon\Carbon::parse($dateParam)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($dateParam)->endOfDay();
+            $startDate = Carbon::parse($dateParam)->startOfDay();
+            $endDate   = Carbon::parse($dateParam)->endOfDay();
         }
 
         // 3. Ambil Master Data
-        $doctors = Doctor::active()->orderBy('full_name')->get();
-        $polis = MasterPoli::active()->get();
+        $doctors        = Doctor::active()->orderBy('full_name')->get();
+        $polis          = MasterPoli::active()->get();
         $guarantorTypes = MasterGuarantorType::active()->get();
         $paymentMethods = MasterPaymentMethod::active()->get()->unique('name');
-        $visitTypes = MasterVisitType::active()->get();
-        $careTypes = MasterCareType::active()->get();
+        $visitTypes     = MasterVisitType::active()->get();
+        $careTypes      = MasterCareType::active()->get();
 
         // 4. Query Data Pendaftaran
         $query = Appointment::with(['doctor', 'patient'])
@@ -110,22 +110,23 @@ class AppointmentController extends Controller
         // 5. Mapping Data ke Grid (LOGIKA SNAP 15 MENIT)
         $schedule = [];
         foreach ($appointments as $apt) {
-            $timeCarbon = \Carbon\Carbon::parse($apt->appointment_datetime);
-            $dateKey = $timeCarbon->toDateString();
-            
-            // --- LOGIKA KATEGORI / SNAP ---
-            $minute = $timeCarbon->minute;
-            $roundedMinute = floor($minute / 15) * 15;
-            $timeKey = $timeCarbon->minute($roundedMinute)->second(0)->format('H:i');
+            $timeCarbon = Carbon::parse($apt->appointment_datetime);
+            $dateKey    = $timeCarbon->toDateString();
 
-            // SUNTIK DATA
-            $apt->patient_name = $apt->patient->full_name ?? 'Pasien';
-            $apt->mr_number = $apt->patient->medical_record_no ?? '-';
-            $apt->treatment_name = \Illuminate\Support\Str::limit($apt->complaint ?? $apt->procedure_plan ?? '-', 20);
-            
+            $minute        = $timeCarbon->minute;
+            $roundedMinute = floor($minute / 15) * 15;
+            $timeKey       = $timeCarbon->minute($roundedMinute)->second(0)->format('H:i');
+
+            $apt->patient_name  = $apt->patient->full_name ?? 'Pasien';
+            $apt->mr_number     = $apt->patient->medical_record_no ?? '-';
+            $apt->treatment_name = Str::limit($apt->complaint ?? $apt->procedure_plan ?? '-', 20);
+
             $statusColors = [
-                'pending' => '#EF4444', 'confirmed' => '#F59E0B', 'waiting' => '#8B5CF6',
-                'engaged' => '#3B82F6', 'succeed' => '#84CC16'
+                'pending'   => '#EF4444',
+                'confirmed' => '#F59E0B',
+                'waiting'   => '#8B5CF6',
+                'engaged'   => '#3B82F6',
+                'succeed'   => '#84CC16',
             ];
             $apt->status_color = $statusColors[strtolower($apt->status)] ?? '#C58F59';
 
@@ -138,8 +139,8 @@ class AppointmentController extends Controller
 
         // 6. Slot Waktu Grid (08:00 - 21:00)
         $timeSlots = [];
-        $start = \Carbon\Carbon::createFromTime(8, 0);
-        $end = \Carbon\Carbon::createFromTime(21, 0);
+        $start     = Carbon::createFromTime(8, 0);
+        $end       = Carbon::createFromTime(21, 0);
         while ($start <= $end) {
             $timeSlots[] = $start->format('H:i');
             $start->addMinutes(15);
@@ -147,7 +148,7 @@ class AppointmentController extends Controller
 
         // 7. Siapkan array Tanggal untuk kolom Header
         $dateColumns = [];
-        $tempDate = $startDate->copy();
+        $tempDate    = $startDate->copy();
         for ($i = 0; $i < 7; $i++) {
             $dateColumns[] = $tempDate->toDateString();
             $tempDate->addDay();
@@ -157,8 +158,8 @@ class AppointmentController extends Controller
             'doctors', 'schedule', 'timeSlots', 'dateParam', 'dateColumns',
             'polis', 'guarantorTypes', 'paymentMethods', 'visitTypes', 'careTypes'
         ))->with([
-            'date' => $dateParam,
-            'carbon' => $startDate
+            'date'   => $dateParam,
+            'carbon' => $startDate,
         ]);
     }
 
@@ -200,15 +201,17 @@ class AppointmentController extends Controller
             'complaint'         => 'nullable|string|max:1000',
             'patient_condition' => 'nullable|string|max:1000',
             'procedure_plan'    => 'nullable|string|max:1000',
+            // FIX: Terima foto dari form pendaftaran baru
+            'photo_base64'      => 'nullable|string',
         ]);
 
         $appointmentDatetime = Carbon::parse($validated['appointment_date'] . ' ' . $validated['appointment_time']);
 
         $appointment = Appointment::create([
-            'id'                   => (string) Str::ulid(), // Menggunakan ULID agar aman
+            'id'                   => (string) Str::ulid(),
             'patient_id'           => $validated['patient_id'],
             'doctor_id'            => $validated['doctor_id'],
-            'admin_id'             => Auth::id() ?? 1, // Beri fallback 1 jika tidak ada auth saat test
+            'admin_id'             => Auth::id() ?? 1,
             'poli_id'              => $validated['poli_id'],
             'guarantor_type_id'    => $validated['guarantor_type_id'] ?? null,
             'payment_method_id'    => $validated['payment_method_id'] ?? null,
@@ -224,11 +227,23 @@ class AppointmentController extends Controller
             'procedure_plan'       => $validated['procedure_plan'] ?? null,
         ]);
 
-        // CEK: Apakah form registrasi  menggunakan AJAX atau Form Biasa?
-        // Jika form HTML biasa, aktifkan kode di bawah ini:
-        // return redirect()->back()->with('success', 'Pendaftaran berhasil disimpan!');
+        // FIX: Update foto pasien jika dikirim dari form pendaftaran baru
+        $photoBase64 = $request->input('photo_base64');
+        if (!empty($photoBase64)) {
+            try {
+                $patient = Patient::find($validated['patient_id']);
+                if ($patient) {
+                    $patient->update(['photo' => $photoBase64]);
+                    \Log::info('Patient photo updated on storeAdmin', ['patient_id' => $patient->id]);
+                }
+            } catch (\Exception $e) {
+                // Jangan gagalkan seluruh request hanya karena foto gagal
+                \Log::error('Failed to update patient photo on storeAdmin: ' . $e->getMessage(), [
+                    'patient_id' => $validated['patient_id'],
+                ]);
+            }
+        }
 
-        // Jika menggunakan AJAX/Axios, biarkan pakai JSON ini:
         return response()->json([
             'success' => true,
             'message' => 'Pendaftaran berhasil disimpan.',
@@ -239,20 +254,20 @@ class AppointmentController extends Controller
     public function show(Appointment $appointment)
     {
         $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod']);
-        
+
         return response()->json([
             'success' => true,
-            'data' => $appointment,
+            'data'    => $appointment,
         ], 200);
     }
 
     public function index(Request $request)
     {
-        $date = $request->get('date'); 
-        $poliId = $request->get('filter_poli');
+        $date     = $request->get('date');
+        $poliId   = $request->get('filter_poli');
         $doctorId = $request->get('filter_dokter');
         $paymentId = $request->get('filter_bayar');
-        $search = $request->get('search');
+        $search   = $request->get('search');
 
         $query = Appointment::with(['patient', 'doctor', 'poli', 'paymentMethod']);
 
@@ -269,16 +284,16 @@ class AppointmentController extends Controller
             $query->where('payment_method_id', $paymentId);
         }
         if ($search) {
-            $query->whereHas('patient', function($q) use ($search) {
+            $query->whereHas('patient', function ($q) use ($search) {
                 $q->where('full_name', 'like', "%{$search}%")
-                ->orWhere('medical_record_no', 'like', "%{$search}%");
+                  ->orWhere('medical_record_no', 'like', "%{$search}%");
             });
         }
 
         $appointments = $query->orderByRaw('DATE(appointment_datetime) DESC')
-                      ->orderByRaw('TIME(appointment_datetime) ASC')
-                      ->paginate(10);
-        $appointments->appends($request->all()); 
+                              ->orderByRaw('TIME(appointment_datetime) ASC')
+                              ->paginate(10);
+        $appointments->appends($request->all());
 
         $doctors        = Doctor::active()->orderBy('full_name')->get();
         $polis          = MasterPoli::active()->get()->unique('name')->sortBy('name')->values();
@@ -288,75 +303,84 @@ class AppointmentController extends Controller
         $careTypes      = MasterCareType::active()->get();
 
         return view('admin.pages.registration', compact(
-            'appointments', 'date', 'search', 
+            'appointments', 'date', 'search',
             'doctors', 'polis', 'guarantorTypes', 'paymentMethods', 'visitTypes', 'careTypes'
         ));
     }
 
     public function update(Request $request, Appointment $appointment)
     {
-        // Debug logging
         \Log::info('Appointment update request', [
-            'appointment_id' => $appointment->id,
-            'patient_id' => $appointment->patient_id,
-            'request_keys' => $request->keys(),
+            'appointment_id'   => $appointment->id,
+            'patient_id'       => $appointment->patient_id,
+            'content_type'     => $request->header('Content-Type'),
             'has_photo_base64' => $request->has('photo_base64'),
-            'photo_base64_length' => strlen($request->input('photo_base64', ''))
         ]);
 
+        // FIX: Hapus batas max pada photo_base64 agar tidak memotong data base64 besar
         $validated = $request->validate([
-            'complaint' => 'nullable|string|max:1000',
+            'complaint'      => 'nullable|string|max:1000',
             'procedure_plan' => 'nullable|string|max:1000',
-            'status' => 'nullable|in:pending,confirmed,waiting,engaged,succeed,completed,cancelled',
-            'notes' => 'nullable|string|max:1000',
-            'photo_base64' => 'nullable|string|max:5000000', // Allow large base64 strings (up to ~5MB)
+            'status'         => 'nullable|in:pending,confirmed,waiting,engaged,succeed,completed,cancelled',
+            'notes'          => 'nullable|string|max:1000',
+            'photo_base64'   => 'nullable|string',
         ]);
 
+        // Bangun array update hanya dari field yang dikirim
         $updateData = [];
-        if (isset($validated['complaint'])) {
+
+        if (array_key_exists('complaint', $validated)) {
             $updateData['complaint'] = $validated['complaint'];
         }
-        if (isset($validated['procedure_plan'])) {
+        if (array_key_exists('procedure_plan', $validated)) {
             $updateData['procedure_plan'] = $validated['procedure_plan'];
         }
-        if (isset($validated['status'])) {
+        if (array_key_exists('status', $validated)) {
             $updateData['status'] = $validated['status'];
         }
-        if (isset($validated['notes'])) {
+        if (array_key_exists('notes', $validated)) {
             $updateData['patient_condition'] = $validated['notes'];
         }
 
-        $appointment->update($updateData);
+        if (!empty($updateData)) {
+            $appointment->update($updateData);
+        }
 
-        // Update patient photo if provided
+        // FIX: Baca photo_base64 dari JSON body (request->input() sudah handle keduanya)
         $photoBase64 = $request->input('photo_base64');
-        if ($photoBase64 && $appointment->patient_id) {
+
+        if (!empty($photoBase64) && $appointment->patient_id) {
             try {
                 $patient = Patient::find($appointment->patient_id);
                 if ($patient) {
-                    \Log::info('Updating patient photo', [
-                        'patient_id' => $patient->id,
-                        'photo_length' => strlen($photoBase64)
-                    ]);
                     $patient->update(['photo' => $photoBase64]);
                     \Log::info('Patient photo updated successfully', ['patient_id' => $patient->id]);
                 } else {
                     \Log::warning('Patient not found for photo update', ['patient_id' => $appointment->patient_id]);
                 }
             } catch (\Exception $e) {
-                // Log error but don't fail the entire request
+                // Log error tapi jangan gagalkan seluruh request
                 \Log::error('Failed to update patient photo: ' . $e->getMessage(), [
                     'appointment_id' => $appointment->id,
-                    'patient_id' => $appointment->patient_id,
-                    'exception' => $e
+                    'patient_id'     => $appointment->patient_id,
                 ]);
             }
         }
 
+        // FIX: Reload relasi dengan fresh data agar foto terbaru ikut terkirim ke frontend
+        $appointment->refresh();
+        $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod']);
+
+        \Log::info('Update response data', [
+            'appointment_id'     => $appointment->id,
+            'has_patient_photo'  => !empty($appointment->patient->photo),
+            'photo_length'       => strlen($appointment->patient->photo ?? ''),
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Detail kunjungan berhasil diperbarui',
-            'data' => $appointment,
+            'data'    => $appointment,
         ], 200);
     }
 }

@@ -170,18 +170,20 @@
                     <table class="reg-table">
                         <thead>
                             <tr>
-                                <th>No</th>
+    <th>No</th>
                                 <th>Status</th>
                                 <th>Tanggal<br>Kunjungan</th>
                                 <th>Tanggal<br>Dibuat</th>
                                 
                                 <th>Poli</th>
                                 <th>Nama Pasien</th>
+
                                 <th>Rencana<br>Tindakan</th>
                                 <th>Dokter Pemeriksa</th>
                                 <th>Metode Bayar</th>
                                 <th>Catatan Medis</th>
                                 <th>Aksi</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -213,10 +215,14 @@
                                 
                                 <td data-label="Poli">{{ $app->poli->name ?? '-' }}</td>
                                 
+
+
                                 <td data-label="Nama Pasien">
                                     <strong>{{ $app->patient->full_name ?? 'Pasien Baru' }}</strong><br>
                                     {{ $app->patient->medical_record_no ?? '-' }}
                                 </td>
+
+
                                 
                                 <td data-label="Rencana Tindakan">{{ $app->procedure_plan ?? '-' }}</td>
                                 
@@ -456,6 +462,9 @@
 
     function renderDetailModalContent(appointment) {
         const patientPhoto = appointment.patient?.photo ? `data:image/png;base64,${appointment.patient.photo}` : null;
+
+
+
         const currentMode = 'view'; // Default mode
 
         return `
@@ -879,89 +888,75 @@
         editPhotoCroppedBase64 = '';
     }
 
-    function submitDetailEdit(e) {
+    async function submitDetailEdit(e) {
         e.preventDefault();
         const form = e.target;
-        const form_data = new FormData(form);
         const appointmentId = form.dataset.appointmentId;
-
-        // Debug: log form data
-        const photoBase64 = form_data.get('photo_base64');
-        console.log('[submitDetailEdit] appointmentId:', appointmentId);
-        console.log('[submitDetailEdit] complaint:', form_data.get('complaint'));
-        console.log('[submitDetailEdit] procedure_plan:', form_data.get('procedure_plan'));
-        console.log('[submitDetailEdit] has photo_base64:', !!photoBase64);
-        console.log('[submitDetailEdit] photo_base64 length:', photoBase64 ? photoBase64.length : 0);
-
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
+
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         submitBtn.disabled = true;
 
-        fetch(`/api/appointments/${appointmentId}`, {
-            method: 'PUT',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            },
-            body: form_data,
-        })
-        .then(res => {
-            console.log('[submitDetailEdit] response status:', res.status);
-            return res.json();
-        })
-        .then(data => {
-            console.log('[submitDetailEdit] response data:', data);
-            if (data.success) {
-                // Refetch appointment data to get updated photo
-                console.log('[submitDetailEdit] fetching updated appointment data');
-                return fetch(`/api/appointments/${appointmentId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    }
-                }).then(res => res.json())
-                .then(response => {
-                    console.log('[submitDetailEdit] refetched appointment:', response.data);
-                    if (response.success && response.data) {
-                        // Update detail modal with new data
-                        const modal = document.getElementById('appointmentDetailModal');
-                        if (modal) {
-                            const appointment = response.data;
-                            modal.innerHTML = renderDetailModalContent(appointment);
-                            setupDetailEventListeners(appointmentId, appointment);
-                            
-                            // Switch back to view mode
-                            const viewMode = document.getElementById('detailViewMode');
-                            const editMode = document.getElementById('detailEditMode');
-                            if (viewMode && editMode) {
-                                viewMode.style.display = 'block';
-                                editMode.style.display = 'none';
-                            }
-                            
-                            console.log('[submitDetailEdit] modal updated with new data');
-                        }
-                    }
-                    return data;
-                });
+        try {
+            // Build payload sebagai JSON (bukan FormData) agar lebih reliable
+            const payload = {
+                complaint:      form.querySelector('[name="complaint"]').value,
+                procedure_plan: form.querySelector('[name="procedure_plan"]').value,
+                photo_base64:   form.querySelector('[name="photo_base64"]').value || null,
+            };
+
+            console.log('[submitDetailEdit] payload:', payload);
+
+            // 1. PUT update appointment
+            const putRes = await fetch(`/api/appointments/${appointmentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const putData = await putRes.json();
+            if (!putData.success) throw new Error(putData.message || 'Gagal menyimpan');
+
+            // 2. GET fresh data
+            const getRes = await fetch(`/api/appointments/${appointmentId}`, {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                cache: 'no-cache',
+            });
+            const getData = await getRes.json();
+            if (!getData.success || !getData.data) throw new Error('Gagal memuat data terbaru');
+
+            // 3. Re-render modal dengan data baru
+            const modal = document.getElementById('appointmentDetailModal');
+            if (modal) {
+                modal.innerHTML = renderDetailModalContent(getData.data);
+                setupDetailEventListeners(appointmentId, getData.data);
+                // Paksa kembali ke view mode
+                const vm = document.getElementById('detailViewMode');
+                const em = document.getElementById('detailEditMode');
+                if (vm) vm.style.display = 'block';
+                if (em) em.style.display = 'none';
+                modal.scrollTop = 0;
             }
-            return Promise.reject(new Error(data.message || 'Gagal menyimpan'));
-        })
-        .then(data => {
+
+            // Reset cropper state
+            editPhotoCropperState = { image: null, originalWidth: 0, originalHeight: 0, frameX: undefined, frameY: undefined, frameSize: 200, isDragging: false };
+            editPhotoCroppedBase64 = '';
+
             alert('✓ Detail kunjungan berhasil disimpan');
-            console.log('[submitDetailEdit] success, reloading in 1.5 seconds');
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        })
-        .catch(err => {
+
+        } catch (err) {
             console.error('[submitDetailEdit] error:', err);
             alert('✗ Error: ' + err.message);
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-        });
+        }
     }
+
 
     function closeDetailModal() {
         const modal = document.getElementById('appointmentDetailModal');
