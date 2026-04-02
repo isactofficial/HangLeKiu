@@ -1,25 +1,8 @@
-# TODO: ✅ FULLY RESOLVED 
+# Task: Implement Functional Navbar Search in navbarPendaftaranBaru.blade.php
 
-**FINAL STATUS: COMPLETE**
-
-All issues fixed per feedback:
-1. ✅ Table reverted (no photo column)
-2. ✅ Modal photo displays in detail (MR lookup)
-3. ✅ Edit/crop/save → **Modal updates immediately** (async/await rewrite)
-4. ✅ No more base64 ERR_INVALID_URL
-5. ✅ JSON payload (reliable over FormData)
-
-**Test:**
-- Open detail → Photo OK
-- Edit photo + fields → Save → **Instant update** (check console)
-- MR after new reg → Photo in detail modal
-
-**Demo:** `/admin/registration` ✅
-
-No more issues!
-
-
-
-
-
+## Steps:
+- [x] 1. Create/enhance PatientController::search() to include latest_appointment_id
+- [x] 2. Replace navbar-search-group block in resources/views/admin/components/navbarPendaftaranBaru.blade.php with functional version (enhanced to show all appointments)
+- [x] 3. Test search functionality (type 2+ chars, verify dropdown with appointments, click to EMR)
+- [x] 4. Complete task
 

@@ -1,7 +1,5 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/pharmacy/obat.css') }}">
-    <!-- Pastikan Tailwind CSS terload untuk utilitas class modal -->
-    <script src="https://cdn.tailwindcss.com"></script>
 @endpush
 
 <div class="apt-card" style="margin-top:16px;">

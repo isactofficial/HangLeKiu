@@ -14,34 +14,161 @@
             </svg>
         </button>
 
-        {{-- DITAMBAHKAN: Pembungkus yang sesuai dengan CSS Anda --}}
-        <div class="navbar-search-group">
-            <div class="navbar-search-wrapper">
-                <svg class="navbar-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" class="navbar-search-input" placeholder="Cari Pasien / No MR / No Ktp / No Asuransi...">
-                <svg class="navbar-user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-            </div>
+        <div class="navbar-search-wrapper" style="position: relative;">
+            <svg class="navbar-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="navbarGlobalSearch" class="navbar-search-input"
+                   placeholder="Cari Pasien / No MR / No Ktp / No Asuransi..."
+                   autocomplete="off">
+            <svg class="navbar-user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
 
-            <div class="navbar-dropdown" id="pendaftaranDropdown">
-                <button class="navbar-btn-primary" onclick="toggleDropdown('pendaftaranMenu')">
-                    <span class="btn-text-desktop">{{ $title ?: 'Pilih Opsi' }}</span>
-                    <span class="btn-text-mobile">Daftar</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </button>
-                <div class="navbar-dropdown-menu" id="pendaftaranMenu">
-                    <a href="#" onclick="openRegModal('modalPendaftaranBaru'); return false;" class="dropdown-item">Pendaftaran Baru</a>
-                    <a href="#" onclick="openRegModal('modalPasienBaru'); return false;" class="dropdown-item">Pasien Baru</a>
-                </div>
+            <div id="navbarSearchDropdown" style="
+                display: none;
+                position: absolute;
+                top: calc(100% + 6px);
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid #E5D6C5;
+                border-radius: 10px;
+                z-index: 9999;
+                max-height: 380px;
+                overflow-y: auto;
+                box-shadow: 0 8px 24px rgba(88,44,12,0.12);
+            "></div>
+        </div>
+
+        <div class="navbar-dropdown" id="pendaftaranDropdown">
+            <button class="navbar-btn-primary" onclick="toggleDropdown('pendaftaranMenu')">
+                <span class="btn-text-desktop">{{ $title ?: 'Pilih Opsi' }}</span>
+                <span class="btn-text-mobile">Daftar</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:6px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+            </button>
+            <div class="navbar-dropdown-menu" id="pendaftaranMenu">
+                <a href="#" onclick="openRegModal('modalPendaftaranBaru'); return false;" class="dropdown-item">Pendaftaran Baru</a>
+                <a href="#" onclick="openRegModal('modalPasienBaru'); return false;" class="dropdown-item">Pasien Baru</a>
             </div>
         </div>
+
+        <script>
+        (function () {
+            const input    = document.getElementById('navbarGlobalSearch');
+            const dropdown = document.getElementById('navbarSearchDropdown');
+            let   timer;
+
+            if (!input) return;
+
+            input.addEventListener('input', function () {
+                clearTimeout(timer);
+                const q = this.value.trim();
+                if (q.length < 2) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                timer = setTimeout(() => doSearch(q), 350);
+            });
+
+            async function doSearch(q) {
+                dropdown.style.display = 'block';
+                dropdown.innerHTML = '<div style="padding:12px 16px; color:#999; font-size:13px;">Mencari...</div>';
+
+                try {
+                    const res = await fetch(`/admin/patients/search?q=${encodeURIComponent(q)}`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    const data = await res.json();
+
+                    if (data.success && data.data && data.data.length > 0) {
+                        dropdown.innerHTML = data.data.map(p => {
+                            const statusColors = {
+                                pending: '#EF4444', confirmed: '#F59E0B', waiting: '#8B5CF6',
+                                engaged: '#3B82F6', succeed: '#84CC16'
+                            };
+
+                            const appointmentRows = p.appointments && p.appointments.length > 0
+                                ? p.appointments.map(a => {
+                                    const dt       = new Date(a.datetime);
+                                    const tgl      = dt.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+                                    const jam      = dt.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+                                    const badgeColor = statusColors[a.status?.toLowerCase()] || '#888';
+
+                                    return `
+                                        <div onclick="navbarSearchSelect('${a.id}', '${p.full_name.replace(/'/g, "\\'")}')"
+                                             style="padding: 7px 16px 7px 28px; cursor: pointer; border-bottom: 1px solid #faf3ec; font-size: 12px; display: flex; justify-content: space-between; align-items: center; background: #fdfaf7;"
+                                             onmouseover="this.style.background='#f5ede0'"
+                                             onmouseout="this.style.background='#fdfaf7'">
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <i class="fas fa-calendar-alt" style="color:#C58F59; font-size:10px;"></i>
+                                                <span style="color:#5a3e28;">${tgl}, ${jam}</span>
+                                                <span style="color:#aaa;">— ${a.poli} / ${a.doctor}</span>
+                                            </div>
+                                            <div style="display:flex; align-items:center; gap:6px;">
+                                                <span style="background:${badgeColor}; color:white; font-size:9px; padding:2px 7px; border-radius:20px; font-weight:700; text-transform:uppercase;">${a.status}</span>
+                                                <span style="color:#C58F59; font-size:10px;"><i class="fas fa-arrow-right"></i></span>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')
+                                : `<div style="padding: 7px 16px 7px 28px; font-size: 12px; color: #bbb; background:#fdfaf7; border-bottom: 1px solid #faf3ec;">
+                                       <i class="fas fa-info-circle"></i> Belum ada kunjungan
+                                   </div>`;
+
+                            return `
+                                <div>
+                                    <div style="padding: 10px 16px; border-bottom: 1px solid #f0e8df; background: white; display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <div style="font-weight: 700; color: #2C1810; font-size: 13px;">${p.full_name}</div>
+                                            <div style="color: #999; font-size: 11px; margin-top: 2px;">
+                                                MR: ${p.medical_record_no || '-'} &nbsp;|&nbsp; KTP: ${p.id_card_number || '-'}
+                                            </div>
+                                        </div>
+                                        <div style="color:#aaa; font-size:11px; white-space:nowrap; margin-left:8px;">
+                                            ${p.appointments.length} kunjungan
+                                        </div>
+                                    </div>
+                                    ${appointmentRows}
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        dropdown.innerHTML = '<div style="padding:12px 16px; color:#999; font-size:13px;">Pasien tidak ditemukan.</div>';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    dropdown.innerHTML = '<div style="padding:12px 16px; color:#e05252; font-size:13px;">Gagal mencari data.</div>';
+                }
+            }
+
+            window.navbarSearchSelect = function (apptId, name) {
+                dropdown.style.display = 'none';
+                input.value = name;
+                window.location.href = `/admin/emr?open=${apptId}`;
+            };
+
+            document.addEventListener('click', function (e) {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    dropdown.style.display = 'none';
+                    this.blur();
+                }
+            });
+        })();
+        </script>
     </div>
 
     {{-- DESKTOP: Right icons --}}

@@ -259,6 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
             attachPatientLinkEvents();
 
             // ================= 4. AUTO-LOAD PASIEN DARI URL PARAMETER =================
+            const patientLinks = document.querySelectorAll('.js-emr-patient-link');
             const urlParams = new URLSearchParams(window.location.search);
             const openApptId = urlParams.get('open'); // Menangkap ID dari URL ?open=123
 
@@ -321,8 +322,43 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.getElementById('emr-loading').classList.add('hidden');
                         document.getElementById('emr-empty-view').classList.remove('hidden'); 
                     });
+            } else {
+                // ===== FALLBACK: patient_id tanpa appointment =====
+                const patientIdParam = urlParams.get('patient_id');
+                if (patientIdParam) {
+                    // Cari link pasien di sidebar berdasarkan data patient
+                    const allLinks = document.querySelectorAll('.js-emr-patient-link');
+                    let found = false;
+                    
+                    allLinks.forEach(link => {
+                        const nameText = link.querySelector('.p-name')?.textContent.trim().toLowerCase();
+                        if (nameText && patientIdParam.toLowerCase().includes(nameText)) {
+                            link.click();
+                            found = true;
+                            return;
+                        }
+                    });
+                    
+                    if (!found) {
+                        document.getElementById('emr-empty-view').innerHTML = `
+                            <div style="text-align:center; padding-top:80px;">
+                                <img src="{{ asset('images/empty-queue.png') }}" style="width:160px; opacity:0.4;">
+                                <h3 style="color:#CBD5E0; margin-top:16px;">Pasien belum memiliki kunjungan</h3>
+                                <p style="color:#A0AEC0; font-size:13px;">Daftarkan pasien terlebih dahulu melalui menu Pendaftaran</p>
+                                <button onclick="openRegModal('modalPendaftaranBaru')" 
+                                        style="margin-top:16px; padding:10px 20px; background:#C58F59; color:white; border:none; border-radius:6px; cursor:pointer; font-size:13px;">
+                                    <i class="fas fa-plus"></i> Daftarkan Kunjungan
+                                </button>
+                            </div>
+                        `;
+                        document.getElementById('emr-empty-view').classList.remove('hidden');
+                    }
+                    
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
             }
         });
+
 
         // ================= 3. FUNGSI GLOBAL (DIPANGGIL SETELAH AJAX) =================
         function bindTabEvents() {

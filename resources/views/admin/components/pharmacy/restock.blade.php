@@ -1,6 +1,5 @@
 ﻿@push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/pharmacy/restock.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
 @endpush
 
 <div class="apt-card">

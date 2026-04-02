@@ -7,7 +7,6 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/pages/cashier.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .badge-lunas-hijau {
             background-color: #dcfce7;
