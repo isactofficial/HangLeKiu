@@ -6,6 +6,8 @@ use App\Models\Appointment;
 use App\Models\MedicalProcedure;
 use App\Models\ProcedureMedicine;
 use App\Models\Patient;
+use App\Models\Invoice;
+use App\Models\ConsumableRestock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +22,11 @@ class OfficeController extends Controller
         // 👉 Jika menu pasien
         if ($activeMenu === 'pasien') {
             return $this->handlePasienMenu($request);
+        }
+
+        // menu keuangan
+        if ($activeMenu === 'keuangan') {
+            return $this->handleKeuanganMenu($request);
         }
 
         // =========================
@@ -109,7 +116,8 @@ class OfficeController extends Controller
 
         // 5. Finance
         $totalMasuk = $sumTodayOmzet;
-        $totalKeluar = 0;
+        $totalKeluar = 0; // Placeholder
+
         $saldoAkhir = $totalMasuk - $totalKeluar;
         $profitMargin = $totalMasuk > 0 ? (($saldoAkhir) / $totalMasuk) * 100 : 0;
 
@@ -210,6 +218,73 @@ class OfficeController extends Controller
             'educationStats' => $educationStats,
 
             'patients' => $patients
+        ]);
+    }
+
+    // MENU KEUANGAN
+    private function handleKeuanganMenu(Request $request)
+    {
+        $activeTab = $request->query('tab', 'ikhtisar');
+        $startDate = $request->query('start_date', now()->startOfMonth()->toDateString());
+        $endDate = $request->query('end_date', now()->endOfMonth()->toDateString());
+
+        // 1. Ikhtisar Stats
+        $income = Invoice::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->sum('amount_paid');
+        
+        $expenses = ConsumableRestock::where('restock_type', 'restock')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->sum(DB::raw('purchase_price * quantity_added'));
+
+        $claims = Invoice::where('payment_type', 'BPJS')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->sum('amount_paid');
+
+        // 2. Total (Cumulative/Lifetime)
+        $totalIncome = Invoice::sum('amount_paid');
+        $totalExpenses = ConsumableRestock::where('restock_type', 'restock')
+            ->sum(DB::raw('purchase_price * quantity_added'));
+        
+        $kas = $totalIncome - $totalExpenses;
+
+        // 3. Detailed Data for Tabs
+        $tabData = [];
+        if ($activeTab === 'pemasukan') {
+            $tabData = Invoice::with(['registration.patient', 'registration.doctor'])
+                ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->orderByDesc('created_at')
+                ->paginate(10);
+        } elseif ($activeTab === 'pengeluaran') {
+            $tabData = ConsumableRestock::with(['item'])
+                ->where('restock_type', 'restock')
+                ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->orderByDesc('created_at')
+                ->paginate(10);
+        } elseif ($activeTab === 'klaim') {
+            $tabData = Invoice::with(['registration.patient'])
+                ->where('payment_type', 'BPJS')
+                ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->orderByDesc('created_at')
+                ->paginate(10);
+        }
+
+        return view('admin.layout.office', [
+            'activeMenu' => 'keuangan',
+            'activeTab' => $activeTab,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            
+            // Stats
+            'income' => $income,
+            'expenses' => $expenses,
+            'claims' => $claims,
+            'margin' => $income - $expenses,
+            
+            // Stats Total
+            'kas' => $kas,
+            
+            // Tab Data
+            'tabData' => $tabData
         ]);
     }
 }

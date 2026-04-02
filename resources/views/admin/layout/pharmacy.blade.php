@@ -7,13 +7,11 @@
     $menuList = [
         'obat'             => 'Obat',
         'penggunaan-obat'  => 'Penggunaan Obat',
-        'kedaluwarsa-obat' => 'Kedaluwarsa Obat',
         'bhp'              => 'Bahan Habis Pakai',
         'penggunaan-bhp'   => 'Penggunaan BHP',
-        'kedaluwarsa-bhp'  => 'Kedaluwarsa Bahan Habis Pakai',
         'restock'          => 'Restock / Return',
     ];
-    $active = request('menu', 'antrian');
+    $active = request('menu', 'obat');
 @endphp
 
 @push('styles')
