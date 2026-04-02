@@ -32,12 +32,7 @@
                     <h2 class="reg-card-title">
                         Rawat Jalan Poli <i class="fas fa-desktop" style="color: #C58F59; margin-left: 8px;"></i>
                     </h2>
-<div class="reg-card-actions">
-                        <button class="reg-icon-btn" title="Informasi"><i class="fas fa-info-circle"></i></button>
-                        <button class="reg-icon-btn" title="Print">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px; color: currentColor;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18.25 7.034V3.375" /></svg>
-                        </button>
-                    </div>
+
                 </div>
 
                 {{-- Filter Pencarian --}}
@@ -149,12 +144,12 @@
                         
 <div class="reg-input-group" style="flex: 1.5; justify-content: flex-end;">
                             <div class="reg-date-wrapper" style="display: flex; align-items: center; gap: 10px; position: relative;">
-                                <div class="reg-search-box" style="flex: 1; position: relative;">
+                                    <div class="reg-search-box" style="flex: 1; position: relative;">
                                     <input type="text" id="filter_search" placeholder="Nama Pasien, Nomor MR..." value="{{ request('search') }}" 
                                            style="padding-right: 40px;" 
-                                           onkeypress="if(event.key === 'Enter') applyFilter()"
-                                           oninput="debounceFilter(this.value, 300)">
-                                    <i class="fas fa-search search-icon" style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #C58F59;" onclick="applyFilter()"></i>
+                                           oninput="clientFilterTable();"
+                                           onsearch="clientFilterTable();">
+                                    <i class="fas fa-search search-icon" style="cursor: pointer; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #C58F59;" onclick="clientFilterTable()"></i>
                                 </div>
                                 <button type="button" onclick="clearSearchFilter()" title="Hapus Pencarian" 
                                     style="color: #C58F59; background-color: transparent; border: 1px solid #C58F59; border-radius: 4px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
@@ -333,14 +328,35 @@
         }
     }
 
-    let searchTimeout;
-    
-    // Debounce helper
-    function debounceFilter(value, delay) {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            if (value.trim()) applyFilter();
-        }, delay);
+    // Client-side table filtering for search (no page reload)
+    function clientFilterTable() {
+        const searchInput = document.getElementById('filter_search');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const tableRows = document.querySelectorAll('tbody tr');
+        let visibleCount = 0;
+
+        tableRows.forEach(row => {
+            const patientCell = row.querySelector('td:nth-child(6)'); // Nama Pasien column
+            const textContent = patientCell ? patientCell.textContent.toLowerCase() : '';
+            
+            if (searchTerm === '' || textContent.includes(searchTerm)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Update pagination info (optional enhancement)
+        const pageInfo = document.querySelector('.reg-page-size span');
+        if (pageInfo && searchTerm !== '') {
+            pageInfo.textContent = `Ditemukan ${visibleCount} hasil pencarian`;
+        } else if (pageInfo) {
+            // Reset to original when search cleared
+            const tbody = document.querySelector('tbody');
+            const totalRows = tbody.querySelectorAll('tr:not([style*="display: none"])').length;
+            pageInfo.textContent = `Menampilkan 1-${Math.min(totalRows, 10)} dari ${totalRows} Data`;
+        }
     }
     
     // FUNGSI UNTUK REFRESH HALAMAN DENGAN FILTER (with loading)
@@ -368,12 +384,12 @@
         window.location.href = url.toString();
     }
     
-    // Clear search filter
+    // Clear search filter (client-side only)
     function clearSearchFilter() {
         const searchInput = document.getElementById('filter_search');
         if (searchInput) {
             searchInput.value = '';
-            applyFilter();
+            clientFilterTable();
         }
     }
     
