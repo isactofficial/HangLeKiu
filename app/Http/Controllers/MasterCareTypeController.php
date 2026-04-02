@@ -24,6 +24,7 @@ class MasterCareTypeController extends BaseMasterController
 
         $item = $this->model::create([
             'id'          => (string) Str::uuid(),
+            'code'        => Str::upper(substr(Str::slug($request->name, '_'), 0, 10)),
             'name'        => $request->name,
             'price'       => $request->price,
             'description' => $request->description,
@@ -43,6 +44,7 @@ class MasterCareTypeController extends BaseMasterController
         $request->validate($this->validationRules);
 
         $item->update([
+            'code'        => Str::upper(substr(Str::slug($request->name, '_'), 0, 10)),
             'name'        => $request->name,
             'price'       => $request->price,
             'description' => $request->description,
@@ -54,5 +56,26 @@ class MasterCareTypeController extends BaseMasterController
             'message' => "{$this->resourceName} berhasil diupdate",
             'data'    => $item
         ]);
+    }
+
+    public function destroy($id)
+    {
+        $item = $this->model::findOrFail($id);
+
+        try {
+            $item->delete();
+            return response()->json([
+                'success' => true,
+                'message' => "{$this->resourceName} berhasil dihapus"
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "{$this->resourceName} tidak bisa dihapus karena sudah digunakan di data lain"
+                ], 422);
+            }
+            throw $e;
+        }
     }
 }

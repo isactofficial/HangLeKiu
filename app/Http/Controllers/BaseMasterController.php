@@ -20,7 +20,6 @@ abstract class BaseMasterController extends Controller
         $this->resourceName = $resourceName;
     }
 
-    // get and search
     public function index(Request $request)
     {
         $query = $this->model::query();
@@ -33,7 +32,7 @@ abstract class BaseMasterController extends Controller
             $query->where('is_active', $request->is_active);
         }
 
-        $data = $query->latest()->paginate(10);
+        $data = $query->orderBy('name')->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -42,7 +41,6 @@ abstract class BaseMasterController extends Controller
         ]);
     }
 
-    // show detail
     public function show($id)
     {
         $item = $this->model::findOrFail($id);
@@ -53,7 +51,6 @@ abstract class BaseMasterController extends Controller
         ]);
     }
 
-    // store
     public function store(Request $request)
     {
         $request->validate($this->validationRules);
@@ -61,7 +58,7 @@ abstract class BaseMasterController extends Controller
         $item = $this->model::create([
             'id'        => (string) Str::uuid(),
             'name'      => $request->name,
-            'is_active' => $request->is_active ?? true,
+            'is_active' => isset($request->is_active) ? (bool) $request->is_active : true,
         ]);
 
         return response()->json([
@@ -71,7 +68,6 @@ abstract class BaseMasterController extends Controller
         ], 201);
     }
 
-    // update
     public function update(Request $request, $id)
     {
         $item = $this->model::findOrFail($id);
@@ -79,7 +75,7 @@ abstract class BaseMasterController extends Controller
 
         $item->update([
             'name'      => $request->name,
-            'is_active' => $request->is_active ?? $item->is_active,
+            'is_active' => isset($request->is_active) ? (bool) $request->is_active : $item->is_active,
         ]);
 
         return response()->json([
@@ -89,15 +85,24 @@ abstract class BaseMasterController extends Controller
         ]);
     }
 
-    // delete
     public function destroy($id)
     {
         $item = $this->model::findOrFail($id);
-        $item->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => "{$this->resourceName} berhasil dihapus"
-        ]);
+        try {
+            $item->delete();
+            return response()->json([
+                'success' => true,
+                'message' => "{$this->resourceName} berhasil dihapus"
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "{$this->resourceName} tidak bisa dihapus karena sudah digunakan di data lain"
+                ], 422);
+            }
+            throw $e;
+        }
     }
 }
