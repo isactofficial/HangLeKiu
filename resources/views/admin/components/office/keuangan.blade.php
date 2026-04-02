@@ -27,18 +27,14 @@
 @if ($tab === 'ikhtisar')
 
     <p class="keu-section-label">Operasional</p>
-    <div class="keu-grid-4">
+    <div class="keu-grid-2">
         <div class="keu-stat">
             <p class="keu-stat-label">Pemasukan</p>
             <p class="keu-stat-amount plus">+ Rp{{ number_format($income, 0, ',', '.') }}</p>
         </div>
         <div class="keu-stat">
-            <p class="keu-stat-label">Pengeluaran</p>
+            <p class="keu-stat-label">Pengeluaran Operasional</p>
             <p class="keu-stat-amount minus">- Rp{{ number_format($expenses, 0, ',', '.') }}</p>
-        </div>
-        <div class="keu-stat">
-            <p class="keu-stat-label">Piutang</p>
-            <p class="keu-stat-amount plus">+ Rp{{ number_format($receivables, 0, ',', '.') }}</p>
         </div>
     </div>
 
@@ -66,29 +62,10 @@
     </div>
 
     <p class="keu-section-label">Total (Seluruh Waktu)</p>
-    <div class="keu-grid-3">
-        <div class="keu-stat">
-            <p class="keu-stat-label">Kas</p>
-            <p class="keu-stat-amount plus">+ Rp{{ number_format($kas, 0, ',', '.') }}</p>
-        </div>
-        <div class="keu-stat">
-            <p class="keu-stat-label">Total Cover BPJS</p>
-            <p class="keu-stat-amount plus">+ Rp{{ number_format($totalClaims, 0, ',', '.') }}</p>
-        </div>
-        <div class="keu-stat">
-            <p class="keu-stat-label">Total Piutang</p>
-            <p class="keu-stat-amount plus">+ Rp{{ number_format($totalReceivables, 0, ',', '.') }}</p>
-        </div>
-    </div>
-    <div class="keu-grid-2">
+    <div class="keu-grid-1">
         <div class="keu-stat">
             <p class="keu-stat-label">Total Saldo</p>
             <p class="keu-stat-amount plus">+ Rp{{ number_format($kas, 0, ',', '.') }}</p>
-        </div>
-        <div class="keu-stat">
-            <p class="keu-stat-label">Total Balance</p>
-            <p class="keu-stat-amount plus">+ Rp{{ number_format($totalBalance, 0, ',', '.') }}</p>
-            <p class="keu-stat-sub">Kas + Piutang</p>
         </div>
     </div>
 
