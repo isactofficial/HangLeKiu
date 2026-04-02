@@ -34,8 +34,13 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                 </a>
                 <div class="apt-date-text">
-                    <span class="apt-date-day">Kamis</span>
-                    <span class="apt-date-full">5 Maret 2026</span>
+                    <span class="apt-date-day">
+                        {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('l') }}
+                    </span>
+
+                    <span class="apt-date-full">
+                    {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('j F Y') }}
+                </span>
                 </div>
                 <a href="#" class="apt-icon-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
