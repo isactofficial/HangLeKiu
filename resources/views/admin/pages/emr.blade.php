@@ -216,42 +216,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
 
-            // ================= 2. AJAX LOADER (RIWAYAT MEDIS) =================
-            const patientLinks = document.querySelectorAll('.js-emr-patient-link');
-            patientLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Tandai menu sidebar aktif
-                    patientLinks.forEach(l => l.querySelector('.patient-card').classList.remove('active'));
-                    this.querySelector('.patient-card').classList.add('active');
-
-                    // Ganti UI ke Loading
-                    document.getElementById('emr-empty-view').classList.add('hidden');
-                    document.getElementById('emr-detail-view').classList.add('hidden');
-                    document.getElementById('emr-loading').classList.remove('hidden');
-
-                    // Ambil HTML dari controller via AJAX
-                    fetch(this.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                        .then(res => res.text())
-                        .then(html => {
-                            document.getElementById('emr-loading').classList.add('hidden');
-                            document.getElementById('emr-detail-view').classList.remove('hidden');
-                            document.getElementById('emr-detail-view').innerHTML = html;
-                            
-                            // Eksekusi fungsi setup UI setelah HTML masuk
-                            if(typeof bindTabEvents === 'function') bindTabEvents();
-                            if(typeof setupFABEvents === 'function') setupFABEvents(); // Pasang ulang event untuk FAB karena HTML baru
-                        })
-                        .catch(err => {
-                            alert('Gagal memuat data pasien.');
-                            console.error(err);
-                            document.getElementById('emr-loading').classList.add('hidden');
+            // ================= 2. HELPER FUNGSI: ATTACH PATIENT LINK EVENTS =================
+            function attachPatientLinkEvents() {
+                document.querySelectorAll('.js-emr-patient-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Tandai menu sidebar aktif
+                        document.querySelectorAll('.js-emr-patient-link').forEach(l => {
+                            const card = l.querySelector('.patient-card');
+                            if(card) card.classList.remove('active');
                         });
-                });
-            });
+                        this.querySelector('.patient-card').classList.add('active');
 
-            // ================= 3. AUTO-LOAD PASIEN DARI URL PARAMETER =================
+                        // Ganti UI ke Loading
+                        document.getElementById('emr-empty-view').classList.add('hidden');
+                        document.getElementById('emr-detail-view').classList.add('hidden');
+                        document.getElementById('emr-loading').classList.remove('hidden');
+
+                        // Ambil HTML dari controller via AJAX
+                        fetch(this.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                            .then(res => res.text())
+                            .then(html => {
+                                document.getElementById('emr-loading').classList.add('hidden');
+                                document.getElementById('emr-detail-view').classList.remove('hidden');
+                                document.getElementById('emr-detail-view').innerHTML = html;
+                                
+                                // Eksekusi fungsi setup UI setelah HTML masuk
+                                if(typeof bindTabEvents === 'function') bindTabEvents();
+                                if(typeof setupFABEvents === 'function') setupFABEvents();
+                            })
+                            .catch(err => {
+                                alert('Gagal memuat data pasien.');
+                                console.error(err);
+                                document.getElementById('emr-loading').classList.add('hidden');
+                            });
+                    });
+                });
+            }
+
+            // ================= 3. INISIAL ATTACH PATIENT LINK EVENTS =================
+            attachPatientLinkEvents();
+
+            // ================= 4. AUTO-LOAD PASIEN DARI URL PARAMETER =================
             const urlParams = new URLSearchParams(window.location.search);
             const openApptId = urlParams.get('open'); // Menangkap ID dari URL ?open=123
 
@@ -470,6 +477,220 @@ async function processUpdateStatus(url, newStatus) {
         alert('Gagal mengubah status pasien. Silakan coba lagi.');
     }
 }
+
+// ================= 4. SINKRONISASI REGISTRASI BARU DARI HALAMAN LAIN =================
+(function() {
+    let lastRefreshTime = 0;
+    let lastSignalTimestamp = 0;
+    const REFRESH_COOLDOWN = 3000; // Jangan refresh lebih dari 1x per 3 detik
+    
+    // Fungsi untuk refresh antrean EMR dengan AJAX (TANPA full reload)
+    // Ini preserve state EMR yang sedang dilihat
+    async function refreshEmrQueueAjax() {
+        const now = Date.now();
+        if (now - lastRefreshTime < REFRESH_COOLDOWN) {
+            console.log('⏱️ Refresh sudah dilakukan baru-baru ini, skip...');
+            return;
+        }
+        lastRefreshTime = now;
+        
+        try {
+            console.log('🔄 Merefresh list pasien via AJAX...');
+            
+            // Simpan appointment ID yang sedang dilihat
+            const activeLink = document.querySelector('.js-emr-patient-link .patient-card.active');
+            const activeAppointmentId = activeLink ? activeLink.closest('a').href.split('/').pop() : null;
+            
+            console.log('📌 Active appointment ID:', activeAppointmentId);
+            
+            // Fetch HTML baru
+            const response = await fetch(window.location.href, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            
+            if (!response.ok) throw new Error('Gagal fetch data baru');
+            
+            const html = await response.text();
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            
+            // Update list pasien hari ini
+            const newTodayList = newDoc.querySelector('#list-hari-ini');
+            const oldTodayList = document.querySelector('#list-hari-ini');
+            
+            if (newTodayList && oldTodayList) {
+                oldTodayList.innerHTML = newTodayList.innerHTML;
+                console.log('✅ Daftar pasien hari ini diperbarui');
+                reattachPatientLinkEvents();
+                
+                // Re-mark active jika appointment masih ada
+                if (activeAppointmentId) {
+                    const newActiveLink = oldTodayList.querySelector(`a[href*="${activeAppointmentId}"]`);
+                    if (newActiveLink) {
+                        const card = newActiveLink.querySelector('.patient-card');
+                        if (card) card.classList.add('active');
+                    }
+                }
+            }
+            
+            // Update list semua pasien
+            const newAllList = newDoc.querySelector('#list-semua');
+            const oldAllList = document.querySelector('#list-semua');
+            
+            if (newAllList && oldAllList) {
+                oldAllList.innerHTML = newAllList.innerHTML;
+                console.log('✅ Daftar semua pasien diperbarui');
+                reattachPatientLinkEvents();
+                
+                // Re-mark active jika appointment masih ada
+                if (activeAppointmentId) {
+                    const newActiveLink = oldAllList.querySelector(`a[href*="${activeAppointmentId}"]`);
+                    if (newActiveLink) {
+                        const card = newActiveLink.querySelector('.patient-card');
+                        if (card) card.classList.add('active');
+                    }
+                }
+            }
+            
+            // Tampilkan toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 32px;
+                right: 32px;
+                background: #10B981;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+                z-index: 99999;
+                font-size: 14px;
+                font-weight: 500;
+            `;
+            toast.innerHTML = '<i class="fa fa-check" style="margin-right: 8px;"></i> Antrean pasien diperbarui!';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+            
+            console.log('✅ Refresh selesai, state EMR terjaga');
+            
+        } catch (error) {
+            console.error('❌ Error saat refresh AJAX:', error);
+            // Fallback: jika AJAX error, barulah full reload
+            console.log('🔄 Fallback: Full page reload...');
+            setTimeout(() => location.reload(), 1000);
+        }
+    }
+    
+    // Fungsi untuk re-attach event listeners
+    function reattachPatientLinkEvents() {
+        document.querySelectorAll('.js-emr-patient-link').forEach(link => {
+            // Clone untuk remove old listeners
+            const newLink = link.cloneNode(true);
+            link.parentNode.replaceChild(newLink, link);
+            
+            newLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Tandai aktif
+                document.querySelectorAll('.js-emr-patient-link').forEach(l => {
+                    const card = l.querySelector('.patient-card');
+                    if(card) card.classList.remove('active');
+                });
+                this.querySelector('.patient-card').classList.add('active');
+
+                // Load detail
+                document.getElementById('emr-empty-view').classList.add('hidden');
+                document.getElementById('emr-detail-view').classList.add('hidden');
+                document.getElementById('emr-loading').classList.remove('hidden');
+
+                fetch(this.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById('emr-loading').classList.add('hidden');
+                        document.getElementById('emr-detail-view').classList.remove('hidden');
+                        document.getElementById('emr-detail-view').innerHTML = html;
+                        
+                        if(typeof bindTabEvents === 'function') bindTabEvents();
+                        if(typeof setupFABEvents === 'function') setupFABEvents();
+                    })
+                    .catch(err => {
+                        alert('Gagal memuat data pasien.');
+                        console.error(err);
+                        document.getElementById('emr-loading').classList.add('hidden');
+                    });
+            });
+        });
+    }
+    
+    // ===== LISTENER 1: Custom Event (Same-Tab) =====
+    window.addEventListener('emr_new_registration', function(e) {
+        const signalData = e.detail;
+        console.log('📢 Custom Event: Registrasi baru terdeteksi', signalData);
+        
+        if (signalData && signalData.timestamp && signalData.timestamp !== lastSignalTimestamp) {
+            lastSignalTimestamp = signalData.timestamp;
+            setTimeout(() => refreshEmrQueueAjax(), 500);
+        }
+    });
+    
+    // ===== LISTENER 2: Storage Event (Cross-Tab) =====
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'emr_refresh_signal') {
+            const signalData = e.newValue ? JSON.parse(e.newValue) : null;
+            if (signalData && signalData.type === 'new_registration') {
+                console.log('📢 Storage Event: Registrasi baru terdeteksi dari tab lain', signalData);
+                
+                if (signalData.timestamp && signalData.timestamp !== lastSignalTimestamp) {
+                    lastSignalTimestamp = signalData.timestamp;
+                    setTimeout(() => refreshEmrQueueAjax(), 1000);
+                }
+            }
+        }
+    });
+    
+    // ===== LISTENER 3: Polling (Fallback untuk Same-Tab) =====
+    let pollingInterval = null;
+    const pollLocalStorage = () => {
+        if (pollingInterval) return;
+        
+        pollingInterval = setInterval(() => {
+            try {
+                const signalDataStr = localStorage.getItem('emr_refresh_signal');
+                if (signalDataStr) {
+                    const signalData = JSON.parse(signalDataStr);
+                    
+                    if (signalData && signalData.type === 'new_registration') {
+                        if (signalData.timestamp && signalData.timestamp !== lastSignalTimestamp) {
+                            console.log('📢 Polling: Registrasi baru terdeteksi', signalData);
+                            lastSignalTimestamp = signalData.timestamp;
+                            localStorage.removeItem('emr_refresh_signal');
+                            
+                            setTimeout(() => refreshEmrQueueAjax(), 500);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Polling error:', error);
+            }
+        }, 1000);
+        
+        setTimeout(() => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }, 60000);
+    };
+    
+    // Start polling
+    pollLocalStorage();
+})();
     </script>
 @endsection
 

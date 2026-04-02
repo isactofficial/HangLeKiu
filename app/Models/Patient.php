@@ -38,6 +38,7 @@ class Patient extends Model
         'occupation',
         'marital_status',
         'first_chat_date',
+        'photo',
     ];
 
     protected $casts = [

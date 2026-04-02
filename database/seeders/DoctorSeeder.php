@@ -13,15 +13,15 @@ class DoctorSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        $doctors = [
+        // Doctors - idempotent upsert by full_name & license_no
+        DB::table('doctor')->updateOrInsert(
+            ['full_name' => 'drg. Budi Santoso', 'license_no' => 'LIC-001'],
             [
                 'id'               => Str::uuid(),
                 'user_id'          => null,
-                'full_name'        => 'drg. Budi Santoso',
                 'email'            => 'budi.santoso@hlds.com',
                 'phone_number'     => '081234567801',
                 'title_prefix'     => 'drg.',
-                'license_no'       => 'LIC-001',
                 'str_institution'  => 'PDGI',
                 'str_number'       => 'STR-001',
                 'str_expiry_date'  => '2027-12-31',
@@ -34,15 +34,17 @@ class DoctorSeeder extends Seeder
                 'is_active'        => 1,
                 'created_at'       => $now,
                 'updated_at'       => $now,
-            ],
+            ]
+        );
+
+        DB::table('doctor')->updateOrInsert(
+            ['full_name' => 'drg. Siti Rahayu, Sp.Ort', 'license_no' => 'LIC-002'],
             [
                 'id'               => Str::uuid(),
                 'user_id'          => null,
-                'full_name'        => 'drg. Siti Rahayu, Sp.Ort',
                 'email'            => 'siti.rahayu@hlds.com',
                 'phone_number'     => '081234567802',
                 'title_prefix'     => 'drg.',
-                'license_no'       => 'LIC-002',
                 'str_institution'  => 'PDGI',
                 'str_number'       => 'STR-002',
                 'str_expiry_date'  => '2027-12-31',
@@ -55,15 +57,17 @@ class DoctorSeeder extends Seeder
                 'is_active'        => 1,
                 'created_at'       => $now,
                 'updated_at'       => $now,
-            ],
+            ]
+        );
+
+        DB::table('doctor')->updateOrInsert(
+            ['full_name' => 'drg. Ahmad Fauzi, Sp.BM', 'license_no' => 'LIC-003'],
             [
                 'id'               => Str::uuid(),
                 'user_id'          => null,
-                'full_name'        => 'drg. Ahmad Fauzi, Sp.BM',
                 'email'            => 'ahmad.fauzi@hlds.com',
                 'phone_number'     => '081234567803',
                 'title_prefix'     => 'drg.',
-                'license_no'       => 'LIC-003',
                 'str_institution'  => 'PDGI',
                 'str_number'       => 'STR-003',
                 'str_expiry_date'  => '2027-12-31',
@@ -76,53 +80,55 @@ class DoctorSeeder extends Seeder
                 'is_active'        => 1,
                 'created_at'       => $now,
                 'updated_at'       => $now,
-            ],
-        ];
+            ]
+        );
 
-        DB::table('doctor')->insert($doctors);
+// Get consistent doctor IDs (use first matching for safety)
+        $doctorBudiId = DB::table('doctor')->where('full_name', 'drg. Budi Santoso')->first()?->id;
+        $doctorSitiId = DB::table('doctor')->where('full_name', 'drg. Siti Rahayu, Sp.Ort')->first()?->id;
+        $doctorAhmadId = DB::table('doctor')->where('full_name', 'drg. Ahmad Fauzi, Sp.BM')->first()?->id;
 
-        // Ambil ID dokter yang baru diinsert
-        $doctorIds = DB::table('doctor')->pluck('id', 'full_name');
+        if (!$doctorBudiId || !$doctorSitiId || !$doctorAhmadId) {
+            $this->command->error('❌ Doctor data not found! Skipping schedules.');
+            return;
+        }
 
-        $schedules = [];
-
-        // drg. Budi — Senin, Rabu, Jumat
+        // Doctor Schedules - idempotent upsert using pre-fetched safe IDs
+        // drg. Budi — Senin, Rabu, Jumat (08:00-12:00)
         foreach (['monday', 'wednesday', 'friday'] as $day) {
-            $schedules[] = [
-                'id'        => Str::uuid(),
-                'doctor_id' => $doctorIds['drg. Budi Santoso'],
-                'day'       => $day,
-                'start_time'=> '08:00:00',
-                'end_time'  => '12:00:00',
-                'is_active' => 1,
-            ];
+            DB::table('doctor_schedule')->updateOrInsert(
+                ['doctor_id' => $doctorBudiId, 'day' => $day, 'start_time' => '08:00:00'],
+                [
+                    'id'        => Str::uuid(),
+                    'end_time'  => '12:00:00',
+                    'is_active' => 1,
+                ]
+            );
         }
 
-        // drg. Siti — Selasa, Kamis, Sabtu
+        // drg. Siti — Selasa, Kamis, Sabtu (09:00-13:00)
         foreach (['tuesday', 'thursday', 'saturday'] as $day) {
-            $schedules[] = [
-                'id'        => Str::uuid(),
-                'doctor_id' => $doctorIds['drg. Siti Rahayu, Sp.Ort'],
-                'day'       => $day,
-                'start_time'=> '09:00:00',
-                'end_time'  => '13:00:00',
-                'is_active' => 1,
-            ];
+            DB::table('doctor_schedule')->updateOrInsert(
+                ['doctor_id' => $doctorSitiId, 'day' => $day, 'start_time' => '09:00:00'],
+                [
+                    'id'        => Str::uuid(),
+                    'end_time'  => '13:00:00',
+                    'is_active' => 1,
+                ]
+            );
         }
 
-        // drg. Ahmad — Senin s/d Jumat
+        // drg. Ahmad — Senin s/d Jumat (13:00-17:00)
         foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day) {
-            $schedules[] = [
-                'id'        => Str::uuid(),
-                'doctor_id' => $doctorIds['drg. Ahmad Fauzi, Sp.BM'],
-                'day'       => $day,
-                'start_time'=> '13:00:00',
-                'end_time'  => '17:00:00',
-                'is_active' => 1,
-            ];
+            DB::table('doctor_schedule')->updateOrInsert(
+                ['doctor_id' => $doctorAhmadId, 'day' => $day, 'start_time' => '13:00:00'],
+                [
+                    'id'        => Str::uuid(),
+                    'end_time'  => '17:00:00',
+                    'is_active' => 1,
+                ]
+            );
         }
-
-        DB::table('doctor_schedule')->insert($schedules);
 
         $this->command->info('✅ Data dokter & jadwal berhasil diisi!');
     }

@@ -36,7 +36,8 @@
         <div class="patient-info-container" id="patientInfoContainer" style="display:none;">
             <div class="patient-info-card">
                 <div class="patient-photo">
-                    <svg fill="currentColor" viewBox="0 0 24 24">
+                    <img id="patientPhotoImg" src="" alt="Foto Pasien" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                    <svg id="patientPhotoPlaceholder" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                     </svg>
                 </div>
@@ -266,6 +267,18 @@
         document.getElementById('pi_id_card').textContent = p.id_card_number || '-';
         document.getElementById('pi_phone').textContent   = p.phone_number || '-';
 
+        // Handle patient photo
+        const photoImg = document.getElementById('patientPhotoImg');
+        const photoPlaceholder = document.getElementById('patientPhotoPlaceholder');
+        if (p.photo) {
+            photoImg.src = p.photo;
+            photoImg.style.display = 'block';
+            photoPlaceholder.style.display = 'none';
+        } else {
+            photoImg.style.display = 'none';
+            photoPlaceholder.style.display = 'block';
+        }
+
         document.getElementById('patientInfoContainer').style.display = 'block';
         document.getElementById('patientActions').style.display = 'flex';
     };
@@ -345,11 +358,32 @@
                 alert.style.border = '1px solid #bbf7d0';
                 alert.textContent = '✓ ' + data.message;
                 alert.style.display = 'block';
+                
+                // 1. Signal EMR page to refresh (hanya update list, tidak full reload)
+                const timestamp = new Date().getTime();
+                const signalData = {
+                    type: 'new_registration',
+                    timestamp: timestamp,
+                    appointmentId: data.data?.id
+                };
+                console.log('📤 Mengirim signal ke EMR:', signalData);
+                
+                // Kirim via localStorage (untuk multi-tab)
+                localStorage.setItem('emr_refresh_signal', JSON.stringify(signalData));
+                console.log('✅ Signal disimpan ke localStorage');
+                
+                // Kirim via custom event (untuk same-tab)
+                window.dispatchEvent(new CustomEvent('emr_new_registration', { detail: signalData }));
+                console.log('✅ Custom event didispatch');
+                
                 this.reset();
                 clearPatientSearch();
+                
+                // 2. Tutup modal dan refresh table (EMR akan handle sendiri via signal)
                 setTimeout(() => {
+                    console.log('🔄 Menutup modal dan refresh table...');
                     closeRegModal('modalPendaftaranBaru');
-                    location.reload(); // Refresh table
+                    location.reload(); // Refresh table registration page
                 }, 1500);
             } else if (res.status === 422 && data.errors) {
                 Object.entries(data.errors).forEach(([field, msgs]) => {

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class, // harus urutan pertama, karena UserSeeder butuh role_id
             UserSeeder::class,
             MasterDataSeeder::class,
+            DoctorSeeder::class, // Add doctors after master data
         ]);
     }
 }

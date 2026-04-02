@@ -126,6 +126,13 @@ Route::prefix('registration')->middleware('auth:api')->group(function () {
 // ================= APPOINTMENTS (ADMIN) =================
 Route::prefix('admin')->middleware('auth:api')->group(function () {
     Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus']);
+    Route::put('/appointments/{appointment}', [AppointmentController::class, 'update']);
+});
+
+// ================= APPOINTMENTS (General) =================
+Route::prefix('appointments')->group(function () {
+    Route::get('/{appointment}', [AppointmentController::class, 'show']);
+    Route::put('/{appointment}', [AppointmentController::class, 'update']);
 });
 
 Route::prefix('medicine')->group(function () {

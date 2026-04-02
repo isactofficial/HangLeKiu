@@ -236,6 +236,16 @@ class AppointmentController extends Controller
         ], 201);
     }
 
+    public function show(Appointment $appointment)
+    {
+        $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod']);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $appointment,
+        ], 200);
+    }
+
     public function index(Request $request)
     {
         $date = $request->get('date'); 
@@ -271,7 +281,7 @@ class AppointmentController extends Controller
         $appointments->appends($request->all()); 
 
         $doctors        = Doctor::active()->orderBy('full_name')->get();
-        $polis          = MasterPoli::active()->get();
+        $polis          = MasterPoli::active()->get()->unique('name')->sortBy('name')->values();
         $guarantorTypes = MasterGuarantorType::active()->get();
         $paymentMethods = MasterPaymentMethod::active()->get()->unique('name');
         $visitTypes     = MasterVisitType::active()->get();
@@ -281,5 +291,72 @@ class AppointmentController extends Controller
             'appointments', 'date', 'search', 
             'doctors', 'polis', 'guarantorTypes', 'paymentMethods', 'visitTypes', 'careTypes'
         ));
+    }
+
+    public function update(Request $request, Appointment $appointment)
+    {
+        // Debug logging
+        \Log::info('Appointment update request', [
+            'appointment_id' => $appointment->id,
+            'patient_id' => $appointment->patient_id,
+            'request_keys' => $request->keys(),
+            'has_photo_base64' => $request->has('photo_base64'),
+            'photo_base64_length' => strlen($request->input('photo_base64', ''))
+        ]);
+
+        $validated = $request->validate([
+            'complaint' => 'nullable|string|max:1000',
+            'procedure_plan' => 'nullable|string|max:1000',
+            'status' => 'nullable|in:pending,confirmed,waiting,engaged,succeed,completed,cancelled',
+            'notes' => 'nullable|string|max:1000',
+            'photo_base64' => 'nullable|string|max:5000000', // Allow large base64 strings (up to ~5MB)
+        ]);
+
+        $updateData = [];
+        if (isset($validated['complaint'])) {
+            $updateData['complaint'] = $validated['complaint'];
+        }
+        if (isset($validated['procedure_plan'])) {
+            $updateData['procedure_plan'] = $validated['procedure_plan'];
+        }
+        if (isset($validated['status'])) {
+            $updateData['status'] = $validated['status'];
+        }
+        if (isset($validated['notes'])) {
+            $updateData['patient_condition'] = $validated['notes'];
+        }
+
+        $appointment->update($updateData);
+
+        // Update patient photo if provided
+        $photoBase64 = $request->input('photo_base64');
+        if ($photoBase64 && $appointment->patient_id) {
+            try {
+                $patient = Patient::find($appointment->patient_id);
+                if ($patient) {
+                    \Log::info('Updating patient photo', [
+                        'patient_id' => $patient->id,
+                        'photo_length' => strlen($photoBase64)
+                    ]);
+                    $patient->update(['photo' => $photoBase64]);
+                    \Log::info('Patient photo updated successfully', ['patient_id' => $patient->id]);
+                } else {
+                    \Log::warning('Patient not found for photo update', ['patient_id' => $appointment->patient_id]);
+                }
+            } catch (\Exception $e) {
+                // Log error but don't fail the entire request
+                \Log::error('Failed to update patient photo: ' . $e->getMessage(), [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                    'exception' => $e
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail kunjungan berhasil diperbarui',
+            'data' => $appointment,
+        ], 200);
     }
 }

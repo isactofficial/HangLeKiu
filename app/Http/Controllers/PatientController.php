@@ -36,10 +36,11 @@ class PatientController extends Controller
             'occupation'     => 'nullable|string|max:50',
             'marital_status' => 'nullable|string|max:50',
             'first_chat_date'=> 'nullable|date',
+            'photo_base64'   => 'nullable|string',
         ]);
 
         try {
-            $patient = Patient::create([
+            $dataToCreate = [
                 'id'               => (string) \Illuminate\Support\Str::uuid(),
                 'full_name'        => $validated['full_name'],
                 'date_of_birth'    => $validated['date_of_birth'],
@@ -56,10 +57,11 @@ class PatientController extends Controller
                 'occupation'       => $validated['occupation'] ?? null,
                 'marital_status'   => $validated['marital_status'] ?? null,
                 'first_chat_date'  => $validated['first_chat_date'] ?? null,
-                // --------------------------------------
-                
+                'photo'            => $validated['photo_base64'] ?? null,
                 'medical_record_no'=> $this->generateMrn(),
-            ]);
+            ];
+
+            $patient = Patient::create($dataToCreate);
 
             return response()->json([
                 'success' => true,
@@ -86,7 +88,7 @@ class PatientController extends Controller
 			->orWhere('medical_record_no', 'like', "%{$q}%")
 			->orderBy('full_name')
 			->limit(10)
-			->get(['id', 'full_name', 'medical_record_no', 'date_of_birth', 'gender', 'address', 'phone_number', 'id_card_number']);
+			->get(['id', 'full_name', 'medical_record_no', 'date_of_birth', 'gender', 'address', 'phone_number', 'id_card_number', 'photo']);
 
 		return response()->json([
 			'success' => true,
