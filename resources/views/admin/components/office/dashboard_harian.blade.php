@@ -153,10 +153,6 @@
             <div class="dsh-breakdown-row"><span class="dsh-breakdown-row-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Gaji & Komisi</span><span class="dsh-breakdown-row-amount">Rp 0</span></div>
             <div class="dsh-breakdown-row"><span class="dsh-breakdown-row-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21l18 0"/><path d="M5 21v-16a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/></svg>Restock Obat dan BHP</span><span class="dsh-breakdown-row-amount">Rp 0</span></div>
         </div>
-        <div class="dsh-breakdown-card">
-            <p class="dsh-breakdown-heading"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C58F59" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2M12 12v4M10 14h4"/></svg>Piutang</p>
-            <div class="dsh-breakdown-row"><span class="dsh-breakdown-row-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>Total Piutang Hari Ini</span><span class="dsh-breakdown-row-amount" style="color:#10B981;">Rp {{ number_format($receivables, 0, ',', '.') }}</span></div>
-        </div>
     </div>
 </div>
 

@@ -117,7 +117,6 @@ class OfficeController extends Controller
         // 5. Finance
         $totalMasuk = $sumTodayOmzet;
         $totalKeluar = 0; // Placeholder
-        $receivables = Invoice::whereDate('created_at', $today)->sum('debt_amount');
 
         $saldoAkhir = $totalMasuk - $totalKeluar;
         $profitMargin = $totalMasuk > 0 ? (($saldoAkhir) / $totalMasuk) * 100 : 0;
@@ -142,7 +141,6 @@ class OfficeController extends Controller
 
             'totalMasuk' => $totalMasuk,
             'totalKeluar' => $totalKeluar,
-            'receivables' => $receivables,
             'saldoAkhir' => $saldoAkhir,
             'profitMargin' => round($profitMargin, 1),
         ]);
@@ -234,9 +232,6 @@ class OfficeController extends Controller
         $income = Invoice::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->sum('amount_paid');
         
-        $receivables = Invoice::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
-            ->sum('debt_amount');
-
         $expenses = ConsumableRestock::where('restock_type', 'restock')
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->sum(DB::raw('purchase_price * quantity_added'));
@@ -249,11 +244,8 @@ class OfficeController extends Controller
         $totalIncome = Invoice::sum('amount_paid');
         $totalExpenses = ConsumableRestock::where('restock_type', 'restock')
             ->sum(DB::raw('purchase_price * quantity_added'));
-        $totalReceivables = Invoice::sum('debt_amount');
-        $totalClaims = Invoice::where('payment_type', 'BPJS')->sum('amount_paid');
         
         $kas = $totalIncome - $totalExpenses;
-        $totalBalance = $kas + $totalReceivables;
 
         // 3. Detailed Data for Tabs
         $tabData = [];
@@ -285,15 +277,11 @@ class OfficeController extends Controller
             // Stats
             'income' => $income,
             'expenses' => $expenses,
-            'receivables' => $receivables,
             'claims' => $claims,
             'margin' => $income - $expenses,
             
             // Stats Total
-            'totalClaims' => $totalClaims,
-            'totalReceivables' => $totalReceivables,
             'kas' => $kas,
-            'totalBalance' => $totalBalance,
             
             // Tab Data
             'tabData' => $tabData
