@@ -169,6 +169,18 @@ class AppointmentController extends Controller
             'status' => 'required|in:pending,confirmed,waiting,engaged,succeed',
         ]);
 
+        $statusOrder = ['pending', 'confirmed', 'waiting', 'engaged', 'succeed'];
+        $currentIndex = array_search(strtolower($appointment->status ?? 'pending'), $statusOrder);
+        $newIndex = array_search(strtolower($request->status), $statusOrder);
+
+        // Jangan izinkan kembali ke status sebelumnya (urutan lebih kecil)
+        if ($newIndex !== false && $currentIndex !== false && $newIndex < $currentIndex) {
+            return response()->json([
+                'success' => false,
+                'message' => "Tidak dapat kembali dari status '" . ucfirst($appointment->status) . "' ke '" . ucfirst($request->status) . "'.",
+            ], 422);
+        }
+
         $appointment->update(['status' => $request->status]);
 
         return response()->json([
@@ -251,14 +263,29 @@ class AppointmentController extends Controller
         ], 201);
     }
 
-    public function show(Appointment $appointment)
+    public function show($id)
     {
-        $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod']);
+        \Log::info('Fetching appointment detail', ['id' => $id]);
+        
+        try {
+            $appointment = Appointment::findOrFail($id);
+            // Minimal relations to rule out circular references/encoding issues
+            $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod', 'admin']);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $appointment,
-        ], 200);
+            return response()->json([
+                'success' => true,
+                'data'    => $appointment->toArray(),
+            ], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching appointment detail', [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan: ' . $e->getMessage(),
+            ], 404);
+        }
     }
 
     public function index(Request $request)

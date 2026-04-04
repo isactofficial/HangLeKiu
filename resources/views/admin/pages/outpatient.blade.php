@@ -193,24 +193,36 @@
                                             @endphp
                                             
                                             @if ($apt)
-                                                <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}')">
-                                                    <div class="apt-card" style="border-left-color:{{ $apt->status_color }}" 
+                                                <td>
+                                                    <div class="apt-card {{ $apt->status }}" style="border-left-color:{{ $apt->status_color }}" 
                                                         data-id="{{ $apt->id }}"
-                                                        data-patient="{{ $apt->patient_name }}"
-                                                        data-mr="{{ $apt->mr_number }}"
-                                                        data-treatment="{{ $apt->treatment_name }}"
-                                                        data-time="{{ $slot }}"
-                                                        data-doctor="{{ $doc->full_name }}"
+                                                        data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
+                                                        data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
+                                                        data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
+                                                        data-gender="{{ $apt->patient->gender ?? '' }}"
+                                                        data-time="{{ $apt->formatted_time }}"
+                                                        data-doctor="{{ $doc->full_name ?? '-' }}"
+                                                        data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
+                                                        data-created-at="{{ $apt->formatted_created_at }}"
+                                                        data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
+                                                        data-duration="{{ $apt->duration_minutes ?? 10 }}"
                                                         data-status="{{ $apt->status }}"
-                                                        onclick="handleAptClick(this, event)">
-                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient_name }}</div>
-                                                        <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                                        data-action="open-detail">
+                                                        <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">{{ $apt->patient->full_name ?? 'Pasien' }}</div>
+                                                        <div class="apt-treat">{{ $apt->poli->name ?? '-' }}</div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 </td>
                                             @elseif ($isPracticing)
                                                 {{-- Sel Kosong TAPI Dokter Sedang Praktek (Hanya Teks) --}}
-                                               <td onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $poliId }}', '{{ $date }}')" class="cursor-pointer hover:bg-[#fdfaf8] transition-colors" style="text-align: center; vertical-align: middle;">
+                                               <td 
+                                                   data-action="open-registration"
+                                                   data-doctor-id="{{ $doc->id }}"
+                                                   data-time="{{ $slot }}"
+                                                   data-poli-id="{{ $poliId }}"
+                                                   data-date="{{ $date }}"
+                                                   class="cursor-pointer hover:bg-[#fdfaf8] transition-colors" 
+                                                   style="text-align: center; vertical-align: middle;">
                                                     <span style="color: #A67C52; font-size: 11px; font-weight: 700;">Tambah Pasien</span>
                                                 </td>
                                             @else
@@ -243,20 +255,37 @@
                                             @endphp
                                             
                                             @if ($apt)
-                                                <td class="{{ $isColToday ? 'col-today' : '' }}" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')">
-                                                    <div class="apt-card" style="border-left: 4px solid {{ $apt->status_color }}" 
+                                                <td class="{{ $isColToday ? 'col-today' : '' }}">
+                                                    <div class="apt-card {{ $apt->status }}" style="border-left: 4px solid {{ $apt->status_color }}" 
                                                         data-id="{{ $apt->id }}"
-                                                        data-patient="{{ $apt->patient_name }}"
-                                                        onclick="handleAptClick(this, event)">
+                                                        data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
+                                                        data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
+                                                        data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
+                                                        data-gender="{{ $apt->patient->gender ?? '' }}"
+                                                        data-time="{{ $apt->formatted_time }}"
+                                                        data-doctor="{{ $selectedDoctor->full_name ?? '-' }}"
+                                                        data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
+                                                        data-created-at="{{ $apt->formatted_created_at }}"
+                                                        data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
+                                                        data-duration="{{ $apt->duration_minutes ?? 10 }}"
+                                                        data-status="{{ $apt->status }}"
+                                                        data-action="open-detail">
                                                         <div class="apt-name" style="{{ $apt->status === 'pending' ? 'color: #ef4444;' : '' }}">
-                                                            {{ $apt->patient_name }}
+                                                            {{ $apt->patient->full_name ?? 'Pasien' }}
                                                         </div>
                                                         <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                     </div>
                                                 </td>
                                             @elseif ($isPracticing)
                                                 {{-- Sel Kosong TAPI Dokter Sedang Praktek (Hanya Teks) --}}
-                                                <td class="{{ $isColToday ? 'col-today' : '' }} cursor-pointer hover:bg-[#fdfaf8] transition-colors" onclick="openRegModal('modalPendaftaranBaru', '{{ $selectedDoctorId }}', '{{ $slot }}', '{{ $poliId }}', '{{ $dc }}')" style="text-align: center; vertical-align: middle;">
+                                                <td 
+                                                    data-action="open-registration"
+                                                    data-doctor-id="{{ $selectedDoctorId }}"
+                                                    data-time="{{ $slot }}"
+                                                    data-poli-id="{{ $poliId }}"
+                                                    data-date="{{ $dc }}"
+                                                    class="{{ $isColToday ? 'col-today' : '' }} cursor-pointer hover:bg-[#fdfaf8] transition-colors" 
+                                                    style="text-align: center; vertical-align: middle;">
                                                     <span style="color: #A67C52; font-size: 11px; font-weight: 700;">Tambah Pasien</span>
                                                 </td>
                                             @else
@@ -295,27 +324,38 @@
                                         @endphp
 
                                         @if ($apt)
-                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
+                                            <div class="apt-card m-card {{ $apt->status }}" style="border-left-color:{{ $apt->status_color }}" 
                                                 data-id="{{ $apt->id }}"
-                                                data-patient="{{ $apt->patient_name }}"
-                                                data-mr="{{ $apt->mr_number }}"
-                                                data-treatment="{{ $apt->treatment_name }}"
-                                                data-time="{{ $slot }}"
-                                                data-doctor="{{ $doc->full_name }}"
+                                                data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
+                                                data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
+                                                data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
+                                                data-gender="{{ $apt->patient->gender ?? '' }}"
+                                                data-time="{{ $apt->formatted_time }}"
+                                                data-doctor="{{ $doc->full_name ?? '-' }}"
+                                                data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
+                                                data-created-at="{{ $apt->formatted_created_at }}"
+                                                data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
+                                                data-duration="{{ $apt->duration_minutes ?? 10 }}"
                                                 data-status="{{ $apt->status }}"
-                                                onclick="handleAptClick(this, event)">
+                                                data-action="open-detail">
                                                 <div class="m-card-header">
-                                                    <div class="apt-name">{{ $apt->patient_name }}</div>
+                                                    <div class="apt-name">{{ $apt->patient->full_name ?? 'Pasien' }}</div>
                                                     <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                 </div>
-                                                <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                                <div class="apt-treat">{{ $apt->poli->name ?? '-' }}</div>
                                                 <div class="m-doc-name">
                                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
                                                     {{ $doc->full_name }}
                                                 </div>
                                             </div>
                                         @elseif ($isPracticing)
-                                            <div class="m-empty-slot" onclick="openRegModal('modalPendaftaranBaru', '{{ $doc->id }}', '{{ $slot }}', '{{ $doc->poli_id ?? '' }}', '{{ $date }}')" style="cursor:pointer; border: 1px dashed #A67C52;">
+                                            <div class="m-empty-slot" 
+                                                data-action="open-registration"
+                                                data-doctor-id="{{ $doc->id }}"
+                                                data-time="{{ $slot }}"
+                                                data-poli-id="{{ $doc->poli_id ?? '' }}"
+                                                data-date="{{ $date }}"
+                                                style="cursor:pointer; border: 1px dashed #A67C52;">
                                                 <div class="m-empty-label text-[#A67C52]"><i class="fa fa-plus"></i> Tambah Pasien ({{ $doc->full_name }})</div>
                                             </div>
                                         @else
@@ -345,20 +385,25 @@
                                 <div class="m-cards">
                                     @if ($aptsForDate->count() > 0)
                                         @foreach ($aptsForDate as $apt)
-                                            <div class="apt-card m-card" style="border-left-color:{{ $apt->status_color }}" 
+                                            <div class="apt-card m-card {{ $apt->status }}" style="border-left-color:{{ $apt->status_color }}" 
                                                 data-id="{{ $apt->id }}"
-                                                data-patient="{{ $apt->patient_name }}"
-                                                data-mr="{{ $apt->mr_number }}"
-                                                data-treatment="{{ $apt->treatment_name }}"
-                                                data-time="{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}"
+                                                data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
+                                                data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
+                                                data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
+                                                data-gender="{{ $apt->patient->gender ?? '' }}"
+                                                data-time="{{ $apt->formatted_time }}"
                                                 data-doctor="{{ $apt->doctor?->full_name ?? $selectedDoctor->full_name }}"
+                                                data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
+                                                data-created-at="{{ $apt->formatted_created_at }}"
+                                                data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
+                                                data-duration="{{ $apt->duration_minutes ?? 10 }}"
                                                 data-status="{{ $apt->status }}"
-                                                onclick="handleAptClick(this, event)">
+                                                data-action="open-detail">
                                                 <div class="m-card-header">
-                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }} | {{ $apt->patient_name }}</div>
+                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }} | {{ $apt->patient->full_name ?? 'Pasien' }}</div>
                                                     <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
                                                 </div>
-                                                <div class="apt-treat">{{ $apt->treatment_name }}</div>
+                                                <div class="apt-treat">{{ $apt->poli->name ?? '-' }}</div>
                                             </div>
                                         @endforeach
                                     @else
@@ -377,60 +422,87 @@
     </div>
 
 <script>
-        // Registration Modal Functions
-        function openRegModal(modalId, doctorId = null, time = null, poliId = null, date = null) {
-            const modal = document.getElementById(modalId);
-            if (!modal) return;
+    document.addEventListener('DOMContentLoaded', function() {
+        const scheduleContainer = document.querySelector('.rj-wrap');
+        if (!scheduleContainer) return;
 
-            modal.classList.add('open');
-            document.body.style.overflow = 'hidden'; 
+        scheduleContainer.addEventListener('click', function(e) {
+            // 1. Handle Appointment Click
+            const aptCard = e.target.closest('[data-action="open-detail"]');
+            if (aptCard) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const data = {
+                    id: aptCard.getAttribute('data-id'),
+                    patientName: aptCard.getAttribute('data-patient'),
+                    mrNumber: aptCard.getAttribute('data-mr'),
+                    dob: aptCard.getAttribute('data-dob'),
+                    gender: aptCard.getAttribute('data-gender'),
+                    time: aptCard.getAttribute('data-time'),
+                    doctor: aptCard.getAttribute('data-doctor'),
+                    creator: aptCard.getAttribute('data-creator'),
+                    createdAt: aptCard.getAttribute('data-created-at'),
+                    payment: aptCard.getAttribute('data-payment'),
+                    duration: aptCard.getAttribute('data-duration'),
+                    status: aptCard.getAttribute('data-status')
+                };
 
-            if (modalId === 'modalPendaftaranBaru') {
-                // Pre-fill fields in pendaftaran-baru.blade.php
-                if (doctorId) {
-                    const docSelect = document.getElementById('pb_doctor_id');
-                    if (docSelect) docSelect.value = doctorId;
+                if (typeof openApptDetailModal === 'function') {
+                    openApptDetailModal(data);
                 }
-                if (time) {
-                    const timeInput = document.getElementById('pb_appointment_time');
-                    if (timeInput) timeInput.value = time;
-                }
-                if (poliId) {
-                    const poliSelect = document.getElementById('pb_poli_id');
-                    if (poliSelect) poliSelect.value = poliId;
-                }
-                if (date) {
-                    const dateInput = document.getElementById('pb_appointment_date');
-                    if (dateInput) dateInput.value = date;
-                }
+                return;
             }
-        }
-        
-        function closeRegModal(modalId) {
-            document.getElementById(modalId).classList.remove('open');
-            document.body.style.overflow = '';
-        }
 
-        // Close registration modals when clicking overlay
-        window.addEventListener('click', function(e) {
-            if (e.target.classList.contains('reg-modal-overlay')) {
-                closeRegModal(e.target.id);
+            // 2. Handle Registration Click
+            const regTarget = e.target.closest('[data-action="open-registration"]');
+            if (regTarget) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const doctorId = regTarget.getAttribute('data-doctor-id');
+                const time = regTarget.getAttribute('data-time');
+                const poliId = regTarget.getAttribute('data-poli-id');
+                const date = regTarget.getAttribute('data-date');
+
+                openRegModal('modalPendaftaranBaru', doctorId, time, poliId, date);
+                return;
             }
         });
-        
-        function handleAptClick(el, e) {
-            if (e) e.stopPropagation();
-            const id = el.getAttribute('data-id');
-            const patient = el.getAttribute('data-patient');
-            const mr = el.getAttribute('data-mr');
-            const treatment = el.getAttribute('data-treatment');
-            const time = el.getAttribute('data-time');
-            const doctor = el.getAttribute('data-doctor');
-            const status = el.getAttribute('data-status');
+    });
+
+    // Registration Modal Functions (Keep global for backward compatibility with pendaftaran-baru include)
+    function openRegModal(modalId, doctorId = null, time = null, poliId = null, date = null) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden'; 
+
+        if (modalId === 'modalPendaftaranBaru') {
+            if (doctorId) document.getElementById('pb_doctor_id').value = doctorId;
+            if (time) document.getElementById('pb_appointment_time').value = time;
+            if (poliId) document.getElementById('pb_poli_id').value = poliId;
+            if (date) document.getElementById('pb_appointment_date').value = date;
             
-            console.log('Opening Apt Detail Modal for:', patient);
-            openApptDetailModal(id, patient, mr, treatment, time, doctor, status);
+            // Trigger change event to fetch doctor schedule in pendaftaran-baru logic
+            const docSelect = document.getElementById('pb_doctor_id');
+            if (docSelect) docSelect.dispatchEvent(new Event('change'));
         }
+    }
+    
+    function closeRegModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Close registration modals when clicking overlay
+    window.addEventListener('click', function(e) {
+        if (e.target.classList.contains('reg-modal-overlay')) {
+            closeRegModal(e.target.id);
+        }
+    });
 </script>
 
     @include('admin.components.pasien-baru')

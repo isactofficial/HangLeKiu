@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
         // Pendaftaran Backend (Admin)
         Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
         Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])->name('appointments.store');
+        Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->name('appointments.show');
         Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
 
         // Manajemen Staff & Pasien
