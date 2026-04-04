@@ -54,4 +54,19 @@ class MedicalProcedure extends Model
         // MedicalProcedure punya banyak ProcedureItem
         return $this->hasMany(ProcedureItem::class, 'procedure_id', 'id');
     }
+
+    public function medicines()
+    {
+        return $this->hasMany(ProcedureMedicine::class, 'procedure_id', 'id');
+    }
+
+    public function doctorNotes()
+    {
+        return $this->hasMany(DoctorNote::class, 'procedure_id', 'id');
+    }
+
+    public function assistants()
+    {
+        return $this->hasMany(ProcedureAssistant::class, 'procedure_id', 'id');
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MedicalProcedure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MedicalProcedureController extends Controller
@@ -15,6 +16,8 @@ class MedicalProcedureController extends Controller
             'registration_id' => 'nullable|string|max:50|exists:registration,id',
             'patient_id' => 'nullable|string|max:50|exists:patient,id',
             'doctor_id' => 'nullable|string|max:50|exists:doctor,id',
+            'assistant_doctor_ids' => 'nullable|array',
+            'assistant_doctor_ids.*' => 'nullable|string|max:50|exists:doctor,id',
             'discount_type' => 'nullable|in:fix,percentage,none',
             'discount_value' => 'nullable|numeric|min:0',
             'total_amount' => 'nullable|numeric|min:0',
@@ -22,16 +25,36 @@ class MedicalProcedureController extends Controller
         ]);
 
         try {
-            $medicalProcedure = MedicalProcedure::create([
-                'id' => (string) Str::uuid(),
-                'registration_id' => $validated['registration_id'] ?? null,
-                'patient_id' => $validated['patient_id'] ?? null,
-                'doctor_id' => $validated['doctor_id'] ?? null,
-                'discount_type' => $validated['discount_type'] ?? null,
-                'discount_value' => $validated['discount_value'] ?? null,
-                'total_amount' => $validated['total_amount'] ?? null,
-                'notes' => $validated['notes'] ?? null,
-            ]);
+            $medicalProcedure = DB::transaction(function () use ($validated) {
+                $medicalProcedure = MedicalProcedure::create([
+                    'id' => (string) Str::uuid(),
+                    'registration_id' => $validated['registration_id'] ?? null,
+                    'patient_id' => $validated['patient_id'] ?? null,
+                    'doctor_id' => $validated['doctor_id'] ?? null,
+                    'discount_type' => $validated['discount_type'] ?? null,
+                    'discount_value' => $validated['discount_value'] ?? null,
+                    'total_amount' => $validated['total_amount'] ?? null,
+                    'notes' => $validated['notes'] ?? null,
+                ]);
+
+                $assistantIds = collect($validated['assistant_doctor_ids'] ?? [])
+                    ->filter()
+                    ->unique()
+                    ->values();
+
+                if ($assistantIds->isNotEmpty()) {
+                    $medicalProcedure->assistants()->createMany(
+                        $assistantIds->map(function ($doctorId) {
+                            return [
+                                'id' => (string) Str::uuid(),
+                                'doctor_id' => $doctorId,
+                            ];
+                        })->all()
+                    );
+                }
+
+                return $medicalProcedure->load('assistants.doctor');
+            });
 
             return response()->json([
                 'success' => true,

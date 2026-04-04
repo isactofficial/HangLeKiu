@@ -122,11 +122,12 @@ class AppointmentController extends Controller
             $apt->treatment_name = Str::limit($apt->complaint ?? $apt->procedure_plan ?? '-', 20);
 
             $statusColors = [
-                'pending'   => '#EF4444',
+                'pending'   => '#6B7280',
                 'confirmed' => '#F59E0B',
                 'waiting'   => '#8B5CF6',
                 'engaged'   => '#3B82F6',
                 'succeed'   => '#84CC16',
+                'failed'    => '#EF4444',
             ];
             $apt->status_color = $statusColors[strtolower($apt->status)] ?? '#C58F59';
 
@@ -166,7 +167,7 @@ class AppointmentController extends Controller
     public function updateStatus(Request $request, Appointment $appointment)
     {
         $request->validate([
-            'status' => 'required|in:pending,confirmed,waiting,engaged,succeed',
+            'status' => 'required|in:pending,confirmed,waiting,engaged,succeed,failed',
         ]);
 
         $statusOrder = ['pending', 'confirmed', 'waiting', 'engaged', 'succeed'];
@@ -181,7 +182,26 @@ class AppointmentController extends Controller
             ], 422);
         }
 
-        $appointment->update(['status' => $request->status]);
+        $currentStatus = strtolower((string) $appointment->status);
+        $targetStatus = strtolower((string) $request->status);
+
+        $allowedTransitions = [
+            'pending' => ['confirmed', 'waiting', 'engaged', 'succeed', 'failed'],
+            'confirmed' => ['waiting', 'engaged', 'succeed', 'failed'],
+            'waiting' => ['engaged', 'succeed', 'failed'],
+            'engaged' => ['succeed', 'failed'],
+            'succeed' => ['failed'],
+            'failed' => [],
+        ];
+
+        if (!in_array($targetStatus, $allowedTransitions[$currentStatus] ?? [], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status tidak valid. Perubahan hanya boleh ke status lanjutan, kecuali succeed dapat diubah ke failed.',
+            ], 422);
+        }
+
+        $appointment->update(['status' => $targetStatus]);
 
         return response()->json([
             'success' => true,

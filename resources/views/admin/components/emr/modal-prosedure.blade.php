@@ -1,84 +1,456 @@
 @push('styles')
-    <style>
-      /* Hilangkan panah spinner pada input number */
-      input[type="number"]::-webkit-inner-spin-button,
-      input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
+<style>
+/* BACKDROP UTAMA PROSEDUR */
+#modalTambahProsedur {
+  backdrop-filter: blur(10px);
+  background-color: rgba(15, 23, 42, 0.25); /* soft dark overlay, tidak full hitam */
+  overflow-y: auto;
+  padding: 16px;
+}
 
-      /* Style khusus untuk input bergaris bawah */
-      .input-underline {
-        width: 100%;
-        border: none;
-        border-bottom: 1.5px solid #d1d5db;
-        padding: 4px 0;
-        outline: none;
-        background-color: transparent;
-        font-size: 14px;
-        color: #1f2937;
-        transition: border-color 0.2s;
-      }
-      .input-underline:focus {
-        border-bottom-color: #3b82f6;
-      }
-      .input-underline:disabled,
-      .input-underline[readonly] {
-        color: #6b7280;
-        border-bottom-color: #e5e7eb;
-      }
+/* BACKDROP KONFIRMASI */
+#modalConfirm {
+  backdrop-filter: blur(10px);
+  background-color: rgba(15, 23, 42, 0.25);
+}
 
-      /* Label kecil di atas input */
-      .label-small {
-        display: block;
-        font-size: 11px;
-        color: #9ca3af;
-        margin-bottom: 2px;
-        font-weight: 500;
-      }
+/* MODAL CARD */
+#modalTambahProsedur > div {
+  border-radius: 16px;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  max-height: calc(100vh - 32px);
+  width: min(100%, 56rem);
+}
 
-      /* Custom scrollbar untuk area form */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-      }
+/* HEADER */
+#modalTambahProsedur .modal-header-panel {
+  background: linear-gradient(180deg, #fdf7f1 0%, #ffffff 100%);
+}
 
-    .res-container {
-        max-height: 200px;
-        overflow-y: auto;
-    }
-    .res-item {
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 13px;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    .res-item:hover {
-        background-color: #f3f8ff;
-    }
-    </style>
+/* BODY */
+#modalTambahProsedur .modal-body-panel {
+  background: #fffdfa;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* FOOTER */
+#modalTambahProsedur .modal-footer-panel {
+  background: #ffffff;
+}
+
+#modalTambahProsedur .modal-shell {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* SECTION */
+#modalTambahProsedur .section-panel {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+#modalTambahProsedur .patient-meta-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  border: 1px solid #eadfd3;
+  border-radius: 12px;
+  background: #fdfaf8;
+  padding: 14px;
+}
+
+#modalTambahProsedur .patient-meta-item {
+  min-width: 0;
+}
+
+#modalTambahProsedur .patient-meta-label {
+  font-size: 10px;
+  color: #6b4b2f;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+#modalTambahProsedur .patient-meta-value {
+  font-size: 13px;
+  color: #8e6a45;
+  font-weight: 700;
+}
+
+/* ROW */
+#modalTambahProsedur .prosedur-row,
+#modalTambahProsedur .obat-row {
+  position: relative;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fffdfa;
+  align-items: end;
+  transition: all 0.2s ease;
+}
+
+#modalTambahProsedur .prosedur-row:focus-within {
+  z-index: 30;
+}
+
+#modalTambahProsedur .obat-row {
+  z-index: 1;
+}
+
+#modalTambahProsedur .prosedur-row {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 92px 74px 120px 190px;
+  gap: 10px;
+}
+
+#modalTambahProsedur .obat-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 84px 32px;
+  gap: 10px;
+}
+
+#modalTambahProsedur .field-prosedur,
+#modalTambahProsedur .field-gigi,
+#modalTambahProsedur .field-qty,
+#modalTambahProsedur .field-price,
+#modalTambahProsedur .field-actions,
+#modalTambahProsedur .field-obat,
+#modalTambahProsedur .field-obat-qty,
+#modalTambahProsedur .field-obat-delete {
+  min-width: 0;
+}
+
+#modalTambahProsedur .action-pack {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  align-items: end;
+}
+
+#modalTambahProsedur .action-pack .fix-label {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  padding-bottom: 8px;
+}
+
+#modalTambahProsedur .icon-btn {
+  height: 34px;
+  width: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalTambahProsedur .medis-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#modalTambahProsedur .prosedur-row:hover,
+#modalTambahProsedur .obat-row:hover {
+  background: #fdf7f1;
+}
+
+/* INPUT */
+#modalTambahProsedur .input-underline {
+  width: 100%;
+  border: 1px solid #d8c7b2;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #5d3f28;
+  background: #fffdfb;
+  transition: all 0.2s ease;
+  min-height: 36px;
+}
+
+/* INPUT FOCUS */
+#modalTambahProsedur .input-underline:focus {
+  border-color: #a67c52;
+  box-shadow: 0 0 0 3px rgba(166,124,82,0.14);
+  background: #fff;
+}
+
+/* DISABLED */
+#modalTambahProsedur .input-underline:disabled,
+#modalTambahProsedur .input-underline[readonly] {
+  color: #9ca3af;
+  background: #f7f3ef;
+}
+
+/* LABEL */
+#modalTambahProsedur .label-small {
+  display: block;
+  font-size: 11px;
+  color: #7a5536;
+  margin-bottom: 4px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+}
+
+#modalTambahProsedur .section-heading {
+  display: block;
+  font-size: 10px;
+  color: #7a5536;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+#modalTambahProsedur .search-field {
+  position: relative;
+}
+
+#modalTambahProsedur .search-field .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  color: #8e6a45;
+}
+
+#modalTambahProsedur .search-field .search-input {
+  padding-left: 34px;
+}
+
+#modalTambahProsedur .modal-title {
+  margin: 0;
+  margin-top: 20px;
+  font-size: 30px;
+  font-weight: 800;
+  color: #3b331e;
+  letter-spacing: 0.01em;
+}
+
+#modalTambahProsedur .modal-close-btn {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #8e6a45;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modalTambahProsedur .modal-close-btn:hover {
+  color: #6b4b2f;
+  background: transparent;
+}
+
+#modalTambahProsedur .action-link {
+  margin-left: 12px;
+  font-size: 10px;
+  line-height: 1.1;
+  margin-top: 8px;
+  display: inline-block;
+}
+
+#modalTambahProsedur .info-shift {
+  padding-left: 16px;
+}
+
+#modalTambahProsedur .asisten-title {
+  margin-bottom: 6px;
+}
+
+/* ADD ASSISTANT BUTTON STYLING */
+#modalTambahProsedur .add-assistant-btn {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #60a5fa;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+#modalTambahProsedur .add-assistant-btn:hover {
+  color: #3b82f6;
+}
+
+#modalTambahProsedur .modal-header-panel {
+  padding-bottom: 8px;
+}
+
+#modalTambahProsedur .modal-body-panel {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+/* INCREASED SPACING BETWEEN SECTIONS */
+#modalTambahProsedur #obatContainer {
+  margin-bottom: 10px;
+}
+
+#modalTambahProsedur #prosedurContainer {
+  margin-bottom: 8px;
+}
+
+#modalTambahProsedur .footer-layout {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+#modalTambahProsedur .footer-layout .total-box {
+  text-align: right;
+}
+
+#modalTambahProsedur .footer-layout .save-box {
+  flex-shrink: 0;
+  
+}
+
+/* Memperbaiki ukuran tombol agar tidak melar 100% */
+#modalTambahProsedur .footer-layout .save-box button {
+  width: auto; 
+  padding: 9px 15px; 
+  font-size: 14px; 
+  border-radius: 12px; 
+}
+
+/* SEARCH ICON FIX ALIGN */
+#modalTambahProsedur svg {
+  flex-shrink: 0;
+}
+
+/* CLEAR BUTTON */
+#modalTambahProsedur button svg {
+  pointer-events: none;
+}
+
+/* DROPDOWN RESULT */
+#modalTambahProsedur .res-container,
+#modalTambahProsedur .res-container-prosedur {
+  border-radius: 10px;
+  margin-top: 6px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  z-index: 9999;
+}
+
+/* ITEM RESULT */
+#modalTambahProsedur .res-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s ease;
+}
+
+#modalTambahProsedur .res-item:hover {
+  background-color: #f3f8ff;
+}
+
+/* SCROLLBAR */
+#modalTambahProsedur ::-webkit-scrollbar {
+  width: 6px;
+}
+#modalTambahProsedur ::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+}
+#modalTambahProsedur ::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* BUTTON SAVE */
+#modalTambahProsedur .primary-save-btn {
+  background: #A67C52;
+  border-radius: 0;
+  border: 1px solid #A67C52;
+  box-shadow: 0 8px 18px rgba(59, 51, 30, 0.25);
+  transition: all 0.2s ease;
+}
+
+#modalTambahProsedur .primary-save-btn:hover {
+  background: #A67C52;
+  transform: translateY(-1px);
+}
+
+/* TOTAL HARGA */
+#totalHargaDisplay {
+  font-size: 22px;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* FIX INPUT NUMBER (HILANG SPINNER) */
+#modalTambahProsedur input[type="number"]::-webkit-inner-spin-button,
+#modalTambahProsedur input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* RESPONSIVE FIX */
+@media (max-width: 1024px) {
+  #modalTambahProsedur .prosedur-row {
+    grid-template-columns: 1fr 92px 74px 120px;
+  }
+
+  #modalTambahProsedur .field-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  #modalTambahProsedur {
+    padding: 10px;
+  }
+
+  #modalTambahProsedur .modal-shell {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  #modalTambahProsedur .patient-meta-card,
+  #modalTambahProsedur .medis-panel {
+    grid-template-columns: 1fr;
+  }
+
+  #modalTambahProsedur .modal-body-panel {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  #modalTambahProsedur .prosedur-row {
+    grid-template-columns: 1fr;
+  }
+
+  #modalTambahProsedur .obat-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 @endpush
-
 <div
       id="modalTambahProsedur"
-      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] transition-opacity duration-300"
+  class="hidden fixed inset-0 flex items-start md:items-center justify-center transition-opacity duration-300"
+  style="z-index:2147483000;"
     >
       <div
-        class="bg-white rounded-lg shadow-2xl w-11/12 max-w-4xl max-h-[90vh] flex flex-col relative transform transition-all scale-100"
+        class="bg-white rounded-lg shadow-2xl w-full max-w-4xl flex flex-col relative transform transition-all scale-100"
       >
         <!-- Tombol Close (X) -->
         <button
           onclick="toggleProsedureModal(false)"
-          class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 z-10"
+          class="absolute top-3 right-3 z-10 modal-close-btn"
+          type="button"
         >
           <svg
             class="w-5 h-5"
@@ -96,22 +468,27 @@
         </button>
 
         <!-- HEADER MODAL (Tetap / Sticky) -->
-        <div class="px-8 pt-8 pb-4 border-b border-gray-100 flex-shrink-0">
-          <h2 class="text-2xl font-bold text-brown-500 text-center mb-6">
+        <div class="modal-shell pt-6 flex-shrink-0 modal-header-panel">
+          <h2 class="modal-title text-center mb-5">
             Tambah Prosedur
           </h2>
 
           <!-- Info Pasien -->
           <div>
-            <p id="prosedur-date-display" class="text-xs text-gray-500 mb-1">Tanggal Hari Ini</p>
-            <div class="flex items-end space-x-3">
-              <span id="prosedur-patient-name" class="text-lg font-bold text-gray-800"
-                >Nama Pasien</span
-              >
-              <span id="prosedur-patient-payment" class="text-sm text-gray-500 mb-0.5">Metode Pembayaran</span>
-              <span id="prosedur-patient-demographics" class="text-xs text-gray-400 mb-1 ml-4"
-                >No. RM &middot; Jenis Kelamin &middot; Umur</span
-              >
+            <p id="prosedur-date-display" class="text-xs mb-1" style="color: #c58f59;">Tanggal Hari Ini</p>
+            <div class="patient-meta-card">
+              <div class="patient-meta-item">
+                <div class="patient-meta-label">Nama Pasien</div>
+                <div id="prosedur-patient-name" class="patient-meta-value">Nama Pasien</div>
+              </div>
+              <div class="patient-meta-item">
+                <div class="patient-meta-label">Metode Pembayaran</div>
+                <div id="prosedur-patient-payment" class="patient-meta-value">Tunai/Umum</div>
+              </div>
+              <div class="patient-meta-item">
+                <div class="patient-meta-label">Data Pasien</div>
+                <div id="prosedur-patient-demographics" class="patient-meta-value">No. RM &middot; Jenis Kelamin &middot; Umur</div>
+              </div>
             </div>
           </div>
           
@@ -121,23 +498,23 @@
         </div>
 
         <!-- BODY MODAL (Bisa di-scroll) -->
-        <div class="p-8 overflow-y-auto flex-grow space-y-6">
+        <div class="modal-shell py-5 flex-grow space-y-5 modal-body-panel">
           <!-- CONTAINER BARIS PROSEDUR -->
           <div
             id="prosedurContainer"
-            class="space-y-6 w-full border-b border-gray-100 pb-6"
+            class="space-y-3 w-full section-panel"
           >
             <!-- Baris 1: Default (Sudah Terisi seperti di gambar) -->
             <div
-              class="prosedur-row flex flex-wrap md:flex-nowrap items-end gap-4 w-full relative"
+              class="prosedur-row w-full relative"
             >
               <!-- Nama Prosedur -->
-              <div class="flex-grow relative w-full md:w-auto">
+              <div class="field-prosedur relative">
                 <label class="label-small">Nama Prosedur *</label>
-                <div class="relative w-full flex items-center">
+                <div class="search-field">
                   <!-- Search Icon -->
                   <svg
-                    class="w-4 h-4 text-gray-400 mr-2 left-0 bottom-2"
+                    class="w-4 h-4 search-icon"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -152,7 +529,7 @@
                   <input
                     type="text"
                     placeholder="Cari Prosedur..."
-                    class="input-underline pl-6 pr-6 search-prosedur w-full"
+                    class="input-underline pr-6 search-prosedur search-input w-full"
                     autocomplete="off"
                   />
                   <!-- Clear Icon (X) -->
@@ -181,7 +558,7 @@
               </div>
 
               <!-- No. Gigi (Auto-complete Multiple) -->
-              <div class="w-24 input-gigi-wrapper relative">
+              <div class="field-gigi input-gigi-wrapper relative">
                 <label class="label-small">No. Gigi</label>
                 <div class="relative w-full">
                     <input
@@ -198,7 +575,7 @@
               </div>
 
               <!-- Qty -->
-              <div class="w-16">
+              <div class="field-qty">
                 <label class="label-small">Qty *</label>
                 <input
                   type="number"
@@ -208,7 +585,7 @@
               </div>
 
               <!-- Harga Jual -->
-              <div class="w-32">
+              <div class="field-price">
                 <label class="label-small">Harga Jual *</label>
                 <input
                   type="text"
@@ -219,16 +596,16 @@
               </div>
 
               <!-- Diskon -->
-              <div class="w-40 flex items-center space-x-2">
-                <div class="flex-grow">
+              <div class="field-actions action-pack">
+                <div>
                   <label class="label-small">Discount</label>
                   <input type="text" class="input-underline input-diskon" value="0" />
                 </div>
-                <span class="text-gray-500 text-sm mt-3">Fix</span>
+                <span class="fix-label">Fix</span>
 
                 <!-- Icon Tong Sampah Merah (Hapus Baris) -->
                 <button
-                  class="text-red-500 hover:text-red-700 mt-3 px-1"
+                  class="text-red-500 hover:text-red-700 icon-btn"
                   onclick="hapusBarisProsedur(this)"
                 >
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -241,7 +618,7 @@
                 </button>
 
                 <!-- Chevron Icon -->
-                <button class="text-gray-400 mt-3">
+                <button class="text-gray-400 icon-btn">
                   <svg
                     class="w-4 h-4"
                     fill="none"
@@ -261,21 +638,31 @@
           </div>
           <!-- AKHIR CONTAINER BARIS PROSEDUR -->
 
+          <div class="pt-0.5">
+            <a
+              href="#"
+              onclick="tambahBarisProsedur(event)"
+              class="inline-flex items-center text-blue-500 action-link font-medium hover:underline"
+            >
+              + Tambah Prosedur
+            </a>
+          </div>
+
           <!-- ============================================== -->
           <!-- CONTAINER BARIS OBAT DINAMIS -->
           <!-- ============================================== -->
-          <div class="mt-8 border-t border-gray-100 pt-6">
-            <div id="obatContainer" class="space-y-4 w-full">
+          <div class="section-panel" style="margin-top: 12px; margin-bottom: 8px;">
+            <div id="obatContainer" class="space-y-3 w-full">
               <!-- Baris Obat 1 (Default) -->
-              <div class="obat-row flex items-end gap-4 w-full relative">
+              <div class="obat-row w-full relative">
                 <!-- Nama Obat -->
-                <div class="flex-grow">
+                <div class="field-obat">
                   <label class="label-small text-gray-400">Obat yang dipakai</label>
-                  <div class="relative w-full flex items-center">
-                    <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="search-field">
+                      <svg class="w-4 h-4 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                     </svg>
-                    <input type="text" placeholder="Cari obat..." class="input-underline w-full search-obat" autocomplete="off" />
+                      <input type="text" placeholder="Cari obat..." class="input-underline w-full search-obat search-input" autocomplete="off" />
                     <!-- Container Dropdown Hasil Pencarian -->
                     <div class="absolute left-0 top-full w-full bg-white shadow-lg rounded-b-md border border-gray-200 z-[100] hidden res-container max-h-48 overflow-y-auto">
                         <!-- Hasil pencarian akan muncul di sini -->
@@ -283,12 +670,12 @@
                   </div>
                 </div>
                 <!-- Qty Obat -->
-                <div class="w-20">
+                <div class="field-obat-qty">
                   <label class="label-small text-gray-400">Qty</label>
                   <input type="number" value="0" class="input-underline text-center w-full" />
                 </div>
                 <!-- Hapus Baris Obat -->
-                <button class="text-red-500 hover:text-red-700 mt-3 px-1 mb-1" onclick="hapusBarisObat(this)">
+                <button class="field-obat-delete text-red-500 hover:text-red-700 icon-btn" onclick="hapusBarisObat(this)">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                   </svg>
@@ -300,7 +687,7 @@
             <a
               href="#"
               onclick="tambahBarisObat(event)"
-              class="text-blue-500 text-xs mt-3 inline-block font-medium hover:underline"
+              class="inline-flex items-center text-blue-500 action-link mt-2 font-medium hover:underline"
             >
               + Tambah Obat
             </a>
@@ -308,8 +695,8 @@
           <!-- AKHIR CONTAINER OBAT -->
 
           <!-- Baris: Catatan -->
-          <div class="mt-4">
-            <label class="label-small text-gray-400 opacity-0">Catatan</label>
+          <div class="section-panel info-shift" style="margin-top: 16px;">
+            <label class="section-heading">Catatan</label>
             <input
               type="text"
               id="prosedur-notes"
@@ -319,11 +706,12 @@
           </div>
 
           <!-- Baris: Tenaga Medis & Trigger Tambah Prosedur -->
-          <div class="flex justify-between items-end pt-4 pb-4">
-            <div class="w-1/2">
-              <label class="label-small">Tenaga Medis Utama</label>
+          <div class="section-panel medis-panel info-shift" style="margin-top: 16px;">
+            <div>
+              <label class="section-heading">Tenaga Medis Utama</label>
               <select
                 id="prosedur-doctor-select"
+                onchange="syncAssistantDoctorChoices()"
                 class="input-underline text-sm cursor-pointer appearance-none bg-white font-medium"
               >
                 <option value="">-- Pilih Tenaga Medis --</option>
@@ -332,40 +720,38 @@
                 @endforeach
               </select>
 
-              <!-- TOMBOL PEMICU TAMBAH BARIS PROSEDUR -->
-              <a
-                href="#"
-                onclick="tambahBarisProsedur(event)"
-                class="text-blue-500 text-xs mt-3 inline-block font-medium hover:underline"
-              >
-                + Tambah Prosedur
-              </a>
             </div>
 
             <div>
+              <label class="section-heading asisten-title">Asisten Tenaga Medis</label>
+              <div id="assistantContainer" class="space-y-2"></div>
               <button
-                class="text-gray-600 text-xs font-bold hover:text-gray-800 tracking-wide"
+                type="button"
+                onclick="addAssistantRow()"
+                class="add-assistant-btn"
               >
-                + TAMBAH ASISTEN TENAGA MEDIS
+                + Tambah Asisten
               </button>
             </div>
           </div>
         </div>
 
         <!-- FOOTER MODAL (Tetap / Sticky) -->
-        <div
-          class="px-8 py-5 border-t border-gray-100 flex-shrink-0 flex justify-end items-center space-x-6 bg-gray-50 rounded-b-lg"
-        >
-          <div class="text-right">
-            <p class="text-xs text-gray-500 mb-0.5">Total Harga</p>
-            <p class="text-xl font-bold text-gray-700" id="totalHargaDisplay">Rp0</p>
+        <div class="modal-shell py-5 flex-shrink-0 modal-footer-panel">
+          <div class="footer-layout flex justify-between items-center w-full px-2">
+            <div class="total-box">
+              <p class="text-xs text-gray-500 mb-0">Total Harga</p>
+              <p class="text-2xl font-bold text-gray-800" id="totalHargaDisplay">Rp0</p>
+            </div>
+            <div class="save-box">
+              <button
+                onclick="toggleConfirmModal(true)"
+                class="bg-[#A67C52] text-white font-bold text-sm tracking-wider py-3 px-10 rounded-xl shadow-md transition-colors primary-save-btn"
+              >
+                SIMPAN
+              </button>
+            </div>
           </div>
-          <button
-            onclick="toggleConfirmModal(true)"
-            class="bg-[#3b331e] hover:bg-slate-900 text-white font-medium py-2.5 px-8 rounded text-sm shadow transition-colors"
-          >
-            SIMPAN
-          </button>
         </div>
       </div>
     </div>
@@ -375,28 +761,41 @@
     <!-- ======================================================= -->
     <div
       id="modalConfirm"
-      class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[10000] transition-opacity duration-200"
+      class="hidden fixed inset-0 flex items-center justify-center transition-opacity duration-200"
+      style="z-index: 2147483001; background-color: rgba(0, 0, 0, 0.5);"
     >
       <div
-        class="bg-white rounded p-6 w-[400px] shadow-2xl transform scale-100"
+        class="bg-white rounded-2xl p-8 shadow-2xl flex flex-col justify-center items-center gap-8 transform scale-100"
+        style="width: 400px; height: 400px;"
       >
-        <p
-          class="text-[15px] font-medium text-gray-800 leading-relaxed pr-8 mb-8"
-        >
+        <div class="flex justify-center">
+          <svg class="w-20 h-20" style="color: #8e6a45;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        
+        <p class="text-lg font-semibold text-center leading-relaxed px-4" style="color: #3b331e;">
           Apakah sudah tidak ada prosedur lagi yang ingin ditambahkan?
         </p>
-        <div class="flex justify-end space-x-6">
+
+        <div class="flex justify-center gap-4 w-full px-4 mt-2">
           <button
             onclick="toggleConfirmModal(false)"
-            class="text-[13px] font-bold text-indigo-700 hover:text-indigo-900 tracking-wide"
+            class="w-full text-sm font-bold py-3 rounded-xl border-2 transition"
+            style="border-color: #d8c7b2; color: #8e6a45; background-color: transparent;"
+            onmouseover="this.style.backgroundColor='#fef0e5'"
+            onmouseout="this.style.backgroundColor='transparent'"
           >
             KEMBALI
           </button>
           <button
             onclick="submitAll()"
-            class="text-[13px] font-bold text-indigo-700 hover:text-indigo-900 tracking-wide"
+            class="w-full text-sm font-bold py-3 rounded-xl shadow-md transition text-white"
+            style="background-color: #3b331e;"
+            onmouseover="this.style.backgroundColor='#241f12'"
+            onmouseout="this.style.backgroundColor='#3b331e'"
           >
-            IYA
+            IYA, SIMPAN
           </button>
         </div>
       </div>
@@ -408,10 +807,97 @@
       const modalConfirm = document.getElementById("modalConfirm");
       const prosedurContainer = document.getElementById("prosedurContainer");
       const obatContainer = document.getElementById("obatContainer");
+      const assistantContainer = document.getElementById('assistantContainer');
+
+      // Pindahkan modal ke body agar tidak kena stacking context parent layout.
+      if (modalMain && modalMain.parentElement !== document.body) {
+        document.body.appendChild(modalMain);
+      }
+      if (modalConfirm && modalConfirm.parentElement !== document.body) {
+        document.body.appendChild(modalConfirm);
+      }
+
+      function renderAssistantSelect(selectedId = '') {
+        return `
+          <div class="assistant-row flex items-center gap-2">
+            <select class="input-underline text-sm assistant-doctor-select" onchange="handleAssistantDoctorChange(this)">
+              <option value="">-- Pilih Asisten --</option>
+              @foreach(\App\Models\Doctor::where('is_active', true)->orderBy('full_name')->get() as $doc)
+                <option value="{{ $doc->id }}" ${selectedId === '{{ $doc->id }}' ? 'selected' : ''}>{{ $doc->full_name }}</option>
+              @endforeach
+            </select>
+            <button type="button" class="text-red-500 hover:text-red-700" onclick="removeAssistantRow(this)">
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        `;
+      }
+
+      function addAssistantRow(selectedId = '') {
+        if (!assistantContainer) return;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = renderAssistantSelect(selectedId);
+        assistantContainer.appendChild(wrapper.firstElementChild);
+      }
+
+      function removeAssistantRow(btn) {
+        const row = btn.closest('.assistant-row');
+        if (row) row.remove();
+      }
+
+      function getAssistantDoctorIds() {
+        return Array.from(document.querySelectorAll('.assistant-doctor-select'))
+          .map(el => el.value)
+          .filter(Boolean);
+      }
+
+      function handleAssistantDoctorChange(selectEl) {
+        const primaryDoctorId = document.getElementById('prosedur-doctor-select')?.value || '';
+        if (!selectEl) return;
+
+        if (primaryDoctorId && selectEl.value && selectEl.value === primaryDoctorId) {
+          alert('Tenaga medis utama tidak boleh sama dengan asisten.');
+          selectEl.value = '';
+        }
+      }
+
+      function syncAssistantDoctorChoices() {
+        const primaryDoctorId = document.getElementById('prosedur-doctor-select')?.value || '';
+        document.querySelectorAll('.assistant-doctor-select').forEach(selectEl => {
+          if (primaryDoctorId && selectEl.value === primaryDoctorId) {
+            selectEl.value = '';
+          }
+        });
+      }
+
+      function hasAtLeastOneProcedureOrMedicine() {
+        const prosedurRows = document.querySelectorAll('.prosedur-row');
+        const hasProcedure = Array.from(prosedurRows).some(row => {
+          const inputProsedur = row.querySelector('.search-prosedur');
+          const qtyInput = row.querySelectorAll('input[type="number"]')[0];
+          const qty = parseInt(qtyInput ? qtyInput.value : 1, 10) || 0;
+          return !!(inputProsedur && inputProsedur.dataset.masterId && qty > 0);
+        });
+
+        if (hasProcedure) return true;
+
+        const obatRows = document.querySelectorAll('.obat-row');
+        const hasMedicine = Array.from(obatRows).some(row => {
+          const inputObat = row.querySelector('.search-obat');
+          const qtyInput = row.querySelector('input[type="number"]');
+          const qty = parseInt(qtyInput ? qtyInput.value : 0, 10) || 0;
+          return !!(inputObat && inputObat.dataset.medicineId && qty > 0);
+        });
+
+        return hasMedicine;
+      }
 
       // Tambahkan parameter 'patientData' di sebelah 'show'
     function toggleProsedureModal(show, patientData = null) {
       if (show) {
+        // Kunci scroll halaman utama saat modal prosedur dibuka
+        document.body.style.overflow = 'hidden';
+
         // 1. Tembak data pasien ke dalam modal JIKA datanya dikirim dari partial
         if (patientData) {
             document.getElementById('prosedur-patient-name').innerText = patientData.name || '-';
@@ -442,6 +928,8 @@
             }
         }
 
+        syncAssistantDoctorChoices();
+
         // 2. Set tanggal hari ini secara otomatis (biar nggak statis)
         const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('prosedur-date-display').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
@@ -449,13 +937,18 @@
         // 3. Tampilkan modal
         modalMain.classList.remove("hidden");
       } else {
-        // Sembunyikan modal
+        // Buka kembali scroll halaman utama dan sembunyikan modal
+        document.body.style.overflow = '';
         modalMain.classList.add("hidden");
       }
     }
 
       function toggleConfirmModal(show) {
         if (show) {
+          if (!hasAtLeastOneProcedureOrMedicine()) {
+            alert('Minimal isi 1 prosedur atau 1 obat sebelum menyimpan.');
+            return;
+          }
           modalConfirm.classList.remove("hidden");
         } else {
           modalConfirm.classList.add("hidden");
@@ -464,6 +957,11 @@
 
       async function submitAll() {
         toggleConfirmModal(false);
+
+        if (!hasAtLeastOneProcedureOrMedicine()) {
+            alert('Tidak bisa simpan. Minimal harus ada 1 prosedur atau 1 obat yang terisi.');
+            return;
+        }
 
         try {
             // Hitung total amount (opsional, berdasarkan form input)
@@ -499,6 +997,7 @@
                 'registration_id': document.getElementById('prosedur-registration-id').value,
                 'patient_id': document.getElementById('prosedur-patient-id').value,
                 'doctor_id': document.getElementById('prosedur-doctor-select').value,
+              'assistant_doctor_ids': getAssistantDoctorIds(),
                 'discount_type': 'none',
                 'discount_value': 0,
                 'total_amount': totalAmount > 0 ? totalAmount : 0,
@@ -581,13 +1080,16 @@
                 }
             }
 
-            // Pesan sukses Estetika di halaman EMR
-            const successMsg = document.createElement('div');
-            successMsg.className = 'fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-2xl z-[99999] flex items-center space-x-3 transition-all duration-500 opacity-0 translate-y-[-20px]';
+           const successMsg = document.createElement('div');
+            
+            // Perhatikan: px-6 diganti jadi px-16, dan ditambah justify-center
+            successMsg.className = 'fixed top-10 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-16 py-3 rounded-none shadow-2xl z-[99999] flex items-center justify-center space-x-3 transition-all duration-500 opacity-0 translate-y-[-20px]';
+            
             successMsg.innerHTML = `
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <svg class="w-6 h-6 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 <span class="font-bold tracking-wide">Prosedur Berhasil Disimpan!</span>
             `;
+            
             document.body.appendChild(successMsg);
             
             // Animasi masuk
@@ -630,15 +1132,15 @@
 
         const newRow = document.createElement("div");
         newRow.className =
-          "prosedur-row flex flex-wrap md:flex-nowrap items-end gap-4 w-full relative mt-4 pt-4 border-t border-gray-100"; // Menambah pemisah antar prosedur
+          "prosedur-row w-full relative mt-4";
 
         newRow.innerHTML = `
                 <!-- Nama Prosedur -->
-                <div class="flex-grow relative w-full md:w-auto">
+                <div class="field-prosedur relative">
                     <label class="label-small text-gray-400">Nama Prosedur *</label>
-                    <div class="relative w-full flex items-center">
-                        <svg class="w-4 h-4 text-gray-400 mr-2 left-0 bottom-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" placeholder="Cari Prosedur *" class="input-underline pl-6 pr-6 search-prosedur w-full" autocomplete="off">
+                  <div class="search-field">
+                    <svg class="w-4 h-4 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" placeholder="Cari Prosedur *" class="input-underline pr-6 search-prosedur search-input w-full" autocomplete="off">
                         <!-- Container Dropdown Hasil Pencarian -->
                         <div class="absolute left-0 top-full w-full bg-white shadow-lg rounded-b-md border border-gray-200 z-[100] hidden res-container-prosedur max-h-48 overflow-y-auto">
                         </div>
@@ -646,7 +1148,7 @@
                 </div>
 
                 <!-- No. Gigi (Auto-complete Multiple) -->
-                <div class="w-24 input-gigi-wrapper relative">
+                <div class="field-gigi input-gigi-wrapper relative">
                     <label class="label-small text-gray-400">No. Gigi</label>
                     <div class="relative w-full">
                         <input type="text" placeholder="Cari (11)..." class="input-underline text-center input-no-gigi search-gigi cursor-text bg-transparent w-full" autocomplete="off">
@@ -656,32 +1158,32 @@
                 </div>
 
                 <!-- Qty -->
-                <div class="w-16">
+                <div class="field-qty">
                     <label class="label-small text-gray-400">Qty *</label>
-                    <input type="number" value="0" class="input-underline text-center">
+                  <input type="number" value="1" class="input-underline text-center">
                 </div>
 
                 <!-- Harga Jual -->
-                <div class="w-32">
+                <div class="field-price">
                     <label class="label-small text-gray-400">Harga Jual *</label>
                     <input type="text" value="Rp0" class="input-underline text-gray-400 input-harga-jual" readonly>
                 </div>
 
                 <!-- Diskon -->
-                <div class="w-40 flex items-center space-x-2">
-                    <div class="flex-grow">
+                <div class="field-actions action-pack">
+                  <div>
                         <label class="label-small text-gray-400">Discount</label>
                         <input type="text" class="input-underline input-diskon" value="0">
                     </div>
-                    <span class="text-gray-500 text-sm mt-3">Fix</span>
+                  <span class="fix-label">Fix</span>
 
                     <!-- Icon Tong Sampah Merah (Hapus Baris) -->
-                    <button class="text-red-500 hover:text-red-700 mt-3 px-1" onclick="hapusBarisProsedur(this)">
+                  <button class="text-red-500 hover:text-red-700 icon-btn" onclick="hapusBarisProsedur(this)">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                     </button>
 
                     <!-- Chevron Icon -->
-                    <button class="text-gray-400 mt-3">
+                  <button class="text-gray-400 icon-btn" type="button">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
                     </button>
                 </div>
@@ -872,23 +1374,23 @@
         e.preventDefault();
 
         const newRow = document.createElement("div");
-        newRow.className = "obat-row flex items-end gap-4 w-full relative mt-4";
+        newRow.className = "obat-row w-full relative mt-4";
         newRow.innerHTML = `
-            <div class="flex-grow">
+            <div class="field-obat">
               <label class="label-small text-gray-400">Obat yang dipakai</label>
-              <div class="relative w-full flex items-center">
-                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="search-field">
+                <svg class="w-4 h-4 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                 </svg>
-                <input type="text" placeholder="Cari obat..." class="input-underline w-full search-obat" autocomplete="off" data-medicine-id="" />
+                <input type="text" placeholder="Cari obat..." class="input-underline w-full search-obat search-input" autocomplete="off" data-medicine-id="" />
                 <div class="res-container absolute left-0 top-full w-full bg-white shadow-lg rounded-b-md border border-gray-200 z-[999] hidden max-h-48 overflow-y-auto"></div>
               </div>
             </div>
-            <div class="w-20">
+            <div class="field-obat-qty">
                 <label class="label-small text-gray-400">Qty</label>
                 <input type="number" value="0" class="input-underline text-center w-full" min="0" />
             </div>
-            <button class="text-red-500 hover:text-red-700 mt-3 px-1 mb-1" onclick="hapusBarisObat(this)">
+            <button class="field-obat-delete text-red-500 hover:text-red-700 icon-btn" onclick="hapusBarisObat(this)">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
               </svg>
@@ -958,6 +1460,10 @@
 
         const totalEle = document.getElementById('totalHargaDisplay');
         if (totalEle) totalEle.innerText = 'Rp0';
+
+        if (assistantContainer) {
+          assistantContainer.innerHTML = '';
+        }
     }
 
     // Debounce function untuk membatasi request API
@@ -1137,4 +1643,7 @@
                 .catch(err => console.error('Error fetching prosedur:', err));
         }
     }));
+
+    window.addAssistantRow = addAssistantRow;
+    window.removeAssistantRow = removeAssistantRow;
     </script>

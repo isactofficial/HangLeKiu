@@ -11,29 +11,29 @@
         /* ================= 1. LAYOUT SIDEBAR & MAIN (FULL WIDTH) ================= */
         .emr-layout { 
             display: flex; 
-            gap: 25px; 
+            gap: 20px; /* Jarak antara sidebar dan konten utama sedikit dirapatkan */
             align-items: flex-start; 
             width: 100%; 
             margin-top: 20px;
         }
 
+        /* LEBAR SIDEBAR DIPERKECIL (Kanan-Kiri) */
         .emr-sidebar { 
-            width: 320px; 
+            width: 260px; /* Awalnya 320px, sekarang jauh lebih ramping */
             flex-shrink: 0; 
         }
 
         .emr-main { 
-            flex: 1; /* Ini agar konten tengah memenuhi sisa layar */
+            flex: 1; 
             background-color: #fff; 
             border: 1px solid #eef2f7; 
             border-radius: 15px; 
-            padding: 25px; 
+            padding: 20px; 
             position: relative; 
             min-height: 80vh; 
         }
 
-        /* ================= 2. SKALA FOTO PROFIL (30 > 18.75 > 12) ================= */
-        /* CSS ini ditaruh di sini agar partial yang di-inject AJAX otomatis mengikuti */
+        /* ================= 2. SKALA FOTO PROFIL ================= */
         .p-avatar-circle { 
             width: 30px; 
             height: 30px; 
@@ -52,28 +52,37 @@
 
         /* ================= 3. SIDEBAR CARDS & SEARCH ================= */
         .emr-sidebar-search-input { 
-            width: 100%; padding: 10px 15px; border: 1px solid #e2e8f0; 
-            border-radius: 10px; font-size: 12px; outline: none; transition: 0.2s; 
+            width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; 
+            border-radius: 8px; font-size: 12px; outline: none; transition: 0.2s; 
         }
         .emr-sidebar-search-input:focus { border-color: #C58F59; }
 
-        .emr-patient-list { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: calc(100vh - 280px); padding: 5px; }
+        .emr-patient-list { 
+            display: flex; flex-direction: column; gap: 8px; overflow-y: auto; 
+            max-height: calc(100vh - 280px); padding: 5px; 
+        }
         
+        /* PADDING KANAN-KIRI KOTAK PASIEN DIPERKECIL */
         .patient-card {
-            background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 14px;
-            display: flex; flex-direction: column; gap: 6px; transition: 0.2s; cursor: pointer;
+            background: #fff; border: 1px solid #eee; border-radius: 8px; 
+            padding: 8px 8px; /* Kanan-kirinya jadi 8px (awalnya 12px atau 14px) */
+            display: flex; flex-direction: column; gap: 4px; transition: 0.2s; cursor: pointer;
             text-decoration: none;
         }
         .patient-card:hover { border-color: #C58F59; transform: translateY(-2px); }
         .patient-card.active { border-color: #C58F59; background-color: rgba(197, 143, 89, 0.05); border-left: 4px solid #C58F59; }
         
         .p-card-top, .p-card-bottom { display: flex; justify-content: space-between; align-items: center; }
+        
         .p-name { font-weight: 700; color: #333; font-size: 12px; }
-        .p-date { font-size: 12px; color: #888; }
-        .status-badge { font-size: 9px; padding: 2px 8px; border-radius: 20px; color: white; font-weight: 800; text-transform: uppercase; }
+        .p-date, .p-mr { font-size: 10px; color: #888; font-weight: 600; }
+        
+        .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; color: white; font-weight: 800; text-transform: uppercase; }
 
+        /* ================= 4. SPINNER & UTILITIES ================= */
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #C58F59; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .hidden { display: none !important; }
     </style>
 @endpush
@@ -87,7 +96,7 @@
                 <p class="emr-subtitle">hanglekiu dental specialist</p>
             </div>
             <div class="emr-status-legend">
-                @php $legendColors = ['EF4444'=>'Pending', 'F59E0B'=>'Confirmed', '8B5CF6'=>'Waiting', '3B82F6'=>'Engaged', '84CC16'=>'Succeed']; @endphp
+                @php $legendColors = ['6B7280'=>'Pending', 'F59E0B'=>'Confirmed', '8B5CF6'=>'Waiting', '3B82F6'=>'Engaged', '84CC16'=>'Succeed', 'EF4444'=>'Failed']; @endphp
                 @foreach($legendColors as $color => $label)
                     <span class="emr-status-item"><span class="emr-dot" style="background-color: #{{ $color }};"></span> {{ $label }}</span>
                 @endforeach
@@ -116,7 +125,7 @@
                 </div>
 
                 <div class="emr-patient-list" id="emrPatientList">
-                    @php $statusColors = ['pending'=>'#EF4444','confirmed'=>'#F59E0B','waiting'=>'#8B5CF6','engaged'=>'#3B82F6','succeed'=>'#84CC16']; @endphp
+                    @php $statusColors = ['pending'=>'#6B7280','confirmed'=>'#F59E0B','waiting'=>'#8B5CF6','engaged'=>'#3B82F6','succeed'=>'#84CC16','failed'=>'#EF4444']; @endphp
 
                     {{-- LIST HARI INI --}}
                     <div id="list-hari-ini" class="js-patient-list-section">
@@ -261,7 +270,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // ================= 4. AUTO-LOAD PASIEN DARI URL PARAMETER =================
             const patientLinks = document.querySelectorAll('.js-emr-patient-link');
             const urlParams = new URLSearchParams(window.location.search);
-            const openApptId = urlParams.get('open'); // Menangkap ID dari URL ?open=123
+            const autoOpenApptId = @json($autoOpenApptId ?? null);
+            const openApptId = urlParams.get('open') || autoOpenApptId; // Prioritas URL, fallback ke pasien engaged
 
             if (openApptId) {
                 // 1. Ganti UI langsung ke Loading
@@ -362,10 +372,44 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // ================= 3. FUNGSI GLOBAL (DIPANGGIL SETELAH AJAX) =================
         function bindTabEvents() {
-            document.querySelectorAll('.tab-item').forEach(btn => {
+            const tabButtons = document.querySelectorAll('.tab-item');
+            const tabPanes = document.querySelectorAll('[data-tab-content]');
+            const currentStatusLabel = document.querySelector('.status-current-text');
+
+            if (currentStatusLabel) {
+                filterStatusMenuByCurrent(currentStatusLabel.textContent);
+            }
+
+            tabButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
-                    document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+                    const tab = this.dataset.tab;
+                    tabButtons.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
+
+                    tabPanes.forEach(p => {
+                        p.classList.toggle('hidden', p.dataset.tabContent !== tab);
+                    });
+                });
+            });
+
+            const recordTabButtons = document.querySelectorAll('.record-tab-btn');
+            const recordPanes = document.querySelectorAll('[data-record-tab-content]');
+
+            recordTabButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.dataset.recordTab;
+                    recordTabButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.color = '#9ca3af';
+                        b.style.borderBottomColor = 'transparent';
+                    });
+                    this.classList.add('active');
+                    this.style.color = '#4b5563';
+                    this.style.borderBottomColor = '#8b5cf6';
+
+                    recordPanes.forEach(p => {
+                        p.classList.toggle('hidden', p.dataset.recordTabContent !== tab);
+                    });
                 });
             });
         }
@@ -423,14 +467,218 @@ document.addEventListener('DOMContentLoaded', function() {
             const fabMenu = document.getElementById('fabMenu');
             if(fabMenu) fabMenu.classList.remove('active');
 
-            const modal = document.getElementById('modalOdontogramOverlay');
-            if(modal) {
-                modal.classList.remove('hidden');
+            // Gunakan fungsi toggleOdontogramModal agar overlay full-screen + blur + kunci scroll
+            if (typeof toggleOdontogramModal === 'function') {
+                toggleOdontogramModal(true, window.lastOdontoPatientData || null);
             } else {
-                console.error("Modal Odontogram tidak ditemukan di halaman ini.");
+                const modal = document.getElementById('modalOdontogramOverlay');
+                if(modal) {
+                    modal.classList.remove('hidden');
+                } else {
+                    console.error("Modal Odontogram tidak ditemukan di halaman ini.");
+                }
             }
         }
+
+function openDoctorNoteModalFromDetail() {
+    const detail = document.querySelector('.p-detail-container');
+    if (!detail) return;
+
+    toggleDoctorNoteModal(true, {
+        appointmentId: detail.dataset.appointmentId || '',
+        patientName: detail.dataset.patientName || '-',
+        patientRm: detail.dataset.patientRm || '-',
+        doctorName: detail.dataset.doctorName || '-',
+        demography: detail.dataset.patientDemography || '-',
+    });
+}
+
+function toggleDoctorNoteModal(show, data = null) {
+    const modal = document.getElementById('modalDoctorNoteOverlay');
+    if (!modal) return;
+
+    if (show) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+
+        if (data) {
+            document.getElementById('doctorNoteRegistrationId').value = data.appointmentId || '';
+            document.getElementById('doctorNotePatientName').textContent = data.patientName || '-';
+            document.getElementById('doctorNotePatientRm').textContent = data.patientRm || '-';
+            document.getElementById('doctorNoteDoctorName').textContent = data.doctorName || '-';
+            document.getElementById('doctorNotePatientDemography').textContent = data.demography || '-';
+        }
+        return;
+    }
+
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+}
+
+async function submitDoctorNote() {
+    const registrationId = document.getElementById('doctorNoteRegistrationId').value;
+    const subjective = document.getElementById('doctorNoteSubjective').value.trim();
+    const objective = document.getElementById('doctorNoteObjective').value.trim();
+    const plan = document.getElementById('doctorNotePlan').value.trim();
+    const saveBtn = document.getElementById('doctorNoteSaveBtn');
+
+    if (!registrationId) {
+        alert('Data kunjungan tidak ditemukan.');
+        return;
+    }
+    if (!subjective && !objective && !plan) {
+        alert('Isi minimal salah satu Subjectives, Objectives, atau Plans.');
+        return;
+    }
+
+    const originalBtnText = saveBtn ? saveBtn.textContent : '';
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Menyimpan...';
+    }
+
+    try {
+        const response = await fetch(`/admin/emr/${registrationId}/doctor-note`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ subjective, objective, plan })
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || 'Gagal menyimpan catatan dokter');
+        }
+
+        document.getElementById('doctorNoteSubjective').value = '';
+        document.getElementById('doctorNoteObjective').value = '';
+        document.getElementById('doctorNotePlan').value = '';
+        toggleDoctorNoteModal(false);
+
+        const activePatientLink = document.querySelector('.js-emr-patient-link .patient-card.active')?.closest('a');
+        if (activePatientLink) {
+            activePatientLink.click();
+        }
+    } catch (error) {
+        console.error('Gagal simpan catatan dokter:', error);
+        alert(error.message || 'Terjadi kesalahan saat menyimpan catatan dokter.');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalBtnText;
+        }
+    }
+}
+
+window.openDoctorNoteModalFromDetail = openDoctorNoteModalFromDetail;
+window.toggleDoctorNoteModal = toggleDoctorNoteModal;
+window.submitDoctorNote = submitDoctorNote;
+
+function playCashierNotificationSound() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        // Chime 2 nada: lebih "cjreng" dan sedikit lebih keras.
+        const playTone = (startTime, freq, type = 'triangle', peak = 0.16, duration = 0.22) => {
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(freq, startTime);
+            oscillator.frequency.exponentialRampToValueAtTime(freq * 1.08, startTime + (duration * 0.5));
+
+            gainNode.gain.setValueAtTime(0.0001, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(peak, startTime + 0.012);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration + 0.02);
+        };
+
+        playTone(now, 1318.51, 'triangle', 0.28, 0.20);      // E6
+        playTone(now + 0.11, 1760.00, 'triangle', 0.24, 0.24); // A6
+
+        setTimeout(() => {
+            if (typeof ctx.close === 'function') {
+                ctx.close().catch(() => {});
+            }
+        }, 450);
+    } catch (e) {
+        console.warn('Audio notifikasi gagal diputar:', e);
+    }
+}
+
+function setCashierAttention(active) {
+    if (active) {
+        localStorage.setItem('cashier_attention_pending', JSON.stringify({
+            active: true,
+            count: 1,
+            timestamp: Date.now(),
+        }));
+    } else {
+        localStorage.removeItem('cashier_attention_pending');
+    }
+    window.dispatchEvent(new Event('cashierAttentionChanged'));
+    if (typeof window.syncCashierBadgeIndicator === 'function') {
+        window.syncCashierBadgeIndicator();
+    }
+}
+
+function filterStatusMenuByCurrent(currentStatus) {
+    const menu = document.getElementById('status-menu-dynamic');
+    if (!menu) return;
+
+    const orderedStatuses = ['pending', 'confirmed', 'waiting', 'engaged', 'succeed'];
+    const normalizedCurrent = (currentStatus || '').toLowerCase();
+    const currentIndex = orderedStatuses.indexOf(normalizedCurrent);
+    const isFailed = normalizedCurrent === 'failed';
+    const isSucceed = normalizedCurrent === 'succeed';
+
+    let hasVisibleOption = false;
+    menu.querySelectorAll('[data-status-option]').forEach((optionEl) => {
+        const optionStatus = (optionEl.dataset.statusOption || '').toLowerCase();
+        let isAllowed = false;
+
+        if (isSucceed) {
+            isAllowed = optionStatus === 'failed';
+        } else if (!isFailed) {
+            if (optionStatus === 'failed') {
+                isAllowed = true;
+            } else {
+                const optionIndex = orderedStatuses.indexOf(optionStatus);
+                isAllowed = currentIndex === -1 ? optionIndex >= 0 : optionIndex > currentIndex;
+            }
+        }
+
+        const li = optionEl.closest('li');
+        if (li) li.style.display = isAllowed ? 'block' : 'none';
+        if (isAllowed) hasVisibleOption = true;
+    });
+
+    const noOptionEl = document.getElementById('status-no-option');
+    if (noOptionEl) {
+        noOptionEl.style.display = hasVisibleOption ? 'none' : 'block';
+    }
+}
+
 async function processUpdateStatus(url, newStatus) {
+    if ((newStatus || '').toLowerCase() === 'failed') {
+        const confirmed = window.confirm('Yakin ingin mengubah status menjadi FAILED?');
+        if (!confirmed) {
+            return;
+        }
+    }
+
     // 1. Langsung sembunyikan menu dropdown setelah diklik
     const dropdown = document.getElementById('status-menu-dynamic');
     if (dropdown) dropdown.classList.add('hidden');
@@ -455,8 +703,72 @@ async function processUpdateStatus(url, newStatus) {
             const activeCardStatus = document.querySelector('.patient-card.active .status-badge');
             if (activeCardStatus) {
                 activeCardStatus.innerText = newStatus.toUpperCase();
-                const colors = {'pending':'#EF4444','confirmed':'#F59E0B','waiting':'#8B5CF6','engaged':'#3B82F6','succeed':'#84CC16'};
+                const colors = {'pending':'#6B7280','confirmed':'#F59E0B','waiting':'#8B5CF6','engaged':'#3B82F6','succeed':'#84CC16','failed':'#EF4444'};
                 activeCardStatus.style.backgroundColor = colors[newStatus];
+            }
+
+            const statusColors = {
+                'pending': '#6B7280', 'confirmed': '#F59E0B', 'waiting': '#8B5CF6',
+                'engaged': '#3B82F6', 'succeed': '#84CC16', 'failed': '#EF4444'
+            };
+
+            const currentLabel = document.querySelector('.status-current-text');
+            const btnToggle = document.querySelector('.btn-status-toggle');
+            if (currentLabel) currentLabel.innerText = newStatus.toUpperCase();
+            if (btnToggle && statusColors[newStatus]) {
+                btnToggle.style.backgroundColor = statusColors[newStatus];
+            }
+
+            const timeInfo = document.querySelector('.card-time-info');
+            if (timeInfo) {
+                const statusTextMap = {
+                    'pending': 'dan belum dimulai',
+                    'confirmed': 'dan sudah terkonfirmasi',
+                    'waiting': 'dan menunggu pemeriksaan',
+                    'engaged': 'dan masih berlangsung',
+                    'succeed': 'dan sudah selesai',
+                    'failed': 'dan dibatalkan'
+                };
+                const baseTime = (timeInfo.textContent || '').trim().split(' WIB')[0] || '--:--';
+                timeInfo.textContent = `${baseTime} WIB ${statusTextMap[newStatus] || ''}`.trim();
+            }
+
+            document.querySelectorAll('[data-status-option]').forEach((optionEl) => {
+                const optionStatus = (optionEl.dataset.statusOption || '').toLowerCase();
+                const optionColor = optionEl.dataset.optionColor || '#4B5563';
+                const isActive = optionStatus === newStatus;
+
+                optionEl.style.background = optionColor;
+                optionEl.style.opacity = isActive ? '1' : '0.88';
+                optionEl.style.border = isActive ? '2px solid #111827' : '2px solid transparent';
+            });
+
+            filterStatusMenuByCurrent(newStatus);
+
+            const addDiagnosaBtn = document.querySelector('.btn-primary-brown');
+            if (addDiagnosaBtn) {
+                const canAddDiagnosa = newStatus === 'engaged';
+                addDiagnosaBtn.disabled = !canAddDiagnosa;
+            }
+
+            const actionsRow = document.querySelector('.card-actions-row');
+            const existingCashierBtn = actionsRow ? actionsRow.querySelector('.btn-ke-kasir') : null;
+            if (newStatus === 'succeed') {
+                playCashierNotificationSound();
+                setCashierAttention(true);
+                if (!existingCashierBtn && actionsRow) {
+                    const cashierBtn = document.createElement('a');
+                    cashierBtn.href = '{{ route('admin.cashier') }}';
+                    cashierBtn.className = 'btn-ke-kasir';
+                    cashierBtn.style.cssText = 'background:#10b981;color:white;padding:6px 12px;border-radius:8px;font-weight:800;font-size:11px;text-decoration:none;display:flex;align-items:center;gap:5px;margin-right:5px;';
+                    cashierBtn.innerHTML = '<i class="fa fa-wallet"></i> KE KASIR';
+                    actionsRow.prepend(cashierBtn);
+                }
+            } else {
+                setCashierAttention(false);
+                if (existingCashierBtn) {
+                    existingCashierBtn.remove();
+                }
             }
 
             // 2. Buat notifikasi (Toast) yang cantik
@@ -481,21 +793,6 @@ async function processUpdateStatus(url, newStatus) {
 
             toast.innerHTML = message;
             document.body.appendChild(toast);
-
-            // 4. Update tampilan tombol secara realtime (Warna & Teks)
-            const currentLabel = document.querySelector('.status-current-text');
-            const btnToggle = document.querySelector('.btn-status-toggle');
-            
-            if (currentLabel) currentLabel.innerText = newStatus.toUpperCase();
-            
-            // Sinkronkan warna tombol sesuai status baru
-            const statusColors = {
-                'pending': '#EF4444', 'confirmed': '#F59E0B', 'waiting': '#8B5CF6', 
-                'engaged': '#3B82F6', 'succeed': '#84CC16'
-            };
-            if (btnToggle && statusColors[newStatus]) {
-                btnToggle.style.backgroundColor = statusColors[newStatus];
-            }
 
             // 5. Hilangkan notifikasi otomatis setelah 3.5 detik
             setTimeout(() => {
@@ -732,3 +1029,4 @@ async function processUpdateStatus(url, newStatus) {
 
 @include('admin.components.emr.modal-odontogram')
 @include('admin.components.emr.modal-prosedure')
+@include('admin.components.emr.modal-doctor-note')
