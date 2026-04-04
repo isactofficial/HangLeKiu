@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <div class="keu-grid-3" style="margin-bottom:28px;">
+    <div class="keu-grid-2" style="margin-bottom:28px;">
         <div class="keu-stat">
             <p class="keu-stat-label">Margin</p>
             <p class="keu-stat-amount plus">+ Rp{{ number_format($margin, 0, ',', '.') }}</p>
@@ -46,10 +46,6 @@
         <div class="keu-stat">
             <p class="keu-stat-label">Margin Murni</p>
             <p class="keu-stat-amount plus">+ Rp{{ number_format($income, 0, ',', '.') }}</p>
-        </div>
-        <div class="keu-show-more">
-            <span class="keu-show-more-label">Show More</span>
-            <span class="keu-show-more-arrow">→</span>
         </div>
     </div>
 
