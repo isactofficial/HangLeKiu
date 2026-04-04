@@ -205,6 +205,7 @@
         border-radius: 3px !important;
         font-size: 13px !important;
         font-weight: 600 !important;
+        text-align: center !important;
         transition: all 0.15s ease !important;
       }
 
@@ -214,20 +215,93 @@
         box-shadow: 0 0 0 2px rgba(142, 106, 69, 0.1) !important;
       }
 
-      #modalOdontogramOverlay input[data-tooth][readonly] {
-        background-color: #fef0e5 !important;
-        color: #8e6a45 !important;
-        cursor: not-allowed !important;
-      }
-
-      #modalOdontogramOverlay input[data-tooth][readonly]:focus {
-        border-color: #d8c7b2 !important;
-        background-color: #fef0e5 !important;
-        box-shadow: none !important;
-      }
-
       #modalOdontogramOverlay input[data-tooth]::placeholder {
         color: #c9a885 !important;
+      }
+
+      /* Nomor gigi di tabel kanan-kiri atas-bawah selalu center. */
+      #modalOdontogramOverlay .odonto-body .grid > div[style*="background-color: #fef0e5"] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        text-align: center;
+      }
+
+      /* ===== EXTRA FORM (RAPIH) ===== */
+      #modalOdontogramOverlay .odonto-extra-section {
+        margin-top: 18px;
+        padding: 16px;
+        border: 1px solid #eadfd3;
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      #modalOdontogramOverlay .odonto-extra-title {
+        margin: 0 0 14px 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: #8e6a45;
+      }
+
+      #modalOdontogramOverlay .odonto-extra-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      #modalOdontogramOverlay .odonto-field {
+        min-width: 0;
+      }
+
+      #modalOdontogramOverlay .odonto-field label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #8e6a45;
+      }
+
+      #modalOdontogramOverlay .odonto-control {
+        width: 100%;
+        border: 1px solid #d8c7b2;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 12px;
+        color: #3b331e;
+        background: #fffdfa;
+        outline: none;
+      }
+
+      #modalOdontogramOverlay .odonto-control:focus {
+        border-color: #a67c52;
+        box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.12);
+        background: #fff;
+      }
+
+      #modalOdontogramOverlay .odonto-dmf-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      #modalOdontogramOverlay .odonto-dmf-row .odonto-field {
+        width: 120px;
+      }
+
+      #modalOdontogramOverlay .odonto-notes-area {
+        min-height: 96px;
+        resize: vertical;
+      }
+
+      @media (max-width: 768px) {
+        #modalOdontogramOverlay .odonto-extra-grid {
+          grid-template-columns: 1fr;
+        }
+
+        #modalOdontogramOverlay .odonto-dmf-row .odonto-field {
+          width: 100%;
+        }
       }
     </style>
 @endpush
@@ -443,20 +517,20 @@
           </div>
 
           <!-- Form Tambahan Bawah -->
-          <div class="mt-8 pt-6 border-t" style="border-color: #d8c7b2;">
-            <h3 class="text-sm font-semibold mb-6" style="color: #8e6a45;">Informasi Tambahan</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
-              <div>
-                <label class="block font-medium mb-2" style="color: #8e6a45;">Occlusi</label>
-                <select name="occlusi" class="w-full border-b pb-2 outline-none" style="border-color: #d8c7b2; color: #3b331e;">
+          <div class="odonto-extra-section">
+            <h3 class="odonto-extra-title">Informasi Tambahan</h3>
+            <div class="odonto-extra-grid">
+              <div class="odonto-field">
+                <label>Occlusi</label>
+                <select name="occlusi" class="odonto-control">
                   <option></option>
                   <option value="Normal">Normal</option>
                   <option value="Kelainan">Kelainan</option>
                 </select>
               </div>
-              <div>
-                <label class="block font-medium mb-2" style="color: #8e6a45;">Torus Palatinus</label>
-                <select name="torus_palatinus" class="w-full border-b pb-2 outline-none" style="border-color: #d8c7b2; color: #3b331e;">
+              <div class="odonto-field">
+                <label>Torus Palatinus</label>
+                <select name="torus_palatinus" class="odonto-control">
                 <option></option>
                 <option value="Tidak Ada">Tidak Ada</option>
                 <option value="Kecil">Kecil</option>
@@ -465,18 +539,18 @@
                 <option value="Multiple">Multiple</option>
               </select>
             </div>
-              <div>
-                <label class="block font-medium mb-2" style="color: #8e6a45;">Diastema</label>
+              <div class="odonto-field">
+                <label>Diastema</label>
                 <input
                   type="text"
                   name="diastema"
                   placeholder="Dijelaskan dimana dan berapa lebarnya"
-                  class="w-full border-b pb-2 outline-none text-xs" style="border-color: #d8c7b2; color: #3b331e;"
+                  class="odonto-control"
                 />
               </div>
-              <div>
-                <label class="block font-medium mb-2" style="color: #8e6a45;">Torus Mandibularis</label>
-                <select name="torus_mandibularis" class="w-full border-b pb-2 outline-none" style="border-color: #d8c7b2; color: #3b331e;">
+              <div class="odonto-field">
+                <label>Torus Mandibularis</label>
+                <select name="torus_mandibularis" class="odonto-control">
                 <option></option>
                 <option value="Tidak Ada">Tidak Ada</option>
                 <option value="Kiri">Kiri</option>
@@ -484,52 +558,53 @@
                 <option value="Bilateral">Bilateral</option>
               </select>
             </div>
-              <div>
-                <label class="block font-medium mb-2" style="color: #8e6a45;">Palatum</label>
-                <select name="palatum" class="w-full border-b pb-2 outline-none" style="border-color: #d8c7b2; color: #3b331e;">
+              <div class="odonto-field">
+                <label>Palatum</label>
+                <select name="palatum" class="odonto-control">
                   <option></option>
                   <option value="Dalam">Dalam</option>
                   <option value="Sedang">Sedang</option>
                   <option value="Rendah">Rendah</option>
                 </select>
               </div>
-              <div>
-                <label class="block font-medium mb-2" style="color: #8e6a45;">Gigi Anomali</label>
+              <div class="odonto-field">
+                <label>Gigi Anomali</label>
                 <input
                   type="text"
                   name="anomali"
                   placeholder="Dijelaskan gigi mana dan bentuknya"
-                  class="w-full border-b pb-2 outline-none text-xs" style="border-color: #d8c7b2; color: #3b331e;"
+                  class="odonto-control"
                 />
               </div>
             </div>
           </div>
 
-          <div class="mt-8 pt-6 border-t" style="border-color: #d8c7b2;">
-            <div class="flex space-x-6 w-1/2">
-              <div class="flex flex-col">
-                <label class="text-xs font-medium mb-2" style="color: #8e6a45;">D (Distal)</label>
-                <input type="text" name="odonto_d" class="border-b pb-1 outline-none text-sm" style="border-color: #d8c7b2; color: #3b331e; width: 100px;"/>
+          <div class="odonto-extra-section">
+            <div class="odonto-dmf-row">
+              <div class="odonto-field">
+                <label>D (Distal)</label>
+                <input type="text" name="odonto_d" class="odonto-control" />
               </div>
-              <div class="flex flex-col">
-                <label class="text-xs font-medium mb-2" style="color: #8e6a45;">M (Mesial)</label>
-                <input type="text" name="odonto_m" class="border-b pb-1 outline-none text-sm" style="border-color: #d8c7b2; color: #3b331e; width: 100px;"/>
+              <div class="odonto-field">
+                <label>M (Mesial)</label>
+                <input type="text" name="odonto_m" class="odonto-control" />
               </div>
-              <div class="flex flex-col">
-                <label class="text-xs font-medium mb-2" style="color: #8e6a45;">F (Facial)</label>
-                <input type="text" name="odonto_f" class="border-b pb-1 outline-none text-sm" style="border-color: #d8c7b2; color: #3b331e; width: 100px;"/>
+              <div class="odonto-field">
+                <label>F (Facial)</label>
+                <input type="text" name="odonto_f" class="odonto-control" />
               </div>
             </div>
           </div>
 
-          <div class="mt-8 pt-6 border-t" style="border-color: #d8c7b2;">
-            <label class="block text-xs font-medium mb-3" style="color: #8e6a45;">Catatan Lainnya</label>
+          <div class="odonto-extra-section">
+            <label style="display:block; margin-bottom:8px; font-size:11px; font-weight:700; color:#8e6a45;">Catatan Lainnya</label>
             <textarea
               name="odonto_notes"
-              class="w-full border-b pb-2 outline-none resize-none text-sm" style="border-color: #d8c7b2; color: #3b331e;"
+              class="odonto-control odonto-notes-area"
               rows="3"
             ></textarea>
           </div>
+
         </div>
 
  
@@ -552,146 +627,167 @@
 
     <!-- TOOLBAR ODONTOGRAM -->
    <div
-      id="toolbar"
-      class="hidden fixed bg-white shadow-2xl rounded-xl border-0 text-sm flex flex-col overflow-hidden"
-      style="z-index:2147483642; width: 200px; height: 300px; border-bottom: 3px solid #8e6a45;"
-    >
-      
-    <div id="toolbarHeader" class="px-4 py-3 flex items-center bg-gradient-to-r rounded-t-xl cursor-grab active:cursor-grabbing" style="background: linear-gradient(135deg, #8e6a45 0%, #a87c4a 100%); flex-shrink: 0; user-select: none;">
-  
+    id="toolbar"
+    class="hidden fixed bg-white shadow-2xl rounded-xl border-0 text-sm flex flex-col overflow-hidden"
+    style="z-index:2147483642; width: 450px; height: 450px; border: 3px solid #8e6a45; padding: 12px;"
+  >
+    
+    <div id="toolbarHeader" class="px-4 py-3 flex items-center bg-gradient-to-r rounded-lg cursor-grab active:cursor-grabbing mb-3" style="background: linear-gradient(135deg, #8e6a45 0%, #a87c4a 100%); flex-shrink: 0; user-select: none;">
       <div class="w-6"></div> 
-
-      <span class="flex-1 font-bold text-white text-xs flex items-center justify-center gap-2">
-        
-        Toolbar
+      <span class="flex-1 font-bold text-white text-sm flex items-center justify-center gap-2">
+        Toolbar Odontogram
       </span>
-
-      <button onclick="document.getElementById('toolbar').classList.add('hidden')" class="w-6 text-white hover:bg-white hover:bg-opacity-20 p-1 rounded transition flex items-center justify-center">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button onclick="document.getElementById('toolbar').classList.add('hidden'); document.getElementById('toolbarToothPicker')?.classList.add('hidden');" class="w-6 text-white hover:bg-white hover:bg-opacity-20 p-1 rounded transition flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
-      
     </div>
 
-      <div class="px-3 py-2.5 border-b" style="border-color: #f0e5d8; flex-shrink: 0;">
-        <input
-          type="text"
-          id="toolbarSearch"
-          placeholder="Cari..."
-          class="w-full outline-none px-2 py-1.5 rounded text-xs" 
-          style="background-color: #fef0e5; border: 1px solid #e5d1b8; color: #3b331e;"
-          oninput="filterToolbar(event)"
-        />
+    <div class="px-3 py-2.5 border-b rounded-lg mb-3" style="border-color: #f0e5d8; flex-shrink: 0; background: #fef0e5;">
+      <input
+        type="text"
+        id="toolbarSearch"
+        placeholder="Cari ketentuan..."
+        class="w-full outline-none px-3 py-2 rounded text-sm" 
+        style="background-color: #ffffff; border: 1px solid #e5d1b8; color: #3b331e;"
+        oninput="filterToolbar(event)"
+      />
+    </div>
+
+    
+
+    <div class="overflow-y-auto py-2 px-2 space-y-2 flex-1 min-h-0" id="toolbarList" style="border-bottom: 2px solid #f0e5d8; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; border-radius: 8px;">
+      
+      <div class="grid gap-2">
+
+      <div id="toolbarToothPicker" class="hidden px-3 py-2.5 border-b rounded-lg mb-3" style="border-color: #f0e5d8; flex-shrink: 0; background: #fffaf5; border: 1px solid #e5d1b8;">
+      <div id="toolbarToothPickerLabel" class="text-sm font-bold mb-2" style="color:#8e6a45;">Pilih nomor gigi</div>
+      <div id="toolbarToothPickerOptions" class="flex gap-2 flex-wrap text-sm"></div>
       </div>
-
-      <div class="overflow-y-auto p-2 space-y-2 flex-1 min-h-0" id="toolbarList" style="border-bottom: 2px solid #f0e5d8; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
         
-        <div class="grid grid-cols-4 gap-2">
-          <div class="toolbar-item flex items-center space-x-2 p-2.5 hover:bg-gray-50 rounded cursor-pointer transition mb-2" style="background-color: #fef0e5;" onclick="applyCondition('clear')">
-              <div class="w-6 h-6 rounded flex items-center justify-center text-xs flex-shrink-0" style="background-color: #d8c7b2; color: #8e6a45;">✕</div>
-              <div>
-                <p class="font-semibold text-[11px] leading-tight" style="color: #3b331e;">Reset</p>
-                <p class="text-[9px] leading-tight text-gray-500">Bersihkan</p>
-              </div>
-            </div>
-
-        
-        
-        
-          <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #7c70ab; background-color: #f3f0ff;" onclick="applyCondition('mesial')">
-            <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
-              <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,0 0,40 12,28 12,12" fill="#7c70ab" stroke="#6f639e" stroke-width="1.5" stroke-linejoin="round" />
-              <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-            </svg>
-            <p class="font-semibold text-[10px] text-gray-800">Mesial (M)</p>
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="background-color: #fef0e5; border: 2px solid #d8c7b2;" onclick="applyCondition('clear')">
+          <div class="text-xl font-black flex items-center justify-center w-9 h-9 bg-white rounded flex-shrink-0" style="color: #8e6a45; border: 1px solid #e5d1b8;">✕</div>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px]" style="color: #3b331e;">Reset Kondisi</p>
+            <p class="text-[11px] leading-tight text-gray-600 mt-0.5">Bersihkan semua tanda pada gigi ini</p>
           </div>
+        </div>
 
-          <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #5e88c9; background-color: #f0f7ff;" onclick="applyCondition('distal')">
-            <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
-              <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="40,0 40,40 28,28 28,12" fill="#5e88c9" stroke="#5275b8" stroke-width="1.5" stroke-linejoin="round" />
-              <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-            </svg>
-            <p class="font-semibold text-[10px] text-gray-800">Distal (D)</p>
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #7c70ab; background-color: #f3f0ff;" onclick="applyCondition('mesial')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
+            <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,0 0,40 12,28 12,12" fill="#7c70ab" stroke="#6f639e" stroke-width="1.5" stroke-linejoin="round" />
+            <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+          </svg>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-gray-800">Mesial <span class="font-normal text-gray-600">(M)</span></p>
+            <p class="text-[11px] text-gray-500 leading-tight mt-0.5">Sisi dekat garis wajah</p>
           </div>
+        </div>
 
-          <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #50c878; background-color: #f0fdf4;" onclick="applyCondition('occlusal')">
-            <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
-              <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <rect x="12" y="12" width="16" height="16" fill="#50c878" stroke="#3da85f" stroke-width="1.5" stroke-linejoin="round" />
-            </svg>
-            <p class="font-semibold text-[10px] text-gray-800">Occlusal (O)</p>
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #5e88c9; background-color: #f0f7ff;" onclick="applyCondition('distal')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
+            <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="40,0 40,40 28,28 28,12" fill="#5e88c9" stroke="#5275b8" stroke-width="1.5" stroke-linejoin="round" />
+            <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+          </svg>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-gray-800">Distal <span class="font-normal text-gray-600">(D)</span></p>
+            <p class="text-[11px] text-gray-500 leading-tight mt-0.5">Sisi jauh garis wajah</p>
           </div>
+        </div>
 
-          <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #f59e0b; background-color: #fffbf0;" onclick="applyCondition('buccal')">
-            <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
-              <polygon points="0,0 40,0 28,12 12,12" fill="#f59e0b" stroke="#e59d00" stroke-width="1.5" stroke-linejoin="round" />
-              <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-            </svg>
-            <p class="font-semibold text-[10px] text-gray-800">Buccal (B)</p>
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #50c878; background-color: #f0fdf4;" onclick="applyCondition('occlusal')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
+            <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <rect x="12" y="12" width="16" height="16" fill="#50c878" stroke="#3da85f" stroke-width="1.5" stroke-linejoin="round" />
+          </svg>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-gray-800">Occlusal <span class="font-normal text-gray-600">(O)</span></p>
+            <p class="text-[11px] text-gray-500 leading-tight mt-0.5">Permukaan kunyah</p>
           </div>
+        </div>
 
-          <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #ec4899; background-color: #fdf2f8;" onclick="applyCondition('lingual')">
-            <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
-              <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <polygon points="0,40 40,40 28,28 12,28" fill="#ec4899" stroke="#d93680" stroke-width="1.5" stroke-linejoin="round" />
-              <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-              <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
-            </svg>
-            <p class="font-semibold text-[10px] text-gray-800">Lingual (L)</p>
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #f59e0b; background-color: #fffbf0;" onclick="applyCondition('buccal')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
+            <polygon points="0,0 40,0 28,12 12,12" fill="#f59e0b" stroke="#e59d00" stroke-width="1.5" stroke-linejoin="round" />
+            <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,40 40,40 28,28 12,28" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+          </svg>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-gray-800">Buccal <span class="font-normal text-gray-600">(B)</span></p>
+            <p class="text-[11px] text-gray-500 leading-tight mt-0.5">Sisi mengarah pipi</p>
           </div>
-        
+        </div>
 
-        
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #ec4899; background-color: #fdf2f8;" onclick="applyCondition('lingual')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
+            <polygon points="0,0 40,0 28,12 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="40,0 40,40 28,28 28,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <polygon points="0,40 40,40 28,28 12,28" fill="#ec4899" stroke="#d93680" stroke-width="1.5" stroke-linejoin="round" />
+            <polygon points="0,0 0,40 12,28 12,12" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+            <rect x="12" y="12" width="16" height="16" fill="white" stroke="#ccc" stroke-width="1" stroke-linejoin="round" />
+          </svg>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-gray-800">Lingual <span class="font-normal text-gray-600">(L)</span></p>
+            <p class="text-[11px] text-gray-500 leading-tight mt-0.5">Sisi mengarah lidah</p>
+          </div>
+        </div>
 
-        <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #ef4444; background-color: #fef2f2;" onclick="applyCondition('caries')">
-          <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #ef4444; background-color: #fef2f2;" onclick="applyCondition('caries')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
             <polygon points="0,0 40,0 28,12 12,12" fill="#ef4444" stroke="#dc2626" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="40,0 40,40 28,28 28,12" fill="#ef4444" stroke="#dc2626" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="0,40 40,40 28,28 12,28" fill="#ef4444" stroke="#dc2626" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="0,0 0,40 12,28 12,12" fill="#ef4444" stroke="#dc2626" stroke-width="1.5" stroke-linejoin="round" />
             <rect x="12" y="12" width="16" height="16" fill="#ef4444" stroke="#dc2626" stroke-width="1.5" stroke-linejoin="round" />
           </svg>
-          <p class="font-semibold text-[10px] text-red-700">Karies (CAR)</p>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-red-700">Karies <span class="font-normal text-red-600">(CAR)</span></p>
+            <p class="text-[11px] text-red-500 leading-tight mt-0.5">Gigi berlubang / busuk</p>
+          </div>
         </div>
 
-        <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #22c55e; background-color: #f0fdf4;" onclick="applyCondition('tambalan')">
-          <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #22c55e; background-color: #f0fdf4;" onclick="applyCondition('tambalan')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
             <polygon points="0,0 40,0 28,12 12,12" fill="#22c55e" stroke="#16a34a" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="40,0 40,40 28,28 28,12" fill="#22c55e" stroke="#16a34a" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="0,40 40,40 28,28 12,28" fill="#22c55e" stroke="#16a34a" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="0,0 0,40 12,28 12,12" fill="#22c55e" stroke="#16a34a" stroke-width="1.5" stroke-linejoin="round" />
             <rect x="12" y="12" width="16" height="16" fill="#22c55e" stroke="#16a34a" stroke-width="1.5" stroke-linejoin="round" />
           </svg>
-          <p class="font-semibold text-[10px] text-green-700">Tambalan (FIL)</p>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-green-700">Tambalan <span class="font-normal text-green-600">(FIL)</span></p>
+            <p class="text-[11px] text-green-600 leading-tight mt-0.5">Gigi sudah ditambal</p>
+          </div>
         </div>
 
-        <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #f97316; background-color: #fef3f2;" onclick="applyCondition('sisa_akar')">
-          <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #f97316; background-color: #fef3f2;" onclick="applyCondition('sisa_akar')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
             <polygon points="0,0 40,0 28,12 12,12" fill="#f97316" stroke="#ea580c" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="40,0 40,40 28,28 28,12" fill="#f97316" stroke="#ea580c" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="0,40 40,40 28,28 12,28" fill="#f97316" stroke="#ea580c" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="0,0 0,40 12,28 12,12" fill="#f97316" stroke="#ea580c" stroke-width="1.5" stroke-linejoin="round" />
             <rect x="12" y="12" width="16" height="16" fill="#f97316" stroke="#ea580c" stroke-width="1.5" stroke-linejoin="round" />
           </svg>
-          <p class="font-semibold text-[10px] text-orange-600">Sisa Akar (ROT)</p>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-orange-600">Sisa Akar <span class="font-normal text-orange-500">(ROT)</span></p>
+            <p class="text-[11px] text-orange-500 leading-tight mt-0.5">Mahkota hilang, sisa akar</p>
+          </div>
         </div>
 
-        <div class="toolbar-item flex items-center space-x-2 p-1.5 hover:shadow-md rounded cursor-pointer transition border" style="border-color: #000; background-color: #f5f5f5;" onclick="applyCondition('missing')">
-          <svg width="24" height="24" viewBox="0 0 40 40" class="flex-shrink-0">
+        <div class="toolbar-item flex flex-row items-center p-3 hover:shadow-lg rounded-lg cursor-pointer transition gap-6" style="border: 2px solid #000; background-color: #f5f5f5;" onclick="applyCondition('missing')">
+          <svg width="36" height="36" viewBox="0 0 40 40" class="flex-shrink-0">
             <polygon points="0,0 40,0 28,12 12,12" fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="40,0 40,40 28,28 28,12" fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round" />
             <polygon points="0,40 40,40 28,28 12,28" fill="#000" stroke="#000" stroke-width="1.5" stroke-linejoin="round" />
@@ -700,11 +796,15 @@
             <line x1="4" y1="4" x2="36" y2="36" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
             <line x1="36" y1="4" x2="4" y2="36" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
           </svg>
-          <p class="font-semibold text-[10px] text-gray-900">Gigi Hilang (MIS)</p>
+          <div class="flex flex-col text-left">
+            <p class="font-bold text-[13px] text-gray-900">Gigi Hilang <span class="font-normal text-gray-600">(MIS)</span></p>
+            <p class="text-[11px] text-gray-600 leading-tight mt-0.5">Telah dicabut / tidak ada</p>
+          </div>
         </div>
-        </div>
+
       </div>
     </div>
+  </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -753,6 +853,12 @@
           // 2. Set tanggal hari ini
           const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
           document.getElementById('odonto-date-display').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
+
+          const patientIdToLoad = document.getElementById('odontogramPatientId')?.value;
+          clearOdontogramState();
+          if (patientIdToLoad) {
+            loadLatestOdontogramToForm(patientIdToLoad);
+          }
 
           modal.classList.remove("hidden");
         } else {
@@ -822,6 +928,7 @@
         if (!teethState[number]) {
             teethState[number] = {
                 surfaces: [],
+            surface_colors: {},
                 condition_code: null,
                 condition_label: null,
                 color_code: null,
@@ -835,10 +942,25 @@
           // Setup event listeners untuk semua input teeth
           const allToothInputs = document.querySelectorAll('#modalOdontogramOverlay input[data-tooth]');
           allToothInputs.forEach(input => {
+            // Aktifkan input tabel agar bisa diketik langsung.
+            input.removeAttribute('readonly');
+
+            const openToolbarFromInput = function(e) {
+              const selectedTooth = pickToothNumberForInput(this, e.type === 'click');
+              if (selectedTooth === null) return;
+
+              const toothGraphic = document.getElementById(`tooth-${selectedTooth}`);
+              openToolbar(e, toothGraphic || null, selectedTooth, this);
+            };
+
+            input.addEventListener('focus', openToolbarFromInput);
+            input.addEventListener('click', openToolbarFromInput);
+
               input.addEventListener('input', function(e) {
-                  const toothNum = this.getAttribute('data-tooth');
-                  initToothState(toothNum);
-                  teethState[toothNum].notes = e.target.value;
+                  const selectedTooth = pickToothNumberForInput(this, false);
+                  if (selectedTooth === null) return;
+
+                  setToothNoteValue(selectedTooth, e.target.value);
                   
                   // Real-time display: update textarea display jika ada
                   const displayArea = document.getElementById('odonto-notes-display');
@@ -872,7 +994,11 @@
           
           // Reset input notes di tabel
           const tableInputs = document.querySelectorAll('#modalOdontogramOverlay input[data-tooth]');
-          tableInputs.forEach(input => input.value = '');
+          tableInputs.forEach(input => {
+            input.value = '';
+            delete input.dataset.selectedTooth;
+            input.title = '';
+          });
           
           // Reset dropdown dan text input pada "Form Tambahan Bawah"
           const allSelects = document.querySelectorAll('#modalOdontogramOverlay select');
@@ -885,48 +1011,208 @@
           // Reset textarea Catatan Lainnya
           const allTextAreas = document.querySelectorAll('#modalOdontogramOverlay textarea');
           allTextAreas.forEach(ta => ta.value = '');
+
+            activeInputElement = null;
+            if (toolbarToothPicker) toolbarToothPicker.classList.add('hidden');
+      }
+
+      function colorForSurfaceFlag(flag) {
+        if (flag === 'M') return '#7c70ab';
+        if (flag === 'D') return '#5e88c9';
+        if (flag === 'O' || flag === 'C') return '#50c878';
+        if (flag === 'B') return '#f59e0b';
+        if (flag === 'L') return '#ec4899';
+        return '#d8c7b2';
+      }
+
+      function paintToothFromState(toothNumber) {
+        const toothEl = document.getElementById(`tooth-${toothNumber}`);
+        const state = teethState[toothNumber];
+        if (!toothEl || !state) return;
+
+        const surfaces = toothEl.querySelectorAll('.tooth-surface');
+        surfaces.forEach((s) => s.setAttribute('fill', 'white'));
+
+        if (state.condition_code && state.surfaces.length === 0 && state.color_code) {
+          surfaces.forEach((s) => s.setAttribute('fill', state.color_code));
+          return;
+        }
+
+        state.surfaces.forEach((flag) => {
+          const drawColor = state.color_code || colorForSurfaceFlag(flag);
+          if (flag === 'M') toothEl.querySelector('.surface-left')?.setAttribute('fill', drawColor);
+          if (flag === 'D') toothEl.querySelector('.surface-right')?.setAttribute('fill', drawColor);
+          if (flag === 'O' || flag === 'C') toothEl.querySelector('.surface-center')?.setAttribute('fill', drawColor);
+          if (flag === 'B') toothEl.querySelector('.surface-top')?.setAttribute('fill', drawColor);
+          if (flag === 'L') toothEl.querySelector('.surface-bottom')?.setAttribute('fill', drawColor);
+        });
+      }
+
+      function fillExtraFieldsFromRecord(record) {
+        const notesText = String(record?.notes || '');
+        const getLineValue = (label) => {
+          const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const match = notesText.match(new RegExp(`^${escaped}:\\s*(.*)$`, 'mi'));
+          return match ? match[1].trim() : '';
+        };
+
+        const setValue = (selector, value) => {
+          const el = document.querySelector(selector);
+          if (!el) return;
+          el.value = value || '';
+        };
+
+        setValue('select[name="occlusi"]', getLineValue('Occlusi'));
+        setValue('select[name="torus_palatinus"]', getLineValue('Torus Palatinus'));
+        setValue('input[name="diastema"]', getLineValue('Diastema'));
+        setValue('select[name="torus_mandibularis"]', getLineValue('Torus Mandibularis'));
+        setValue('select[name="palatum"]', getLineValue('Palatum'));
+        setValue('input[name="anomali"]', getLineValue('Gigi Anomali'));
+
+        const dmfMatch = notesText.match(/^\s*D:\s*([^,\n]*),\s*M:\s*([^,\n]*),\s*F:\s*([^\n\r]*)/mi);
+        if (dmfMatch) {
+          const cleanD = (dmfMatch[1] || '').trim();
+          const cleanM = (dmfMatch[2] || '').trim();
+          const cleanF = (dmfMatch[3] || '')
+            .replace(/\s*Catatan\s+Tambahan\s*:?\s*$/i, '')
+            .trim();
+
+          setValue('input[name="odonto_d"]', cleanD);
+          setValue('input[name="odonto_m"]', cleanM);
+          setValue('input[name="odonto_f"]', cleanF);
+        }
+
+        const extraNoteMatch = notesText.match(/(?:^|\n)\s*Catatan Tambahan:\s*([\s\S]*)$/i);
+        const cleanExtraNotes = (extraNoteMatch ? extraNoteMatch[1] : '')
+          .replace(/^\s*Catatan\s+Tambahan\s*:\s*/i, '')
+          .trim();
+        setValue('textarea[name="odonto_notes"]', cleanExtraNotes);
+      }
+
+      function hydrateOdontogramFromRecord(record) {
+        if (!record) return;
+
+        clearOdontogramState();
+        fillExtraFieldsFromRecord(record);
+
+        const exInp = document.getElementById('odontogramExaminedBy');
+        if (exInp) exInp.value = record.examined_by || exInp.value || '';
+
+        const teeth = Array.isArray(record.teeth) ? record.teeth : [];
+        teeth.forEach((toothRow) => {
+          const toothNumber = parseInt(toothRow.tooth_number, 10);
+          if (Number.isNaN(toothNumber)) return;
+
+          const surfacesArray = String(toothRow.surfaces || '')
+            .split(',')
+            .map((v) => v.trim())
+            .filter(Boolean);
+
+          teethState[toothNumber] = {
+            surfaces: surfacesArray,
+            surface_colors: {},
+            condition_code: toothRow.condition_code || null,
+            condition_label: toothRow.condition_label || null,
+            color_code: toothRow.color_code || null,
+            notes: toothRow.notes || ''
+          };
+
+          syncToothNoteValue(toothNumber);
+          paintToothFromState(toothNumber);
+        });
+      }
+
+      async function loadLatestOdontogramToForm(patientId) {
+        if (!patientId || patientId === 'dummy-patient-id') return;
+
+        try {
+          const response = await fetch(`/api/odontogram/patient/${patientId}`, {
+            headers: { 'Accept': 'application/json' }
+          });
+          const data = await response.json();
+
+          if (!response.ok || data.status !== 'success') {
+            throw new Error(data.message || 'Gagal memuat odontogram terakhir');
+          }
+
+          const records = Array.isArray(data.data) ? data.data : [];
+          if (records.length > 0) {
+            hydrateOdontogramFromRecord(records[0]);
+          }
+        } catch (err) {
+          console.warn('Gagal memuat data odontogram terakhir:', err?.message || err);
+        }
       }
 
      // Variabel penampung state Toolbar
       const toolbar = document.getElementById("toolbar");
       const modalBody = document.getElementById("modalBody");
       const toolbarList = document.getElementById("toolbarList");
+        const toolbarToothPicker = document.getElementById("toolbarToothPicker");
+        const toolbarToothPickerLabel = document.getElementById("toolbarToothPickerLabel");
+        const toolbarToothPickerOptions = document.getElementById("toolbarToothPickerOptions");
       let activeToothElement = null;
       let activeToothNumber = null;
+        let activeInputElement = null;
 
       // ==========================================
       // FUNGSI MEMBUKA TOOLBAR
       // ==========================================
       
       // Fungsi untuk mengatur posisi awal dan batas layer
-      function openToolbar(event, element, number) {
+      function openToolbar(event, element, number, anchorElement = null) {
         if (!toolbar) return;
         event.stopPropagation();
-        activeToothElement = element;
+        activeToothElement = element || document.getElementById(`tooth-${number}`) || null;
         activeToothNumber = number;
+        activeInputElement = (anchorElement && anchorElement.matches && anchorElement.matches('input[data-tooth]')) ? anchorElement : null;
+        renderToolbarToothPicker(activeInputElement);
 
         // Tampilkan toolbar
         toolbar.classList.remove("hidden");
         toolbar.style.transform = "none";
 
-        const elRect = element.getBoundingClientRect();
+        // Sesuaikan ukuran toolbar agar tidak melebihi viewport (khususnya layar kecil/mobile)
+        const viewportPadding = 16;
+        const maxToolbarWidth = Math.max(280, window.innerWidth - (viewportPadding * 2));
+        const maxToolbarHeight = Math.max(260, window.innerHeight - (viewportPadding * 2));
+        toolbar.style.width = `${Math.min(450, maxToolbarWidth)}px`;
+        toolbar.style.height = `${Math.min(450, maxToolbarHeight)}px`;
+
+        const anchor = anchorElement || element;
+        const elRect = anchor.getBoundingClientRect();
         const toolbarWidth = toolbar.offsetWidth || 320;
-        const toolbarHeight = toolbar.offsetHeight;
+        const toolbarHeight = toolbar.offsetHeight || 320;
 
         // Posisi default: di bawah gigi, posisi tengah sejajar dengan gigi
         let topPos = elRect.bottom + 8; 
         let leftPos = elRect.left - (toolbarWidth / 2) + (elRect.width / 2);
 
         // KOREKSI BATAS LAYAR (Agar tidak keluar/melebihi batas browser)
-        if (leftPos + toolbarWidth > window.innerWidth - 16) {
-          leftPos = window.innerWidth - toolbarWidth - 16;
+        if (leftPos + toolbarWidth > window.innerWidth - viewportPadding) {
+          leftPos = window.innerWidth - toolbarWidth - viewportPadding;
         }
-        if (leftPos < 16) {
-          leftPos = 16;
+        if (leftPos < viewportPadding) {
+          leftPos = viewportPadding;
         }
-        // Jika numbur di bawah, pindahkan ke atas gigi
-        if (topPos + toolbarHeight > window.innerHeight - 16) {
+
+        // Jika muncul di bawah melebihi layar, pindahkan ke atas anchor
+        if (topPos + toolbarHeight > window.innerHeight - viewportPadding) {
           topPos = elRect.top - toolbarHeight - 8;
+        }
+
+        // Clamp terakhir agar tetap berada dalam viewport
+        if (topPos < viewportPadding) {
+          topPos = viewportPadding;
+        }
+        if (topPos + toolbarHeight > window.innerHeight - viewportPadding) {
+          topPos = window.innerHeight - toolbarHeight - viewportPadding;
+        }
+        if (leftPos + toolbarWidth > window.innerWidth - viewportPadding) {
+          leftPos = window.innerWidth - toolbarWidth - viewportPadding;
+        }
+        if (leftPos < viewportPadding) {
+          leftPos = viewportPadding;
         }
 
         // Set posisi absolute-nya
@@ -1094,6 +1380,68 @@
         return targets;
       }
 
+      function getToothNumbersForTarget(targetToothNumber) {
+        const target = parseInt(targetToothNumber, 10);
+        if (Number.isNaN(target)) return [];
+
+        const related = new Set([target]);
+        Object.entries(toothFieldAliasMap).forEach(([from, to]) => {
+          const fromNum = parseInt(from, 10);
+          const toNum = parseInt(to, 10);
+          if (toNum === target) related.add(fromNum);
+          if (fromNum === target) related.add(toNum);
+        });
+
+        return Array.from(related);
+      }
+
+      function getToothDisplayToken(toothNumber) {
+        const tooth = teethState[toothNumber];
+        if (!tooth) return "";
+
+        const hasCondition = !!tooth.condition_code;
+        const hasSurfaces = Array.isArray(tooth.surfaces) && tooth.surfaces.length > 0;
+        const hasNotes = typeof tooth.notes === "string" && tooth.notes.trim() !== "";
+
+        if (!hasCondition && !hasSurfaces && !hasNotes) {
+          return "";
+        }
+
+        const base = [];
+        if (hasCondition) base.push(tooth.condition_code);
+        if (hasSurfaces) base.push(tooth.surfaces.join('+'));
+        if (hasNotes) base.push(tooth.notes.trim());
+
+        return base.join('.');
+      }
+
+      function syncToothInputsByTarget(targetToothNumber) {
+        const inputs = document.querySelectorAll(`input[data-tooth="${targetToothNumber}"]`);
+        if (!inputs.length) return;
+
+        const relatedTeeth = getToothNumbersForTarget(targetToothNumber);
+        const tokens = relatedTeeth
+          .map((toothNumber) => {
+            const token = getToothDisplayToken(toothNumber);
+            if (!token) return "";
+
+            // Jika 1 field mewakili 2 gigi (contoh 11[51]), tampilkan nomor gigi agar tidak saling timpa.
+            return `${toothNumber}:${token}`;
+          })
+          .filter(Boolean);
+
+        const value = tokens.join(' + ');
+        inputs.forEach((input) => {
+          input.value = value;
+        });
+      }
+
+      function syncToothNoteValue(toothNumber) {
+        getToothInputTargets(toothNumber).forEach((targetToothNumber) => {
+          syncToothInputsByTarget(targetToothNumber);
+        });
+      }
+
       function getToothNoteInputs(toothNumber) {
         const inputs = [];
         getToothInputTargets(toothNumber).forEach((target) => {
@@ -1104,42 +1452,131 @@
       }
 
       function setToothNoteValue(toothNumber, value) {
-        const noteInputs = getToothNoteInputs(toothNumber);
-        noteInputs.forEach((input) => {
-          input.value = value;
+        const toothNum = parseInt(toothNumber, 10);
+        if (!Number.isNaN(toothNum)) {
+          initToothState(toothNum);
+          teethState[toothNum].notes = value || "";
+          syncToothNoteValue(toothNum);
+        }
+      }
+
+      function renderToolbarToothPicker(inputEl) {
+        if (!toolbarToothPicker || !toolbarToothPickerOptions || !toolbarToothPickerLabel) return;
+
+        if (!inputEl) {
+          toolbarToothPicker.classList.add('hidden');
+          toolbarToothPickerOptions.innerHTML = '';
+          return;
+        }
+
+        const targetTooth = parseInt(inputEl.getAttribute('data-tooth'), 10);
+        const relatedTeeth = getToothNumbersForTarget(targetTooth).sort((a, b) => a - b);
+
+        if (relatedTeeth.length <= 1) {
+          toolbarToothPicker.classList.add('hidden');
+          toolbarToothPickerOptions.innerHTML = '';
+          return;
+        }
+
+        toolbarToothPicker.classList.remove('hidden');
+        toolbarToothPickerLabel.textContent = `Pilih nomor gigi (${relatedTeeth.join('/')})`;
+
+        let selected = parseInt(inputEl.dataset.selectedTooth || '', 10);
+        if (Number.isNaN(selected) || !relatedTeeth.includes(selected)) {
+          selected = relatedTeeth[0];
+          inputEl.dataset.selectedTooth = String(selected);
+        }
+
+        inputEl.title = `Sedang mengisi gigi ${selected} (field gabungan: ${relatedTeeth.join('/')})`;
+
+        toolbarToothPickerOptions.innerHTML = '';
+        relatedTeeth.forEach((toothNumber) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'px-3 py-1.5 rounded text-sm font-semibold border transition';
+
+          if (toothNumber === selected) {
+            btn.style.background = '#8e6a45';
+            btn.style.color = '#ffffff';
+            btn.style.borderColor = '#8e6a45';
+            btn.textContent = `${toothNumber} ✓`;
+          } else {
+            btn.style.background = '#ffffff';
+            btn.style.color = '#8e6a45';
+            btn.style.borderColor = '#d8c7b2';
+            btn.textContent = String(toothNumber);
+          }
+
+          btn.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            inputEl.dataset.selectedTooth = String(toothNumber);
+            inputEl.title = `Sedang mengisi gigi ${toothNumber} (field gabungan: ${relatedTeeth.join('/')})`;
+
+            activeToothNumber = toothNumber;
+            activeToothElement = document.getElementById(`tooth-${toothNumber}`);
+            renderToolbarToothPicker(inputEl);
+          });
+
+          toolbarToothPickerOptions.appendChild(btn);
         });
       }
 
+      function pickToothNumberForInput(inputEl, forcePick = false) {
+        const targetTooth = parseInt(inputEl.getAttribute('data-tooth'), 10);
+        if (Number.isNaN(targetTooth)) return null;
+
+        const relatedTeeth = getToothNumbersForTarget(targetTooth).sort((a, b) => a - b);
+        if (relatedTeeth.length <= 1) {
+          inputEl.dataset.selectedTooth = String(targetTooth);
+          inputEl.title = `Input gigi ${targetTooth}`;
+          renderToolbarToothPicker(inputEl);
+          return targetTooth;
+        }
+
+        let selected = parseInt(inputEl.dataset.selectedTooth || '', 10);
+        if (Number.isNaN(selected) || !relatedTeeth.includes(selected)) {
+          selected = relatedTeeth[0];
+          inputEl.dataset.selectedTooth = String(selected);
+        }
+
+        inputEl.title = `Sedang mengisi gigi ${selected} (field gabungan: ${relatedTeeth.join('/')})`;
+        renderToolbarToothPicker(inputEl);
+        return selected;
+      }
+
       function applyCondition(condition) {
-        if (!activeToothElement) {
+        if (activeToothNumber === null || Number.isNaN(parseInt(activeToothNumber, 10))) {
           alert("Pilih gigi terlebih dahulu!");
           return;
         }
 
-        const toothNumber = parseInt(activeToothElement.id.replace("tooth-", ""));
+        const toothNumber = parseInt(activeToothNumber, 10);
         initToothState(toothNumber);
         const state = teethState[toothNumber];
 
-        const surfaces = activeToothElement.querySelectorAll(".tooth-surface");
+        const surfaces = activeToothElement ? activeToothElement.querySelectorAll(".tooth-surface") : [];
 
         if (condition === "clear") {
+          if (activeToothElement) {
             surfaces.forEach((s) => {
-                if(s.tagName === "polygon" || s.tagName === "path" || s.tagName === "rect" || s.tagName === "circle") {
-                    s.setAttribute("fill", "white");
-                }
+              if(s.tagName === "polygon" || s.tagName === "path" || s.tagName === "rect" || s.tagName === "circle") {
+                s.setAttribute("fill", "white");
+              }
             });
             const crossLines = activeToothElement.querySelectorAll("line");
             crossLines.forEach((l) => l.remove());
+          }
             
             teethState[toothNumber] = {
                 surfaces: [],
+              surface_colors: {},
                 condition_code: null,
                 condition_label: null,
                 color_code: null,
                 notes: ""
             };
 
-            setToothNoteValue(toothNumber, "");
+            syncToothNoteValue(toothNumber);
 
             const searchInput = document.getElementById('toolbarSearch');
             if (searchInput) {
@@ -1152,20 +1589,24 @@
 
         // --- HELPER UNTUK MASALAH GIGI ---
         const applyDisease = (hexColor, code, label) => {
+          if (activeToothElement) {
             const crossLines = activeToothElement.querySelectorAll("line");
             crossLines.forEach((l) => l.remove());
+          }
 
+          if (activeToothElement) {
             if (state.surfaces.length > 0) {
-                surfaces.forEach((s) => s.setAttribute("fill", "white")); // Reset sisa warna default
-                state.surfaces.forEach(sMode => {
-                    if (sMode === "M") activeToothElement.querySelector(".surface-left")?.setAttribute("fill", hexColor);
-                    if (sMode === "O") activeToothElement.querySelector(".surface-center")?.setAttribute("fill", hexColor);
-                    if (sMode === "D") activeToothElement.querySelector(".surface-right")?.setAttribute("fill", hexColor);
-                    if (sMode === "B") activeToothElement.querySelector(".surface-top")?.setAttribute("fill", hexColor);
-                    if (sMode === "L") activeToothElement.querySelector(".surface-bottom")?.setAttribute("fill", hexColor);
-                });
+              surfaces.forEach((s) => s.setAttribute("fill", "white")); // Reset sisa warna default
+              state.surfaces.forEach(sMode => {
+                if (sMode === "M") activeToothElement.querySelector(".surface-left")?.setAttribute("fill", hexColor);
+                if (sMode === "O") activeToothElement.querySelector(".surface-center")?.setAttribute("fill", hexColor);
+                if (sMode === "D") activeToothElement.querySelector(".surface-right")?.setAttribute("fill", hexColor);
+                if (sMode === "B") activeToothElement.querySelector(".surface-top")?.setAttribute("fill", hexColor);
+                if (sMode === "L") activeToothElement.querySelector(".surface-bottom")?.setAttribute("fill", hexColor);
+              });
             } else {
-                surfaces.forEach((s) => s.setAttribute("fill", hexColor));
+              surfaces.forEach((s) => s.setAttribute("fill", hexColor));
+            }
             }
             state.condition_code = code;
             state.condition_label = label;
@@ -1183,54 +1624,45 @@
         };
 
         // --- HELPER UNTUK PERMUKAAN GIGI ---
-        const addSurface = (flag, selector) => {
-            // Jika belum ada kondisi, gunakan biru muda sebagai indikator visual (bukan hitam)
-            const drawColor = state.color_code || "#60a5fa";
+        const addSurface = (flag, selector, surfaceColor) => {
+          const drawColor = state.color_code || surfaceColor;
             
-            const crossLines = activeToothElement.querySelectorAll("line");
-            crossLines.forEach((l) => l.remove());
+            if (activeToothElement) {
+                const crossLines = activeToothElement.querySelectorAll("line");
+                crossLines.forEach((l) => l.remove());
+            }
 
             // TOGGLE MATI (Jika di-klik lagi)
             if (state.surfaces.includes(flag)) {
                 state.surfaces = state.surfaces.filter(s => s !== flag);
-                activeToothElement.querySelector(selector).setAttribute("fill", "white");
+              delete state.surface_colors[flag];
+                if (activeToothElement) {
+                    activeToothElement.querySelector(selector)?.setAttribute("fill", "white");
+                }
                 
                 // Jika semua surface sudah dimatikan tapi kondisi masih ada, warnai seluruh gigi lagi
-                if(state.surfaces.length === 0 && state.color_code) {
+                if(activeToothElement && state.surfaces.length === 0 && state.color_code) {
                     surfaces.forEach((s) => s.setAttribute("fill", state.color_code));
                 }
                 
                 // UPDATE INPUT FIELD KETIKA SURFACE DI-TOGGLE OFF
-                const noteInputs = getToothNoteInputs(toothNumber);
-                noteInputs.forEach(input => {
-                    if (state.surfaces.length > 0 && state.condition_code) {
-                        input.value = `${state.condition_code}.${state.surfaces.join('+')}`;
-                    } else if (state.condition_code) {
-                        input.value = state.condition_code;
-                    } else {
-                        input.value = '';
-                    }
-                });
+                syncToothNoteValue(toothNumber);
                 return;
             }
 
             // Bila pengguna klik surface pertama kali setelah mengklik Masalah Full-Tooth
-            if (state.surfaces.length === 0 && state.condition_code) {
+            if (activeToothElement && state.surfaces.length === 0 && state.condition_code) {
                 surfaces.forEach((s) => s.setAttribute("fill", "white"));
             }
             
-            activeToothElement.querySelector(selector).setAttribute("fill", drawColor);
+            if (activeToothElement) {
+              activeToothElement.querySelector(selector)?.setAttribute("fill", drawColor);
+            }
             state.surfaces.push(flag);
+            state.surface_colors[flag] = drawColor;
             
             // UPDATE INPUT FIELD KETIKA SURFACE DI-TOGGLE ON
-            const noteInputs = getToothNoteInputs(toothNumber);
-            noteInputs.forEach(input => {
-                if (state.condition_code) {
-                    input.value = `${state.condition_code}.${state.surfaces.join('+')}`;
-                } else {
-                    input.value = state.surfaces.join('+');
-                }
-            });
+            syncToothNoteValue(toothNumber);
         };
 
         if (condition === "caries") {
@@ -1242,12 +1674,15 @@
         } else if (condition === "missing") {
             applyDisease("#000000", "MIS", "Gigi Hilang");
         } 
-        else if (condition === "mesial")   { addSurface("M", ".surface-left"); }
-        else if (condition === "occlusal") { addSurface("O", ".surface-center"); }
-        else if (condition === "center")   { addSurface("C", ".surface-center"); }
-        else if (condition === "distal")   { addSurface("D", ".surface-right"); }
-        else if (condition === "buccal")   { addSurface("B", ".surface-top"); }
-        else if (condition === "lingual")  { addSurface("L", ".surface-bottom"); }
+        else if (condition === "mesial")   { addSurface("M", ".surface-left", "#7c70ab"); }
+        else if (condition === "occlusal") { addSurface("O", ".surface-center", "#50c878"); }
+        else if (condition === "center")   { addSurface("C", ".surface-center", "#50c878"); }
+        else if (condition === "distal")   { addSurface("D", ".surface-right", "#5e88c9"); }
+        else if (condition === "buccal")   { addSurface("B", ".surface-top", "#f59e0b"); }
+        else if (condition === "lingual")  { addSurface("L", ".surface-bottom", "#ec4899"); }
+
+        // Sinkronkan field setelah semua perubahan kondisi.
+        syncToothNoteValue(toothNumber);
 
         // Reset search field when applied
         const searchInput = document.getElementById('toolbarSearch');
@@ -1342,30 +1777,15 @@
               
               const data = await res.json();
               if (res.ok && data.status === 'success') {
-                  const ask = confirm("Data Odontogram berhasil disimpan!\n\nApakah Anda ingin langsung merekomendasikan/mencatat tindakan tambahan pada gigi-gigi tersebut ke Form Prosedur?");
-                  toggleOdontogramModal(false);
-
-                  if (ask && typeof toggleProsedureModal === "function") {
-                      // Buka modal prosedur dengan membawa data pasien & dokter dari odontogram
-                      toggleProsedureModal(true, window.lastOdontoPatientData);
-
-                      setTimeout(() => {
-                          let savedTeethNumbers = [];
-                          if (data.data && data.data.teeth) {
-                              const uniqueTeeth = new Set(data.data.teeth.map(function(t) { return t.tooth_number; }));
-                              savedTeethNumbers = Array.from(uniqueTeeth);
-                          }
-                          
-                          if (savedTeethNumbers.length === 0) return;
-
-                          const toothNumbersStr = savedTeethNumbers.join(', ');
-                          const noGigiInput = document.querySelector('.input-no-gigi');
-                          if (noGigiInput) {
-                              noGigiInput.value = toothNumbersStr;
-                              if (typeof hitungTotalHarga === "function") hitungTotalHarga();
-                          }
-                      }, 300);
+                  // Extract and store tooth numbers for procedure modal
+                  let savedTeethNumbers = [];
+                  if (data.data && data.data.teeth) {
+                      const uniqueTeeth = new Set(data.data.teeth.map(function(t) { return t.tooth_number; }));
+                      savedTeethNumbers = Array.from(uniqueTeeth);
                   }
+                  window.lastSavedToothNumbers = savedTeethNumbers;
+                  
+                  toggleOdontogramModal(false);
                   
                   // Reset form Odontogram usai sukses submit
                   clearOdontogramState();
@@ -1384,6 +1804,8 @@
         modalBody.addEventListener("click", function (e) {
           if (!toolbar.contains(e.target)) {
             toolbar.classList.add("hidden");
+            activeInputElement = null;
+            if (toolbarToothPicker) toolbarToothPicker.classList.add('hidden');
           }
         });
       }

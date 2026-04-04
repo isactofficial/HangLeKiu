@@ -101,10 +101,6 @@
                     <span class="emr-status-item"><span class="emr-dot" style="background-color: #{{ $color }};"></span> {{ $label }}</span>
                 @endforeach
             </div>
-            <div class="emr-header-actions">
-                <button class="emr-icon-btn"><i class="fa fa-print"></i></button>
-                <button class="emr-icon-btn" onclick="window.location.reload()"><i class="fa fa-sync"></i></button>
-            </div>
         </div>
 
         <div class="emr-layout">
@@ -131,7 +127,11 @@
                     <div id="list-hari-ini" class="js-patient-list-section">
                         @if(isset($todayPatients) && count($todayPatients) > 0)
                             @foreach($todayPatients as $apt)
-                                <a href="{{ route('admin.emr.show', $apt->id) }}" class="js-emr-patient-link">
+                                          <a href="{{ route('admin.emr.show', $apt->id) }}"
+                                              class="js-emr-patient-link"
+                                              data-patient-name="{{ strtolower($apt->patient->full_name ?? 'Pasien') }}"
+                                              data-patient-rm="{{ strtolower($apt->patient->medical_record_no ?? '-') }}"
+                                              data-patient-status="{{ strtolower($apt->status ?? '') }}">
                                     <div class="patient-card">
                                         <div class="p-card-top">
                                             <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
@@ -153,7 +153,11 @@
                     <div id="list-semua" class="hidden js-patient-list-section">
                         @if(isset($allPatients) && count($allPatients) > 0)
                             @foreach($allPatients as $apt)
-                                <a href="{{ route('admin.emr.show', $apt->id) }}" class="js-emr-patient-link">
+                                          <a href="{{ route('admin.emr.show', $apt->id) }}"
+                                              class="js-emr-patient-link"
+                                              data-patient-name="{{ strtolower($apt->patient->full_name ?? 'Pasien') }}"
+                                              data-patient-rm="{{ strtolower($apt->patient->medical_record_no ?? '-') }}"
+                                              data-patient-status="{{ strtolower($apt->status ?? '') }}">
                                     <div class="patient-card">
                                         <div class="p-card-top">
                                             <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
@@ -222,6 +226,349 @@ document.addEventListener('DOMContentLoaded', function() {
                     activeSection.querySelectorAll('.js-emr-patient-link').forEach(link => {
                         link.style.display = link.textContent.toLowerCase().includes(term) ? "block" : "none";
                     });
+                });
+            }
+
+            initEmrTopbarSearch();
+            initEmrAdvanceSearch();
+
+            function initEmrTopbarSearch() {
+                const input = document.querySelector('.navbar-search-input');
+                const wrapper = input ? input.closest('.navbar-search-wrapper') : null;
+                if (!input || !wrapper || input.dataset.boundTopbarSearch === '1') {
+                    return;
+                }
+
+                window.emrTopbarAdvancedFilter = window.emrTopbarAdvancedFilter || {
+                    status: '',
+                    scope: 'semua',
+                };
+
+                input.dataset.boundTopbarSearch = '1';
+                wrapper.style.position = 'relative';
+
+                let dropdownResult = document.getElementById('emrTopbarSearchDropdown');
+                if (!dropdownResult) {
+                    dropdownResult = document.createElement('div');
+                    dropdownResult.id = 'emrTopbarSearchDropdown';
+                    dropdownResult.style.display = 'none';
+                    dropdownResult.style.position = 'absolute';
+                    dropdownResult.style.top = 'calc(100% + 6px)';
+                    dropdownResult.style.left = '0';
+                    dropdownResult.style.right = '0';
+                    dropdownResult.style.background = '#fff';
+                    dropdownResult.style.border = '1px solid #E5D6C5';
+                    dropdownResult.style.borderRadius = '10px';
+                    dropdownResult.style.zIndex = '9999';
+                    dropdownResult.style.maxHeight = '380px';
+                    dropdownResult.style.overflowY = 'auto';
+                    dropdownResult.style.boxShadow = '0 8px 24px rgba(88,44,12,0.12)';
+                    wrapper.appendChild(dropdownResult);
+                }
+
+                let timer;
+                input.addEventListener('input', function () {
+                    clearTimeout(timer);
+                    const q = this.value.trim();
+                    if (q.length < 2) {
+                        dropdownResult.style.display = 'none';
+                        return;
+                    }
+
+                    timer = setTimeout(() => doTopbarSearch(q), 350);
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        dropdownResult.style.display = 'none';
+                        this.blur();
+                    }
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!wrapper.contains(e.target)) {
+                        dropdownResult.style.display = 'none';
+                    }
+                });
+
+                async function doTopbarSearch(q) {
+                    dropdownResult.style.display = 'block';
+                    dropdownResult.innerHTML = '<div style="padding:12px 16px; color:#999; font-size:13px;">Mencari...</div>';
+
+                    try {
+                        const res = await fetch(`/admin/patients/search?q=${encodeURIComponent(q)}`, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                            }
+                        });
+                        const data = await res.json();
+
+                        if (data.success && data.data && data.data.length > 0) {
+                            const statusColors = {
+                                pending: '#EF4444',
+                                confirmed: '#F59E0B',
+                                waiting: '#8B5CF6',
+                                engaged: '#3B82F6',
+                                succeed: '#84CC16',
+                                failed: '#6B7280',
+                            };
+
+                            const activeStatusFilter = (window.emrTopbarAdvancedFilter?.status || '').toLowerCase();
+                            const activeScopeFilter = (window.emrTopbarAdvancedFilter?.scope || 'semua').toLowerCase();
+                            const todayKey = new Date().toISOString().slice(0, 10);
+
+                            const filteredPatients = data.data.map((p) => {
+                                const sourceAppointments = Array.isArray(p.appointments) ? p.appointments : [];
+                                const filteredAppointments = sourceAppointments.filter((a) => {
+                                    const statusMatch = !activeStatusFilter || String(a.status || '').toLowerCase() === activeStatusFilter;
+
+                                    let scopeMatch = true;
+                                    if (activeScopeFilter === 'hari_ini') {
+                                        const apptDate = a.datetime ? new Date(a.datetime).toISOString().slice(0, 10) : '';
+                                        scopeMatch = apptDate === todayKey;
+                                    }
+
+                                    return statusMatch && scopeMatch;
+                                });
+
+                                return {
+                                    ...p,
+                                    filteredAppointments,
+                                };
+                            }).filter((p) => {
+                                if (!activeStatusFilter && activeScopeFilter === 'semua') {
+                                    return true;
+                                }
+                                return p.filteredAppointments.length > 0;
+                            });
+
+                            if (filteredPatients.length === 0) {
+                                dropdownResult.innerHTML = '<div style="padding:12px 16px; color:#999; font-size:13px;">Tidak ada hasil sesuai filter.</div>';
+                                return;
+                            }
+
+                            dropdownResult.innerHTML = filteredPatients.map(p => {
+                                const appointmentsForRender = p.filteredAppointments || [];
+                                const appointmentRows = appointmentsForRender.length > 0
+                                    ? appointmentsForRender.map(a => {
+                                        const dt = new Date(a.datetime);
+                                        const tgl = dt.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+                                        const jam = dt.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+                                        const badgeColor = statusColors[(a.status || '').toLowerCase()] || '#888';
+
+                                        return `
+                                            <div onclick="emrTopbarSearchSelect('${a.id}', '${String(p.full_name || '').replace(/'/g, "\\'")}')"
+                                                 style="padding: 7px 16px 7px 28px; cursor: pointer; border-bottom: 1px solid #faf3ec; font-size: 12px; display: flex; justify-content: space-between; align-items: center; background: #fdfaf7;"
+                                                 onmouseover="this.style.background='#f5ede0'"
+                                                 onmouseout="this.style.background='#fdfaf7'">
+                                                <div style="display:flex; align-items:center; gap:8px;">
+                                                    <i class="fas fa-calendar-alt" style="color:#C58F59; font-size:10px;"></i>
+                                                    <span style="color:#5a3e28;">${tgl}, ${jam}</span>
+                                                    <span style="color:#aaa;">- ${a.poli || '-'} / ${a.doctor || '-'}</span>
+                                                </div>
+                                                <div style="display:flex; align-items:center; gap:6px;">
+                                                    <span style="background:${badgeColor}; color:white; font-size:9px; padding:2px 7px; border-radius:20px; font-weight:700; text-transform:uppercase;">${a.status || '-'}</span>
+                                                    <span style="color:#C58F59; font-size:10px;"><i class="fas fa-arrow-right"></i></span>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')
+                                    : '<div style="padding: 7px 16px 7px 28px; font-size: 12px; color: #bbb; background:#fdfaf7; border-bottom: 1px solid #faf3ec;"><i class="fas fa-info-circle"></i> Belum ada kunjungan</div>';
+
+                                return `
+                                    <div>
+                                        <div style="padding: 10px 16px; border-bottom: 1px solid #f0e8df; background: white; display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <div style="font-weight: 700; color: #2C1810; font-size: 13px;">${p.full_name || '-'}</div>
+                                                <div style="color: #999; font-size: 11px; margin-top: 2px;">MR: ${p.medical_record_no || '-'} | KTP: ${p.id_card_number || '-'}</div>
+                                            </div>
+                                            <div style="color:#aaa; font-size:11px; white-space:nowrap; margin-left:8px;">${appointmentsForRender.length} kunjungan</div>
+                                        </div>
+                                        ${appointmentRows}
+                                    </div>
+                                `;
+                            }).join('');
+                        } else {
+                            dropdownResult.innerHTML = '<div style="padding:12px 16px; color:#999; font-size:13px;">Pasien tidak ditemukan.</div>';
+                        }
+                    } catch (error) {
+                        console.error('Topbar EMR search error:', error);
+                        dropdownResult.innerHTML = '<div style="padding:12px 16px; color:#e05252; font-size:13px;">Gagal mencari data.</div>';
+                    }
+                }
+
+                window.emrTopbarSearchSelect = function(apptId, patientName) {
+                    dropdownResult.style.display = 'none';
+                    input.value = patientName;
+                    window.location.href = `/admin/emr?open=${apptId}`;
+                };
+
+                window.emrRunTopbarSearch = async function(query) {
+                    const q = String(query || '').trim();
+                    if (q.length < 2) {
+                        dropdownResult.style.display = 'block';
+                        dropdownResult.innerHTML = '<div style="padding:12px 16px; color:#999; font-size:13px;">Masukkan minimal 2 karakter untuk mencari.</div>';
+                        return;
+                    }
+
+                    await doTopbarSearch(q);
+                };
+            }
+
+            function initEmrAdvanceSearch() {
+                const advanceBtn = document.querySelector('.navbar-btn-primary');
+                const topbarInput = document.querySelector('.navbar-search-input');
+
+                if (!advanceBtn || advanceBtn.dataset.boundAdvanceSearch === '1') {
+                    return;
+                }
+
+                advanceBtn.dataset.boundAdvanceSearch = '1';
+                advanceBtn.type = 'button';
+
+                const host = advanceBtn.parentElement || document.body;
+                host.style.position = 'relative';
+
+                let panel = document.getElementById('emrAdvanceSearchPanel');
+                if (!panel) {
+                    panel = document.createElement('div');
+                    panel.id = 'emrAdvanceSearchPanel';
+                    panel.style.cssText = [
+                        'display:none',
+                        'position:absolute',
+                        'top:calc(100% + 8px)',
+                        'left:0',
+                        'min-width:320px',
+                        'background:#fff',
+                        'border:1px solid #E5D6C5',
+                        'border-radius:12px',
+                        'padding:12px',
+                        'box-shadow:0 10px 24px rgba(88,44,12,0.16)',
+                        'z-index:9999'
+                    ].join(';');
+
+                    panel.innerHTML = `
+                        <div style="font-size:12px;font-weight:800;color:#5a3e28;margin-bottom:8px;">Advance Search</div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <div>
+                                <label style="font-size:11px;color:#8e6a45;font-weight:700;display:block;margin-bottom:4px;">Keyword</label>
+                                <input id="emrAdvKeyword" type="text" placeholder="Nama/MR/KTP" style="width:100%;border:1px solid #E5D6C5;border-radius:8px;padding:8px 10px;font-size:12px;outline:none;">
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                <div>
+                                    <label style="font-size:11px;color:#8e6a45;font-weight:700;display:block;margin-bottom:4px;">Status</label>
+                                    <select id="emrAdvStatus" style="width:100%;border:1px solid #E5D6C5;border-radius:8px;padding:8px 10px;font-size:12px;background:#fff;outline:none;">
+                                        <option value="">Semua</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="waiting">Waiting</option>
+                                        <option value="engaged">Engaged</option>
+                                        <option value="succeed">Succeed</option>
+                                        <option value="failed">Failed</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:11px;color:#8e6a45;font-weight:700;display:block;margin-bottom:4px;">Cakupan</label>
+                                    <select id="emrAdvScope" style="width:100%;border:1px solid #E5D6C5;border-radius:8px;padding:8px 10px;font-size:12px;background:#fff;outline:none;">
+                                        <option value="hari_ini">Hari Ini</option>
+                                        <option value="semua">Semua</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:2px;">
+                                <button id="emrAdvReset" type="button" style="padding:7px 10px;border:1px solid #d8c7b2;background:#fff;color:#6f5635;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Reset</button>
+                                <button id="emrAdvApply" type="button" style="padding:7px 10px;border:1px solid #8e6a45;background:#8e6a45;color:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Terapkan</button>
+                            </div>
+                        </div>
+                    `;
+
+                    host.appendChild(panel);
+                }
+
+                const keywordInput = panel.querySelector('#emrAdvKeyword');
+                const statusSelect = panel.querySelector('#emrAdvStatus');
+                const scopeSelect = panel.querySelector('#emrAdvScope');
+                const applyBtn = panel.querySelector('#emrAdvApply');
+                const resetBtn = panel.querySelector('#emrAdvReset');
+
+                function applyAdvancedFilter() {
+                    const rawKeyword = (keywordInput?.value || topbarInput?.value || '').trim();
+                    const keyword = rawKeyword.toLowerCase();
+                    const selectedStatus = (statusSelect?.value || '').toLowerCase();
+                    const selectedScope = scopeSelect?.value || 'hari_ini';
+
+                    if (keywordInput) {
+                        keywordInput.value = rawKeyword;
+                    }
+
+                    window.emrTopbarAdvancedFilter = {
+                        status: selectedStatus,
+                        scope: selectedScope,
+                    };
+
+                    if (topbarInput) {
+                        topbarInput.value = rawKeyword;
+                    }
+
+                    if (typeof window.emrRunTopbarSearch === 'function') {
+                        window.emrRunTopbarSearch(rawKeyword);
+                    }
+                }
+
+                function resetAdvancedFilter() {
+                    if (keywordInput) keywordInput.value = '';
+                    if (statusSelect) statusSelect.value = '';
+                    if (scopeSelect) scopeSelect.value = 'hari_ini';
+                    if (topbarInput) topbarInput.value = '';
+
+                    window.emrTopbarAdvancedFilter = {
+                        status: '',
+                        scope: 'semua',
+                    };
+                }
+
+                advanceBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (keywordInput && topbarInput) {
+                        keywordInput.value = topbarInput.value || '';
+                    }
+                    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                });
+
+                if (applyBtn) {
+                    applyBtn.addEventListener('click', function() {
+                        applyAdvancedFilter();
+                        panel.style.display = 'none';
+                    });
+                }
+
+                if (keywordInput) {
+                    keywordInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            applyAdvancedFilter();
+                            panel.style.display = 'none';
+                        }
+                    });
+                }
+
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', function() {
+                        resetAdvancedFilter();
+                        panel.style.display = 'none';
+                    });
+                }
+
+                panel.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!host.contains(e.target)) {
+                        panel.style.display = 'none';
+                    }
                 });
             }
 
@@ -378,6 +725,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (currentStatusLabel) {
                 filterStatusMenuByCurrent(currentStatusLabel.textContent);
+            }
+            if (typeof initPatientDetailPhotoInput === 'function') {
+                initPatientDetailPhotoInput();
+            }
+            if (typeof initSensitiveInfoToggles === 'function') {
+                initSensitiveInfoToggles();
             }
 
             tabButtons.forEach(btn => {
@@ -577,6 +930,429 @@ window.openDoctorNoteModalFromDetail = openDoctorNoteModalFromDetail;
 window.toggleDoctorNoteModal = toggleDoctorNoteModal;
 window.submitDoctorNote = submitDoctorNote;
 
+const patientDetailPhotoCropperState = {
+    image: null,
+    originalWidth: 0,
+    originalHeight: 0,
+    frameX: undefined,
+    frameY: undefined,
+    frameSize: 180,
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    mouseDownHandler: null,
+    mouseMoveHandler: null,
+    mouseUpHandler: null,
+};
+
+function togglePatientDetailEdit(isEditMode) {
+    const fields = document.querySelectorAll('[data-patient-field]');
+    const editBtn = document.getElementById('patientDetailEditBtn');
+    const cancelBtn = document.getElementById('patientDetailCancelBtn');
+    const saveBtn = document.getElementById('patientDetailSaveBtn');
+    const photoInput = document.getElementById('patientDetailPhotoInput');
+    const photoUploadLabel = document.getElementById('patientDetailPhotoUploadLabel');
+    const photoBase64 = document.getElementById('patientDetailPhotoBase64');
+    const photoPreview = document.getElementById('patientDetailPhotoPreview');
+
+    fields.forEach((field) => {
+        field.disabled = !isEditMode;
+    });
+
+    if (isEditMode && photoPreview) {
+        photoPreview.dataset.originalSrc = photoPreview.src || '';
+    }
+
+    if (photoInput) {
+        photoInput.disabled = !isEditMode;
+        if (!isEditMode) {
+            photoInput.value = '';
+            if (photoBase64) photoBase64.value = '';
+        }
+    }
+
+    if (!isEditMode && photoPreview && photoPreview.dataset.originalSrc) {
+        photoPreview.src = photoPreview.dataset.originalSrc;
+    }
+
+    if (photoUploadLabel) {
+        photoUploadLabel.classList.toggle('disabled', !isEditMode);
+    }
+
+    if (editBtn) editBtn.classList.toggle('hidden', isEditMode);
+    if (cancelBtn) cancelBtn.classList.toggle('hidden', !isEditMode);
+    if (saveBtn) saveBtn.classList.toggle('hidden', !isEditMode);
+}
+
+function openPatientDetailPhotoCropperModal() {
+    const modal = document.getElementById('patientDetailPhotoCropperModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+        renderPatientDetailPhotoCropperCanvas();
+        attachPatientDetailPhotoCropperEvents();
+    }, 60);
+}
+
+function closePatientDetailPhotoCropperModal() {
+    const modal = document.getElementById('patientDetailPhotoCropperModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+    detachPatientDetailPhotoCropperEvents();
+    patientDetailPhotoCropperState.isDragging = false;
+}
+
+function renderPatientDetailPhotoCropperCanvas() {
+    const canvas = document.getElementById('patientDetailPhotoCropperCanvas');
+    const img = patientDetailPhotoCropperState.image;
+    if (!canvas || !img) return;
+
+    let displayWidth = Math.min(img.width, 520);
+    let displayHeight = (img.height / img.width) * displayWidth;
+
+    if (displayHeight > 420) {
+        displayHeight = 420;
+        displayWidth = (img.width / img.height) * displayHeight;
+    }
+
+    displayWidth = Math.round(displayWidth);
+    displayHeight = Math.round(displayHeight);
+
+    canvas.width = displayWidth;
+    canvas.height = displayHeight;
+
+    if (patientDetailPhotoCropperState.frameX === undefined || patientDetailPhotoCropperState.frameY === undefined) {
+        patientDetailPhotoCropperState.frameX = displayWidth / 2;
+        patientDetailPhotoCropperState.frameY = displayHeight / 2;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, displayWidth, displayHeight);
+    ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.48)';
+    ctx.fillRect(0, 0, displayWidth, displayHeight);
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(
+        patientDetailPhotoCropperState.frameX,
+        patientDetailPhotoCropperState.frameY,
+        patientDetailPhotoCropperState.frameSize / 2,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+    ctx.restore();
+
+    ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.beginPath();
+    ctx.arc(
+        patientDetailPhotoCropperState.frameX,
+        patientDetailPhotoCropperState.frameY,
+        patientDetailPhotoCropperState.frameSize / 2,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+
+    ctx.strokeStyle = '#C58F59';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(
+        patientDetailPhotoCropperState.frameX,
+        patientDetailPhotoCropperState.frameY,
+        patientDetailPhotoCropperState.frameSize / 2,
+        0,
+        Math.PI * 2
+    );
+    ctx.stroke();
+}
+
+function attachPatientDetailPhotoCropperEvents() {
+    const canvas = document.getElementById('patientDetailPhotoCropperCanvas');
+    if (!canvas) return;
+
+    detachPatientDetailPhotoCropperEvents();
+
+    const mouseDownHandler = function(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const dx = x - patientDetailPhotoCropperState.frameX;
+        const dy = y - patientDetailPhotoCropperState.frameY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= (patientDetailPhotoCropperState.frameSize / 2) + 10) {
+            patientDetailPhotoCropperState.isDragging = true;
+            patientDetailPhotoCropperState.startX = x;
+            patientDetailPhotoCropperState.startY = y;
+        }
+    };
+
+    const mouseMoveHandler = function(event) {
+        if (!patientDetailPhotoCropperState.isDragging) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        const deltaX = x - patientDetailPhotoCropperState.startX;
+        const deltaY = y - patientDetailPhotoCropperState.startY;
+
+        let nextX = patientDetailPhotoCropperState.frameX + deltaX;
+        let nextY = patientDetailPhotoCropperState.frameY + deltaY;
+        const radius = patientDetailPhotoCropperState.frameSize / 2;
+
+        nextX = Math.max(radius * 0.25, Math.min(canvas.width - (radius * 0.25), nextX));
+        nextY = Math.max(radius * 0.25, Math.min(canvas.height - (radius * 0.25), nextY));
+
+        patientDetailPhotoCropperState.frameX = nextX;
+        patientDetailPhotoCropperState.frameY = nextY;
+        patientDetailPhotoCropperState.startX = x;
+        patientDetailPhotoCropperState.startY = y;
+
+        renderPatientDetailPhotoCropperCanvas();
+    };
+
+    const mouseUpHandler = function() {
+        patientDetailPhotoCropperState.isDragging = false;
+    };
+
+    canvas.addEventListener('mousedown', mouseDownHandler);
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+
+    patientDetailPhotoCropperState.mouseDownHandler = mouseDownHandler;
+    patientDetailPhotoCropperState.mouseMoveHandler = mouseMoveHandler;
+    patientDetailPhotoCropperState.mouseUpHandler = mouseUpHandler;
+}
+
+function detachPatientDetailPhotoCropperEvents() {
+    const canvas = document.getElementById('patientDetailPhotoCropperCanvas');
+    if (canvas && patientDetailPhotoCropperState.mouseDownHandler) {
+        canvas.removeEventListener('mousedown', patientDetailPhotoCropperState.mouseDownHandler);
+    }
+    if (patientDetailPhotoCropperState.mouseMoveHandler) {
+        document.removeEventListener('mousemove', patientDetailPhotoCropperState.mouseMoveHandler);
+    }
+    if (patientDetailPhotoCropperState.mouseUpHandler) {
+        document.removeEventListener('mouseup', patientDetailPhotoCropperState.mouseUpHandler);
+    }
+
+    patientDetailPhotoCropperState.mouseDownHandler = null;
+    patientDetailPhotoCropperState.mouseMoveHandler = null;
+    patientDetailPhotoCropperState.mouseUpHandler = null;
+}
+
+function applyPatientDetailPhotoCrop() {
+    const canvas = document.getElementById('patientDetailPhotoCropperCanvas');
+    const photoPreview = document.getElementById('patientDetailPhotoPreview');
+    const photoBase64 = document.getElementById('patientDetailPhotoBase64');
+
+    if (!canvas || !photoPreview || !photoBase64 || !patientDetailPhotoCropperState.image) {
+        return;
+    }
+
+    const size = patientDetailPhotoCropperState.frameSize;
+    const croppedCanvas = document.createElement('canvas');
+    croppedCanvas.width = size;
+    croppedCanvas.height = size;
+
+    const ctx = croppedCanvas.getContext('2d');
+    if (!ctx) return;
+
+    const scaleX = patientDetailPhotoCropperState.originalWidth / canvas.width;
+    const scaleY = patientDetailPhotoCropperState.originalHeight / canvas.height;
+
+    const srcX = (patientDetailPhotoCropperState.frameX - (size / 2)) * scaleX;
+    const srcY = (patientDetailPhotoCropperState.frameY - (size / 2)) * scaleY;
+    const srcSizeX = size * scaleX;
+    const srcSizeY = size * scaleY;
+
+    ctx.drawImage(
+        patientDetailPhotoCropperState.image,
+        srcX, srcY, srcSizeX, srcSizeY,
+        0, 0, size, size
+    );
+
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    const fullDataUrl = croppedCanvas.toDataURL('image/png');
+    photoPreview.src = fullDataUrl;
+    photoBase64.value = fullDataUrl;
+
+    closePatientDetailPhotoCropperModal();
+}
+
+function initPatientDetailPhotoInput() {
+    const photoInput = document.getElementById('patientDetailPhotoInput');
+    const cropperModal = document.getElementById('patientDetailPhotoCropperModal');
+
+    if (!photoInput || photoInput.dataset.bound === '1') {
+        return;
+    }
+
+    photoInput.dataset.bound = '1';
+    photoInput.addEventListener('change', function(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('File harus berupa gambar.');
+            event.target.value = '';
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran foto maksimal 2MB.');
+            event.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(loadEvent) {
+            const result = loadEvent.target && loadEvent.target.result ? String(loadEvent.target.result) : '';
+            if (!result) return;
+
+            const image = new Image();
+            image.onload = function() {
+                patientDetailPhotoCropperState.image = image;
+                patientDetailPhotoCropperState.originalWidth = image.width;
+                patientDetailPhotoCropperState.originalHeight = image.height;
+                patientDetailPhotoCropperState.frameX = undefined;
+                patientDetailPhotoCropperState.frameY = undefined;
+                openPatientDetailPhotoCropperModal();
+            };
+            image.src = result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    if (cropperModal && cropperModal.dataset.bound !== '1') {
+        cropperModal.dataset.bound = '1';
+        cropperModal.addEventListener('click', function(event) {
+            if (event.target && event.target.id === 'patientDetailPhotoCropperModal') {
+                closePatientDetailPhotoCropperModal();
+            }
+        });
+    }
+}
+
+function initSensitiveInfoToggles() {
+    document.querySelectorAll('.js-sensitive-toggle').forEach((icon) => {
+        if (icon.dataset.bound === '1') return;
+
+        icon.dataset.bound = '1';
+        icon.addEventListener('click', function() {
+            const targetId = icon.dataset.sensitiveTarget;
+            if (!targetId) return;
+
+            const target = document.getElementById(targetId);
+            if (!target) return;
+
+            const original = target.dataset.sensitiveOriginal || '-';
+            const isVisible = target.dataset.sensitiveVisible === '1';
+
+            if (isVisible) {
+                target.textContent = original === '-' ? '-' : '••••••••';
+                target.dataset.sensitiveVisible = '0';
+                target.classList.add('is-masked');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                icon.classList.remove('is-active');
+                return;
+            }
+
+            target.textContent = original;
+            target.dataset.sensitiveVisible = '1';
+            target.classList.remove('is-masked');
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            icon.classList.add('is-active');
+        });
+    });
+}
+
+async function savePatientDetailFromModal() {
+    const patientId = document.getElementById('patientDetailPatientId')?.value;
+    const saveBtn = document.getElementById('patientDetailSaveBtn');
+
+    if (!patientId) {
+        alert('Data pasien tidak ditemukan.');
+        return;
+    }
+
+    const payload = {};
+    document.querySelectorAll('[data-patient-field]').forEach((field) => {
+        payload[field.dataset.patientField] = field.value;
+    });
+
+    const photoBase64 = document.getElementById('patientDetailPhotoBase64')?.value || '';
+    if (photoBase64) {
+        payload.photo_base64 = photoBase64;
+    }
+
+    const originalText = saveBtn ? saveBtn.textContent : '';
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Menyimpan...';
+    }
+
+    try {
+        const response = await fetch(`/api/patients/${patientId}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || 'Gagal menyimpan data pasien.');
+        }
+
+        togglePatientDetailEdit(false);
+
+        const activePatientLink = document.querySelector('.js-emr-patient-link .patient-card.active')?.closest('a');
+        if (activePatientLink) {
+            activePatientLink.click();
+        }
+
+        alert('Data pasien berhasil diperbarui.');
+    } catch (error) {
+        console.error('Gagal update data pasien:', error);
+        alert(error.message || 'Terjadi kesalahan saat memperbarui data pasien.');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
+    }
+}
+
+window.togglePatientDetailEdit = togglePatientDetailEdit;
+window.savePatientDetailFromModal = savePatientDetailFromModal;
+window.initPatientDetailPhotoInput = initPatientDetailPhotoInput;
+window.closePatientDetailPhotoCropperModal = closePatientDetailPhotoCropperModal;
+window.applyPatientDetailPhotoCrop = applyPatientDetailPhotoCrop;
+
 function playCashierNotificationSound() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -745,7 +1521,7 @@ async function processUpdateStatus(url, newStatus) {
 
             filterStatusMenuByCurrent(newStatus);
 
-            const addDiagnosaBtn = document.querySelector('.btn-primary-brown');
+            const addDiagnosaBtn = document.querySelector('.btn-primary-blue, .btn-primary-brown');
             if (addDiagnosaBtn) {
                 const canAddDiagnosa = newStatus === 'engaged';
                 addDiagnosaBtn.disabled = !canAddDiagnosa;

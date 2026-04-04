@@ -250,11 +250,17 @@ class PatientController extends Controller
             'gender'          => 'sometimes|required|in:Male,Female',
             'blood_type'      => 'sometimes|nullable|in:A,B,AB,O,unknown',
             'rhesus'          => 'sometimes|nullable|in:+,-,unknown',
-            'address'         => 'sometimes|nullable|string|max:50',
+            'address'         => 'sometimes|nullable|string|max:200',
             'phone_number'    => 'sometimes|nullable|string|max:20',
             'city'            => 'sometimes|nullable|string|max:50',
             'id_card_number'  => 'sometimes|nullable|string|max:20',
             'allergy_history' => 'sometimes|nullable|string',
+            'religion'        => 'sometimes|nullable|string|max:50',
+            'education'       => 'sometimes|nullable|string|max:50',
+            'occupation'      => 'sometimes|nullable|string|max:50',
+            'marital_status'  => 'sometimes|nullable|string|max:50',
+            'first_chat_date' => 'sometimes|nullable|date',
+            'photo_base64'    => 'sometimes|nullable|string',
         ]);
 
         try {
@@ -283,6 +289,21 @@ class PatientController extends Controller
 
                 $patientPayload = $validated;
                 unset($patientPayload['password']);
+
+                if (array_key_exists('photo_base64', $patientPayload)) {
+                    $incomingPhoto = trim((string) ($patientPayload['photo_base64'] ?? ''));
+
+                    if ($incomingPhoto === '') {
+                        $patientPayload['photo'] = null;
+                    } elseif (str_starts_with($incomingPhoto, 'data:image')) {
+                        $patientPayload['photo'] = $incomingPhoto;
+                    } else {
+                        $patientPayload['photo'] = 'data:image/png;base64,' . preg_replace('/\s+/', '', $incomingPhoto);
+                    }
+
+                    unset($patientPayload['photo_base64']);
+                }
+
                 $patient->update($patientPayload);
 
                 $patient->refresh();
