@@ -110,8 +110,11 @@
                                 </div>
                                 <div class="reg-options">
                                     <div class="reg-option {{ request('filter_dokter', 'semua') === 'semua' ? 'is-selected' : '' }}" data-value="semua">Semua Tenaga Medis</div>
-                                    @foreach($doctors as $d)
-                                        <div class="reg-option {{ request('filter_dokter') == $d->id ? 'is-selected' : '' }}" data-value="{{ $d->id }}">{{ $d->full_name }}</div>
+@foreach($doctors as $d)
+                                        <div class="reg-option {{ request('filter_dokter') == $d->id ? 'is-selected' : '' }}" data-value="{{ $d->id }}" data-avatar="{{ $d->foto_profil ? 'data:image/png;base64,' . $d->foto_profil : asset('images/profile.svg') }}">
+                                            <img src="{{ $d->foto_profil ? 'data:image/png;base64,' . $d->foto_profil : asset('images/profile.svg') }}" style="width:24px;height:24px;border-radius:50%;margin-right:8px;object-fit:cover;flex-shrink:0;" alt="{{ $d->full_name }}">
+                                            <span>{{ $d->full_name }}</span>
+                                        </div>
                                     @endforeach
                                 </div>
                                 <input type="hidden" id="filter_dokter" value="{{ request('filter_dokter', 'semua') }}">
@@ -134,8 +137,27 @@
                                 </div>
                                 <div class="reg-options">
                                     <div class="reg-option {{ request('filter_bayar', 'semua') === 'semua' ? 'is-selected' : '' }}" data-value="semua">Semua Metode Pembayaran</div>
-                                    @foreach($paymentMethods as $pm)
-                                        <div class="reg-option {{ request('filter_bayar') == $pm->id ? 'is-selected' : '' }}" data-value="{{ $pm->id }}">{{ $pm->name }}</div>
+@foreach($paymentMethods as $pm)
+                                        <?php 
+                                            $logoMap = [
+                                                'Admedika' => asset('images/Admedika 1.svg'),
+                                                'Avrist' => asset('images/Avrist 1.svg'),
+                                                'Chubb' => asset('images/Chubb 1.svg'),
+                                                'Generali' => asset('images/Generali 1.svg'),
+                                                'GlobalExcel' => asset('images/GlobalExcel 1.svg'),
+                                                'GreatEastern' => asset('images/GreatEastern 1.svg'),
+                                                'LippoLife' => asset('images/LippoLife 1.svg'),
+                                                'MedikaPlaza' => asset('images/MedikaPlaza 1.svg'),
+                                                'Meditap' => asset('images/Meditap 1.svg'),
+                                                'PLN' => asset('images/PLN 1.svg'),
+                                                'Umum' => asset('images/cashier.svg'),
+                                            ];
+                                            $logo = $logoMap[$pm->name] ?? asset('images/profile.svg');
+                                        ?>
+                                        <div class="reg-option {{ request('filter_bayar') == $pm->id ? 'is-selected' : '' }}" data-value="{{ $pm->id }}">
+                                            <img src="{{ $logo }}" style="width:28px;height:20px;margin-right:8px;flex-shrink:0;" alt="{{ $pm->name }}">
+                                            <span>{{ $pm->name }}</span>
+                                        </div>
                                     @endforeach
                                 </div>
                                 <input type="hidden" id="filter_bayar" value="{{ request('filter_bayar', 'semua') }}">
@@ -290,7 +312,15 @@
                     e.stopPropagation();
                     options.forEach(opt => opt.classList.remove('is-selected'));
                     this.classList.add('is-selected');
-                    textDisplay.textContent = this.textContent;
+                    
+                    // Update trigger dengan img jika ada
+                    const img = this.querySelector('img');
+                    const spanText = this.querySelector('span')?.textContent || this.textContent;
+                    if (img) {
+                        textDisplay.innerHTML = `<img src="${img.src}" style="width:20px;height:20px;border-radius:50%;margin-right:6px;object-fit:cover;flex-shrink:0;vertical-align:middle;">${spanText}`;
+                    } else {
+                        textDisplay.textContent = spanText;
+                    }
                     
                     if (hiddenInput) {
                         hiddenInput.value = this.dataset.value;
@@ -300,6 +330,25 @@
                 });
             });
         });
+
+        // Update CSS untuk support images in options
+        const style = document.createElement('style');
+        style.textContent = `
+            .reg-option {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+            }
+            .reg-select-trigger {
+                display: flex;
+                align-items: center;
+            }
+            .reg-select-text {
+                display: flex;
+                align-items: center;
+            }
+        `;
+        document.head.appendChild(style);
 
         window.addEventListener('click', function(e) {
             customSelects.forEach(dropdown => dropdown.classList.remove('open'));
@@ -477,9 +526,8 @@
     }
 
     function renderDetailModalContent(appointment) {
-        const patientPhoto = appointment.patient?.photo ? `data:image/png;base64,${appointment.patient.photo}` : null;
-
-
+        const patientPhotoRaw = appointment.patient?.photo || null;
+        const patientPhoto = patientPhotoRaw?.startsWith('data:image') ? patientPhotoRaw : (patientPhotoRaw ? `data:image/png;base64,${patientPhotoRaw}` : null);
 
         const currentMode = 'view'; // Default mode
 
@@ -602,7 +650,7 @@
                                 <div style="display: flex; gap: 15px; align-items: flex-start;">
                                     <div id="editPhotoBox" style="width: 100px; height: 100px; border-radius: 50%; background: #E5D6C5; border: 2px solid #C58F59; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; position: relative; flex-shrink: 0;">
                                         ${patientPhoto ? 
-                                            `<img src="${patientPhoto}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                            `<img src="${patientPhoto}" style="width: 100%; height: 100%; object-fit: cover;" alt="Patient photo">` :
                                             `<i class="fas fa-camera" style="font-size: 28px; color: #A67C52;"></i>`
                                         }
                                     </div>

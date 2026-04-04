@@ -117,10 +117,11 @@ class AppointmentController extends Controller
             $roundedMinute = floor($minute / 15) * 15;
             $timeKey       = $timeCarbon->minute($roundedMinute)->second(0)->format('H:i');
 
-            $apt->patient_name  = $apt->patient->full_name ?? 'Pasien';
-            $apt->mr_number     = $apt->patient->medical_record_no ?? '-';
+            $apt->patient_name   = $apt->patient->full_name ?? 'Pasien';
+            $apt->mr_number      = $apt->patient->medical_record_no ?? '-';
             $apt->treatment_name = Str::limit($apt->complaint ?? $apt->procedure_plan ?? '-', 20);
 
+            // RESOLVED: Gunakan warna dari v2 — pending abu-abu netral, failed merah eksplisit
             $statusColors = [
                 'pending'   => '#6B7280',
                 'confirmed' => '#F59E0B',
@@ -164,15 +165,16 @@ class AppointmentController extends Controller
         ]);
     }
 
+    // RESOLVED: Gunakan implementasi v2 — lebih lengkap dengan validasi transisi status
     public function updateStatus(Request $request, Appointment $appointment)
     {
         $request->validate([
             'status' => 'required|in:pending,confirmed,waiting,engaged,succeed,failed',
         ]);
 
-        $statusOrder = ['pending', 'confirmed', 'waiting', 'engaged', 'succeed'];
+        $statusOrder  = ['pending', 'confirmed', 'waiting', 'engaged', 'succeed'];
         $currentIndex = array_search(strtolower($appointment->status ?? 'pending'), $statusOrder);
-        $newIndex = array_search(strtolower($request->status), $statusOrder);
+        $newIndex     = array_search(strtolower($request->status), $statusOrder);
 
         // Jangan izinkan kembali ke status sebelumnya (urutan lebih kecil)
         if ($newIndex !== false && $currentIndex !== false && $newIndex < $currentIndex) {
@@ -183,15 +185,15 @@ class AppointmentController extends Controller
         }
 
         $currentStatus = strtolower((string) $appointment->status);
-        $targetStatus = strtolower((string) $request->status);
+        $targetStatus  = strtolower((string) $request->status);
 
         $allowedTransitions = [
-            'pending' => ['confirmed', 'waiting', 'engaged', 'succeed', 'failed'],
+            'pending'   => ['confirmed', 'waiting', 'engaged', 'succeed', 'failed'],
             'confirmed' => ['waiting', 'engaged', 'succeed', 'failed'],
-            'waiting' => ['engaged', 'succeed', 'failed'],
-            'engaged' => ['succeed', 'failed'],
-            'succeed' => ['failed'],
-            'failed' => [],
+            'waiting'   => ['engaged', 'succeed', 'failed'],
+            'engaged'   => ['succeed', 'failed'],
+            'succeed'   => ['failed'],
+            'failed'    => [],
         ];
 
         if (!in_array($targetStatus, $allowedTransitions[$currentStatus] ?? [], true)) {
@@ -233,7 +235,6 @@ class AppointmentController extends Controller
             'complaint'         => 'nullable|string|max:1000',
             'patient_condition' => 'nullable|string|max:1000',
             'procedure_plan'    => 'nullable|string|max:1000',
-            // FIX: Terima foto dari form pendaftaran baru
             'photo_base64'      => 'nullable|string',
         ]);
 
@@ -259,7 +260,6 @@ class AppointmentController extends Controller
             'procedure_plan'       => $validated['procedure_plan'] ?? null,
         ]);
 
-        // FIX: Update foto pasien jika dikirim dari form pendaftaran baru
         $photoBase64 = $request->input('photo_base64');
         if (!empty($photoBase64)) {
             try {
@@ -269,7 +269,6 @@ class AppointmentController extends Controller
                     \Log::info('Patient photo updated on storeAdmin', ['patient_id' => $patient->id]);
                 }
             } catch (\Exception $e) {
-                // Jangan gagalkan seluruh request hanya karena foto gagal
                 \Log::error('Failed to update patient photo on storeAdmin: ' . $e->getMessage(), [
                     'patient_id' => $validated['patient_id'],
                 ]);
@@ -286,10 +285,9 @@ class AppointmentController extends Controller
     public function show($id)
     {
         \Log::info('Fetching appointment detail', ['id' => $id]);
-        
+
         try {
             $appointment = Appointment::findOrFail($id);
-            // Minimal relations to rule out circular references/encoding issues
             $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod', 'admin']);
 
             return response()->json([
@@ -298,9 +296,10 @@ class AppointmentController extends Controller
             ], 200);
         } catch (\Exception $e) {
             \Log::error('Error fetching appointment detail', [
-                'id' => $id,
-                'error' => $e->getMessage()
+                'id'    => $id,
+                'error' => $e->getMessage(),
             ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Data tidak ditemukan: ' . $e->getMessage(),
@@ -310,11 +309,11 @@ class AppointmentController extends Controller
 
     public function index(Request $request)
     {
-        $date     = $request->get('date');
-        $poliId   = $request->get('filter_poli');
-        $doctorId = $request->get('filter_dokter');
+        $date      = $request->get('date');
+        $poliId    = $request->get('filter_poli');
+        $doctorId  = $request->get('filter_dokter');
         $paymentId = $request->get('filter_bayar');
-        $search   = $request->get('search');
+        $search    = $request->get('search');
 
         $query = Appointment::with(['patient', 'doctor', 'poli', 'paymentMethod']);
 
@@ -364,16 +363,15 @@ class AppointmentController extends Controller
             'has_photo_base64' => $request->has('photo_base64'),
         ]);
 
-        // FIX: Hapus batas max pada photo_base64 agar tidak memotong data base64 besar
+        // RESOLVED: Hapus completed & cancelled agar konsisten dengan enum di updateStatus
         $validated = $request->validate([
             'complaint'      => 'nullable|string|max:1000',
             'procedure_plan' => 'nullable|string|max:1000',
-            'status'         => 'nullable|in:pending,confirmed,waiting,engaged,succeed,completed,cancelled',
+            'status'         => 'nullable|in:pending,confirmed,waiting,engaged,succeed,failed',
             'notes'          => 'nullable|string|max:1000',
             'photo_base64'   => 'nullable|string',
         ]);
 
-        // Bangun array update hanya dari field yang dikirim
         $updateData = [];
 
         if (array_key_exists('complaint', $validated)) {
@@ -393,7 +391,6 @@ class AppointmentController extends Controller
             $appointment->update($updateData);
         }
 
-        // FIX: Baca photo_base64 dari JSON body (request->input() sudah handle keduanya)
         $photoBase64 = $request->input('photo_base64');
 
         if (!empty($photoBase64) && $appointment->patient_id) {
@@ -406,7 +403,6 @@ class AppointmentController extends Controller
                     \Log::warning('Patient not found for photo update', ['patient_id' => $appointment->patient_id]);
                 }
             } catch (\Exception $e) {
-                // Log error tapi jangan gagalkan seluruh request
                 \Log::error('Failed to update patient photo: ' . $e->getMessage(), [
                     'appointment_id' => $appointment->id,
                     'patient_id'     => $appointment->patient_id,
@@ -414,14 +410,13 @@ class AppointmentController extends Controller
             }
         }
 
-        // FIX: Reload relasi dengan fresh data agar foto terbaru ikut terkirim ke frontend
         $appointment->refresh();
         $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod']);
 
         \Log::info('Update response data', [
-            'appointment_id'     => $appointment->id,
-            'has_patient_photo'  => !empty($appointment->patient->photo),
-            'photo_length'       => strlen($appointment->patient->photo ?? ''),
+            'appointment_id'    => $appointment->id,
+            'has_patient_photo' => !empty($appointment->patient->photo),
+            'photo_length'      => strlen($appointment->patient->photo ?? ''),
         ]);
 
         return response()->json([
