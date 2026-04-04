@@ -137,14 +137,7 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Nomor HP</label>
-                        <input type="text" name="phone_number" class="input-line">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Alamat Email</label>
-                        <input type="email" name="email" class="input-line">
-                    </div>
+
 
                     <div class="form-group">
                         <label class="form-label">Poli <span class="req">*</span></label>
