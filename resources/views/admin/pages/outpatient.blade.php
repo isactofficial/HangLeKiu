@@ -10,6 +10,15 @@
     <link rel="stylesheet" href="{{ asset('css/admin/pages/registration-shared.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/pages/pasien-baru.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/pages/pendaftaran-baru.css') }}">
+    <style>
+        /* Force hidden mobile view on desktop to prevent click-through */
+        @media (min-width: 1024px) {
+            .rj-mobile-schedule {
+                display: none !important;
+                pointer-events: none !important;
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -427,52 +436,58 @@
         if (!scheduleContainer) return;
 
         scheduleContainer.addEventListener('click', function(e) {
-            // 1. Handle Appointment Click
-            const aptCard = e.target.closest('[data-action="open-detail"]');
-            if (aptCard) {
-                e.preventDefault();
-                e.stopPropagation();
-                
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
+
+            // Debug log to see what was clicked
+            console.log('Target clicked:', target);
+            console.log('Action:', target.getAttribute('data-action'));
+
+            // Ignore if the target is actually hidden (prevents invisible mobile card clicks)
+            if (window.getComputedStyle(target).display === 'none' || target.offsetParent === null) {
+                console.log('Canceled: Target is hidden');
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const action = target.getAttribute('data-action');
+
+            if (action === 'open-detail') {
                 const data = {
-                    id: aptCard.getAttribute('data-id'),
-                    patientName: aptCard.getAttribute('data-patient'),
-                    mrNumber: aptCard.getAttribute('data-mr'),
-                    dob: aptCard.getAttribute('data-dob'),
-                    gender: aptCard.getAttribute('data-gender'),
-                    time: aptCard.getAttribute('data-time'),
-                    doctor: aptCard.getAttribute('data-doctor'),
-                    creator: aptCard.getAttribute('data-creator'),
-                    createdAt: aptCard.getAttribute('data-created-at'),
-                    payment: aptCard.getAttribute('data-payment'),
-                    duration: aptCard.getAttribute('data-duration'),
-                    status: aptCard.getAttribute('data-status')
+                    id: target.getAttribute('data-id'),
+                    patientName: target.getAttribute('data-patient'),
+                    mrNumber: target.getAttribute('data-mr'),
+                    dob: target.getAttribute('data-dob'),
+                    gender: target.getAttribute('data-gender'),
+                    time: target.getAttribute('data-time'),
+                    doctor: target.getAttribute('data-doctor'),
+                    creator: target.getAttribute('data-creator'),
+                    createdAt: target.getAttribute('data-created-at'),
+                    payment: target.getAttribute('data-payment'),
+                    duration: target.getAttribute('data-duration'),
+                    status: target.getAttribute('data-status')
                 };
 
                 if (typeof openApptDetailModal === 'function') {
                     openApptDetailModal(data);
                 }
-                return;
-            }
-
-            // 2. Handle Registration Click
-            const regTarget = e.target.closest('[data-action="open-registration"]');
-            if (regTarget) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const doctorId = regTarget.getAttribute('data-doctor-id');
-                const time = regTarget.getAttribute('data-time');
-                const poliId = regTarget.getAttribute('data-poli-id');
-                const date = regTarget.getAttribute('data-date');
+            } 
+            else if (action === 'open-registration') {
+                const doctorId = target.getAttribute('data-doctor-id');
+                const time = target.getAttribute('data-time');
+                const poliId = target.getAttribute('data-poli-id');
+                const date = target.getAttribute('data-date');
 
                 openRegModal('modalPendaftaranBaru', doctorId, time, poliId, date);
-                return;
             }
         });
     });
 
-    // Registration Modal Functions (Keep global for backward compatibility with pendaftaran-baru include)
+    /** --- GLOBAL MODAL CONTROLLER (RESTORED) --- **/
     function openRegModal(modalId, doctorId = null, time = null, poliId = null, date = null) {
+        console.log('Opening modal:', modalId);
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
@@ -480,18 +495,33 @@
         document.body.style.overflow = 'hidden'; 
 
         if (modalId === 'modalPendaftaranBaru') {
-            if (doctorId) document.getElementById('pb_doctor_id').value = doctorId;
-            if (time) document.getElementById('pb_appointment_time').value = time;
-            if (poliId) document.getElementById('pb_poli_id').value = poliId;
-            if (date) document.getElementById('pb_appointment_date').value = date;
-            
-            // Trigger change event to fetch doctor schedule in pendaftaran-baru logic
-            const docSelect = document.getElementById('pb_doctor_id');
-            if (docSelect) docSelect.dispatchEvent(new Event('change'));
+            if (doctorId) {
+                const docSelect = document.getElementById('pb_doctor_id');
+                if (docSelect) {
+                    docSelect.value = doctorId;
+                    docSelect.dispatchEvent(new Event('change'));
+                }
+            }
+            if (time) {
+                const timeInput = document.getElementById('pb_appointment_time');
+                if (timeInput) timeInput.value = time;
+            }
+            if (poliId) {
+                const poliSelect = document.getElementById('pb_poli_id');
+                if (poliSelect) {
+                    poliSelect.value = poliId;
+                    poliSelect.dispatchEvent(new Event('change'));
+                }
+            }
+            if (date) {
+                const dateInput = document.getElementById('pb_appointment_date');
+                if (dateInput) dateInput.value = date;
+            }
         }
     }
-    
+
     function closeRegModal(modalId) {
+        console.log('Closing modal:', modalId);
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('open');
         document.body.style.overflow = '';
@@ -505,8 +535,10 @@
     });
 </script>
 
-    @include('admin.components.pasien-baru')
-    @include('admin.components.pendaftaran-baru')
-    @include('admin.components.appointment-detail')
-
+@include('admin.components.pasien-baru')
+@include('admin.components.appointment-detail')
+@include('admin.components.pendaftaran-baru')
+    
 @endsection
+
+
