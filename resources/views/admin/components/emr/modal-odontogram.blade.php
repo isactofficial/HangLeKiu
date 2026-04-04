@@ -825,6 +825,13 @@
         const toolbar = document.getElementById("toolbar");
 
         if (show) {
+            const patientIdInput = document.getElementById('odontogramPatientId');
+            const visitIdInput = document.getElementById('odontogramVisitId');
+
+            // Selalu reset id tersembunyi terlebih dahulu agar tidak memakai registrasi sebelumnya.
+            if (patientIdInput) patientIdInput.value = 'dummy-patient-id';
+            if (visitIdInput) visitIdInput.value = '';
+
             // KUNCI MATI SCROLL HALAMAN UTAMA (EMR) AGAR TIDAK BOCOR
             document.body.style.overflow = "hidden";
 
@@ -840,7 +847,7 @@
                 document.getElementById('odonto-patient-payment').innerText = patientData.payment || 'Umum';
                 
                 // Input hidden untuk proses simpan ke database
-                document.getElementById('odontogramPatientId').value = patientData.patient_id || '';
+                document.getElementById('odontogramPatientId').value = patientData.patient_id || 'dummy-patient-id';
                 document.getElementById('odontogramVisitId').value = patientData.registration_id || '';
               
               // Set dokter otomatis (Nama Dokter)
@@ -854,10 +861,10 @@
           const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
           document.getElementById('odonto-date-display').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
 
-          const patientIdToLoad = document.getElementById('odontogramPatientId')?.value;
+          const registrationIdToLoad = document.getElementById('odontogramVisitId')?.value?.trim();
           clearOdontogramState();
-          if (patientIdToLoad) {
-            loadLatestOdontogramToForm(patientIdToLoad);
+          if (registrationIdToLoad) {
+            loadLatestOdontogramToForm(registrationIdToLoad);
           }
 
           modal.classList.remove("hidden");
@@ -1122,11 +1129,11 @@
         });
       }
 
-      async function loadLatestOdontogramToForm(patientId) {
-        if (!patientId || patientId === 'dummy-patient-id') return;
+      async function loadLatestOdontogramToForm(registrationId) {
+        if (!registrationId) return;
 
         try {
-          const response = await fetch(`/api/odontogram/patient/${patientId}`, {
+          const response = await fetch(`/api/odontogram/registration/${registrationId}`, {
             headers: { 'Accept': 'application/json' }
           });
           const data = await response.json();
@@ -1135,9 +1142,9 @@
             throw new Error(data.message || 'Gagal memuat odontogram terakhir');
           }
 
-          const records = Array.isArray(data.data) ? data.data : [];
-          if (records.length > 0) {
-            hydrateOdontogramFromRecord(records[0]);
+          const record = data.data || null;
+          if (record) {
+            hydrateOdontogramFromRecord(record);
           }
         } catch (err) {
           console.warn('Gagal memuat data odontogram terakhir:', err?.message || err);

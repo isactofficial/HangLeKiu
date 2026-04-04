@@ -24,6 +24,23 @@ class OdontogramController extends Controller
     }
 
     // ----------------------------------------------------------------
+    // GET /api/odontogram/registration/{registrationId}
+    // Ambil record odontogram terakhir untuk registrasi tertentu saja
+    // ----------------------------------------------------------------
+    public function latestByRegistration(string $registrationId): JsonResponse
+    {
+        $record = OdontogramRecord::with('teeth')
+            ->where('visit_id', $registrationId)
+            ->orderByDesc('examined_at')
+            ->first();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $record,
+        ]);
+    }
+
+    // ----------------------------------------------------------------
     // GET /api/odontogram/{recordId}
     // ----------------------------------------------------------------
     public function show(string $recordId): JsonResponse

@@ -214,6 +214,7 @@ Route::prefix('master-payment')->group(function () {
 Route::prefix('odontogram')->group(function () {
     Route::post('/', [OdontogramController::class, 'store']);
     Route::get('/patient/{patientId}', [OdontogramController::class, 'indexByPatient']);
+    Route::get('/registration/{registrationId}', [OdontogramController::class, 'latestByRegistration']);
     Route::get('/{recordId}', [OdontogramController::class, 'show']);
     Route::patch('/{recordId}', [OdontogramController::class, 'update']);
     Route::delete('/{recordId}', [OdontogramController::class, 'destroy']);
