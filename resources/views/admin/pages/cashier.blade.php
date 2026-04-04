@@ -294,6 +294,14 @@
     let activeData = {};
     let currentGrandTotal = 0;
 
+    try {
+        localStorage.removeItem('cashier_attention_pending');
+        localStorage.removeItem('cashier_attention_count');
+        window.dispatchEvent(new Event('cashierAttentionChanged'));
+    } catch (e) {
+        console.warn('Gagal sinkronisasi badge cashier:', e);
+    }
+
     function openPayment(inv, dataPasien, tindakanArray, pricesArray, qtyArray, diskonArray, subtotalArray, gigiArray, tanggalInput, appointmentId) {
         const listTindakan = Array.isArray(tindakanArray) ? tindakanArray : [];
         const listHarga = Array.isArray(pricesArray) ? pricesArray : [];

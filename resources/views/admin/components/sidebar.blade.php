@@ -96,7 +96,8 @@
                 <div class="sidebar-divider"></div>
             @else
                 <a href="{{ route($item['route']) }}"
-                    class="sidebar-item {{ request()->routeIs($item['route']) ? 'active' : '' }}">
+                    class="sidebar-item {{ request()->routeIs($item['route']) ? 'active' : '' }}"
+                    @if(($item['route'] ?? '') === 'admin.cashier') data-cashier-link="1" @endif>
                     @if (isset($item['is_image']) && $item['is_image'])
                         <img src="{{ $item['icon'] }}" alt="icon" class="sidebar-icon-img">
                     @elseif ($item['filled'] ?? false)
@@ -109,6 +110,10 @@
                             {!! $item['icon'] !!}
                         </svg>
                     @endif
+
+                    @if(($item['route'] ?? '') === 'admin.cashier')
+                        <span class="sidebar-badge hidden" data-cashier-badge>!</span>
+                    @endif
                 </a>
             @endif
         @endforeach
@@ -120,24 +125,56 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggle   = document.getElementById('sidebarToggle');
     const sidebar  = document.getElementById('appSidebar');
     const backdrop = document.getElementById('sidebarBackdrop');
-    if (!toggle || !sidebar) return;
+    if (!sidebar) return;
 
     function open()  {
         sidebar.classList.add('open');
         if (backdrop) backdrop.classList.add('show');
-        toggle.style.opacity = '0';
-        toggle.style.pointerEvents = 'none';
+        if (toggle) {
+            toggle.style.opacity = '0';
+            toggle.style.pointerEvents = 'none';
+        }
     }
     function close() {
         sidebar.classList.remove('open');
         if (backdrop) backdrop.classList.remove('show');
-        toggle.style.opacity = '1';
-        toggle.style.pointerEvents = 'auto';
+        if (toggle) {
+            toggle.style.opacity = '1';
+            toggle.style.pointerEvents = 'auto';
+        }
     }
 
-    toggle.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+    if (toggle) {
+        toggle.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
+    }
     if (backdrop) backdrop.addEventListener('click', close);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
     document.querySelectorAll('.sidebar-item').forEach(el => el.addEventListener('click', close));
+
+    function syncCashierBadge() {
+        const cashierLink = document.querySelector('[data-cashier-link="1"]');
+        const cashierBadge = document.querySelector('[data-cashier-badge]');
+        if (!cashierLink) return;
+
+        let badgeCount = 0;
+        try {
+            const raw = localStorage.getItem('cashier_attention_pending');
+            const payload = raw ? JSON.parse(raw) : null;
+            badgeCount = payload && typeof payload.count === 'number' ? payload.count : (payload && payload.active ? 1 : 0);
+        } catch (err) {
+            badgeCount = 0;
+        }
+
+        cashierLink.classList.toggle('has-notification', badgeCount > 0);
+        if (cashierBadge) {
+            cashierBadge.textContent = '!';
+            cashierBadge.classList.toggle('hidden', badgeCount <= 0);
+        }
+    }
+
+    syncCashierBadge();
+    window.syncCashierBadgeIndicator = syncCashierBadge;
+    window.addEventListener('storage', syncCashierBadge);
+    window.addEventListener('cashierAttentionChanged', syncCashierBadge);
 });
 </script>

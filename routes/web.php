@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
         // Route EMR Memanggil Controller
         Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
         Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
+        Route::post('/emr/{appointment}/doctor-note', [EmrController::class, 'storeDoctorNote'])->name('emr.doctor-note.store');
         
         // Lain-lain
         Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');

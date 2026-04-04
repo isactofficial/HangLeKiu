@@ -24,6 +24,7 @@ class ProcedureItem extends Model
         'id',
         'procedure_id',
         'master_procedure_id',
+        'tooth_numbers',
         'quantity',
         'unit_price',
         'discount_type',

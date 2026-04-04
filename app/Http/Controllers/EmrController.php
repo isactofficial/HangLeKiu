@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment; 
+use App\Models\DoctorNote;
+use App\Models\MedicalProcedure;
 use App\Models\OndotogramTooth;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class EmrController extends Controller
@@ -18,7 +22,7 @@ class EmrController extends Controller
         $search = $request->get('search');
 
         // 2. Data Pasien HARI INI (Untuk Sidebar Atas)
-        $todayPatients = Appointment::with(['patient', 'doctor'])
+        $todayPatients = Appointment::with(['patient', 'doctor', 'paymentMethod', 'guarantorType'])
             ->whereDate('appointment_datetime', Carbon::today())
             ->when($search, function($query) use ($search) {
                 $query->whereHas('patient', function($q) use ($search) {
@@ -29,7 +33,7 @@ class EmrController extends Controller
             ->get();
 
         // 3. SEMUA Data Pasien (Untuk Sidebar Bawah)
-        $allPatients = Appointment::with(['patient', 'doctor'])
+        $allPatients = Appointment::with(['patient', 'doctor', 'paymentMethod', 'guarantorType'])
             ->when($search, function($query) use ($search) {
                 $query->whereHas('patient', function($q) use ($search) {
                     $q->where('full_name', 'like', "%{$search}%")
@@ -39,21 +43,189 @@ class EmrController extends Controller
             ->orderBy('appointment_datetime', 'desc')
             ->paginate(15);
 
+        // Auto-open pasien "engaged" dari hari ini jika ada
+        $autoOpenApptId = $todayPatients->firstWhere('status', 'engaged')?->id;
+
         // 4. Kirim ke View
-        return view('admin.pages.emr', compact('todayPatients', 'allPatients', 'search'));
+        return view('admin.pages.emr', compact('todayPatients', 'allPatients', 'search', 'autoOpenApptId'));
     }
 
     public function show(Request $request, $id)
     {
+        $hasProcedureAssistantTable = Schema::hasTable('procedure_assistant');
+
+        $relations = [
+            'patient',
+            'doctor',
+            'poli',
+            'paymentMethod',
+            'guarantorType',
+            'medicalProcedures.doctor',
+            'medicalProcedures.doctorNotes.user',
+        ];
+
+        if ($hasProcedureAssistantTable) {
+            $relations[] = 'medicalProcedures.assistants.doctor';
+        }
+
         // Ambil data pendaftaran beserta relasi pasien dan dokternya
-        $appointment = Appointment::with(['patient', 'doctor'])->findOrFail($id);
+        $appointment = Appointment::with($relations)->findOrFail($id);
+
+        $patientRegistrationRelations = [
+            'doctor',
+            'poli',
+            'medicalProcedures.items.masterProcedure',
+            'medicalProcedures.medicines.medicine',
+            'medicalProcedures.doctor',
+        ];
+
+        if ($hasProcedureAssistantTable) {
+            $patientRegistrationRelations[] = 'medicalProcedures.assistants.doctor';
+        }
+
+        $patientRegistrations = Appointment::with($patientRegistrationRelations)
+            ->where('patient_id', $appointment->patient_id)
+            ->orderByDesc('appointment_datetime')
+            ->get();
+
+        $doctorNotes = $appointment->medicalProcedures
+            ->flatMap(function ($procedure) use ($hasProcedureAssistantTable) {
+                $assistantNames = collect();
+                if ($hasProcedureAssistantTable) {
+                    $assistantNames = $procedure->assistants
+                        ->map(fn($assistant) => optional($assistant->doctor)->full_name)
+                        ->filter()
+                        ->values();
+                }
+
+                return $procedure->doctorNotes->map(function ($note) use ($assistantNames, $procedure) {
+                    $noteText = (string) ($note->notes ?? '');
+
+                    $subjective = '';
+                    $objective = '';
+                    $plan = '';
+
+                    if (preg_match('/Subjective:\s*(.*?)(?=\n\n(?:Objective|Plan):|$)/s', $noteText, $m)) {
+                        $subjective = trim($m[1]);
+                    }
+                    if (preg_match('/Objective:\s*(.*?)(?=\n\n(?:Subjective|Plan):|$)/s', $noteText, $m)) {
+                        $objective = trim($m[1]);
+                    }
+                    if (preg_match('/Plan:\s*(.*?)(?=\n\n(?:Subjective|Objective):|$)/s', $noteText, $m)) {
+                        $plan = trim($m[1]);
+                    }
+
+                    if ($subjective === '' && $objective === '' && $plan === '') {
+                        $plan = trim($noteText);
+                    }
+
+                    return [
+                        'id' => $note->id,
+                        'created_at' => $note->created_at,
+                        'created_at_label' => $note->created_at
+                            ? Carbon::parse($note->created_at)->translatedFormat('d F Y H:i')
+                            : '-',
+                        'doctor_name' => optional($procedure->doctor)->full_name ?: (optional($note->user)->name ?: '-'),
+                        'assistant_names' => $assistantNames,
+                        'subjective' => $subjective,
+                        'objective' => $objective,
+                        'plan' => $plan,
+                    ];
+                });
+            })
+            ->sortByDesc('created_at')
+            ->values();
 
         // Jika request datang dari AJAX (klik sidebar), kirimkan isi tengah saja
         if ($request->ajax()) {
-            return view('admin.components.emr.patient-detail-partial', compact('appointment'))->render();
+            return view('admin.components.emr.patient-detail-partial', compact('appointment', 'doctorNotes', 'patientRegistrations'))->render();
         }
 
         return redirect()->route('admin.emr');
+    }
+
+    public function storeDoctorNote(Request $request, Appointment $appointment)
+    {
+        $validated = $request->validate([
+            'subjective' => 'nullable|string',
+            'objective' => 'nullable|string',
+            'plan' => 'nullable|string',
+        ]);
+
+        $subjective = trim((string) ($validated['subjective'] ?? ''));
+        $objective = trim((string) ($validated['objective'] ?? ''));
+        $plan = trim((string) ($validated['plan'] ?? ''));
+
+        if ($subjective === '' && $objective === '' && $plan === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Isi minimal salah satu Subjectives, Objectives, atau Plans.',
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $procedure = $appointment->medicalProcedures()
+                ->orderByDesc('created_at')
+                ->first();
+
+            if (! $procedure) {
+                $procedure = MedicalProcedure::create([
+                    'id' => (string) Str::uuid(),
+                    'registration_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                    'doctor_id' => $appointment->doctor_id,
+                    'discount_type' => 'none',
+                    'discount_value' => 0,
+                    'total_amount' => 0,
+                    'notes' => 'Auto-created for doctor note entry',
+                ]);
+            }
+
+            $sections = [];
+            if ($subjective !== '') {
+                $sections[] = "Subjective:\n{$subjective}";
+            }
+            if ($objective !== '') {
+                $sections[] = "Objective:\n{$objective}";
+            }
+            if ($plan !== '') {
+                $sections[] = "Plan:\n{$plan}";
+            }
+
+            $formattedNotes = implode("\n\n", $sections);
+
+            $doctorNote = DoctorNote::create([
+                'id' => (string) Str::uuid(),
+                'procedure_id' => $procedure->id,
+                'user_id' => Auth::id(),
+                'notes' => $formattedNotes,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Catatan dokter berhasil disimpan.',
+                'data' => [
+                    'id' => $doctorNote->id,
+                    'subjective' => $subjective,
+                    'objective' => $objective,
+                    'plan' => $plan,
+                    'created_at' => optional($doctorNote->created_at)->format('d M Y H:i') ?? now()->format('d M Y H:i'),
+                    'doctor_name' => optional($procedure->doctor)->full_name ?? (optional($appointment->doctor)->full_name ?? '-'),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan catatan dokter.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function indexCashier(Request $request)

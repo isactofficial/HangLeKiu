@@ -45,11 +45,12 @@ class Appointment extends Model
 
     // ─── Status Colors ────────────────────────────
     const STATUS_COLORS = [
-        'pending'   => '#EF4444',
+        'pending'   => '#6B7280',
         'confirmed' => '#F59E0B',
         'waiting'   => '#8B5CF6',
         'engaged'   => '#3B82F6',
         'succeed'   => '#84CC16',
+        'failed'    => '#EF4444',
     ];
 
     /*
@@ -120,6 +121,7 @@ class Appointment extends Model
             'waiting'   => 'badge-waiting',
             'engaged'   => 'badge-engaged',
             'succeed'   => 'badge-succeed',
+            'failed'    => 'badge-failed',
             default     => 'badge-default'
         };
     }
@@ -201,7 +203,7 @@ class Appointment extends Model
 
     public function scopeActive($query)
     {
-        return $query->whereNotIn('status', ['succeed']);
+        return $query->whereNotIn('status', ['succeed', 'failed']);
     }
 
     public function medicalProcedures()

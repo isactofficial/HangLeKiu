@@ -15,6 +15,7 @@ class ProcedureItemController extends Controller
         $validated = $request->validate([
             'procedure_id' => 'nullable|string|max:50|exists:medical_procedure,id',
             'master_procedure_id' => 'nullable|string|max:50|exists:master_procedure,id',
+            'tooth_numbers' => 'nullable|string|max:255',
             'quantity' => 'nullable|integer|min:1',
             'unit_price' => 'nullable|numeric|min:0',
             'discount_type' => 'nullable|in:fix,percentage,none',
@@ -27,6 +28,7 @@ class ProcedureItemController extends Controller
                 'id' => (string) Str::uuid(),
                 'procedure_id' => $validated['procedure_id'] ?? null,
                 'master_procedure_id' => $validated['master_procedure_id'] ?? null,
+                'tooth_numbers' => $validated['tooth_numbers'] ?? null,
                 'quantity' => $validated['quantity'] ?? null,
                 'unit_price' => $validated['unit_price'] ?? null,
                 'discount_type' => $validated['discount_type'] ?? null,
@@ -80,6 +82,7 @@ class ProcedureItemController extends Controller
         $validated = $request->validate([
             'procedure_id' => 'sometimes|nullable|string|max:50|exists:medical_procedure,id',
             'master_procedure_id' => 'sometimes|nullable|string|max:50|exists:master_procedure,id',
+            'tooth_numbers' => 'sometimes|nullable|string|max:255',
             'quantity' => 'sometimes|nullable|integer|min:1',
             'unit_price' => 'sometimes|nullable|numeric|min:0',
             'discount_type' => 'sometimes|nullable|in:fix,percentage,none',
