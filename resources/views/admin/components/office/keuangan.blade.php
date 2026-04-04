@@ -54,18 +54,35 @@
     </div>
 
     <p class="keu-section-label">Cover</p>
-    <div class="keu-grid-4" style="margin-bottom:28px;">
+    <div class="keu-grid-1" style="margin-bottom:28px;">
         <div class="keu-stat">
-            <p class="keu-stat-label">BPJS</p>
-            <p class="keu-stat-amount plus">+ Rp{{ number_format($claims, 0, ',', '.') }}</p>
+            <p class="keu-stat-label">Langsung</p>
+            <p class="keu-stat-amount plus">+ Rp{{ number_format($directIncome, 0, ',', '.') }}</p>
         </div>
     </div>
 
-    <p class="keu-section-label">Total (Seluruh Waktu)</p>
-    <div class="keu-grid-1">
+    <p class="keu-section-label">Total</p>
+    <div style="border-top:1px solid #ECECEC; margin-bottom:12px;"></div>
+
+    <div class="keu-grid-2" style="margin-bottom:12px;">
+        <div class="keu-stat">
+            <p class="keu-stat-label">Kas</p>
+            <p class="keu-stat-amount plus">+ Rp{{ number_format($kas, 0, ',', '.') }}</p>
+        </div>
+        <div class="keu-stat">
+            <p class="keu-stat-label">Cover BPJS</p>
+            <p class="keu-stat-amount plus">+ Rp{{ number_format($totalClaims, 0, ',', '.') }}</p>
+        </div>
+    </div>
+    <div class="keu-grid-2">
         <div class="keu-stat">
             <p class="keu-stat-label">Total Saldo</p>
             <p class="keu-stat-amount plus">+ Rp{{ number_format($kas, 0, ',', '.') }}</p>
+        </div>
+        <div class="keu-stat">
+            <p class="keu-stat-label">Total Balance</p>
+            <p class="keu-stat-amount plus">+ Rp{{ number_format($kas, 0, ',', '.') }}</p>
+            <p class="keu-stat-sub">Semua akun</p>
         </div>
     </div>
 

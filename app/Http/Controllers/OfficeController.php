@@ -229,8 +229,15 @@ class OfficeController extends Controller
         $endDate = $request->query('end_date', now()->endOfMonth()->toDateString());
 
         // 1. Ikhtisar Stats
-        $income = Invoice::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+        $directIncome = Invoice::where('payment_type', '!=', 'BPJS')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->sum('amount_paid');
+
+        $claims = Invoice::where('payment_type', 'BPJS')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->sum('amount_paid');
+
+        $income = $directIncome + $claims;
         
         $expenses = ConsumableRestock::where('restock_type', 'restock')
             ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
@@ -245,6 +252,7 @@ class OfficeController extends Controller
         $totalExpenses = ConsumableRestock::where('restock_type', 'restock')
             ->sum(DB::raw('purchase_price * quantity_added'));
         
+        $totalClaims = Invoice::where('payment_type', 'BPJS')->sum('amount_paid');
         $kas = $totalIncome - $totalExpenses;
 
         // 3. Detailed Data for Tabs
@@ -275,12 +283,14 @@ class OfficeController extends Controller
             'endDate' => $endDate,
             
             // Stats
+            'directIncome' => $directIncome,
             'income' => $income,
             'expenses' => $expenses,
             'claims' => $claims,
             'margin' => $income - $expenses,
             
             // Stats Total
+            'totalClaims' => $totalClaims,
             'kas' => $kas,
             
             // Tab Data

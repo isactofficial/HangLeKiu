@@ -255,6 +255,31 @@ class MedicineController extends Controller
         ]);
     }
 
+    public function allStockMutations()
+    {
+        $mutations = \App\Models\StockMutation::with('medicine')
+        ->orderByDesc('created_at')
+        ->get()
+        ->map(function ($m) {
+            return [
+                'id'                => $m->id,
+                'restock_type'      => $m->type === 'in' ? 'restock' : 'return',
+                'created_at'        => $m->created_at,
+                'purchase_price'    => $m->unit_price ?? 0,
+                'quantity_added'    => $m->type === 'in'  ? $m->quantity : 0,
+                'quantity_returned' => $m->type === 'out' ? $m->quantity : 0,
+                'notes'             => $m->notes,
+                'batch_number'      => null,
+                '_source'           => 'obat',
+                'item'              => [
+                    'item_name' => $m->medicine->medicine_name ?? '-',
+                ],
+            ];
+        });
+    
+        return response()->json(['data' => $mutations]);
+        }
+
     // ── PRIVATE HELPER ───────────────────────────────────────
     private function hitungMargin(Medicine $medicine): float|null
     {

@@ -123,10 +123,10 @@ Route::prefix('appointments')->group(function () {
 Route::prefix('medicine')->group(function () {
     Route::get('/', [MedicineController::class, 'index']);
     Route::post('/', [MedicineController::class, 'store']);
+    Route::get('/stock-mutations', [MedicineController::class, 'allStockMutations']); 
     Route::get('/{id}', [MedicineController::class, 'show']);
     Route::put('/{id}', [MedicineController::class, 'update']);
     Route::delete('/{id}', [MedicineController::class, 'destroy']);
-
     Route::post('/{id}/stock-in', [MedicineController::class, 'stockIn']);
     Route::post('/{id}/stock-out', [MedicineController::class, 'stockOut']);
     Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);

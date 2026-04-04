@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Doctor;
 use App\Models\DoctorSchedule;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class DoctorController extends Controller
 {
@@ -18,10 +23,107 @@ class DoctorController extends Controller
         $menu = $request->query('menu', 'info-tenaga-medis');
         $doctors = Doctor::orderBy('full_name', 'asc')->get();
 
+        $staffRoleFilter = strtoupper((string) $request->query('staff_role', 'ALL'));
+        $allowedStaffRoles = ['ADM', 'OWN', 'DCT'];
+
+        $staffAccountsQuery = User::with('role')
+            ->whereHas('role', function ($query) use ($allowedStaffRoles) {
+                $query->whereIn('code', $allowedStaffRoles);
+            });
+
+        if (in_array($staffRoleFilter, $allowedStaffRoles, true)) {
+            $staffAccountsQuery->whereHas('role', function ($query) use ($staffRoleFilter) {
+                $query->where('code', $staffRoleFilter);
+            });
+        } else {
+            $staffRoleFilter = 'ALL';
+        }
+
+        $staffAccounts = $staffAccountsQuery
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $staffCounts = User::query()
+            ->join('role', 'role.id', '=', 'user.role_id')
+            ->whereIn('role.code', $allowedStaffRoles)
+            ->selectRaw('role.code as role_code, COUNT(*) as total')
+            ->groupBy('role.code')
+            ->pluck('total', 'role_code');
+
         return view('admin.layout.settings', [
             'menu' => $menu,
-            'doctors' => $doctors
+            'doctors' => $doctors,
+            'staffAccounts' => $staffAccounts,
+            'staffRoleFilter' => $staffRoleFilter,
+            'staffCounts' => $staffCounts,
         ]);
+    }
+
+    public function storeStaffAccountFromAdmin(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'full_name' => ['required', 'string', 'max:50'],
+            'email' => ['required', 'email', 'max:50', 'unique:user,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'access_type' => ['required', Rule::in(['ADM', 'OWN', 'DCT'])],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $role = Role::where('code', $validated['access_type'])->first();
+
+        if (! $role) {
+            return redirect()->route('admin.settings', ['menu' => 'manajemen-staff'])
+                ->withErrors(['staff_account_create' => 'Role tidak ditemukan.'])
+                ->withInput();
+        }
+
+        User::create([
+            'id' => (string) Str::uuid(),
+            'role_id' => $role->id,
+            'name' => $validated['full_name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'is_active' => $request->boolean('is_active', true),
+            'is_verified' => true,
+        ]);
+
+        return redirect()->route('admin.settings', ['menu' => 'manajemen-staff'])
+            ->with('success', 'Akun staff berhasil dibuat.');
+    }
+
+    public function toggleStaffAccountStatus($id): JsonResponse
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            if ((string) Auth::id() === (string) $user->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak dapat mengubah status akun sendiri.',
+                ], 403);
+            }
+            
+            // Hanya toggle akun dengan role ADM/OWN/DCT
+            if (! in_array($user->role?->code, ['ADM', 'OWN', 'DCT'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Hanya akun staff yang dapat di-toggle.'
+                ], 403);
+            }
+
+            $user->update(['is_active' => ! $user->is_active]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $user->is_active ? 'Akun diaktifkan.' : 'Akun dinonaktifkan.',
+                'is_active' => $user->is_active,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengubah status: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

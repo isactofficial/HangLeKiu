@@ -131,6 +131,23 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
+        $adminUser = User::with('role')
+            ->where('email', $credentials['email'])
+            ->first();
+
+        // Prevent non-admin accounts from attempting admin authentication.
+        if (! $adminUser || $adminUser->role?->code !== 'ADM') {
+            return back()->withErrors([
+                'email' => 'Akun ini bukan akun admin.',
+            ])->onlyInput('email');
+        }
+
+        if (! $adminUser->is_active) {
+            return back()->withErrors([
+                'email' => 'Akun telah dinonaktifkan.',
+            ])->onlyInput('email');
+        }
+
         $attempted = $this->attemptWithLegacyFallback(
             $credentials['email'],
             $credentials['password'],
@@ -139,14 +156,6 @@ class AuthController extends Controller
         );
 
         if ($attempted) {
-            // Kalau yang login ternyata bukan admin, tolak
-            if (Auth::user()->role?->code !== 'ADM') {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Akun ini bukan akun admin.',
-                ])->onlyInput('email');
-            }
-
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }
@@ -250,7 +259,7 @@ class AuthController extends Controller
     private function attemptWithLegacyFallback(string $email, string $plainPassword, string $expectedRoleCode, bool $remember): bool
     {
         try {
-            if (Auth::attempt(['email' => $email, 'password' => $plainPassword], $remember)) {
+            if (Auth::attempt(['email' => $email, 'password' => $plainPassword, 'is_active' => true], $remember)) {
                 return true;
             }
         } catch (\RuntimeException $e) {
@@ -263,6 +272,7 @@ class AuthController extends Controller
 
         $legacyUser = User::with('role')
             ->where('email', $email)
+            ->where('is_active', true)
             ->first();
 
         if (! $legacyUser || $legacyUser->role?->code !== $expectedRoleCode) {
