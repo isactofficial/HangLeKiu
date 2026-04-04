@@ -47,8 +47,8 @@
                         <i class="fas fa-camera" style="color:white; font-size:20px;"></i>
                     </div>
                 </div>
-                <div style="text-align:center; font-size:10px; color:#C58F59; margin-top:4px; cursor:pointer;" onclick="document.getElementById('pbPhotoFileInput').click()">
-                    Upload Foto
+<div style="text-align:center; font-size:10px; color:#C58F59; margin-top:4px; cursor:pointer;" onclick="document.getElementById('pbPhotoFileInput').click()">
+                    <i class="fas fa-camera" style="margin-right:4px;"></i>Upload Foto
                 </div>
                 <div class="patient-details">
                     <div class="detail-label">Nama Lengkap</div>  <div class="detail-value" id="pi_name">-</div>

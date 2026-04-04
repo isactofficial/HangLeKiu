@@ -52,8 +52,14 @@
                 </svg>
             </button>
             <div class="navbar-dropdown-menu" id="pendaftaranMenu">
-                <a href="#" onclick="openRegModal('modalPendaftaranBaru'); return false;" class="dropdown-item">Pendaftaran Baru</a>
-                <a href="#" onclick="openRegModal('modalPasienBaru'); return false;" class="dropdown-item">Pasien Baru</a>
+                <a href="#" onclick="openRegModal('modalPendaftaranBaru'); return false;" class="dropdown-item" style="display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-calendar-plus" style="color:#C58F59;width:16px;"></i>
+                    Pendaftaran Baru
+                </a>
+                <a href="#" onclick="openRegModal('modalPasienBaru'); return false;" class="dropdown-item" style="display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-user-plus" style="color:#C58F59;width:16px;"></i>
+                    Pasien Baru
+                </a>
             </div>
         </div>
 

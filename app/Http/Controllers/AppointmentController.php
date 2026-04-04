@@ -251,9 +251,9 @@ class AppointmentController extends Controller
         ], 201);
     }
 
-    public function show(Appointment $appointment)
+public function show(Appointment $appointment)
     {
-        $appointment->load(['patient', 'doctor', 'poli', 'paymentMethod']);
+        $appointment->load(['patient:id,photo,full_name,medical_record_no,date_of_birth,gender', 'doctor', 'poli', 'paymentMethod']);
 
         return response()->json([
             'success' => true,
