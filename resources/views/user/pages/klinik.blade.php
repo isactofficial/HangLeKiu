@@ -35,9 +35,8 @@
                 </h1>
 
                 <p class="text-base md:text-xl font-medium text-white/90 max-w-4xl leading-relaxed mb-8">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do<br>
-                    eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim<br>
-                    ad minim veniam.
+                    Wujudkan Senyum Ideal Anda Melalui Dedikasi Tim Profesional Kami Yang Menghadirkan
+                    Standar Perawatan Gigi Dengan Keahlian Dan Presisi Medis Terbaik.
                 </p>
         </section>
 
@@ -47,7 +46,7 @@
             {{-- Padding Bawah = 40px (Bagian dari jarak Gallery ke Lokasi yang totalnya 80px) --}}
             <div class="max-w-7xl mx-auto w-full px-6 md:px-10 lg:px-16 pt-[100px] pb-[40px]">
                 <h2 class="text-3xl md:text-[40px] font-bold text-[#582C0C] text-center">
-                    Lorem Ipsum
+                    Fasilitas
                 </h2>
 
                 {{-- Jarak 62px antara tulisan dan Grid --}}
