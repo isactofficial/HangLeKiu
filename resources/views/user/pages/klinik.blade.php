@@ -97,7 +97,7 @@
                         <div class="bg-[#C18B51] rounded-[20px] p-6 lg:p-7 text-[#582C0C] shadow-sm">
                             <h3 class="text-[20px] lg:text-[22px] font-bold mb-2">Hanglekiu Dental Specialist</h3>
                             <p class="text-[14px] lg:text-[15px] font-medium opacity-90 mb-4 leading-normal pr-4">
-                                Jl. Hang Lekiu V No.8, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan
+                                8, Jl. Hang Lekiu V No.8, RT.6/RW.4, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12120
                             </p>
                             
                             <div class="mb-4">
@@ -105,11 +105,11 @@
                                 <ul class="space-y-1 text-[14px] lg:text-[15px] font-medium opacity-90">
                                     <li class="flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 rounded-full bg-[#582C0C] opacity-70"></span> 
-                                        <span class="w-[50px]">Senin</span> <span>: 10.00 - 19.00</span>
+                                        Senin - Jumat: 10.00 - 19.00
                                     </li>
                                     <li class="flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 rounded-full bg-[#582C0C] opacity-70"></span> 
-                                        <span class="w-[50px]">Selasa</span> <span>: 10.00 - 19.00</span>
+                                        Sabtu - Minggu: 10.00 - 13.00
                                     </li>
                                 </ul>
                             </div>
@@ -123,12 +123,12 @@
                         </div>
 
                         {{-- Contact Button --}}
-                        <a href="https://wa.me/6288888888888" target="_blank" 
+                        <a href="https://wa.me/6285211888621" target="_blank" 
                            class="bg-[#4D2303] hover:bg-[#321402] text-white py-3.5 lg:py-4 rounded-[20px] font-medium text-[14px] lg:text-[15px] shadow-sm transition-colors flex items-center justify-center gap-2 w-full shrink-0">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                             </svg>
-                            +6288888888888 (Jakarta Selatan)
+                            085211888621 (Jakarta Selatan)
                         </a>
                     </div>
 
