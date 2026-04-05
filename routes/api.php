@@ -86,6 +86,7 @@ Route::prefix('doctor-notes')->group(function () {
 // ================= MEDICAL PROCEDURE =================
 Route::prefix('medical-procedures')->group(function () {
     Route::post('/', [MedicalProcedureController::class, 'store']);
+    Route::get('/check-registration/{registrationId}', [MedicalProcedureController::class, 'checkByRegistration']);
     Route::get('/{id}', [MedicalProcedureController::class, 'show']);
     Route::put('/{id}', [MedicalProcedureController::class, 'update']);
     Route::delete('/{id}', [MedicalProcedureController::class, 'destroy']);
@@ -213,6 +214,7 @@ Route::prefix('master-payment')->group(function () {
 Route::prefix('odontogram')->group(function () {
     Route::post('/', [OdontogramController::class, 'store']);
     Route::get('/patient/{patientId}', [OdontogramController::class, 'indexByPatient']);
+    Route::get('/registration/{registrationId}', [OdontogramController::class, 'latestByRegistration']);
     Route::get('/{recordId}', [OdontogramController::class, 'show']);
     Route::patch('/{recordId}', [OdontogramController::class, 'update']);
     Route::delete('/{recordId}', [OdontogramController::class, 'destroy']);

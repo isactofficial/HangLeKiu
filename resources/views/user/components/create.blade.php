@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -42,6 +42,7 @@
                 <div class="form-group">
                     <label>Nomor WhatsApp <span class="req">*</span></label>
                     <input type="tel" name="patient_phone" placeholder="08xxxxxxxxxx"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                         value="{{ old('patient_phone') }}" required>
                     @error('patient_phone')
                         <div class="field-error">{{ $message }}</div>

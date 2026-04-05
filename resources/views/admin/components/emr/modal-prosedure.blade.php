@@ -892,6 +892,105 @@
         return hasMedicine;
       }
 
+      function formatRupiah(value) {
+        return 'Rp' + new Intl.NumberFormat('id-ID').format(Number(value || 0));
+      }
+
+      function fillProcedureRowFromData(row, item) {
+        if (!row || !item) return;
+
+        const prosedurInput = row.querySelector('.search-prosedur');
+        const gigiInput = row.querySelector('.input-no-gigi');
+        const qtyInput = row.querySelectorAll('input[type="number"]')[0];
+        const hargaInput = row.querySelector('.input-harga-jual');
+        const diskonInput = row.querySelector('.input-diskon');
+
+        const procedureName = item.master_procedure?.procedure_name || item.master_procedure?.name || '';
+        const unitPrice = Number(item.unit_price || 0);
+        const quantity = Number(item.quantity || 1);
+        const discountValue = Number(item.discount_value || 0);
+
+        if (prosedurInput) {
+          prosedurInput.value = procedureName;
+          prosedurInput.dataset.masterId = item.master_procedure_id || '';
+          prosedurInput.dataset.basePrice = String(unitPrice);
+        }
+        if (gigiInput) gigiInput.value = item.tooth_numbers || '';
+        if (qtyInput) qtyInput.value = quantity > 0 ? String(quantity) : '1';
+        if (hargaInput) hargaInput.value = formatRupiah(unitPrice);
+        if (diskonInput) diskonInput.value = String(discountValue);
+      }
+
+      function fillMedicineRowFromData(row, item) {
+        if (!row || !item) return;
+
+        const obatInput = row.querySelector('.search-obat');
+        const qtyInput = row.querySelector('input[type="number"]');
+
+        if (obatInput) {
+          obatInput.value = item.medicine?.medicine_name || '';
+          obatInput.dataset.medicineId = item.medicine_id || '';
+          obatInput.dataset.price = String(item.medicine?.selling_price_general || 0);
+        }
+        if (qtyInput) qtyInput.value = String(Number(item.quantity_used || 0));
+      }
+
+      async function loadExistingProcedureForRegistration(registrationId) {
+        if (!registrationId) {
+          resetProsedurForm();
+          return false;
+        }
+
+        const res = await fetch(`/api/medical-procedures/check-registration/${registrationId}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const payload = await res.json();
+
+        resetProsedurForm();
+
+        if (!res.ok || !payload.success || !payload.data) {
+          return false;
+        }
+
+        const record = payload.data;
+
+        const noteEl = document.getElementById('prosedur-notes');
+        if (noteEl) noteEl.value = record.notes || '';
+
+        const doctorSelect = document.getElementById('prosedur-doctor-select');
+        if (doctorSelect && record.doctor_id) {
+          doctorSelect.value = record.doctor_id;
+        }
+
+        if (assistantContainer) assistantContainer.innerHTML = '';
+        const assistants = Array.isArray(record.assistants) ? record.assistants : [];
+        assistants.forEach((assistant) => {
+          if (assistant?.doctor_id) addAssistantRow(assistant.doctor_id);
+        });
+        syncAssistantDoctorChoices();
+
+        const items = Array.isArray(record.items) ? record.items : [];
+        items.forEach((item, idx) => {
+          if (idx > 0) {
+            tambahBarisProsedur({ preventDefault: function() {} });
+          }
+          const row = prosedurContainer.querySelectorAll('.prosedur-row')[idx];
+          fillProcedureRowFromData(row, item);
+        });
+
+        const medicines = Array.isArray(record.medicines) ? record.medicines : [];
+        medicines.forEach((medicine, idx) => {
+          if (idx > 0) {
+            tambahBarisObat({ preventDefault: function() {} });
+          }
+          const row = obatContainer.querySelectorAll('.obat-row')[idx];
+          fillMedicineRowFromData(row, medicine);
+        });
+
+        hitungTotalHarga();
+        return true;
+      }
+
       // Tambahkan parameter 'patientData' di sebelah 'show'
     function toggleProsedureModal(show, patientData = null) {
       if (show) {
@@ -933,6 +1032,25 @@
         // 2. Set tanggal hari ini secara otomatis (biar nggak statis)
         const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('prosedur-date-display').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
+
+        // 2b. Jika sudah ada record pada registration yang sama, load untuk mode edit.
+        // Jika belum ada, baru prefill no. gigi dari odontogram terakhir.
+        const registrationId = document.getElementById('prosedur-registration-id')?.value;
+        loadExistingProcedureForRegistration(registrationId)
+          .then((hasExisting) => {
+            if (!hasExisting && window.lastSavedToothNumbers && window.lastSavedToothNumbers.length > 0) {
+              const toothNumbersStr = window.lastSavedToothNumbers.join(', ');
+              const noGigiInput = document.querySelector('.input-no-gigi');
+              if (noGigiInput) {
+                noGigiInput.value = toothNumbersStr;
+                noGigiInput.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            }
+            window.lastSavedToothNumbers = null;
+          })
+          .catch(() => {
+            resetProsedurForm();
+          });
 
         // 3. Tampilkan modal
         modalMain.classList.remove("hidden");
@@ -992,7 +1110,51 @@
                 }
             });
 
-            // 1. Simpan Parent Medical Procedure
+            const itemsPayload = [];
+            for (let row of prosedurRows) {
+              const inputProsedur = row.querySelector('.search-prosedur');
+              const masterId = inputProsedur?.dataset?.masterId;
+              if (!masterId) continue;
+
+              const qtyInput = row.querySelectorAll('input[type="number"]')[0];
+              const diskonInput = row.querySelector('.input-diskon');
+              const gigiInp = row.querySelector('.input-no-gigi');
+
+              const qty = parseInt(qtyInput ? qtyInput.value : 1, 10) || 1;
+              const basePrice = parseFloat(inputProsedur.dataset.basePrice || 0) || 0;
+              const diskonVal = parseFloat(diskonInput ? diskonInput.value : 0) || 0;
+
+              itemsPayload.push({
+                master_procedure_id: masterId,
+                tooth_numbers: gigiInp ? gigiInp.value : null,
+                quantity: qty,
+                unit_price: basePrice,
+                discount_type: diskonVal > 0 ? 'fix' : 'none',
+                discount_value: diskonVal,
+                subtotal: Math.max(0, (basePrice * qty) - diskonVal)
+              });
+            }
+
+            const medicinesPayload = [];
+            const obatRows = document.querySelectorAll('.obat-row');
+            for (let row of obatRows) {
+              const inputObat = row.querySelector('.search-obat');
+              if (!inputObat) continue;
+
+              const medicineId = inputObat.dataset.medicineId;
+              if (!medicineId) continue;
+
+              const qtyInput = row.querySelectorAll('input[type="number"]')[0];
+              const qty = parseInt(qtyInput ? qtyInput.value : 0, 10) || 0;
+              if (qty <= 0) continue;
+
+              medicinesPayload.push({
+                medicine_id: medicineId,
+                quantity_used: qty
+              });
+            }
+
+            // Simpan Medical Procedure (upsert by registration_id)
             const payloadParent = {
                 'registration_id': document.getElementById('prosedur-registration-id').value,
                 'patient_id': document.getElementById('prosedur-patient-id').value,
@@ -1001,7 +1163,9 @@
                 'discount_type': 'none',
                 'discount_value': 0,
                 'total_amount': totalAmount > 0 ? totalAmount : 0,
-                'notes': document.getElementById('prosedur-notes').value
+              'notes': document.getElementById('prosedur-notes').value,
+              'items': itemsPayload,
+              'medicines': medicinesPayload
             };
 
             const resParent = await fetch('/api/medical-procedures', {
@@ -1014,72 +1178,6 @@
             if (!parentData.success || !parentData.data) {
                 throw new Error(parentData.message || 'Gagal menyimpan data parent');
             }
-            const procedureId = parentData.data.id;
-
-            // 2. Simpan Procedure Items (dan otomatis Tooth Procedure via Controller)
-            for (let row of prosedurRows) {
-                const inputProsedur = row.querySelector('.search-prosedur');
-                const masterId = inputProsedur.dataset.masterId;
-                
-                if (!masterId) continue;
-                
-                const qtyInput = row.querySelectorAll('input[type="number"]')[0];
-                const diskonInput = row.querySelector('.input-diskon');
-                const gigiInp = row.querySelector('.input-no-gigi');
-                
-                const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
-                const basePrice = parseFloat(inputProsedur.dataset.basePrice || 0);
-                const diskonVal = parseFloat(diskonInput ? diskonInput.value : 0) || 0;
-
-                const payloadItem = {
-                    'procedure_id': procedureId,
-                    'master_procedure_id': masterId,
-                    'tooth_numbers': gigiInp ? gigiInp.value : null,
-                    'quantity': qty,
-                    'unit_price': basePrice,
-                    'discount_type': diskonVal > 0 ? 'fix' : 'none',
-                    'discount_value': diskonVal,
-                    'subtotal': (basePrice * qty) - diskonVal
-                };
-
-                await fetch('/api/procedure-items', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(payloadItem)
-                });
-            }
-
-            // 3. Simpan Procedure Medicines
-            const obatRows = document.querySelectorAll('.obat-row');
-            for (let row of obatRows) {
-                const inputObat = row.querySelector('.search-obat');
-                if (!inputObat) continue;
-                
-                const medicineId = inputObat.dataset.medicineId;
-                if (!medicineId) continue;
-                
-                const qtyInput = row.querySelectorAll('input[type="number"]')[0];
-                const qty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
-
-                if (qty > 0) {
-                    const payloadObat = {
-                        'procedure_id': procedureId,
-                        'medicine_id': medicineId,
-                        'quantity_used': qty
-                    };
-
-                    const resObat = await fetch('/api/procedure-medicine', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify(payloadObat)
-                    });
-                    const obatData = await resObat.json();
-                    if (!obatData.success) {
-                        alert("Gagal mengurangi stok obat: " + (obatData.message || ''));
-                    }
-                }
-            }
-
            const successMsg = document.createElement('div');
             
             // Perhatikan: px-6 diganti jadi px-16, dan ditambah justify-center
@@ -1109,6 +1207,12 @@
             if (typeof clearOdontogramState === 'function') clearOdontogramState();
             if (typeof resetProsedurForm === 'function') resetProsedurForm();
             toggleProsedureModal(false);
+
+            // Refresh detail pasien aktif agar tab Record > Rekam Medis langsung menampilkan asisten terbaru.
+            const activePatientLink = document.querySelector('.js-emr-patient-link .patient-card.active')?.closest('a');
+            if (activePatientLink) {
+              activePatientLink.click();
+            }
 
         } catch (e) {
             // Pesan Error Estetika

@@ -339,24 +339,24 @@
                 <div class="ad-dot"></div>
                 <h2 class="ad-name" id="ad_patient_name">Kama</h2>
                 <div style="margin-left: auto; display: flex; gap: 4px;">
-                    <button class="ad-icon-action" title="Edit">
+                    <!-- <button class="ad-icon-action" title="Edit">
                         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
                     </button>
                     <button class="ad-icon-action" title="Print">
                         <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9" /><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" /><rect x="6" y="14" width="12" height="8" /></svg>
-                    </button>
+                    </button> -->
                 </div>
             </div>
 
             <div class="ad-mr-wrapper">
                 <span class="ad-mr-number" id="ad_mr_number">MR000025</span>
-                <button class="ad-pill-btn">LABEL</button>
+                <!-- <button class="ad-pill-btn">LABEL</button>
                 <button class="ad-pill-btn" style="padding: 4px 8px;" title="Download">
                     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                </button>
+                </button> -->
             </div>
 
-            <div class="ad-demo-text">
+            <div class="ad-demo-text" id="ad_patient_demo">
                 Laki - laki &nbsp;&nbsp; 13 Tahun 10 Bulan 28 Hari
             </div>
         </div>
@@ -367,22 +367,22 @@
                 <div class="ad-schedule-text">
                     <strong id="ad_appointment_time">14:45 WIB</strong> dengan <span id="ad_doctor_name">drg. Ria Budiati Sp. Ortho</span>
                 </div>
-                <div class="ad-schedule-sub">
+                <div class="ad-schedule-sub" id="ad_duration">
                     Perkiraan lama konsultasi selama 10 menit
                 </div>
             </div>
 
             <div class="ad-meta-wrapper">
                 <div class="ad-meta-info">
-                    Metode Pembayaran: <span>Tunai</span><br>
-                    Dibuat Oleh: <span>Sonia Novitasari</span><br>
-                    Dibuat Jam: <span>14:51 WIB</span>
+                    Metode Pembayaran: <span id="ad_payment_method">Tunai</span><br>
+                    Dibuat Oleh: <span id="ad_creator_name">Sonia Novitasari</span><br>
+                    Dibuat Jam: <span id="ad_created_at">14:51 WIB</span>
                 </div>
 
-                <button type="button" class="ad-consent-btn">
+                <!-- <button type="button" class="ad-consent-btn">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
                     <div class="ad-consent-text">GENERAL<br>CONSENT</div>
-                </button>
+                </button> -->
             </div>
         </div>
 
@@ -400,11 +400,11 @@
 
                 {{-- Status Dropdown Menu --}}
                 <div id="ad_status_dropdown" class="ad-status-dropdown-menu">
-                    <button class="dropdown-item" onclick="updateAppointmentStatus('pending')">Pending</button>
-                    <button class="dropdown-item" onclick="updateAppointmentStatus('confirmed')">Confirmed</button>
-                    <button class="dropdown-item" onclick="updateAppointmentStatus('waiting')">Waiting</button>
-                    <button class="dropdown-item" onclick="updateAppointmentStatus('engaged')">Engaged</button>
-                    <button class="dropdown-item" onclick="updateAppointmentStatus('succeed')">Succeed</button>
+                    <button class="dropdown-item" data-status="pending" onclick="updateAppointmentStatus('pending')">Pending</button>
+                    <button class="dropdown-item" data-status="confirmed" onclick="updateAppointmentStatus('confirmed')">Confirmed</button>
+                    <button class="dropdown-item" data-status="waiting" onclick="updateAppointmentStatus('waiting')">Waiting</button>
+                    <button class="dropdown-item" data-status="engaged" onclick="updateAppointmentStatus('engaged')">Engaged</button>
+                    <button class="dropdown-item" data-status="succeed" onclick="updateAppointmentStatus('succeed')">Succeed</button>
                 </div>
             </div>
         </div>
@@ -415,35 +415,108 @@
 <script>
     let currentAppointmentId = null;
 
-    function openApptDetailModal(id, patientName, mrNumber, treatment, time, doctorName, status) {
-        currentAppointmentId = id;
-        document.getElementById('ad_patient_name').textContent = patientName;
-        document.getElementById('ad_mr_number').textContent = mrNumber || '-';
-        document.getElementById('ad_appointment_time').textContent = time || '-';
+    function calculateAge(dob) {
+        if (!dob) return '-';
+        const birthDate = new Date(dob);
+        if (isNaN(birthDate)) return '-';
+        const today = new Date();
         
-        if (doctorName) {
-            const adDoctorName = document.getElementById('ad_doctor_name');
-            if (adDoctorName) adDoctorName.textContent = doctorName;
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+
+        if (days < 0) {
+            months--;
+            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += lastMonth.getDate();
+        }
+        if (months < 0) {
+            years--;
+            months += 12;
         }
 
-        if (status) {
-            const statusCapitalized = status.charAt(0).toUpperCase() + status.slice(1);
+        let result = [];
+        if (years > 0) result.push(years + ' Tahun');
+        if (months > 0) result.push(months + ' Bulan');
+        if (days > 0 || result.length === 0) result.push(days + ' Hari');
+        
+        return result.join(' ');
+    }
+
+    function openApptDetailModal(data) {
+        try {
+            currentAppointmentId = data.id;
+            
+            // Update Name & MR
+            if (document.getElementById('ad_patient_name')) document.getElementById('ad_patient_name').textContent = data.patientName || 'Pasien';
+            if (document.getElementById('ad_mr_number')) document.getElementById('ad_mr_number').textContent = data.mrNumber || '-';
+            
+            // Update Code (using last 6 chars of ULID for display)
+            if (document.getElementById('ad_appointment_code')) {
+                const code = data.id ? data.id.substring(data.id.length - 6).toUpperCase() : '-';
+                document.getElementById('ad_appointment_code').textContent = 'Code: ' + code;
+            }
+
+            // Update Demo (Gender & Age)
+            const genderLabel = data.gender === 'Male' ? 'Laki-laki' : (data.gender === 'Female' ? 'Perempuan' : '-');
+            const ageLabel = calculateAge(data.dob);
+            if (document.getElementById('ad_patient_demo')) document.getElementById('ad_patient_demo').textContent = `${genderLabel} • ${ageLabel}`;
+
+            // Update Schedule Info
+            if (document.getElementById('ad_appointment_time')) document.getElementById('ad_appointment_time').textContent = data.time || '-';
+            if (document.getElementById('ad_doctor_name')) document.getElementById('ad_doctor_name').textContent = data.doctor || '-';
+            if (document.getElementById('ad_duration')) document.getElementById('ad_duration').textContent = `Perkiraan lama konsultasi selama ${data.duration || 0} menit`;
+
+            // Update Meta Info
+            if (document.getElementById('ad_payment_method')) document.getElementById('ad_payment_method').textContent = data.payment || '-';
+            if (document.getElementById('ad_creator_name')) document.getElementById('ad_creator_name').textContent = data.creator || '-';
+            if (document.getElementById('ad_created_at')) document.getElementById('ad_created_at').textContent = data.createdAt || '-';
+
+            // Update Status UI & Sequence Logic
+            const status = (data.status || 'pending').toLowerCase();
+            const statusOrder = ['pending', 'confirmed', 'waiting', 'engaged', 'succeed'];
+            const currentIndex = statusOrder.indexOf(status);
+
             const statusText = document.getElementById('ad_status_text');
             const btnStatusText = document.getElementById('ad_btn_status_text');
+            const statusCapitalized = status.charAt(0).toUpperCase() + status.slice(1);
+
             if (statusText) statusText.textContent = statusCapitalized;
             if (btnStatusText) btnStatusText.textContent = statusCapitalized;
-        }
 
-        // TAMBAHKAN LOGIKA REDIRECT KE EMR DI SINI
-        const btnEmr = document.getElementById('btn_goto_emr');
-        if (btnEmr) {
-            btnEmr.onclick = function() {
-                // Pindah ke halaman EMR dengan membawa parameter 'open' di URL
-                window.location.href = '/admin/emr?open=' + id;
-            };
+            // Disable/Hide previous statuses in dropdown
+            document.querySelectorAll('#ad_status_dropdown .dropdown-item').forEach(btn => {
+                const btnStatus = btn.getAttribute('data-status');
+                const btnIndex = statusOrder.indexOf(btnStatus);
+                
+                if (btnIndex >= 0 && btnIndex <= currentIndex) {
+                    btn.style.display = 'none'; // Hide if current or past
+                } else {
+                    btn.style.display = 'block';
+                }
+            });
+
+            // If currently 'succeed', hide the whole dropdown button
+            const statusWrap = document.querySelector('.ad-status-wrapper');
+            if (status === 'succeed' && statusWrap) {
+                statusWrap.style.display = 'none';
+            } else if (statusWrap) {
+                statusWrap.style.display = 'inline-block';
+            }
+
+            // EMR Redirect Button
+            const btnEmr = document.getElementById('btn_goto_emr');
+            if (btnEmr) {
+                btnEmr.onclick = function() {
+                    window.location.href = '/admin/emr?open=' + data.id;
+                };
+            }
+
+            openRegModal('modalAppointmentDetail');
+        } catch (err) {
+            console.error('Error in openApptDetailModal:', err);
+            alert('Gagal memproses data janji temu.');
         }
-        
-        openRegModal('modalAppointmentDetail');
     }
 
     function toggleStatusDropdown() {

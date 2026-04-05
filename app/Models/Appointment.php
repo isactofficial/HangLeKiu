@@ -17,6 +17,8 @@ class Appointment extends Model
 
     // public $timestamps = false; // <-- INI SUDAH DIHAPUS BIAR created_at OTOMATIS JALAN!
 
+    protected $appends = ['formatted_time', 'formatted_created_at'];
+
     // Sudah dibersihkan dari duplikat
     protected $fillable = [
         'id', // Hapus ini dari fillable jika 'id' Auto Increment
@@ -136,6 +138,14 @@ class Appointment extends Model
         }
 
         return Carbon::parse($this->appointment_datetime)->format('H:i') . ' WIB';
+    }
+
+    /**
+     * Format created_at: "d M Y H:i"
+     */
+    public function getFormattedCreatedAtAttribute(): string
+    {
+        return $this->created_at ? $this->created_at->format('d M Y H:i') : '-';
     }
 
     // Kompatibilitas view lama

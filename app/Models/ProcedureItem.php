@@ -47,7 +47,7 @@ class ProcedureItem extends Model
 
     public function masterProcedure(): BelongsTo
     {
-        return $this->belongsTo(Treatment::class, 'master_procedure_id');
+        return $this->belongsTo(MasterProcedure::class, 'master_procedure_id');
     }
 
         
