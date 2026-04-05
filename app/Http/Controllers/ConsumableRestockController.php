@@ -12,7 +12,7 @@ class ConsumableRestockController extends Controller
     // GET /api/admin/bhp/restock
     public function index(Request $request)
     {
-        $query = ConsumableRestock::with('item:id,item_code,item_name');
+        $query = ConsumableRestock::with('item:id,item_code,item_name,current_stock');
 
         if ($request->filled('bhp_id')) {
             $query->where('bhp_id', $request->bhp_id);
@@ -38,7 +38,7 @@ class ConsumableRestockController extends Controller
     // GET /api/admin/bhp/restock/{id}
     public function show($id)
     {
-        $restock = ConsumableRestock::with('item')->find($id);
+        $restock = ConsumableRestock::with('item:id,item_code,item_name,current_stock')->find($id);
 
         if (!$restock) {
             return response()->json(['success' => false, 'message' => 'Data restock tidak ditemukan'], 404);

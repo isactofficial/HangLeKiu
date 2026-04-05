@@ -62,6 +62,7 @@ class EmrController extends Controller
             'guarantorType',
             'medicalProcedures.doctor',
             'medicalProcedures.doctorNotes.user',
+            'medicalProcedures.bhpUsages.item',
         ];
 
         if ($hasProcedureAssistantTable) {
@@ -76,6 +77,7 @@ class EmrController extends Controller
             'poli',
             'medicalProcedures.items.masterProcedure',
             'medicalProcedures.medicines.medicine',
+            'medicalProcedures.bhpUsages.item',
             'medicalProcedures.doctor',
         ];
 

@@ -1791,6 +1791,9 @@
                       savedTeethNumbers = Array.from(uniqueTeeth);
                   }
                   window.lastSavedToothNumbers = savedTeethNumbers;
+                    try {
+                      sessionStorage.setItem('emr_last_saved_tooth_numbers', JSON.stringify(savedTeethNumbers));
+                    } catch (error) {}
                   
                   toggleOdontogramModal(false);
                   

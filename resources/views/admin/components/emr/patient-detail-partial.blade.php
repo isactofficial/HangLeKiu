@@ -864,6 +864,13 @@
                             ->unique()
                             ->values();
 
+                        $bhpNames = $reg->medicalProcedures
+                            ->flatMap(fn($mp) => $mp->bhpUsages)
+                            ->map(fn($usage) => optional($usage->item)->item_name)
+                            ->filter()
+                            ->unique()
+                            ->values();
+
                         $toothNumbers = $reg->medicalProcedures
                             ->flatMap(fn($mp) => $mp->items)
                             ->pluck('tooth_numbers')
@@ -888,6 +895,7 @@
                         <div class="record-table-text">
                             <div><strong>Prosedur</strong> {{ $procedureNames->isNotEmpty() ? $procedureNames->implode(', ') : '-' }}</div>
                             <div><strong>Obat</strong> {{ $medicineNames->isNotEmpty() ? $medicineNames->implode(', ') : '-' }}</div>
+                            <div><strong>BHP</strong> {{ $bhpNames->isNotEmpty() ? $bhpNames->implode(', ') : '-' }}</div>
                         </div>
                         <div class="record-table-text" style="font-weight:600;">{{ $toothNumbers->isNotEmpty() ? $toothNumbers->implode(', ') : '-' }}</div>
                         <div class="record-table-text" style="font-weight:700; text-transform:uppercase;">{{ $reg->status ?? '-' }}</div>

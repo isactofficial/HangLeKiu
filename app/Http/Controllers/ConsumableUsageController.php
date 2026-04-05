@@ -12,7 +12,7 @@ class ConsumableUsageController extends Controller
     // GET /api/admin/bhp/usage
     public function index(Request $request)
     {
-        $query = ConsumableUsage::with('item:id,item_code,item_name');
+        $query = ConsumableUsage::with('item:id,item_code,item_name,current_stock');
 
         if ($request->filled('bhp_id')) {
             $query->where('bhp_id', $request->bhp_id);
@@ -38,7 +38,7 @@ class ConsumableUsageController extends Controller
     // GET /api/admin/bhp/usage/{id}
     public function show($id)
     {
-        $usage = ConsumableUsage::with('item')->find($id);
+        $usage = ConsumableUsage::with('item:id,item_code,item_name,current_stock')->find($id);
 
         if (!$usage) {
             return response()->json(['success' => false, 'message' => 'Data usage tidak ditemukan'], 404);

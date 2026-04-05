@@ -84,7 +84,8 @@
 
 /* ROW */
 #modalTambahProsedur .prosedur-row,
-#modalTambahProsedur .obat-row {
+#modalTambahProsedur .obat-row,
+#modalTambahProsedur .bhp-row {
   position: relative;
   border-radius: 12px;
   padding: 12px;
@@ -101,6 +102,10 @@
   z-index: 1;
 }
 
+#modalTambahProsedur .bhp-row {
+  z-index: 1;
+}
+
 #modalTambahProsedur .prosedur-row {
   display: grid;
   grid-template-columns: minmax(240px, 1fr) 92px 74px 120px 190px;
@@ -113,6 +118,12 @@
   gap: 10px;
 }
 
+#modalTambahProsedur .bhp-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 84px 32px;
+  gap: 10px;
+}
+
 #modalTambahProsedur .field-prosedur,
 #modalTambahProsedur .field-gigi,
 #modalTambahProsedur .field-qty,
@@ -120,7 +131,10 @@
 #modalTambahProsedur .field-actions,
 #modalTambahProsedur .field-obat,
 #modalTambahProsedur .field-obat-qty,
-#modalTambahProsedur .field-obat-delete {
+#modalTambahProsedur .field-obat-delete,
+#modalTambahProsedur .field-bhp,
+#modalTambahProsedur .field-bhp-qty,
+#modalTambahProsedur .field-bhp-delete {
   min-width: 0;
 }
 
@@ -153,7 +167,8 @@
 }
 
 #modalTambahProsedur .prosedur-row:hover,
-#modalTambahProsedur .obat-row:hover {
+#modalTambahProsedur .obat-row:hover,
+#modalTambahProsedur .bhp-row:hover {
   background: #fdf7f1;
 }
 
@@ -694,6 +709,45 @@
           </div>
           <!-- AKHIR CONTAINER OBAT -->
 
+          <!-- ============================================== -->
+          <!-- CONTAINER BARIS BHP DINAMIS -->
+          <!-- ============================================== -->
+          <div class="section-panel" style="margin-top: 12px; margin-bottom: 8px;">
+            <div id="bhpContainer" class="space-y-3 w-full">
+              <!-- Baris BHP 1 (Default) -->
+              <div class="bhp-row w-full relative">
+                <div class="field-bhp">
+                  <label class="label-small text-gray-400">BHP yang dipakai</label>
+                  <div class="search-field">
+                    <svg class="w-4 h-4 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    <input type="text" placeholder="Cari BHP..." class="input-underline w-full search-bhp search-input" autocomplete="off" />
+                    <div class="absolute left-0 top-full w-full bg-white shadow-lg rounded-b-md border border-gray-200 z-[100] hidden bhp-res-container max-h-48 overflow-y-auto"></div>
+                  </div>
+                </div>
+                <div class="field-bhp-qty">
+                  <label class="label-small text-gray-400">Qty</label>
+                  <input type="number" value="0" class="input-underline text-center w-full" min="0" />
+                </div>
+                <button class="field-bhp-delete text-red-500 hover:text-red-700 icon-btn" onclick="hapusBarisBhp(this)">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <a
+              href="#"
+              onclick="tambahBarisBhp(event)"
+              class="inline-flex items-center text-blue-500 action-link mt-2 font-medium hover:underline"
+            >
+              + Tambah BHP
+            </a>
+          </div>
+          <!-- AKHIR CONTAINER BHP -->
+
           <!-- Baris: Catatan -->
           <div class="section-panel info-shift" style="margin-top: 16px;">
             <label class="section-heading">Catatan</label>
@@ -807,6 +861,7 @@
       const modalConfirm = document.getElementById("modalConfirm");
       const prosedurContainer = document.getElementById("prosedurContainer");
       const obatContainer = document.getElementById("obatContainer");
+      const bhpContainer = document.getElementById("bhpContainer");
       const assistantContainer = document.getElementById('assistantContainer');
 
       // Pindahkan modal ke body agar tidak kena stacking context parent layout.
@@ -889,7 +944,17 @@
           return !!(inputObat && inputObat.dataset.medicineId && qty > 0);
         });
 
-        return hasMedicine;
+        if (hasMedicine) return true;
+
+        const bhpRows = document.querySelectorAll('.bhp-row');
+        const hasBhp = Array.from(bhpRows).some(row => {
+          const inputBhp = row.querySelector('.search-bhp');
+          const qtyInput = row.querySelector('input[type="number"]');
+          const qty = parseInt(qtyInput ? qtyInput.value : 0, 10) || 0;
+          return !!(inputBhp && inputBhp.dataset.bhpId && qty > 0);
+        });
+
+        return hasBhp;
       }
 
       function formatRupiah(value) {
@@ -935,6 +1000,58 @@
         if (qtyInput) qtyInput.value = String(Number(item.quantity_used || 0));
       }
 
+      function fillBhpRowFromData(row, item) {
+        if (!row || !item) return;
+
+        const bhpInput = row.querySelector('.search-bhp');
+        const qtyInput = row.querySelector('input[type="number"]');
+
+        if (bhpInput) {
+          bhpInput.value = item.item?.item_name || '';
+          bhpInput.dataset.bhpId = item.bhp_id || '';
+          bhpInput.dataset.price = String(item.item?.general_price || item.unit_price || 0);
+        }
+        if (qtyInput) qtyInput.value = String(Number(item.quantity_used || 0));
+      }
+
+      function getSavedToothNumbersText() {
+        const cachedNumbers = Array.isArray(window.lastSavedToothNumbers) && window.lastSavedToothNumbers.length > 0
+          ? window.lastSavedToothNumbers
+          : (() => {
+              try {
+                const stored = sessionStorage.getItem('emr_last_saved_tooth_numbers');
+                return stored ? JSON.parse(stored) : [];
+              } catch (error) {
+                return [];
+              }
+            })();
+
+        if (!Array.isArray(cachedNumbers) || cachedNumbers.length === 0) {
+          return '';
+        }
+
+        return cachedNumbers
+          .map(value => String(value).trim())
+          .filter(Boolean)
+          .join(', ');
+      }
+
+      function applySavedToothNumbersToProcedureRow(row) {
+        if (!row) return;
+
+        const toothText = getSavedToothNumbersText();
+        if (!toothText) return;
+
+        const toothInput = row.querySelector('.input-no-gigi');
+        if (!toothInput) return;
+
+        const currentValue = String(toothInput.value || '').trim();
+        if (currentValue) return;
+
+        toothInput.value = toothText;
+        toothInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
       async function loadExistingProcedureForRegistration(registrationId) {
         if (!registrationId) {
           resetProsedurForm();
@@ -978,6 +1095,10 @@
           fillProcedureRowFromData(row, item);
         });
 
+        if (items.length === 0) {
+          applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'));
+        }
+
         const medicines = Array.isArray(record.medicines) ? record.medicines : [];
         medicines.forEach((medicine, idx) => {
           if (idx > 0) {
@@ -985,6 +1106,15 @@
           }
           const row = obatContainer.querySelectorAll('.obat-row')[idx];
           fillMedicineRowFromData(row, medicine);
+        });
+
+        const bhpUsages = Array.isArray(record.bhp_usages) ? record.bhp_usages : [];
+        bhpUsages.forEach((usage, idx) => {
+          if (idx > 0) {
+            tambahBarisBhp({ preventDefault: function() {} });
+          }
+          const row = bhpContainer.querySelectorAll('.bhp-row')[idx];
+          fillBhpRowFromData(row, usage);
         });
 
         hitungTotalHarga();
@@ -1038,6 +1168,8 @@
         const registrationId = document.getElementById('prosedur-registration-id')?.value;
         loadExistingProcedureForRegistration(registrationId)
           .then((hasExisting) => {
+            applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'));
+
             if (!hasExisting && window.lastSavedToothNumbers && window.lastSavedToothNumbers.length > 0) {
               const toothNumbersStr = window.lastSavedToothNumbers.join(', ');
               const noGigiInput = document.querySelector('.input-no-gigi');
@@ -1046,7 +1178,6 @@
                 noGigiInput.dispatchEvent(new Event('input', { bubbles: true }));
               }
             }
-            window.lastSavedToothNumbers = null;
           })
           .catch(() => {
             resetProsedurForm();
@@ -1064,7 +1195,7 @@
       function toggleConfirmModal(show) {
         if (show) {
           if (!hasAtLeastOneProcedureOrMedicine()) {
-            alert('Minimal isi 1 prosedur atau 1 obat sebelum menyimpan.');
+            alert('Minimal isi 1 prosedur, 1 obat, atau 1 BHP sebelum menyimpan.');
             return;
           }
           modalConfirm.classList.remove("hidden");
@@ -1077,7 +1208,7 @@
         toggleConfirmModal(false);
 
         if (!hasAtLeastOneProcedureOrMedicine()) {
-            alert('Tidak bisa simpan. Minimal harus ada 1 prosedur atau 1 obat yang terisi.');
+          alert('Tidak bisa simpan. Minimal harus ada 1 prosedur, 1 obat, atau 1 BHP yang terisi.');
             return;
         }
 
@@ -1109,6 +1240,17 @@
                     totalAmount += (price * qty);
                 }
             });
+
+                const allBhpRows = document.querySelectorAll('.bhp-row');
+                allBhpRows.forEach(function(row) {
+                  const inputBhp = row.querySelector('.search-bhp');
+                  if (inputBhp && inputBhp.dataset.bhpId) {
+                    const price = parseFloat(inputBhp.dataset.price || 0);
+                    const qtyBhp = row.querySelector('input[type="number"]');
+                    const qty = parseInt(qtyBhp ? qtyBhp.value : 0) || 0;
+                    totalAmount += (price * qty);
+                  }
+                });
 
             const itemsPayload = [];
             for (let row of prosedurRows) {
@@ -1154,6 +1296,27 @@
               });
             }
 
+            const bhpsPayload = [];
+            const bhpRows = document.querySelectorAll('.bhp-row');
+            for (let row of bhpRows) {
+              const inputBhp = row.querySelector('.search-bhp');
+              if (!inputBhp) continue;
+
+              const bhpId = inputBhp.dataset.bhpId;
+              if (!bhpId) continue;
+
+              const qtyInput = row.querySelectorAll('input[type="number"]')[0];
+              const qty = parseInt(qtyInput ? qtyInput.value : 0, 10) || 0;
+              if (qty <= 0) continue;
+
+              bhpsPayload.push({
+                bhp_id: bhpId,
+                quantity_used: qty,
+                unit_price: parseFloat(inputBhp.dataset.price || 0) || 0,
+                usage_type: 'umum'
+              });
+            }
+
             // Simpan Medical Procedure (upsert by registration_id)
             const payloadParent = {
                 'registration_id': document.getElementById('prosedur-registration-id').value,
@@ -1165,7 +1328,8 @@
                 'total_amount': totalAmount > 0 ? totalAmount : 0,
               'notes': document.getElementById('prosedur-notes').value,
               'items': itemsPayload,
-              'medicines': medicinesPayload
+                'medicines': medicinesPayload,
+                'bhps': bhpsPayload
             };
 
             const resParent = await fetch('/api/medical-procedures', {
@@ -1294,6 +1458,7 @@
             `;
 
         prosedurContainer.appendChild(newRow);
+        applySavedToothNumbersToProcedureRow(newRow);
         scrollToBottom();
       }
 
@@ -1353,6 +1518,17 @@
                   total += (price * qty);
               }
           });
+
+            const semuaBhpRows = document.querySelectorAll('.bhp-row');
+            semuaBhpRows.forEach(function(row) {
+              const inputBhp = row.querySelector('.search-bhp');
+              if (inputBhp && inputBhp.dataset.bhpId) {
+                const price = parseFloat(inputBhp.dataset.price || 0);
+                const qtyInput = row.querySelector('input[type="number"]');
+                const qty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
+                total += (price * qty);
+              }
+            });
           
           const totalEle = document.getElementById('totalHargaDisplay');
           if (totalEle) {
@@ -1516,6 +1692,50 @@
         }
       }
 
+      function tambahBarisBhp(e) {
+        e.preventDefault();
+
+        const newRow = document.createElement("div");
+        newRow.className = "bhp-row w-full relative mt-4";
+        newRow.innerHTML = `
+            <div class="field-bhp">
+              <label class="label-small text-gray-400">BHP yang dipakai</label>
+              <div class="search-field">
+                <svg class="w-4 h-4 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                <input type="text" placeholder="Cari BHP..." class="input-underline w-full search-bhp search-input" autocomplete="off" data-bhp-id="" />
+                <div class="bhp-res-container absolute left-0 top-full w-full bg-white shadow-lg rounded-b-md border border-gray-200 z-[999] hidden max-h-48 overflow-y-auto"></div>
+              </div>
+            </div>
+            <div class="field-bhp-qty">
+                <label class="label-small text-gray-400">Qty</label>
+                <input type="number" value="0" class="input-underline text-center w-full" min="0" />
+            </div>
+            <button class="field-bhp-delete text-red-500 hover:text-red-700 icon-btn" onclick="hapusBarisBhp(this)">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+            </button>
+        `;
+        bhpContainer.appendChild(newRow);
+        scrollToBottom();
+      }
+
+      function hapusBarisBhp(buttonElement) {
+        const row = buttonElement.closest(".bhp-row");
+
+        if (bhpContainer.querySelectorAll(".bhp-row").length > 1) {
+          row.remove();
+        } else {
+          const inputs = row.querySelectorAll("input");
+          inputs[0].value = "";
+          inputs[1].value = "0";
+          delete inputs[0].dataset.bhpId;
+          delete inputs[0].dataset.price;
+        }
+      }
+
       // FUNGSI HELPER UNTUK SCROLL KE BAWAH SAAT ITEM BARU DITAMBAHKAN
       function scrollToBottom() {
         const modalBody = document.querySelector("#modalTambahProsedur .overflow-y-auto");
@@ -1561,6 +1781,23 @@
                 searchInp.dataset.medicineId = '';
             }
         }
+
+          const bhpRows = document.querySelectorAll('.bhp-row');
+          bhpRows.forEach((row, i) => {
+            if (i > 0) row.remove();
+          });
+          const firstBhp = document.querySelector('.bhp-row');
+          if (firstBhp) {
+            const inputs = firstBhp.querySelectorAll('input');
+            inputs.forEach(inp => inp.value = '');
+            const qtyInp = firstBhp.querySelector('input[type="number"]');
+            if(qtyInp) qtyInp.value = '0';
+            const searchInp = firstBhp.querySelector('.search-bhp');
+            if (searchInp) {
+              searchInp.dataset.bhpId = '';
+              searchInp.dataset.price = '0';
+            }
+          }
 
         const totalEle = document.getElementById('totalHargaDisplay');
         if (totalEle) totalEle.innerText = 'Rp0';
@@ -1628,6 +1865,53 @@
                     container.classList.remove('hidden');
                 })
                 .catch(function(err) { console.error('Error fetching medicine:', err); });
+            } else if (e.target.classList.contains('search-bhp')) {
+              const input = e.target;
+              const query = input.value;
+              const container = input.closest('.relative').querySelector('.bhp-res-container');
+
+              if (query.length < 2) {
+                container.classList.add('hidden');
+                return;
+              }
+
+              const bhpUrl = '{{ url("/api/bhp/items") }}' + '?search=' + encodeURIComponent(query);
+              fetch(bhpUrl, { headers: { 'Accept': 'application/json' } })
+                .then(function(res) {
+                  if (!res.ok) throw new Error('HTTP error: ' + res.status);
+                  return res.json();
+                })
+                .then(function(res) {
+                  const items = Array.isArray(res.data) ? res.data : [];
+                  let html = '';
+
+                  if (items && items.length > 0) {
+                    items.forEach(function(item) {
+                      const harga = item.general_price || 0;
+                      const stockColor = item.current_stock > 0 ? 'text-green-600' : 'text-red-600';
+                      html += '<div class="res-item bhp-suggestion-item hover:bg-gray-50 p-2 cursor-pointer border-b text-sm"' +
+                        ' data-id="' + item.id + '"' +
+                        ' data-nama="' + item.item_name + '"' +
+                        ' data-price="' + harga + '">' +
+                        '<div class="flex justify-between items-center">' +
+                        '<div>' +
+                        '<div class="font-bold text-gray-800">' + item.item_name + '</div>' +
+                        '<div class="text-[10px] text-gray-500">' + (item.item_code || '') + ' &middot; ' + (item.brand || 'BHP') + '</div>' +
+                        '<div class="text-xs text-blue-600 font-bold">Rp' + new Intl.NumberFormat('id-ID').format(harga) + '</div>' +
+                        '</div>' +
+                        '<div class="text-right">' +
+                        '<div class="text-xs font-bold ' + stockColor + '">Stok: ' + (item.current_stock || 0) + '</div>' +
+                        '<div class="text-[10px] text-gray-400">' + (item.min_stock !== undefined ? 'Min ' + item.min_stock : '') + '</div>' +
+                        '</div></div></div>';
+                    });
+                  } else {
+                    html = '<div class="p-4 text-xs text-center text-gray-400 italic">BHP tidak ditemukan</div>';
+                  }
+
+                  container.innerHTML = html;
+                  container.classList.remove('hidden');
+                })
+                .catch(function(err) { console.error('Error fetching BHP:', err); });
         }
     }));
 
@@ -1659,6 +1943,28 @@
             if (container) container.classList.add('hidden');
             return;
         }
+
+          const itemBhp = e.target.closest('.bhp-suggestion-item');
+          if (itemBhp) {
+            const row = itemBhp.closest('.bhp-row');
+            if (!row) return;
+            const inputName = row.querySelector('.search-bhp');
+            const container = inputName.closest('.relative').querySelector('.bhp-res-container');
+            const inputQty = row.querySelector('input[type="number"]');
+
+            inputName.value = itemBhp.dataset.nama;
+            inputName.dataset.bhpId = itemBhp.dataset.id;
+            inputName.dataset.price = itemBhp.dataset.price;
+
+            if (inputQty && (!inputQty.value || inputQty.value === '0' || inputQty.value === '')) {
+              inputQty.value = 1;
+            }
+
+            hitungTotalHarga();
+
+            if (container) container.classList.add('hidden');
+            return;
+          }
 
         // --- KLIK HASIL PENCARIAN PROSEDUR ---
         const itemProsedur = e.target.closest('.prosedur-row .res-item');
@@ -1695,6 +2001,9 @@
         if (!e.target.classList.contains('search-obat')) {
             document.querySelectorAll('.res-container').forEach(el => el.classList.add('hidden'));
         }
+        if (!e.target.classList.contains('search-bhp')) {
+          document.querySelectorAll('.bhp-res-container').forEach(el => el.classList.add('hidden'));
+        }
         if (!e.target.classList.contains('search-prosedur')) {
             document.querySelectorAll('.res-container-prosedur').forEach(el => el.classList.add('hidden'));
         }
@@ -1705,7 +2014,8 @@
         // Hitung ulang total saat qty prosedur, diskon, atau qty obat berubah
         const inProsedurRow = e.target.closest('.prosedur-row');
         const inObatRow = e.target.closest('.obat-row');
-        if ((inProsedurRow || inObatRow) && (e.target.type === 'number' || e.target.classList.contains('input-diskon'))) {
+      const inBhpRow = e.target.closest('.bhp-row');
+      if ((inProsedurRow || inObatRow || inBhpRow) && (e.target.type === 'number' || e.target.classList.contains('input-diskon'))) {
             hitungTotalHarga();
         }
     });

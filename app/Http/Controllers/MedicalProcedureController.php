@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConsumableItem;
+use App\Models\ConsumableUsage;
 use App\Models\Medicine;
 use App\Models\MedicalProcedure;
 use App\Models\ProcedureItem;
@@ -37,6 +39,11 @@ class MedicalProcedureController extends Controller
             'medicines' => 'nullable|array',
             'medicines.*.medicine_id' => 'required|string|max:50|exists:medicine,id',
             'medicines.*.quantity_used' => 'required|integer|min:1',
+            'bhps' => 'nullable|array',
+            'bhps.*.bhp_id' => 'required|string|max:50|exists:consumable_items,id',
+            'bhps.*.quantity_used' => 'required|integer|min:1',
+            'bhps.*.unit_price' => 'required|numeric|min:0',
+            'bhps.*.usage_type' => 'nullable|in:umum,bpjs',
         ]);
 
         try {
@@ -146,10 +153,36 @@ class MedicalProcedureController extends Controller
                     ]);
                 }
 
+                // Rollback previous BHP usage before replacing BHP entries
+                $oldBhpUsages = ConsumableUsage::where('treatment_id', $medicalProcedure->id)->get();
+                foreach ($oldBhpUsages as $oldUsage) {
+                    $oldUsage->delete();
+                }
+
+                // Save new BHP usage and reduce stock
+                foreach ($validated['bhps'] ?? [] as $bhp) {
+                    $item = ConsumableItem::findOrFail($bhp['bhp_id']);
+                    if ($item->current_stock < $bhp['quantity_used']) {
+                        throw new \RuntimeException("Stok BHP {$item->item_name} tidak cukup");
+                    }
+
+                    ConsumableUsage::create([
+                        'id' => (string) Str::uuid(),
+                        'bhp_id' => $bhp['bhp_id'],
+                        'treatment_id' => $medicalProcedure->id,
+                        'usage_type' => $bhp['usage_type'] ?? 'umum',
+                        'quantity_used' => $bhp['quantity_used'],
+                        'unit_price' => $bhp['unit_price'],
+                        'usage_date' => now()->toDateString(),
+                        'notes' => 'Digunakan untuk prosedur ID: ' . $medicalProcedure->id,
+                    ]);
+                }
+
                 return $medicalProcedure->load([
                     'assistants.doctor',
                     'items.masterProcedure',
                     'medicines.medicine',
+                    'bhpUsages.item',
                 ]);
             });
 
@@ -173,6 +206,7 @@ class MedicalProcedureController extends Controller
             'assistants.doctor',
             'items.masterProcedure',
             'medicines.medicine',
+            'bhpUsages.item',
         ])->where('registration_id', $registrationId)->first();
 
         return response()->json([
@@ -184,7 +218,12 @@ class MedicalProcedureController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $medicalProcedure = MedicalProcedure::with(['registration', 'patient', 'doctor'])->find($id);
+        $medicalProcedure = MedicalProcedure::with([
+            'registration',
+            'patient',
+            'doctor',
+            'bhpUsages.item',
+        ])->find($id);
 
         if (! $medicalProcedure) {
             return response()->json([
