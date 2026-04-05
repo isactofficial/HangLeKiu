@@ -1,4 +1,4 @@
-﻿@extends('admin.layout.admin')
+@extends('admin.layout.admin')
 @section('title', 'Kasir - HangLeKiu')
 
 @section('navbar')
@@ -8,6 +8,31 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/pages/cashier.css') }}">
     <style>
+        /* Modal Overlay — sama persis dengan obat.css */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 300ms ease, visibility 300ms ease;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-container {
+            transform: scale(0.95);
+            transition: transform 300ms ease;
+        }
+        .modal-overlay.open .modal-container {
+            transform: scale(1);
+        }
         .badge-lunas-hijau {
             background-color: #dcfce7;
             color: #166534;
@@ -75,7 +100,6 @@
         {{-- Tabs --}}
         <div class="cashier-tabs">
             <button class="cashier-tab active">Pembayaran</button>
-            <button class="cashier-tab">Hutang & Piutang</button>
         </div>
 
         <div class="cashier-content">
@@ -348,22 +372,20 @@
             currentGrandTotal += subtotal;
 
             htmlItems += `
-                <tr class="border-b border-[#A67C52]/20 hover:bg-[#A67C52]/5 transition-colors">
-                    <td class="p-3 text-[#A67C52] font-medium">${tanggalInput}</td>
-                    <td class="p-3 text-[#A67C52] font-bold">${tindakan}</td>
-                    <td class="p-3 text-center text-[#A67C52] font-black bg-[#A67C52]/5">${noGigi}</td>
-                    <td class="p-3 text-center">
-                        <input type="text" value="${qty}" readonly class="w-10 text-center border border-[#A67C52]/30 rounded p-1 text-xs bg-white outline-none text-[#A67C52] font-bold">
+                <tr style="border-bottom:1px solid #f0ebe4;">
+                    <td style="padding:8px 10px; font-size:12px; color:#6b7280; white-space:nowrap;">${tanggalInput}</td>
+                    <td style="padding:8px 10px; font-size:12px; color:#374151; font-weight:500;">${tindakan}</td>
+                    <td style="padding:8px 10px; text-align:center; font-size:12px; color:#8B5E3C; font-weight:700;">${noGigi}</td>
+                    <td style="padding:8px 10px; text-align:center;">
+                        <div style="border:1px solid #e5e7eb; border-radius:4px; padding:3px 8px; display:inline-block; min-width:28px; text-align:center; font-size:12px; color:#374151;">${qty}</div>
                     </td>
-                    <td class="p-3 text-right text-[#A67C52] font-medium">Rp${Number(harga).toLocaleString('id-ID')}</td>
-                    <td class="p-3 text-right">
-                        <div class="flex justify-end gap-1">
-                            <input type="text" value="${Number(diskon).toLocaleString('id-ID')}" readonly class="w-20 border border-[#A67C52]/30 rounded p-1 text-xs text-right bg-white outline-none text-[#A67C52]/50 font-medium">
-                        </div>
+                    <td style="padding:8px 10px; text-align:right; font-size:12px; color:#6b7280;">Rp${Number(harga).toLocaleString('id-ID')}</td>
+                    <td style="padding:8px 10px; text-align:right;">
+                        <div style="border:1px solid #e5e7eb; border-radius:4px; padding:3px 8px; display:inline-block; min-width:40px; text-align:right; font-size:12px; color:#9ca3af;">${Number(diskon).toLocaleString('id-ID')}</div>
                     </td>
-                    <td class="p-3 text-right text-[#A67C52] font-black">Rp${Number(subtotal).toLocaleString('id-ID')}</td>
-                    <td class="p-3 text-center">
-                        <button class="text-[#A67C52]/50 hover:text-red-500 transition-colors"><i class="fa fa-trash"></i></button>
+                    <td style="padding:8px 10px; text-align:right; font-size:12px; color:#8B5E3C; font-weight:700;">Rp${Number(subtotal).toLocaleString('id-ID')}</td>
+                    <td style="padding:8px 10px; text-align:center;">
+                        <button style="background:none; border:none; cursor:pointer; color:#d1d5db; font-size:13px;" onclick=""><i class="fa fa-trash"></i></button>
                     </td>
                 </tr>`;
         });
@@ -376,8 +398,8 @@
         
         if(typeof hitungKembalian === 'function') hitungKembalian(); 
 
-        document.getElementById('modalPayment').classList.remove('hidden');
-        document.getElementById('modalPayment').style.display = 'flex';
+        const modal = document.getElementById('modalPayment');
+        modal.classList.add('open');
     }
 
     function hitungKembalian() {
@@ -401,9 +423,78 @@
     }
     
     function closePayment() { 
-        const modal = document.getElementById('modalPayment');
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
+        document.getElementById('modalPayment').classList.remove('open');
+    }
+
+    // ─── HAPUS ITEM DARI TABEL MODAL ────────────────────────────────
+    function hapusItemModal(index) {
+        activeData.tindakanArray.splice(index, 1);
+        activeData.pricesArray.splice(index, 1);
+        activeData.qtyArray.splice(index, 1);
+        activeData.diskonArray.splice(index, 1);
+        activeData.subtotalArray.splice(index, 1);
+        activeData.gigiArray.splice(index, 1);
+        recalcTableFromActiveData();
+    }
+
+    function recalcTableFromActiveData() {
+        let htmlItems = '';
+        currentGrandTotal = 0;
+
+        activeData.tindakanArray.forEach((tindakan, index) => {
+            const harga    = parseFloat(activeData.pricesArray[index])   || 0;
+            const qty      = parseInt(activeData.qtyArray[index])        || 1;
+            const diskon   = parseFloat(activeData.diskonArray[index])   || 0;
+            const subtotal = parseFloat(activeData.subtotalArray[index]) || 0;
+            const noGigi   = (index === 0 && activeData.gigiArray[0] && activeData.gigiArray[0] !== '-') ? activeData.gigiArray[0] : '-';
+            currentGrandTotal += subtotal;
+
+            htmlItems += `
+                <tr style="border-bottom:1px solid #f0ebe4;">
+                    <td style="padding:8px 10px; font-size:12px; color:#6b7280; white-space:nowrap;">${activeData.tglInput}</td>
+                    <td style="padding:8px 10px; font-size:12px; color:#374151; font-weight:500;">${tindakan}</td>
+                    <td style="padding:8px 10px; text-align:center; font-size:12px; color:#8B5E3C; font-weight:700;">${noGigi}</td>
+                    <td style="padding:8px 10px; text-align:center;">
+                        <div style="border:1px solid #e5e7eb; border-radius:4px; padding:3px 8px; display:inline-block; min-width:28px; text-align:center; font-size:12px; color:#374151;">${qty}</div>
+                    </td>
+                    <td style="padding:8px 10px; text-align:right; font-size:12px; color:#6b7280;">Rp${Number(harga).toLocaleString('id-ID')}</td>
+                    <td style="padding:8px 10px; text-align:right;">
+                        <div style="border:1px solid #e5e7eb; border-radius:4px; padding:3px 8px; display:inline-block; min-width:40px; text-align:right; font-size:12px; color:#9ca3af;">${Number(diskon).toLocaleString('id-ID')}</div>
+                    </td>
+                    <td style="padding:8px 10px; text-align:right; font-size:12px; color:#8B5E3C; font-weight:700;">Rp${Number(subtotal).toLocaleString('id-ID')}</td>
+                    <td style="padding:8px 10px; text-align:center;">
+                        <button style="background:none; border:none; cursor:pointer; color:#d1d5db; font-size:13px;" onclick="hapusItemModal(${index})"><i class="fa fa-trash"></i></button>
+                    </td>
+                </tr>`;
+        });
+
+        activeData.total = currentGrandTotal;
+        document.getElementById('m-items').innerHTML = htmlItems || '<tr><td colspan="8" style="text-align:center;padding:16px;color:#9ca3af;">Tidak ada item.</td></tr>';
+        document.getElementById('m-grand-total').innerText = 'Rp' + Number(currentGrandTotal).toLocaleString('id-ID');
+        document.getElementById('m-input-bayar').value = currentGrandTotal;
+        hitungKembalian();
+    }
+
+    function doPrintPreview() {
+        if (!activeData || !activeData.inv) return;
+        const showDetail = document.getElementById('m-cb-detail')?.checked !== false;
+        const metodeText = document.getElementById('m-metode')?.options[document.getElementById('m-metode')?.selectedIndex]?.text || 'Tunai';
+        // Jika showDetail=false, tampilkan array kosong agar item tidak muncul di nota
+        prepareAndPrint(
+            activeData.inv,
+            activeData.nama,
+            activeData.dokter,
+            showDetail ? activeData.tindakanArray : [],
+            showDetail ? activeData.pricesArray   : [],
+            showDetail ? activeData.qtyArray       : [],
+            showDetail ? activeData.diskonArray    : [],
+            showDetail ? activeData.subtotalArray  : [],
+            showDetail ? activeData.gigiArray      : [],
+            metodeText,
+            activeData.tglInput,
+            document.getElementById('m-notes')?.value || '-',
+            'unpaid', 0, 0, 0
+        );
     }
 
     async function prosesDone() {
@@ -449,12 +540,14 @@
                 },
                 body: JSON.stringify({ 
                     registration_id: appointmentId, 
-                    payment_method: paymentMethodName,
-                    amount_paid: amountPaid,
-                    change_amount: changeAmount,
-                    debt_amount: debtAmount,
-                    status: statusKasir, 
-                    notes: notes
+                    payment_method:  paymentMethodName,
+                    payment_type:    document.getElementById('m-tipe')?.value || 'Langsung',
+                    cash_account:    document.getElementById('m-akun-kas')?.value || 'Kas Utama Klinik',
+                    amount_paid:     amountPaid,
+                    change_amount:   changeAmount,
+                    debt_amount:     debtAmount,
+                    status:          statusKasir, 
+                    notes:           notes
                 }) 
             });
 
