@@ -97,11 +97,6 @@
     </div>
 
     <div class="cashier-layout">
-        {{-- Tabs --}}
-        <div class="cashier-tabs">
-            <button class="cashier-tab active">Pembayaran</button>
-        </div>
-
         <div class="cashier-content">
             <div class="cashier-tab-content active">
                 {{-- Toolbar --}}
