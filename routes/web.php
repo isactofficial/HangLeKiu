@@ -97,7 +97,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/medicine/{id}', [MedicineController::class, 'update'])->name('medicine.update');    
             Route::delete('/medicine/{id}', [MedicineController::class, 'destroy'])->name('medicine.destroy');    
             Route::post('/medicine/{id}/stock-in', [MedicineController::class, 'stockIn'])->name('medicine.stockIn');
-            
+            Route::delete('/medicine/{medicineId}/stock-mutation/{mutationId}', [MedicineController::class, 'destroyMutation']);            
             Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
 
             // BHP (Bahan Habis Pakai)

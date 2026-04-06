@@ -239,6 +239,30 @@ class MedicineController extends Controller
         ]);
     }
 
+    public function destroyMutation($medicineId, $mutationId)
+    {
+        $mutation = StockMutation::where('id', $mutationId)
+        ->where('medicine_id', $medicineId)
+        ->firstOrFail();
+        $medicine = Medicine::findOrFail($medicineId);
+        
+        // Rollback stok
+        if ($mutation->type === 'in') {
+            if ($medicine->current_stock < $mutation->quantity) {
+                return response()->json([
+                    'success' => false,                
+                    'message' => 'Tidak bisa hapus. Stok saat ini lebih kecil dari jumlah restock.',
+                    ], 422);
+                    }
+                    $medicine->decrement('current_stock', $mutation->quantity);
+                    } else {
+                        $medicine->increment('current_stock', $mutation->quantity);
+                    }
+                    
+                    $mutation->delete();
+                    return response()->json(['success' => true, 'message' => 'Transaksi obat berhasil dihapus']);
+    }
+
     // 🔥 HISTORY LOG STOK
     public function stockHistory($id)
     {
@@ -261,6 +285,7 @@ class MedicineController extends Controller
         ->orderByDesc('created_at')
         ->get()
         ->map(function ($m) {
+            $harga = $m->unit_price ?? $m->medicine->purchase_price ?? 0;
             return [
                 'id'                => $m->id,
                 'restock_type'      => $m->type === 'in' ? 'restock' : 'return',
@@ -271,6 +296,7 @@ class MedicineController extends Controller
                 'notes'             => $m->notes,
                 'batch_number'      => null,
                 '_source'           => 'obat',
+                'medicine_id'       => $m->medicine_id, 
                 'item'              => [
                     'item_name' => $m->medicine->medicine_name ?? '-',
                 ],
