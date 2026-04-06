@@ -1,7 +1,9 @@
 @extends('admin.layout.admin')
 @section('title', 'Apotek')
 
-@section('content')
+@section('navbar')
+    @include('admin.components.navbar', ['title' => 'Apotek'])
+@endsection
 
 @php
     $menuList = [
