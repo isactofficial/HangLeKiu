@@ -1791,8 +1791,20 @@
                       savedTeethNumbers = Array.from(uniqueTeeth);
                   }
                   window.lastSavedToothNumbers = savedTeethNumbers;
+                  const currentRegistrationId = String(visitIdEl ? (visitIdEl.value || '') : '').trim();
+                  window.lastSavedToothNumbersByRegistration = window.lastSavedToothNumbersByRegistration || {};
+                  if (currentRegistrationId) {
+                    window.lastSavedToothNumbersByRegistration[currentRegistrationId] = savedTeethNumbers;
+                  }
                     try {
                       sessionStorage.setItem('emr_last_saved_tooth_numbers', JSON.stringify(savedTeethNumbers));
+
+                      const savedMapRaw = sessionStorage.getItem('emr_last_saved_tooth_numbers_by_registration');
+                      const savedMap = savedMapRaw ? JSON.parse(savedMapRaw) : {};
+                      if (savedMap && typeof savedMap === 'object' && currentRegistrationId) {
+                        savedMap[currentRegistrationId] = savedTeethNumbers;
+                        sessionStorage.setItem('emr_last_saved_tooth_numbers_by_registration', JSON.stringify(savedMap));
+                      }
                     } catch (error) {}
                   
                   toggleOdontogramModal(false);

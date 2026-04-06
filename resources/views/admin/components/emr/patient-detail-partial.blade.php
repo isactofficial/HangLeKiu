@@ -604,14 +604,14 @@
                 <div class="info-group">
                     <label>
                         ALAMAT RUMAH
-                        <i class="fa fa-eye-slash js-sensitive-toggle"
+                        <i class="fa fa-eye js-sensitive-toggle is-active"
                            data-sensitive-target="patientAddressValue"
                            title="Tampilkan/Sembunyikan"></i>
                     </label>
-                    <div class="info-value is-masked"
+                    <div class="info-value"
                          id="patientAddressValue"
                          data-sensitive-original="{{ e($patient->address ?? '-') }}"
-                         data-sensitive-visible="0">••••••••</div>
+                         data-sensitive-visible="1">{{ e($patient->address ?? '-') }}</div>
                     <div class="info-link" style="text-align: left; margin-top: 8px;">
                         <a href="#patientDetailModal">Lihat data lainnya &gt;</a>
                     </div>
@@ -619,26 +619,26 @@
                 <div class="info-group">
                     <label>
                         NOMOR KTP
-                        <i class="fa fa-eye-slash js-sensitive-toggle"
+                        <i class="fa fa-eye js-sensitive-toggle is-active"
                            data-sensitive-target="patientIdCardValue"
                            title="Tampilkan/Sembunyikan"></i>
                     </label>
-                    <div class="info-value is-masked"
+                    <div class="info-value"
                          id="patientIdCardValue"
                          data-sensitive-original="{{ e($patient->id_card_number ?? '-') }}"
-                         data-sensitive-visible="0">••••••••</div>
+                         data-sensitive-visible="1">{{ e($patient->id_card_number ?? '-') }}</div>
                 </div>
                 <div class="info-group">
                     <label>
                         NOMOR HP
-                        <i class="fa fa-eye-slash js-sensitive-toggle"
+                        <i class="fa fa-eye js-sensitive-toggle is-active"
                            data-sensitive-target="patientPhoneValue"
                            title="Tampilkan/Sembunyikan"></i>
                     </label>
-                    <div class="info-value is-masked"
+                    <div class="info-value"
                          id="patientPhoneValue"
                          data-sensitive-original="{{ e($patient->phone_number ?? '-') }}"
-                         data-sensitive-visible="0">••••••••</div>
+                         data-sensitive-visible="1">{{ e($patient->phone_number ?? '-') }}</div>
                 </div>
             </div>
         </div>

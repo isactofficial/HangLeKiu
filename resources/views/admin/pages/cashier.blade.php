@@ -1,4 +1,4 @@
-@extends('admin.layout.admin')
+﻿@extends('admin.layout.admin')
 @section('title', 'Kasir - HangLeKiu')
 
 @section('navbar')
@@ -180,6 +180,25 @@
                                         $arrSubtotal[] = $medPrice * $medQty;
                                         $arrGigi[] = '-'; 
                                     }
+
+                                    // Gabungkan BHP (Consumable)
+                                    $bhpUsages = \Illuminate\Support\Facades\DB::table('consumable_usage')
+                                        ->join('consumable_items', 'consumable_usage.bhp_id', '=', 'consumable_items.id')
+                                        ->where('consumable_usage.treatment_id', $medicalProcedure->id)
+                                        ->select('consumable_items.item_name', 'consumable_usage.unit_price', 'consumable_usage.quantity_used')
+                                        ->get();
+
+                                    foreach ($bhpUsages as $bhp) {
+                                        $arrTindakan[] = $bhp->item_name;
+                                        $bhpPrice = (float) $bhp->unit_price;
+                                        $bhpQty = (int) $bhp->quantity_used;
+
+                                        $arrHarga[] = $bhpPrice;
+                                        $arrQty[] = $bhpQty;
+                                        $arrDiskon[] = 0;
+                                        $arrSubtotal[] = $bhpPrice * $bhpQty;
+                                        $arrGigi[] = '-';
+                                    }
                                 }
                                 
                                 // 4. CEK DATA DI TABEL INVOICE (Data Permanen setelah Refresh)
@@ -266,16 +285,34 @@
                                                 <span class="badge-belum-lunas">Belum Lunas</span>
                                             @endif
 
-                                            {{-- Tombol Nota tetap muncul untuk print ulang --}}
-                                            <button class="text-white bg-[#8e6a45] px-3 py-1.5 rounded shadow-sm font-bold text-xs hover:bg-[#7a5938] transition-colors flex items-center" 
-                                                onclick='prepareAndPrint(@json($invoiceNo), @json($apt->patient->full_name ?? "Pasien"), @json($apt->doctor->full_name ?? "-"), @json($arrTindakan), @json($arrHarga), @json($arrQty), @json($arrDiskon), @json($arrSubtotal), @json($arrGigi), @json($metodeBayar), @json($tglInputStr), @json($catatanInvoice), @json($invoiceStatus), {{ $amtPaid }}, {{ $amtChange }}, {{ $amtDebt }})'>
-                                                <i class="fa fa-print mr-1"></i> Nota
-                                            </button>
+                                                                                    {{-- Tombol Nota tetap muncul untuk print ulang --}}
+                                            <button class="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-white transition-colors bg-[#8e6a45] border-2 border-[#8e6a45] rounded shadow-sm hover:bg-[#7a5938] hover:border-[#7a5938]" 
+                                            onclick='prepareAndPrint(
+                                                @json($invoiceNo), 
+                                                @json($apt->patient->full_name ?? "Pasien"), 
+                                                @json($apt->doctor->full_name ?? "-"), 
+                                                @json($arrTindakan), 
+                                                @json($arrHarga), 
+                                                @json($arrQty), 
+                                                @json($arrDiskon), 
+                                                @json($arrSubtotal), 
+                                                @json($arrGigi), 
+                                                @json($metodeBayar), 
+                                                @json($tglInputStr), 
+                                                @json($catatanInvoice), 
+                                                @json($invoiceStatus), 
+                                                {{ $amtPaid }}, 
+                                                {{ $amtChange }}, 
+                                                {{ $amtDebt }}
+                                            )'
+                                        >
+                                            <i class="fa fa-print"></i> Nota
+                                        </button>
                                         </div>
                                     @elseif($apt->status === 'succeed')
                                         {{-- JIKA BELUM ADA DI TABEL INVOICE SAMA SEKALI --}}
                                         <div class="flex justify-center w-full">
-                                            <button class="btn-bayar-tabel text-white bg-[#A67C52] px-4 py-2 rounded shadow-sm font-bold text-xs hover:bg-[#8e6a45] transition-colors flex items-center" 
+                                            <button class="btn-bayar-tabel text-white bg-[#A67C52] px-4 py-2 rounded shadow-sm font-bold text-xs hover:bg-[#8e6a45] transition-colors flex items-center gap-2" 
                                                 onclick='openPayment(
                                                     @json($invoiceNo), 
                                                     @json($dataPasien), 
@@ -288,7 +325,7 @@
                                                     @json($tglInputStr),
                                                     @json($apt->id)
                                                 )'>
-                                                <i class="fa fa-wallet mr-1.5"></i> Bayar Sekarang
+                                                <i class="fa fa-wallet"></i> Bayar Sekarang
                                             </button>
                                         </div>
                                     @endif

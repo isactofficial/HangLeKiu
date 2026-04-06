@@ -79,6 +79,7 @@ class EmrController extends Controller
             'medicalProcedures.medicines.medicine',
             'medicalProcedures.bhpUsages.item',
             'medicalProcedures.doctor',
+            'medicalProcedures.doctorNotes.user',
         ];
 
         if ($hasProcedureAssistantTable) {
@@ -90,7 +91,8 @@ class EmrController extends Controller
             ->orderByDesc('appointment_datetime')
             ->get();
 
-        $doctorNotes = $appointment->medicalProcedures
+        $doctorNotes = $patientRegistrations
+            ->flatMap(fn($registration) => $registration->medicalProcedures)
             ->flatMap(function ($procedure) use ($hasProcedureAssistantTable) {
                 $assistantNames = collect();
                 if ($hasProcedureAssistantTable) {
@@ -281,21 +283,27 @@ public function storePayment(Request $request)
             $receiptNumber = 'REC-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
 
             // 2. Simpan data transaksi ke tabel invoices, TERMASUK status
-            $invoice = Invoice::create([
+            $invoicePayload = [
                 'registration_id' => $request->registration_id,
                 'admin_id'        => Auth::id() ?? '49f9ad75-bd0b-43ca-8a19-a9adebfd0c5f', // Menggunakan fallback ID admin jika auth kosong
                 'invoice_number'  => $invoiceNumber,
                 'receipt_number'  => $receiptNumber,
                 'payment_type'    => $request->payment_type ?? 'Langsung',
                 'payment_method'  => $request->payment_method,
-                'cash_account'    => $request->cash_account,
                 'amount_paid'     => $request->amount_paid,
                 'change_amount'   => $request->change_amount,
                 'debt_amount'     => $request->debt_amount,
                 'status'          => $request->status, // <--- INI KUNCI AGAR SAAT REFRESH TOMBOLNYA BERUBAH
                 'rounding'        => 0,
                 'notes'           => $request->notes,
-            ]);
+            ];
+
+            // Kompatibilitas: beberapa environment belum menjalankan migration cash_account.
+            if (Schema::hasColumn('invoices', 'cash_account')) {
+                $invoicePayload['cash_account'] = $request->cash_account;
+            }
+
+            $invoice = Invoice::create($invoicePayload);
 
             // Update status pendaftaran menjadi 'succeed' atau status selesai lainnya
             Appointment::where('id', $request->registration_id)->update([

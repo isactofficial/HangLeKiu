@@ -98,6 +98,14 @@
   z-index: 30;
 }
 
+#modalTambahProsedur .obat-row:focus-within {
+  z-index: 40;
+}
+
+#modalTambahProsedur .bhp-row:focus-within {
+  z-index: 20;
+}
+
 #modalTambahProsedur .obat-row {
   z-index: 1;
 }
@@ -1014,17 +1022,32 @@
         if (qtyInput) qtyInput.value = String(Number(item.quantity_used || 0));
       }
 
-      function getSavedToothNumbersText() {
-        const cachedNumbers = Array.isArray(window.lastSavedToothNumbers) && window.lastSavedToothNumbers.length > 0
-          ? window.lastSavedToothNumbers
-          : (() => {
-              try {
-                const stored = sessionStorage.getItem('emr_last_saved_tooth_numbers');
-                return stored ? JSON.parse(stored) : [];
-              } catch (error) {
-                return [];
-              }
-            })();
+      function parseSavedToothMap() {
+        try {
+          const storedMap = sessionStorage.getItem('emr_last_saved_tooth_numbers_by_registration');
+          if (!storedMap) return {};
+          const parsed = JSON.parse(storedMap);
+          return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function getSavedToothNumbersByRegistration(registrationId) {
+        const regKey = String(registrationId || '').trim();
+        if (!regKey) return [];
+
+        const inMemoryMap = window.lastSavedToothNumbersByRegistration;
+        if (inMemoryMap && Array.isArray(inMemoryMap[regKey])) {
+          return inMemoryMap[regKey];
+        }
+
+        const storedMap = parseSavedToothMap();
+        return Array.isArray(storedMap[regKey]) ? storedMap[regKey] : [];
+      }
+
+      function getSavedToothNumbersText(registrationId) {
+        const cachedNumbers = getSavedToothNumbersByRegistration(registrationId);
 
         if (!Array.isArray(cachedNumbers) || cachedNumbers.length === 0) {
           return '';
@@ -1036,10 +1059,10 @@
           .join(', ');
       }
 
-      function applySavedToothNumbersToProcedureRow(row) {
+      function applySavedToothNumbersToProcedureRow(row, registrationId) {
         if (!row) return;
 
-        const toothText = getSavedToothNumbersText();
+        const toothText = getSavedToothNumbersText(registrationId);
         if (!toothText) return;
 
         const toothInput = row.querySelector('.input-no-gigi');
@@ -1096,7 +1119,7 @@
         });
 
         if (items.length === 0) {
-          applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'));
+          applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'), registrationId);
         }
 
         const medicines = Array.isArray(record.medicines) ? record.medicines : [];
@@ -1168,15 +1191,8 @@
         const registrationId = document.getElementById('prosedur-registration-id')?.value;
         loadExistingProcedureForRegistration(registrationId)
           .then((hasExisting) => {
-            applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'));
-
-            if (!hasExisting && window.lastSavedToothNumbers && window.lastSavedToothNumbers.length > 0) {
-              const toothNumbersStr = window.lastSavedToothNumbers.join(', ');
-              const noGigiInput = document.querySelector('.input-no-gigi');
-              if (noGigiInput) {
-                noGigiInput.value = toothNumbersStr;
-                noGigiInput.dispatchEvent(new Event('input', { bubbles: true }));
-              }
+            if (!hasExisting) {
+              applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'), registrationId);
             }
           })
           .catch(() => {
@@ -1458,7 +1474,6 @@
             `;
 
         prosedurContainer.appendChild(newRow);
-        applySavedToothNumbersToProcedureRow(newRow);
         scrollToBottom();
       }
 
