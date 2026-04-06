@@ -49,6 +49,30 @@
                     @enderror
                 </div>
 
+            
+                <div class="row-2">    
+                    <div class="form-group">
+                    <label>Tanggal Lahir <span class="req">*</span></label>
+                    <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}"            
+                    max="{{ today()->toDateString() }}" required>                
+                    @error('date_of_birth')                
+                    <div class="field-error">{{ $message }}</div>               
+                    @enderror
+                </div>
+    
+                <div class="form-group">
+                    <label>Jenis Kelamin <span class="req">*</span></label>        
+                    <select name="gender" required>
+                        <option value="" disabled {{ old('gender') ? '' : 'selected' }}>Pilih...</option>                    
+                        <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Perempuan</option> 
+                    </select>
+                            @error('gender')            
+                    <div class="field-error">{{ $message }}</div>        
+                    @enderror    
+                </div>
+            </div>
+
                 <div class="form-group">
                     <label>Jenis Perawatan <span class="req">*</span></label>
                     <select name="treatment_id" required>

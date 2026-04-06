@@ -31,36 +31,57 @@ class AppointmentController extends Controller
 
         return view('user.components.create', compact('doctors', 'treatments'));
     }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'patient_name'     => 'required|string|max:100',
+            'patient_name'     => 'required|string|max:100',        
             'patient_phone'    => 'required|string|max:20',
+            'date_of_birth'    => 'required|date|before:today',
+            'gender'           => 'required|in:Male,Female',
             'doctor_id'        => 'required|exists:doctor,id',
             'treatment_id'     => 'required|exists:master_procedure,id',
             'appointment_date' => 'required|date|after_or_equal:today',
             'appointment_time' => 'required|date_format:H:i',
             'payment_method'   => 'required|in:tunai',
             'notes'            => 'nullable|string|max:500',
-        ]);
+            ]);
 
-        $appointmentDateTime = Carbon::parse($validated['appointment_date'] . ' ' . $validated['appointment_time']);
-        $treatment = Treatment::query()->find($validated['treatment_id']);
+            $patient = Patient::firstOrCreate(
+            ['phone_number' => $validated['patient_phone']],
+            [
+                'id'                => (string) Str::ulid(),            
+                'full_name'         => $validated['patient_name'],            
+                'medical_record_no' => 'MR' . str_pad(Patient::count() + 1, 6, '0', STR_PAD_LEFT),
+                'date_of_birth'     => $validated['date_of_birth'],
+                'gender'            => $validated['gender'],
+                ]
+                );
 
-        Appointment::create([
-            'id'                   => (string) Str::ulid(),
-            'doctor_id'            => $validated['doctor_id'],
-            'registration_date'    => $validated['appointment_date'],
-            'appointment_datetime' => $appointmentDateTime,
-            'status'               => 'pending',
-            'procedure_plan'       => $treatment?->procedure_name,
-            'complaint'            => trim("Nama: {$validated['patient_name']}\nWhatsApp: {$validated['patient_phone']}\nCatatan: " . ($validated['notes'] ?? '-')),
-        ]);
+                $paymentMethod = MasterPaymentMethod::where('name', 'like', '%' . $validated['payment_method'] . '%')       
+                ->first();
 
-        return redirect()->route('appointments.success')
-            ->with('success', 'Pendaftaran berhasil! Kami akan konfirmasi via WhatsApp dalam 1x24 jam.');
-    }
+                $appointmentDateTime = Carbon::parse(
+                $validated['appointment_date'] . ' ' . $validated['appointment_time']
+                );
+
+                $treatment = Treatment::find($validated['treatment_id']);
+
+                Appointment::create([
+                'id'                   => (string) Str::ulid(),
+                'patient_id'           => $patient->id,
+                'doctor_id'            => $validated['doctor_id'],
+                'registration_date'    => $validated['appointment_date'],
+                'appointment_datetime' => $appointmentDateTime,
+                'status'               => 'pending',        
+                'procedure_plan'       => $treatment?->procedure_name,        
+                'complaint'            => $validated['notes'] ?? null,        
+                'payment_method_id'    => $paymentMethod?->id,                
+                'admin_id'             => null,                            
+                ]);
+        
+                return redirect()->route('appointments.success')    
+                ->with('success', 'Pendaftaran berhasil! Kami akan konfirmasi via WhatsApp dalam 1x24 jam.');
+            }
 
     public function success()
     {
