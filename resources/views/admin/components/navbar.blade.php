@@ -4,14 +4,10 @@
 @props(['title' => ''])
 
 <header class="admin-navbar">
-
-    {{-- Hamburger — inline, hanya mobile --}}
-    <button id="sidebarToggle" class="sidebar-hamburger" type="button" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-    </button>
+    {{-- Main Navbar Content --}}
 
     {{-- Right: Actions --}}
-    <div class="navbar-right w-full flex align-center w-[100%] justify-between md:justify-end">
+    <div class="navbar-right w-full flex items-center justify-between md:justify-end">
         
         {{-- Left Items (Mobile) --}}
         <div class="navbar-left flex items-center md:hidden">
