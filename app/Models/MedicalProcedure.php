@@ -60,6 +60,11 @@ class MedicalProcedure extends Model
         return $this->hasMany(ProcedureMedicine::class, 'procedure_id', 'id');
     }
 
+    public function bhpUsages()
+    {
+        return $this->hasMany(ConsumableUsage::class, 'treatment_id', 'id');
+    }
+
     public function doctorNotes()
     {
         return $this->hasMany(DoctorNote::class, 'procedure_id', 'id');

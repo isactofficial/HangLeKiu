@@ -60,4 +60,9 @@ class ConsumableUsage extends Model
     {
         return $this->belongsTo(ConsumableItem::class, 'bhp_id');
     }
+
+    public function medicalProcedure()
+    {
+        return $this->belongsTo(MedicalProcedure::class, 'treatment_id');
+    }
 }

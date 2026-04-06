@@ -62,6 +62,7 @@ class EmrController extends Controller
             'guarantorType',
             'medicalProcedures.doctor',
             'medicalProcedures.doctorNotes.user',
+            'medicalProcedures.bhpUsages.item',
         ];
 
         if ($hasProcedureAssistantTable) {
@@ -76,6 +77,7 @@ class EmrController extends Controller
             'poli',
             'medicalProcedures.items.masterProcedure',
             'medicalProcedures.medicines.medicine',
+            'medicalProcedures.bhpUsages.item',
             'medicalProcedures.doctor',
         ];
 
@@ -258,10 +260,12 @@ public function storePayment(Request $request)
         $request->validate([
             'registration_id' => 'required',
             'payment_method'  => 'required',
+            'payment_type'    => 'nullable|string|max:100',
+            'cash_account'    => 'nullable|string|max:100',
             'amount_paid'     => 'required|numeric',
             'change_amount'   => 'required|numeric',
             'debt_amount'     => 'required|numeric',
-            'status'          => 'required|in:paid,partial,unpaid', // Validasi status dari JS
+            'status'          => 'required|in:paid,partial,unpaid',
         ]);
 
         DB::beginTransaction();
@@ -282,8 +286,9 @@ public function storePayment(Request $request)
                 'admin_id'        => Auth::id() ?? '49f9ad75-bd0b-43ca-8a19-a9adebfd0c5f', // Menggunakan fallback ID admin jika auth kosong
                 'invoice_number'  => $invoiceNumber,
                 'receipt_number'  => $receiptNumber,
-                'payment_type'    => 'Langsung', 
+                'payment_type'    => $request->payment_type ?? 'Langsung',
                 'payment_method'  => $request->payment_method,
+                'cash_account'    => $request->cash_account,
                 'amount_paid'     => $request->amount_paid,
                 'change_amount'   => $request->change_amount,
                 'debt_amount'     => $request->debt_amount,

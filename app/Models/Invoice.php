@@ -22,6 +22,7 @@ class Invoice extends Model
         'receipt_number',
         'payment_type',
         'payment_method',
+        'cash_account',
         'amount_paid',
         'change_amount',
         'debt_amount',

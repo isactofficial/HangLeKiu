@@ -34,14 +34,344 @@
         gap: 20px 40px; width: 100%;
     }
     .info-group { display: flex; flex-direction: column; }
-    .info-group label { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--brown-500); font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+    .info-group label { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #111827; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
     .info-group label i { color: var(--brown-300); font-size: 11px; cursor: pointer; }
-    .info-value { font-size: 14px; color: var(--brown-800); font-weight: 600; line-height: 1.4; }
-    .name-highlight { font-size: 26px; font-weight: 800; color: var(--brown-900); letter-spacing: -0.5px; margin-top: -3px; }
+    .info-group label i.is-active { color: var(--brown-700); }
+    .info-value { font-size: 14px; color: var(--brown-600); font-weight: 600; line-height: 1.4; }
+    .info-value.is-masked { letter-spacing: 1px; }
+    .name-highlight { font-size: 26px; font-weight: 800; color: var(--brown-600); letter-spacing: -0.5px; margin-top: -3px; }
     
     .info-link { margin-top: 8px; }
     .info-link a { font-size: 12px; color: var(--brown-700); text-decoration: none; font-weight: 700; transition: 0.2s; }
     .info-link a:hover { text-decoration: underline; color: var(--brown-900); }
+
+    .patient-detail-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(28, 22, 14, 0.45);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 2147483001;
+    }
+
+    .patient-detail-modal:target {
+        display: flex;
+    }
+
+    .patient-detail-modal-card {
+        width: min(100%, 760px);
+        max-height: calc(100vh - 40px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border-radius: 14px;
+        background: #fff;
+        border: 1px solid var(--brown-200);
+        box-shadow: 0 20px 48px rgba(59, 51, 30, 0.28);
+    }
+
+    .patient-detail-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--brown-200);
+        background: linear-gradient(180deg, #fdf7f1 0%, #ffffff 100%);
+    }
+
+    .patient-detail-modal-title {
+        margin: 0;
+        font-size: 15px;
+        color: #111827;
+        font-weight: 800;
+        text-align: center;
+        width: 100%;
+    }
+
+    .patient-detail-modal-close {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        color: var(--brown-700);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .patient-detail-modal-body {
+        padding: 16px;
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    .patient-detail-photo-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--brown-200);
+    }
+
+    .patient-detail-photo {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--brown-200);
+        background: var(--brown-50);
+        flex-shrink: 0;
+    }
+
+    .patient-detail-photo-meta {
+        min-width: 0;
+    }
+
+    .patient-detail-photo-actions {
+        margin-top: 6px;
+    }
+
+    .patient-detail-photo-upload-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--brown-700);
+        border: 1px solid var(--brown-200);
+        border-radius: 8px;
+        padding: 5px 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    .patient-detail-photo-upload-label.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .patient-detail-photo-hint {
+        margin-top: 4px;
+        font-size: 10px;
+        color: var(--brown-500);
+    }
+
+    .patient-detail-photo-cropper-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 2147483010;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .patient-detail-photo-cropper-card {
+        background: #fff;
+        border: 1px solid var(--brown-200);
+        border-radius: 12px;
+        width: min(96vw, 680px);
+        max-height: 92vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .patient-detail-photo-cropper-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--brown-200);
+    }
+
+    .patient-detail-photo-cropper-head h3 {
+        margin: 0;
+        font-size: 16px;
+        color: var(--brown-900);
+        font-weight: 800;
+    }
+
+    .patient-detail-photo-cropper-close {
+        border: none;
+        background: transparent;
+        color: var(--brown-700);
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .patient-detail-photo-cropper-body {
+        padding: 16px;
+    }
+
+    .patient-detail-photo-cropper-note {
+        margin: 0 0 10px;
+        font-size: 12px;
+        color: var(--brown-600);
+    }
+
+    .patient-detail-photo-cropper-canvas-wrap {
+        border: 1px solid var(--brown-200);
+        border-radius: 10px;
+        background: var(--brown-50);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+        padding: 10px;
+    }
+
+    #patientDetailPhotoCropperCanvas {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        user-select: none;
+        cursor: grab;
+        border-radius: 8px;
+    }
+
+    #patientDetailPhotoCropperCanvas:active {
+        cursor: grabbing;
+    }
+
+    .patient-detail-photo-cropper-actions {
+        padding: 12px 16px;
+        border-top: 1px solid var(--brown-200);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .patient-detail-photo-name {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--brown-600);
+        line-height: 1.2;
+    }
+
+    .patient-detail-photo-rm {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--brown-500);
+        margin-top: 2px;
+    }
+
+    .patient-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .patient-detail-item {
+        border: 1px solid var(--brown-200);
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: var(--brown-50);
+    }
+
+    .patient-detail-item.full {
+        grid-column: 1 / -1;
+    }
+
+    .patient-detail-label {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: var(--brown-500);
+        margin-bottom: 3px;
+    }
+
+    .patient-detail-value {
+        font-size: 13px;
+        color: var(--brown-600);
+        font-weight: 600;
+        line-height: 1.4;
+        word-break: break-word;
+    }
+
+    .patient-detail-input,
+    .patient-detail-select,
+    .patient-detail-textarea {
+        width: 100%;
+        border: 1px solid var(--brown-200);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 12px;
+        color: var(--brown-600);
+        background: #fff;
+        outline: none;
+    }
+
+    .patient-detail-textarea {
+        min-height: 74px;
+        resize: vertical;
+    }
+
+    .patient-detail-input:disabled,
+    .patient-detail-select:disabled,
+    .patient-detail-textarea:disabled {
+        background: var(--brown-50);
+        color: var(--brown-600);
+        opacity: 1;
+        cursor: not-allowed;
+    }
+
+    .patient-detail-actions {
+        margin-top: 14px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .patient-detail-btn {
+        border: 1px solid var(--brown-200);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .patient-detail-btn.primary {
+        background: var(--brown-800);
+        color: #fff;
+        border-color: var(--brown-800);
+    }
+
+    .patient-detail-btn.secondary {
+        background: #fff;
+        color: var(--brown-800);
+    }
+
+    .patient-detail-btn.success {
+        background: #166534;
+        color: #fff;
+        border-color: #166534;
+    }
+
+    @media (max-width: 768px) {
+        .patient-detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 
     /* ================= 3. TABS NAV ================= */
     .emr-tabs-nav { display: flex; gap: 40px; border-bottom: 2px solid var(--brown-100); margin-bottom: 30px; width: 100%; }
@@ -77,7 +407,7 @@
         padding: 12px;
         font-size: 11px;
         font-weight: 800;
-        color: var(--brown-500);
+        color: var(--brown-900);
         text-transform: uppercase;
     }
 
@@ -92,13 +422,13 @@
     }
 
     .record-table-text {
-        color: var(--brown-800);
+        color: var(--brown-600);
         font-size: 12px;
         line-height: 1.5;
     }
 
     .record-table-text strong {
-        color: var(--brown-900);
+        color: var(--brown-600);
     }
 
     .record-empty-state {
@@ -127,7 +457,7 @@
         padding: 25px; background: #fff; margin-bottom: 30px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.02); 
     }
-    .card-title { font-size: 15px; color: var(--brown-800); margin-bottom: 15px; }
+    .card-title { font-size: 15px; color: var(--brown-600); margin-bottom: 15px; }
     .doc-link { color: var(--brown-700); font-weight: 700; }
 
     /* LAYOUT KIRI-KANAN TIMELINE */
@@ -219,11 +549,28 @@
     $patientDobText = $patientDob ? \Carbon\Carbon::parse($patientDob)->translatedFormat('d F Y') : '-';
     $patientAgeText = $patientDob ? \Carbon\Carbon::parse($patientDob)->age . ' Thn' : '-';
     $patientAgeNumber = $patientDob ? \Carbon\Carbon::parse($patientDob)->age : 0;
+    $patientFirstChatDateValue = $patient?->first_chat_date
+        ? \Carbon\Carbon::parse($patient->first_chat_date)->format('Y-m-d')
+        : '';
     $patientGenderLabel = ($patient->gender ?? '') === 'Male' ? 'Laki-laki' : 'Perempuan';
     $patientPhoto = $patient?->photo ?? '';
-    $patientPhotoSrc = str_starts_with((string) $patientPhoto, 'data:image')
-        ? $patientPhoto
-        : ($patientPhoto ? asset('storage/' . $patientPhoto) : asset('images/avatar-placeholder.png'));
+    $normalizedPhoto = trim((string) $patientPhoto);
+    $looksLikeRawBase64 = $normalizedPhoto !== ''
+        && !str_starts_with($normalizedPhoto, 'data:image')
+        && !preg_match('/^(https?:\/\/|\/)/i', $normalizedPhoto)
+        && !preg_match('/\.(jpg|jpeg|png|gif|webp|svg)$/i', $normalizedPhoto)
+        && !str_contains($normalizedPhoto, 'storage/')
+        && strlen(preg_replace('/\s+/', '', $normalizedPhoto)) > 120;
+
+    if (str_starts_with($normalizedPhoto, 'data:image')) {
+        $patientPhotoSrc = $normalizedPhoto;
+    } elseif ($looksLikeRawBase64) {
+        $patientPhotoSrc = 'data:image/png;base64,' . preg_replace('/\s+/', '', $normalizedPhoto);
+    } elseif ($normalizedPhoto !== '') {
+        $patientPhotoSrc = asset('storage/' . ltrim($normalizedPhoto, '/'));
+    } else {
+        $patientPhotoSrc = asset('images/avatar-placeholder.png');
+    }
 @endphp
 
 <div class="p-detail-container"
@@ -255,19 +602,43 @@
                 <div></div>
                 
                 <div class="info-group">
-                    <label>ALAMAT RUMAH <i class="fa fa-eye-slash"></i></label>
-                    <div class="info-value">{{ $patient->address ?? '-' }}</div>
+                    <label>
+                        ALAMAT RUMAH
+                        <i class="fa fa-eye-slash js-sensitive-toggle"
+                           data-sensitive-target="patientAddressValue"
+                           title="Tampilkan/Sembunyikan"></i>
+                    </label>
+                    <div class="info-value is-masked"
+                         id="patientAddressValue"
+                         data-sensitive-original="{{ e($patient->address ?? '-') }}"
+                         data-sensitive-visible="0">••••••••</div>
                     <div class="info-link" style="text-align: left; margin-top: 8px;">
-                        <a href="#">Lihat data lainnya ></a>
+                        <a href="#patientDetailModal">Lihat data lainnya &gt;</a>
                     </div>
                 </div>
                 <div class="info-group">
-                    <label>NOMOR KTP <i class="fa fa-eye-slash"></i></label>
-                    <div class="info-value">{{ $patient->id_card_number ?? '-' }}</div>
+                    <label>
+                        NOMOR KTP
+                        <i class="fa fa-eye-slash js-sensitive-toggle"
+                           data-sensitive-target="patientIdCardValue"
+                           title="Tampilkan/Sembunyikan"></i>
+                    </label>
+                    <div class="info-value is-masked"
+                         id="patientIdCardValue"
+                         data-sensitive-original="{{ e($patient->id_card_number ?? '-') }}"
+                         data-sensitive-visible="0">••••••••</div>
                 </div>
                 <div class="info-group">
-                    <label>NOMOR HP <i class="fa fa-eye-slash"></i></label>
-                    <div class="info-value">{{ $patient->phone_number ?? '-' }}</div>
+                    <label>
+                        NOMOR HP
+                        <i class="fa fa-eye-slash js-sensitive-toggle"
+                           data-sensitive-target="patientPhoneValue"
+                           title="Tampilkan/Sembunyikan"></i>
+                    </label>
+                    <div class="info-value is-masked"
+                         id="patientPhoneValue"
+                         data-sensitive-original="{{ e($patient->phone_number ?? '-') }}"
+                         data-sensitive-visible="0">••••••••</div>
                 </div>
             </div>
         </div>
@@ -446,7 +817,15 @@
                     <div>Status</div>
                 </div>
 
-                @forelse(($patientRegistrations ?? collect()) as $reg)
+                @php
+                    $sortedPatientRegistrations = collect($patientRegistrations ?? collect())
+                        ->sortByDesc(function ($reg) {
+                            return $reg->created_at ?? $reg->appointment_datetime;
+                        })
+                        ->values();
+                @endphp
+
+                @forelse($sortedPatientRegistrations as $reg)
                     @php
                         $primaryDoctorName = $reg->doctor->full_name
                             ?? optional($reg->medicalProcedures->first()?->doctor)->full_name
@@ -485,6 +864,13 @@
                             ->unique()
                             ->values();
 
+                        $bhpNames = $reg->medicalProcedures
+                            ->flatMap(fn($mp) => $mp->bhpUsages)
+                            ->map(fn($usage) => optional($usage->item)->item_name)
+                            ->filter()
+                            ->unique()
+                            ->values();
+
                         $toothNumbers = $reg->medicalProcedures
                             ->flatMap(fn($mp) => $mp->items)
                             ->pluck('tooth_numbers')
@@ -509,6 +895,7 @@
                         <div class="record-table-text">
                             <div><strong>Prosedur</strong> {{ $procedureNames->isNotEmpty() ? $procedureNames->implode(', ') : '-' }}</div>
                             <div><strong>Obat</strong> {{ $medicineNames->isNotEmpty() ? $medicineNames->implode(', ') : '-' }}</div>
+                            <div><strong>BHP</strong> {{ $bhpNames->isNotEmpty() ? $bhpNames->implode(', ') : '-' }}</div>
                         </div>
                         <div class="record-table-text" style="font-weight:600;">{{ $toothNumbers->isNotEmpty() ? $toothNumbers->implode(', ') : '-' }}</div>
                         <div class="record-table-text" style="font-weight:700; text-transform:uppercase;">{{ $reg->status ?? '-' }}</div>
@@ -527,7 +914,15 @@
                     <div>Catatan</div>
                 </div>
 
-                @forelse(($doctorNotes ?? collect()) as $note)
+                @php
+                    $sortedDoctorNotes = collect($doctorNotes ?? collect())
+                        ->sortByDesc(function ($note) {
+                            return data_get($note, 'created_at');
+                        })
+                        ->values();
+                @endphp
+
+                @forelse($sortedDoctorNotes as $note)
                     @php
                         $doctorName = $note['doctor_name'] ?? '-';
                         $assistantNames = collect($note['assistant_names'] ?? [])
@@ -576,4 +971,186 @@
         </div>
     </div>
 
+</div>
+
+<div id="patientDetailModal" class="patient-detail-modal">
+    <div class="patient-detail-modal-card">
+        <div class="patient-detail-modal-head">
+            <h3 class="patient-detail-modal-title">Detail Data Pasien</h3>
+            <a href="#" class="patient-detail-modal-close">✕</a>
+        </div>
+        <div class="patient-detail-modal-body">
+            <input type="hidden" id="patientDetailPatientId" value="{{ $patient->id ?? '' }}">
+            <input type="hidden" id="patientDetailPhotoBase64" value="">
+
+            <div class="patient-detail-photo-wrap">
+                <img src="{{ $patientPhotoSrc }}" alt="Foto pasien" class="patient-detail-photo" id="patientDetailPhotoPreview">
+                <div class="patient-detail-photo-meta">
+                    <div class="patient-detail-photo-name">{{ $patient->full_name ?? '-' }}</div>
+                    <div class="patient-detail-photo-rm">RM: {{ $patient->medical_record_no ?? '-' }}</div>
+                    <div class="patient-detail-photo-actions">
+                        <label for="patientDetailPhotoInput" id="patientDetailPhotoUploadLabel" class="patient-detail-photo-upload-label disabled">
+                            <i class="fa fa-image"></i> Ganti Foto
+                        </label>
+                        <input id="patientDetailPhotoInput" type="file" accept="image/*" class="hidden" disabled>
+                        <div class="patient-detail-photo-hint">Format: JPG/PNG, maksimal 2MB</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="patient-detail-grid">
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">ID Pasien</div>
+                    <input class="patient-detail-input" value="{{ $patient->id ?? '-' }}" disabled data-readonly-permanent="1">
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">User ID</div>
+                    <input class="patient-detail-input" value="{{ $patient->user_id ?? '-' }}" disabled data-readonly-permanent="1">
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Nama Lengkap</div>
+                    <input id="patientDetailFullName" data-patient-field="full_name" class="patient-detail-input" value="{{ $patient->full_name ?? '' }}" disabled>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Email</div>
+                    <input id="patientDetailEmail" data-patient-field="email" class="patient-detail-input" value="{{ $patient->email ?? '' }}" disabled>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">No. Rekam Medis</div>
+                    <input class="patient-detail-input" value="{{ $patient->medical_record_no ?? '-' }}" disabled data-readonly-permanent="1">
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Tanggal Lahir</div>
+                    <input id="patientDetailDob" type="date" data-patient-field="date_of_birth" class="patient-detail-input" value="{{ optional($patient?->date_of_birth)->format('Y-m-d') }}" disabled>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Jenis Kelamin</div>
+                    <select id="patientDetailGender" data-patient-field="gender" class="patient-detail-select" disabled>
+                        <option value="">-</option>
+                        <option value="Male" {{ ($patient->gender ?? '') === 'Male' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Female" {{ ($patient->gender ?? '') === 'Female' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Golongan Darah</div>
+                    <select id="patientDetailBloodType" data-patient-field="blood_type" class="patient-detail-select" disabled>
+                        <option value="">-</option>
+                        <option value="A" {{ ($patient->blood_type ?? '') === 'A' ? 'selected' : '' }}>A</option>
+                        <option value="B" {{ ($patient->blood_type ?? '') === 'B' ? 'selected' : '' }}>B</option>
+                        <option value="AB" {{ ($patient->blood_type ?? '') === 'AB' ? 'selected' : '' }}>AB</option>
+                        <option value="O" {{ ($patient->blood_type ?? '') === 'O' ? 'selected' : '' }}>O</option>
+                        <option value="unknown" {{ ($patient->blood_type ?? '') === 'unknown' ? 'selected' : '' }}>Tidak diketahui</option>
+                    </select>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Rhesus</div>
+                    <select id="patientDetailRhesus" data-patient-field="rhesus" class="patient-detail-select" disabled>
+                        <option value="">-</option>
+                        <option value="+" {{ ($patient->rhesus ?? '') === '+' ? 'selected' : '' }}>+</option>
+                        <option value="-" {{ ($patient->rhesus ?? '') === '-' ? 'selected' : '' }}>-</option>
+                        <option value="unknown" {{ ($patient->rhesus ?? '') === 'unknown' ? 'selected' : '' }}>Tidak diketahui</option>
+                    </select>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Nomor HP</div>
+                    <input id="patientDetailPhone" data-patient-field="phone_number" class="patient-detail-input" value="{{ $patient->phone_number ?? '' }}" disabled>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Nomor KTP</div>
+                    <input id="patientDetailIdCard" data-patient-field="id_card_number" class="patient-detail-input" value="{{ $patient->id_card_number ?? '' }}" disabled>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Kota</div>
+                    <input id="patientDetailCity" data-patient-field="city" class="patient-detail-input" value="{{ $patient->city ?? '' }}" disabled>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Agama</div>
+                    <select id="patientDetailReligion" data-patient-field="religion" class="patient-detail-select" disabled>
+                        <option value="">-</option>
+                        <option value="Islam" {{ ($patient->religion ?? '') === 'Islam' ? 'selected' : '' }}>Islam</option>
+                        <option value="Kristen" {{ ($patient->religion ?? '') === 'Kristen' ? 'selected' : '' }}>Kristen</option>
+                        <option value="Katolik" {{ ($patient->religion ?? '') === 'Katolik' ? 'selected' : '' }}>Katolik</option>
+                        <option value="Hindu" {{ ($patient->religion ?? '') === 'Hindu' ? 'selected' : '' }}>Hindu</option>
+                        <option value="Buddha" {{ ($patient->religion ?? '') === 'Buddha' ? 'selected' : '' }}>Buddha</option>
+                        <option value="Konghucu" {{ ($patient->religion ?? '') === 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+                    </select>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Pendidikan</div>
+                    <select id="patientDetailEducation" data-patient-field="education" class="patient-detail-select" disabled>
+                        <option value="">-</option>
+                        <option value="SD/Sederajat" {{ in_array(($patient->education ?? ''), ['SD/Sederajat', 'SD'], true) ? 'selected' : '' }}>SD/Sederajat</option>
+                        <option value="SMP/Sederajat" {{ in_array(($patient->education ?? ''), ['SMP/Sederajat', 'SMP'], true) ? 'selected' : '' }}>SMP/Sederajat</option>
+                        <option value="SMA/Sederajat" {{ in_array(($patient->education ?? ''), ['SMA/Sederajat', 'SMA'], true) ? 'selected' : '' }}>SMA/Sederajat</option>
+                        <option value="D3" {{ ($patient->education ?? '') === 'D3' ? 'selected' : '' }}>D3</option>
+                        <option value="S1/D4" {{ in_array(($patient->education ?? ''), ['S1/D4', 'S1'], true) ? 'selected' : '' }}>S1/D4</option>
+                        <option value="S2" {{ ($patient->education ?? '') === 'S2' ? 'selected' : '' }}>S2</option>
+                        <option value="S3" {{ ($patient->education ?? '') === 'S3' ? 'selected' : '' }}>S3</option>
+                        <option value="Lainnya" {{ ($patient->education ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    </select>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Pekerjaan</div>
+                    <select id="patientDetailOccupation" data-patient-field="occupation" class="patient-detail-select" disabled>
+                        <option value="">-</option>
+                        <option value="Pelajar/Mahasiswa" {{ ($patient->occupation ?? '') === 'Pelajar/Mahasiswa' ? 'selected' : '' }}>Pelajar/Mahasiswa</option>
+                        <option value="PNS" {{ ($patient->occupation ?? '') === 'PNS' ? 'selected' : '' }}>PNS</option>
+                        <option value="Karyawan Swasta" {{ ($patient->occupation ?? '') === 'Karyawan Swasta' ? 'selected' : '' }}>Karyawan Swasta</option>
+                        <option value="Wiraswasta" {{ ($patient->occupation ?? '') === 'Wiraswasta' ? 'selected' : '' }}>Wiraswasta</option>
+                        <option value="Ibu Rumah Tangga" {{ ($patient->occupation ?? '') === 'Ibu Rumah Tangga' ? 'selected' : '' }}>Ibu Rumah Tangga</option>
+                        <option value="Lainnya" {{ ($patient->occupation ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    </select>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Status Perkawinan</div>
+                    <select id="patientDetailMaritalStatus" data-patient-field="marital_status" class="patient-detail-select" disabled>
+                        <option value="">-</option>
+                        <option value="Belum Kawin" {{ in_array(($patient->marital_status ?? ''), ['Belum Kawin', 'Belum Menikah'], true) ? 'selected' : '' }}>Belum Kawin</option>
+                        <option value="Kawin" {{ in_array(($patient->marital_status ?? ''), ['Kawin', 'Menikah'], true) ? 'selected' : '' }}>Kawin</option>
+                        <option value="Cerai Hidup" {{ in_array(($patient->marital_status ?? ''), ['Cerai Hidup', 'Cerai'], true) ? 'selected' : '' }}>Cerai Hidup</option>
+                        <option value="Cerai Mati" {{ ($patient->marital_status ?? '') === 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
+                        <option value="Lainnya" {{ ($patient->marital_status ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    </select>
+                </div>
+                <div class="patient-detail-item">
+                    <div class="patient-detail-label">Tanggal Chat Pertama</div>
+                    <input id="patientDetailFirstChatDate" type="date" data-patient-field="first_chat_date" class="patient-detail-input" value="{{ $patientFirstChatDateValue }}" disabled>
+                </div>
+                <div class="patient-detail-item full">
+                    <div class="patient-detail-label">Alamat Rumah</div>
+                    <textarea id="patientDetailAddress" data-patient-field="address" class="patient-detail-textarea" disabled>{{ $patient->address ?? '' }}</textarea>
+                </div>
+                <div class="patient-detail-item full">
+                    <div class="patient-detail-label">Riwayat Alergi</div>
+                    <textarea id="patientDetailAllergy" data-patient-field="allergy_history" class="patient-detail-textarea" disabled>{{ $patient->allergy_history ?? '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="patient-detail-actions">
+                <a href="#" class="patient-detail-btn secondary">Tutup</a>
+                <button type="button" id="patientDetailEditBtn" class="patient-detail-btn primary" onclick="togglePatientDetailEdit(true)">Edit Data</button>
+                <button type="button" id="patientDetailCancelBtn" class="patient-detail-btn secondary hidden" onclick="togglePatientDetailEdit(false)">Batal</button>
+                <button type="button" id="patientDetailSaveBtn" class="patient-detail-btn success hidden" onclick="savePatientDetailFromModal()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="patientDetailPhotoCropperModal" class="patient-detail-photo-cropper-modal">
+    <div class="patient-detail-photo-cropper-card">
+        <div class="patient-detail-photo-cropper-head">
+            <h3>Pilih Area Foto Bulat</h3>
+            <button type="button" class="patient-detail-photo-cropper-close" onclick="closePatientDetailPhotoCropperModal()">&times;</button>
+        </div>
+        <div class="patient-detail-photo-cropper-body">
+            <p class="patient-detail-photo-cropper-note">Geser area bulat untuk menentukan posisi foto profil.</p>
+            <div class="patient-detail-photo-cropper-canvas-wrap">
+                <canvas id="patientDetailPhotoCropperCanvas"></canvas>
+            </div>
+        </div>
+        <div class="patient-detail-photo-cropper-actions">
+            <button type="button" class="patient-detail-btn secondary" onclick="closePatientDetailPhotoCropperModal()">Batal</button>
+            <button type="button" class="patient-detail-btn success" onclick="applyPatientDetailPhotoCrop()">Terapkan Crop</button>
+        </div>
+    </div>
 </div>
