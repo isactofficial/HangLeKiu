@@ -131,6 +131,7 @@ Route::prefix('medicine')->group(function () {
     Route::post('/{id}/stock-in', [MedicineController::class, 'stockIn']);
     Route::post('/{id}/stock-out', [MedicineController::class, 'stockOut']);
     Route::get('/{id}/stock-history', [MedicineController::class, 'stockHistory']);
+    Route::delete('/{medicineId}/stock-mutation/{mutationId}', [MedicineController::class, 'destroyMutation']);
 });
 
 // ================= ADMIN REGISTRATION =================
