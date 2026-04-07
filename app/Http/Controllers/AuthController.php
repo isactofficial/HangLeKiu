@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\VerifyEmailMail;
+use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -170,9 +174,12 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'max:255', 'unique:user,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name'          => ['required', 'string', 'max:255'],
+            'email'         => ['required', 'email', 'max:255', 'unique:user,email'],
+            'password'      => ['required', 'string', 'min:8', 'confirmed'],
+            'date_of_birth' => ['required', 'date', 'before:today'],
+            'gender'        => ['required', 'in:Male,Female'],
+            'phone_number'  => ['required', 'string', 'max:20'],
         ]);
 
         $userRole = Role::where('code', 'PAT')->first();
@@ -187,20 +194,58 @@ class AuthController extends Controller
             ]);
         }
 
-        $user = User::create([
-            'id' => (string) Str::uuid(),
-            'role_id' => $userRole->id,
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'is_active' => true,
-            'is_verified' => false,
-        ]);
+        $verificationToken = Str::random(64);
+
+        $user = DB::transaction(function () use ($validated, $userRole, $verificationToken) {
+            $user = User::create([
+                'id'                       => (string) Str::uuid(),
+                'role_id'                  => $userRole->id,
+                'name'                     => $validated['name'],
+                'email'                    => $validated['email'],
+                'password'                 => Hash::make($validated['password']),
+                'is_active'                => true,
+                'is_verified'              => false,
+                'email_verification_token' => $verificationToken,
+            ]);
+
+            Patient::create([
+                'id'                => (string) Str::ulid(),
+                'user_id'           => $user->id,
+                'full_name'         => $validated['name'],
+                'email'             => $validated['email'],
+                'medical_record_no' => $this->generateMedicalRecordNumber(),
+                'date_of_birth'     => $validated['date_of_birth'],
+                'gender'            => $validated['gender'],
+                'phone_number'      => $validated['phone_number'],
+            ]);
+
+            return $user;
+        });
+
+        try {
+            $verificationUrl = url('/api/auth/verify/' . $verificationToken);
+            Mail::to($user->email)->send(new VerifyEmailMail($verificationUrl, $user->name));
+        } catch (\Exception $e) {
+            Log::warning('Failed to send verification email after web registration.', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'message' => $e->getMessage(),
+            ]);
+        }
 
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect('/user/dashboard');
+        return redirect('/user/dashboard')->with('success', 'Registrasi berhasil. Data pasien sudah terhubung, dan email verifikasi telah dikirim.');
+    }
+
+    private function generateMedicalRecordNumber(): string
+    {
+        do {
+            $number = 'MR' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
+        } while (Patient::where('medical_record_no', $number)->exists());
+
+        return $number;
     }
 
     // ── ADMIN REGISTER ────────────────────────────────────────

@@ -1,6 +1,6 @@
-<div class="reg-modal-overlay" id="modalPasienBaru">
+<div class="reg-modal-overlay" id="modalPasienBaru" style="z-index: 1100;">
     <div class="reg-modal-content">
-        <button type="button" class="modal-close-btn" onclick="closeRegModal('modalPasienBaru')">
+        <button type="button" class="modal-close-btn" onclick="closePasienModalAndBackToReg()">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -190,7 +190,7 @@
 
                     {{-- Submit Button --}}
                     <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
-                        <button type="button" class="btn-outline" onclick="closeRegModal('modalPasienBaru')">Batal</button>
+                        <button type="button" class="btn-outline" onclick="closePasienModalAndBackToReg()">Batal</button>
                         <button type="submit" class="btn-solid" id="pasienBaruSubmitBtn">Simpan Pasien Baru</button>
                     </div>
 
@@ -271,6 +271,13 @@ async function simpanDataPasienBaru(e) {
             
             form.reset();
             
+            // Dispatch event untuk auto-select patient di registration form
+            if (data.data) {
+                window.dispatchEvent(new CustomEvent('patientCreatedInModal', {
+                    detail: { patient: data.data }
+                }));
+            }
+            
             // Reset photo preview
             const photoPreview = document.getElementById('photoPreview');
             const photoPlaceholder = document.getElementById('photoPlaceholder');
@@ -279,11 +286,11 @@ async function simpanDataPasienBaru(e) {
             if (photoPlaceholder) photoPlaceholder.style.display = 'flex';
             if (photoCroppedBase64) photoCroppedBase64.value = '';
             
-            // Tutup pop-up setelah 1.5 detik
+            // Tutup pop-up setelah 1.5 detik dan kembali ke form daftar
             setTimeout(() => {
-                if(typeof closeRegModal === 'function') {
-                    closeRegModal('modalPasienBaru');
-                    console.log('Modal closed');
+                if(typeof closePasienModalAndBackToReg === 'function') {
+                    closePasienModalAndBackToReg();
+                    console.log('Modal closed and back to registration form');
                 }
             }, 1500);
 
@@ -640,4 +647,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+/**
+ * Close Pasien Baru modal dan kembali ke form Daftar Kunjungan
+ */
+window.closePasienModalAndBackToReg = function() {
+    const pasienModal = document.getElementById('modalPasienBaru');
+    const regModal = document.getElementById('modalPendaftaranBaru');
+    
+    if (pasienModal) {
+        pasienModal.style.display = 'none';
+    }
+    if (regModal) {
+        regModal.style.display = 'flex';
+    }
+};
 </script>
