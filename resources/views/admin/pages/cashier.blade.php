@@ -101,8 +101,17 @@
             <div class="cashier-tab-content active">
                 {{-- Toolbar --}}
                 <div class="cashier-toolbar">
-                    <div class="cashier-search">
-                        <input type="text" placeholder="Cari invoice atau pasien..." class="cashier-search-input" id="cashierSearch">
+                    <div class="cashier-search" style="display: flex; gap: 12px; align-items: center; flex: 1;">
+                        <input type="text" placeholder="Cari invoice atau pasien..." class="cashier-search-input" id="cashierSearch" style="flex: 1;">
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <label style="font-size: 12px; color: #6B513E; white-space: nowrap;">Dari:</label>
+                            <input type="date" id="filterFromDate" style="padding: 8px 12px; border: 1.5px solid #E5D6C5; border-radius: 6px; font-size: 12px; font-family: 'Instrument Sans', sans-serif; color: #582C0C;">
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <label style="font-size: 12px; color: #6B513E; white-space: nowrap;">Sampai:</label>
+                            <input type="date" id="filterToDate" style="padding: 8px 12px; border: 1.5px solid #E5D6C5; border-radius: 6px; font-size: 12px; font-family: 'Instrument Sans', sans-serif; color: #582C0C;">
+                        </div>
+                        <button class="cashier-btn btn-cokelat" style="padding: 8px 14px; font-size: 12px;" onclick="resetFilters()">Reset</button>
                     </div>
                     <button class="cashier-btn btn-cokelat">+ Pembayaran Manual</button>
                     <button class="cashier-btn cashier-btn-success">Export CSV</button>
@@ -335,6 +344,13 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Pagination Controls --}}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding: 16px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(88, 44, 12, 0.06);">
+                    <button class="cashier-btn btn-cokelat" id="pagination-prev-btn" onclick="previousPage()" style="padding: 10px 18px; font-size: 12px;">← Sebelumnya</button>
+                    <span id="pagination-info" style="font-size: 12px; color: #6B513E; font-weight: 600;">Halaman 1 • 0 data</span>
+                    <button class="cashier-btn btn-cokelat" id="pagination-next-btn" onclick="nextPage()" style="padding: 10px 18px; font-size: 12px;">Berikutnya →</button>
                 </div>
             </div>
         </div>
@@ -707,13 +723,149 @@
     }
 
     document.getElementById('cashierSearch').addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('.patient-row');
-        rows.forEach(row => {
+        applyCashierFilters();
+    });
+
+    document.getElementById('filterFromDate').addEventListener('change', function(e) {
+        applyCashierFilters();
+    });
+
+    document.getElementById('filterToDate').addEventListener('change', function(e) {
+        applyCashierFilters();
+    });
+
+    // ──── PAGINATION & FILTER ────────────────────
+    const CASHIER_PAGE_SIZE = 10;
+    let currentCashierPage = 1;
+    let allPatientRows = [];
+
+    function applyCashierFilters() {
+        const searchTerm = document.getElementById('cashierSearch').value.toLowerCase();
+        const fromDate = document.getElementById('filterFromDate').value;
+        const toDate = document.getElementById('filterToDate').value;
+
+        const allRows = document.querySelectorAll('.patient-row');
+        allPatientRows = [];
+
+        allRows.forEach(row => {
             const name = row.querySelector('.patient-name').innerText.toLowerCase();
             const inv = row.querySelector('.invoice-number').innerText.toLowerCase();
-            row.style.display = (name.includes(term) || inv.includes(term)) ? '' : 'none';
+            const dateStr = row.querySelector('.invoice-date').innerText.trim();
+            
+            // Parse tanggal dari format "dd MMM yyyy" menjadi comparable format
+            const rowDate = parseIndonesianDate(dateStr);
+            
+            // Check search term
+            const matchesSearch = name.includes(searchTerm) || inv.includes(searchTerm);
+            
+            // Check date range
+            let matchesDateRange = true;
+            if (fromDate || toDate) {
+                const fromDateObj = fromDate ? new Date(fromDate) : null;
+                const toDateObj = toDate ? new Date(toDate) : null;
+                
+                if (rowDate) {
+                    if (fromDateObj && rowDate < fromDateObj) matchesDateRange = false;
+                    if (toDateObj) {
+                        // Add 1 day untuk include hari terakhir
+                        toDateObj.setDate(toDateObj.getDate() + 1);
+                        if (rowDate >= toDateObj) matchesDateRange = false;
+                    }
+                }
+            }
+
+            if (matchesSearch && matchesDateRange) {
+                allPatientRows.push(row);
+            }
         });
+
+        currentCashierPage = 1;
+        applyCashierPagination();
+    }
+
+    function parseIndonesianDate(dateStr) {
+        // Format: "02 Mar 2025" atau "2 Mar 2025"
+        const months = {
+            'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+            'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+        };
+        
+        const parts = dateStr.split(' ');
+        if (parts.length === 3) {
+            const day = parts[0].padStart(2, '0');
+            const month = months[parts[1]] || '01';
+            const year = parts[2];
+            return new Date(`${year}-${month}-${day}`);
+        }
+        return null;
+    }
+
+    function applyCashierPagination() {
+        const totalRows = allPatientRows.length;
+        const totalPages = Math.ceil(totalRows / CASHIER_PAGE_SIZE);
+        
+        // Validasi current page
+        if (currentCashierPage > totalPages) currentCashierPage = totalPages || 1;
+        if (currentCashierPage < 1) currentCashierPage = 1;
+
+        const startIdx = (currentCashierPage - 1) * CASHIER_PAGE_SIZE;
+        const endIdx = startIdx + CASHIER_PAGE_SIZE;
+
+        // Sembunyikan semua row
+        document.querySelectorAll('.patient-row').forEach(row => {
+            row.style.display = 'none';
+        });
+
+        // Tampilkan hanya row di halaman ini
+        allPatientRows.slice(startIdx, endIdx).forEach(row => {
+            row.style.display = '';
+        });
+
+        // Update pagination info
+        const infoText = totalRows === 0 
+            ? 'Tidak ada data' 
+            : `Halaman ${currentCashierPage} dari ${totalPages} • ${totalRows} data`;
+        document.getElementById('pagination-info').innerText = infoText;
+
+        // Update button states
+        document.getElementById('pagination-prev-btn').disabled = currentCashierPage === 1;
+        document.getElementById('pagination-next-btn').disabled = currentCashierPage === totalPages || totalPages === 0;
+
+        // Styling untuk disabled buttons
+        const prevBtn = document.getElementById('pagination-prev-btn');
+        const nextBtn = document.getElementById('pagination-next-btn');
+        prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+        prevBtn.style.cursor = prevBtn.disabled ? 'not-allowed' : 'pointer';
+        nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+        nextBtn.style.cursor = nextBtn.disabled ? 'not-allowed' : 'pointer';
+    }
+
+    function previousPage() {
+        if (currentCashierPage > 1) {
+            currentCashierPage--;
+            applyCashierPagination();
+        }
+    }
+
+    function nextPage() {
+        const totalRows = allPatientRows.length;
+        const totalPages = Math.ceil(totalRows / CASHIER_PAGE_SIZE) || 1;
+        if (currentCashierPage < totalPages) {
+            currentCashierPage++;
+            applyCashierPagination();
+        }
+    }
+
+    function resetFilters() {
+        document.getElementById('cashierSearch').value = '';
+        document.getElementById('filterFromDate').value = '';
+        document.getElementById('filterToDate').value = '';
+        applyCashierFilters();
+    }
+
+    // INIT: Load semua rows on page load
+    window.addEventListener('load', function() {
+        applyCashierFilters();
     });
 </script>
 @endsection

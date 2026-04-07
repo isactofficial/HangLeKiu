@@ -718,6 +718,101 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         // ================= 3. FUNGSI GLOBAL (DIPANGGIL SETELAH AJAX) =================
+        const RECORD_PAGE_SIZE = 5;
+
+        function applyRecordPaginationForPane(pane, forceFirstPage = false) {
+            if (!pane) return;
+
+            const shell = pane.querySelector('.record-table-shell');
+            if (!shell) return;
+
+            const rows = Array.from(shell.querySelectorAll('.record-table-row'));
+            const totalRows = rows.length;
+            const totalPages = Math.max(1, Math.ceil(totalRows / RECORD_PAGE_SIZE));
+
+            if (forceFirstPage) {
+                pane.dataset.recordPage = '1';
+            }
+
+            let currentPage = parseInt(pane.dataset.recordPage || '1', 10);
+            if (!Number.isFinite(currentPage) || currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            pane.dataset.recordPage = String(currentPage);
+
+            const start = (currentPage - 1) * RECORD_PAGE_SIZE;
+            const end = start + RECORD_PAGE_SIZE;
+
+            rows.forEach((row, index) => {
+                row.classList.toggle('hidden', !(index >= start && index < end));
+            });
+
+            let pager = pane.querySelector('.record-pagination');
+            if (!pager) {
+                pager = document.createElement('div');
+                pager.className = 'record-pagination';
+                pager.style.display = 'flex';
+                pager.style.justifyContent = 'space-between';
+                pager.style.alignItems = 'center';
+                pager.style.gap = '10px';
+                pager.style.padding = '12px 14px';
+                pager.style.borderTop = '1px solid var(--brown-200)';
+                pager.style.background = '#fff';
+                shell.appendChild(pager);
+            }
+
+            if (totalRows <= RECORD_PAGE_SIZE) {
+                pager.style.display = 'none';
+                return;
+            }
+
+            pager.style.display = 'flex';
+            pager.innerHTML = `
+                <div style="font-size:12px; color:var(--brown-500); font-weight:700;">
+                    Halaman ${currentPage} dari ${totalPages} • ${totalRows} data
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="record-page-prev" style="border:1px solid var(--brown-200); background:#fff; color:var(--brown-700); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">
+                        Prev
+                    </button>
+                    <button type="button" class="record-page-next" style="border:1px solid var(--brown-200); background:#fff; color:var(--brown-700); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">
+                        Next
+                    </button>
+                </div>
+            `;
+
+            const prevBtn = pager.querySelector('.record-page-prev');
+            const nextBtn = pager.querySelector('.record-page-next');
+
+            const syncBtnState = (btn, disabled) => {
+                if (!btn) return;
+                btn.disabled = disabled;
+                btn.style.opacity = disabled ? '0.45' : '1';
+                btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+            };
+
+            syncBtnState(prevBtn, currentPage <= 1);
+            syncBtnState(nextBtn, currentPage >= totalPages);
+
+            if (prevBtn) {
+                prevBtn.onclick = () => {
+                    pane.dataset.recordPage = String(Math.max(1, currentPage - 1));
+                    applyRecordPaginationForPane(pane);
+                };
+            }
+
+            if (nextBtn) {
+                nextBtn.onclick = () => {
+                    pane.dataset.recordPage = String(Math.min(totalPages, currentPage + 1));
+                    applyRecordPaginationForPane(pane);
+                };
+            }
+        }
+
+        function initRecordPagination() {
+            const recordPanes = document.querySelectorAll('[data-record-tab-content]');
+            recordPanes.forEach((pane) => applyRecordPaginationForPane(pane));
+        }
+
         function bindTabEvents() {
             const tabButtons = document.querySelectorAll('.tab-item');
             const tabPanes = document.querySelectorAll('[data-tab-content]');
@@ -763,8 +858,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     recordPanes.forEach(p => {
                         p.classList.toggle('hidden', p.dataset.recordTabContent !== tab);
                     });
+
+                    const activePane = Array.from(recordPanes).find(p => p.dataset.recordTabContent === tab);
+                    if (activePane) {
+                        applyRecordPaginationForPane(activePane);
+                    }
                 });
             });
+
+            initRecordPagination();
         }
 
         // Dropdown Tambah Diagnosa
@@ -868,6 +970,119 @@ function toggleDoctorNoteModal(show, data = null) {
     modal.style.display = 'none';
 }
 
+function formatDoctorNoteDisplayDate(rawDate) {
+    if (!rawDate) return '-';
+
+    const parsedDate = new Date(rawDate);
+    if (!Number.isNaN(parsedDate.getTime())) {
+        return parsedDate.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+
+    const monthMap = {
+        Jan: 'Januari',
+        Feb: 'Februari',
+        Mar: 'Maret',
+        Apr: 'April',
+        May: 'Mei',
+        Jun: 'Juni',
+        Jul: 'Juli',
+        Aug: 'Agustus',
+        Sep: 'September',
+        Oct: 'Oktober',
+        Nov: 'November',
+        Dec: 'Desember',
+    };
+
+    const parts = String(rawDate).trim().split(/\s+/);
+    if (parts.length >= 3) {
+        const day = parts[0];
+        const month = monthMap[parts[1]] || parts[1];
+        const year = parts[2];
+        return `${day} ${month} ${year}`;
+    }
+
+    return String(rawDate);
+}
+
+function prependDoctorNoteToRecordTab(noteData = {}) {
+    const pane = document.querySelector('[data-record-tab-content="catatan-dokter"]');
+    const recordShell = pane?.querySelector('.record-table-shell');
+    if (!recordShell) return;
+
+    const emptyState = recordShell.querySelector('#doctor-note-empty');
+    if (emptyState) {
+        emptyState.remove();
+    }
+
+    const row = document.createElement('div');
+    row.className = 'record-table-row';
+    row.style.gridTemplateColumns = '180px 300px 1fr';
+
+    const dateCell = document.createElement('div');
+    dateCell.className = 'record-table-text';
+    dateCell.style.fontWeight = '600';
+    dateCell.textContent = formatDoctorNoteDisplayDate(noteData.created_at);
+
+    const doctorCell = document.createElement('div');
+    doctorCell.className = 'record-table-text';
+    doctorCell.style.fontWeight = '700';
+    doctorCell.style.lineHeight = '1.5';
+    const doctorName = document.createElement('div');
+    doctorName.textContent = noteData.doctor_name || '-';
+    doctorCell.appendChild(doctorName);
+
+    const noteCell = document.createElement('div');
+    noteCell.style.padding = '10px 12px';
+
+    const noteGrid = document.createElement('div');
+    noteGrid.style.display = 'grid';
+    noteGrid.style.gridTemplateColumns = '150px minmax(0, 1fr)';
+    noteGrid.style.gap = '6px 12px';
+    noteGrid.style.alignItems = 'start';
+
+    const appendSection = (title, content) => {
+        const label = document.createElement('div');
+        label.style.fontSize = '11px';
+        label.style.color = 'var(--brown-500)';
+        label.style.fontWeight = '800';
+        label.style.textTransform = 'uppercase';
+        label.textContent = title;
+
+        const value = document.createElement('div');
+        value.className = 'record-table-text';
+        value.style.lineHeight = '1.35';
+        value.textContent = content || '-';
+
+        noteGrid.appendChild(label);
+        noteGrid.appendChild(value);
+    };
+
+    appendSection('Subjectives', noteData.subjective);
+    appendSection('Objectives', noteData.objective);
+    appendSection('Plans', noteData.plan);
+
+    noteCell.appendChild(noteGrid);
+
+    row.appendChild(dateCell);
+    row.appendChild(doctorCell);
+    row.appendChild(noteCell);
+
+    const tableHead = recordShell.querySelector('.record-table-head');
+    if (tableHead && tableHead.parentNode === recordShell) {
+        recordShell.insertBefore(row, tableHead.nextSibling);
+    } else {
+        recordShell.appendChild(row);
+    }
+
+    if (pane) {
+        applyRecordPaginationForPane(pane, true);
+    }
+}
+
 async function submitDoctorNote() {
     const registrationId = document.getElementById('doctorNoteRegistrationId').value;
     const subjective = document.getElementById('doctorNoteSubjective').value.trim();
@@ -909,12 +1124,12 @@ async function submitDoctorNote() {
         document.getElementById('doctorNoteSubjective').value = '';
         document.getElementById('doctorNoteObjective').value = '';
         document.getElementById('doctorNotePlan').value = '';
-        toggleDoctorNoteModal(false);
 
-        const activePatientLink = document.querySelector('.js-emr-patient-link .patient-card.active')?.closest('a');
-        if (activePatientLink) {
-            activePatientLink.click();
+        if (data.data) {
+            prependDoctorNoteToRecordTab(data.data);
         }
+
+        toggleDoctorNoteModal(false);
     } catch (error) {
         console.error('Gagal simpan catatan dokter:', error);
         alert(error.message || 'Terjadi kesalahan saat menyimpan catatan dokter.');

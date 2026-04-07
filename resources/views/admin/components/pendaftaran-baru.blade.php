@@ -27,6 +27,9 @@
                     <div id="patientSearchResults" style="display:none; position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #E5D6C5; border-radius:8px; z-index:100; max-height:200px; overflow-y:auto; box-shadow:0 4px 12px rgba(88,44,12,0.1);"></div>
                 </div>
                 <button type="button" class="btn-solid" onclick="searchPatient()">Cari</button>
+                <button type="button" class="btn-solid" onclick="openNewPatientModal()" style="background-color:#2C8659; border-color:#2C8659;">
+                    <i class="fas fa-plus" style="margin-right:6px;"></i> New Pasien
+                </button>
             </div>
             <div class="req-notice">Tanda <span>*</span> wajib diisi!</div>
         </div>
@@ -653,6 +656,29 @@
         if (photoImg)         { photoImg.src = ''; photoImg.style.display = 'none'; }
         if (photoPlaceholder) { photoPlaceholder.style.display = 'block'; }
     };
+
+    /* ============================================================
+       NEW PATIENT MODAL
+    ============================================================ */
+    window.openNewPatientModal = function () {
+        const modal = document.getElementById('modalPasienBaru');
+        if (modal) {
+            modal.style.display = 'flex';
+            // Reset form if needed
+            const form = document.getElementById('pasienBaruForm');
+            if (form) form.reset();
+        }
+    };
+
+    // Listen for new patient created event to auto-select it
+    window.addEventListener('patientCreatedInModal', function (e) {
+        const newPatient = e.detail?.patient;
+        if (newPatient) {
+            // Auto-select the newly created patient
+            selectPatient(newPatient);
+        }
+    });
+
 
     window.togglePatientInfo = function () {
         const container = document.getElementById('patientInfoContainer');
