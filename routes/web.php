@@ -120,6 +120,7 @@ Route::middleware('auth')->group(function () {
     // ================= USER AREA =================
     Route::middleware('role:PAT')->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', [DashboardUserController::class, 'index'])->name('dashboard');    
+        Route::put('/profile/update', [DashboardUserController::class, 'updateProfile'])->name('profile.update');
         Route::get('/medical-history', [DashboardUserController::class, 'medicalHistory'])->name('medical-history');    
         Route::get('/medical-history/{appointment}', [DashboardUserController::class, 'medicalHistoryDetail']) ->name('medical-history.detail');    
         Route::get('/odontogram-history',[DashboardUserController::class, 'odontogramHistory'])->name('odontogram-history');
