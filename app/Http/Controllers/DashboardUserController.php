@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\OdontogramRecord;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +10,7 @@ use Illuminate\Http\Request;
 
 class DashboardUserController extends Controller
 {
-    // ── Dashboard Utama ───────────────────────────────────────
+    // ── DASHBOARD ─────────────────────────────────────────────
 
     public function index()
     {
@@ -21,24 +20,38 @@ class DashboardUserController extends Controller
         $totalVisits         = 0;
         $upcomingAppointment = null;
         $recentAppointments  = collect();
+        $latestOdontogram    = null;
 
         if ($patient) {
+
+            // Total kunjungan
             $totalVisits = Appointment::where('patient_id', $patient->id)
                 ->whereIn('status', ['confirmed', 'succeed'])
                 ->count();
 
+            // Antrean aktif
             $upcomingAppointment = Appointment::where('patient_id', $patient->id)
                 ->whereIn('status', ['pending', 'confirmed', 'waiting'])
                 ->where('appointment_datetime', '>=', now())
-                ->with('doctor')
+                ->with(['doctor', 'poli'])
                 ->orderBy('appointment_datetime')
                 ->first();
 
+            // 🔥 Riwayat + CATATAN DOKTER (FIX DI SINI)
             $recentAppointments = Appointment::where('patient_id', $patient->id)
-                ->with('doctor')
+                ->with([
+                    'doctor',
+                    'medicalProcedures.doctorNotes' // penting
+                ])
                 ->latest('appointment_datetime')
                 ->take(5)
                 ->get();
+
+            // 🔥 ODONTOGRAM TERBARU (FIX DI SINI)
+            $latestOdontogram = OdontogramRecord::where('patient_id', $patient->id)
+                ->with('teeth') // WAJIB biar gigi kebaca
+                ->latest('examined_at')
+                ->first();
         }
 
         return view('user.pages.dashboard', compact(
@@ -46,43 +59,44 @@ class DashboardUserController extends Controller
             'patient',
             'totalVisits',
             'upcomingAppointment',
-            'recentAppointments'
+            'recentAppointments',
+            'latestOdontogram'
         ));
     }
 
-    // ── Update Profil Pasien ──────────────────────────────────
+    // ── UPDATE PROFIL ─────────────────────────────────────────
 
     public function updateProfile(Request $request)
     {
         $user    = Auth::user();
         $patient = $user->patient;
 
-        $request->validate([
+        $validated = $request->validate([
             'name'          => 'required|string|max:255',
             'phone_number'  => 'required|numeric',
-            'date_of_birth' => 'nullable|date',
+            'date_of_birth' => 'nullable|date|before:today',
             'password'      => 'nullable|string|min:8|confirmed',
         ]);
 
-        // 1. Update nama di tabel user
-        $user->name = $request->name;
+        $user->name = $validated['name'];
+
         if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+            $user->password = Hash::make($validated['password']);
         }
+
         $user->save();
 
-        // 2. Update data di tabel patient
         if ($patient) {
-            $patient->full_name    = $request->name;
-            $patient->phone_number = $request->phone_number;
-            $patient->date_of_birth = $request->date_of_birth;
+            $patient->full_name     = $validated['name'];
+            $patient->phone_number  = $validated['phone_number'];
+            $patient->date_of_birth = $validated['date_of_birth'] ?? $patient->date_of_birth;
             $patient->save();
         }
 
         return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
     }
 
-    // ── Riwayat Medis ─────────────────────────────────────────
+    // ── RIWAYAT MEDIS ─────────────────────────────────────────
 
     public function medicalHistory()
     {
@@ -90,7 +104,10 @@ class DashboardUserController extends Controller
 
         $appointments = $patient
             ? Appointment::where('patient_id', $patient->id)
-                ->with(['doctor', 'medicalProcedures.doctorNotes.doctor'])
+                ->with([
+                    'doctor',
+                    'medicalProcedures.doctorNotes' // FIX
+                ])
                 ->latest('appointment_datetime')
                 ->paginate(10)
             : collect();
@@ -98,20 +115,23 @@ class DashboardUserController extends Controller
         return view('user.pages.medical-history', compact('appointments'));
     }
 
-    // ── Detail Riwayat Medis ──────────────────────────────────
+    // ── DETAIL RIWAYAT MEDIS ──────────────────────────────────
 
     public function medicalHistoryDetail(string $appointmentId)
     {
         $patient = Auth::user()->patient;
 
         $appointment = Appointment::where('patient_id', $patient?->id)
-            ->with(['doctor', 'medicalProcedures.doctorNotes.doctor'])
+            ->with([
+                'doctor',
+                'medicalProcedures.doctorNotes' // FIX
+            ])
             ->findOrFail($appointmentId);
 
         return view('user.pages.medical-history-detail', compact('appointment'));
     }
 
-    // ── Riwayat Odontogram ────────────────────────────────────
+    // ── RIWAYAT ODONTOGRAM ────────────────────────────────────
 
     public function odontogramHistory()
     {
@@ -119,7 +139,7 @@ class DashboardUserController extends Controller
 
         $odontogramRecords = $patient
             ? OdontogramRecord::where('patient_id', $patient->id)
-                ->with('teeth')
+                ->with('teeth') // FIX WAJIB
                 ->latest('examined_at')
                 ->paginate(10)
             : collect();
@@ -127,14 +147,14 @@ class DashboardUserController extends Controller
         return view('user.pages.odontogram-history', compact('odontogramRecords'));
     }
 
-    // ── Detail Odontogram ─────────────────────────────────────
+    // ── DETAIL ODONTOGRAM ─────────────────────────────────────
 
     public function odontogramDetail(string $recordId)
     {
         $patient = Auth::user()->patient;
 
         $record = OdontogramRecord::where('patient_id', $patient?->id)
-            ->with('teeth')
+            ->with('teeth') // FIX WAJIB
             ->findOrFail($recordId);
 
         return view('user.pages.odontogram-detail', compact('record'));
