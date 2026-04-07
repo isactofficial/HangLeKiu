@@ -59,7 +59,7 @@
     </button>
     <div class="pelayanan-submenu hidden pl-8 border-l-2 border-[var(--font-color-secondary)] bg-gray-50">
         <a href="/pelayanan/dokter" class="block px-6 py-4 text-[20px] font-normal text-[var(--font-color-secondary)] hover:bg-white transition-colors">Dokter</a>
-        <a href="/pelayanan/perawatan" class="block px-6 py-4 text-[20px] font-normal text-[var(--font-color-secondary)] hover:bg-white transition-colors">Perawatan</a>
+        <a href="{{ route('perawatan') }}" class="block px-6 py-4 text-[20px] font-normal text-[var(--font-color-secondary)] hover:bg-white transition-colors">Perawatan</a>
     </div>
 </div>
         <a href="{{ route('klinik') }}" class="px-6 py-4 text-[24px] font-medium border-b border-gray-50 text-[var(--font-color-secondary)]">Klinik</a>

@@ -11,6 +11,7 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PenggunaanObatController;
 use App\Http\Controllers\ConsumableItemController;
 use App\Http\Controllers\ConsumableUsageController;
+use App\Http\Controllers\TreatmentPageController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
@@ -23,6 +24,7 @@ Route::get('/registration',  [AppointmentController::class, 'create'])->name('re
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
 Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
+Route::get('/pelayanan/perawatan', [TreatmentPageController::class, 'index'])->name('perawatan');
 
 // ================= ADMIN & DOCTOR AUTH =================
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
