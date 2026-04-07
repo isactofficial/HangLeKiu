@@ -191,14 +191,14 @@
 
                             {{-- Social Media --}}
                             <div class="flex items-center gap-3 mb-0 md:mb-16">
-                                <a href="#"
+                                <a href="https://www.instagram.com/"
                                     class="w-7 h-7 bg-[var(--font-color-primary)] rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
                                     <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
                                         <path
                                             d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
                                     </svg>
                                 </a>
-                                <a href="#"
+                                <a href="https://www.linkedin.com/"
                                     class="w-7 h-7 bg-[var(--font-color-primary)] rounded-full flex items-center justify-center hover:opacity-80 transition-opacity">
                                     <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
                                         <path
@@ -269,8 +269,9 @@
                             class="text-[15px] md:text-[18.75px] font-normal text-[#582C0C] leading-relaxed mb-5 flex-1 text-center">
                             Pembersihan karang gigi profesional untuk menjaga kesehatan gusi dan gigi.
                         </p>
-                        <button
-                            class="text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto">
+                        <button data-treatment="0"
+                            class="treatment-detail-btn text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto cursor-pointer"
+                            onclick="openTreatmentModal(0)">
                             Info Selengkapnya
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -292,8 +293,9 @@
                             class="text-[15px] md:text-[18.75px] font-normal text-[#582C0C] leading-relaxed mb-5 flex-1 text-center">
                             Perawatan restorasi gigi berlubang dengan bahan berkualitas tinggi.
                         </p>
-                        <button
-                            class="text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto">
+                        <button data-treatment="1"
+                            class="treatment-detail-btn text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto cursor-pointer"
+                            onclick="openTreatmentModal(1)">
                             Info Selengkapnya
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -315,8 +317,9 @@
                             class="text-[15px] md:text-[18.75px] font-normal text-[#582C0C] leading-relaxed mb-5 flex-1 text-center">
                             Prosedur pencabutan gigi yang aman dan minim rasa sakit.
                         </p>
-                        <button
-                            class="text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto">
+                        <button data-treatment="2"
+                            class="treatment-detail-btn text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto cursor-pointer"
+                            onclick="openTreatmentModal(2)">
                             Info Selengkapnya
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -338,8 +341,9 @@
                             class="text-[15px] md:text-[18.75px] font-normal text-[#582C0C] leading-relaxed mb-5 flex-1 text-center">
                             Ortodonti untuk merapikan susunan gigi dengan hasil optimal.
                         </p>
-                        <button
-                            class="text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto">
+                        <button data-treatment="3"
+                            class="treatment-detail-btn text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto cursor-pointer"
+                            onclick="openTreatmentModal(3)">
                             Info Selengkapnya
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -361,8 +365,9 @@
                             class="text-[15px] md:text-[18.75px] font-normal text-[#582C0C] leading-relaxed mb-5 flex-1 text-center">
                             Lapisan tipis untuk mempercantik tampilan gigi Anda.
                         </p>
-                        <button
-                            class="text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto">
+                        <button data-treatment="4"
+                            class="treatment-detail-btn text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto cursor-pointer"
+                            onclick="openTreatmentModal(4)">
                             Info Selengkapnya
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -384,8 +389,9 @@
                             class="text-[15px] md:text-[18.75px] font-normal text-[#582C0C] leading-relaxed mb-5 flex-1 text-center">
                             Restorasi gigi permanen dengan mahkota dan jembatan gigi.
                         </p>
-                        <button
-                            class="text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto">
+                        <button data-treatment="5"
+                            class="treatment-detail-btn text-[15px] md:text-[18.75px] font-medium text-[#C58F59] flex items-center gap-1.5 hover:opacity-75 transition-opacity ml-auto cursor-pointer"
+                            onclick="openTreatmentModal(5)">
                             Info Selengkapnya
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -398,10 +404,10 @@
 
                 {{-- Button Layanan Lainnya --}}
                 <div class="flex justify-center">
-                    <button
-                        class="px-8 py-3 bg-[#C58F59] hover:bg-[#A0703E] text-white text-[15px] md:text-[18.75px] font-normal rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                    <a href="/pelayanan/perawatan"
+                        class="px-8 py-3 bg-[#C58F59] hover:bg-[#A0703E] text-white text-[15px] md:text-[18.75px] font-normal rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 inline-block">
                         Layanan Lainnya
-                    </button>
+                    </a>
                 </div>
 
             </div>
@@ -545,6 +551,77 @@
 
         </div>
     </section>
+
+    {{-- Treatment Modals --}}
+    {{-- Single Treatment Detail Modal --}}
+    <style>
+        /* Treatment Modal Styles */
+        #treatmentDetailModal, #allTreatmentsModal {
+            backdrop-filter: blur(4px);
+        }
+        #treatmentDetailModal .bg-white, #allTreatmentsModal .bg-white {
+            animation: modalSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        #treatmentDetailModal ul li {
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        #treatmentDetailModal ul li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #C58F59;
+            font-weight: bold;
+        }
+        .treatment-card-mini {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .treatment-card-mini:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 640px) {
+            #treatmentDetailModal .max-w-md,
+            #allTreatmentsModal .max-w-4xl { 
+                margin: 1rem; 
+            }
+        }
+    </style>
+
+    <div id="treatmentDetailModal" class="fixed inset-0 bg-black/60 z-[9999] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 id="treatmentTitle" class="text-2xl md:text-3xl font-bold text-[#582C0C]"></h3>
+                    <button onclick="closeTreatmentModal()" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+                </div>
+            </div>
+            <div class="p-6 md:p-8">
+                <div class="text-center mb-8">
+                    <img src="{{ asset('images/gigi.svg') }}" alt="Treatment Icon" class="w-20 h-20 md:w-24 md:h-24 mx-auto mb-6 object-contain">
+                    <div id="treatmentPrice" class="text-2xl md:text-3xl font-bold text-[#C58F59] mb-2"></div>
+                </div>
+                
+                <div class="mb-8">
+                    <p id="treatmentShortDesc" class="text-lg md:text-xl text-[#582C0C] leading-relaxed text-center"></p>
+                </div>
+                
+                <div class="text-center">
+                    <button id="bookAppointmentBtn" onclick="goToRegistration()" 
+                        class="bg-[#C58F59] hover:bg-[#A0703E] text-white text-lg md:text-xl font-semibold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1">
+                        Buat Janji Temu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     {{-- Footer --}}
     @include('user.components.footerWelcome')
@@ -873,6 +950,150 @@
 
             renderInitial();
         })();
+
+        // ========== TREATMENT MODALS DATA ==========
+        const treatmentsData = [
+            {
+                id: 0,
+                title: "Scaling & Polishing",
+                shortDesc: "Pembersihan karang gigi profesional untuk menjaga kesehatan gusi dan gigi.",
+                price: "Rp 250.000",
+                duration: "30 menit",
+                benefits: [
+                    "Membersihkan karang gigi & plak secara menyeluruh",
+                    "Mencegah radang gusi & bau mulut",
+                    "Hasil gigi lebih bersih & mengkilap"
+                ],
+                fullDesc: "Prosedur scaling menggunakan ultrasonic scaler untuk menghilangkan karang gigi dan polishing dengan pasta khusus untuk menghaluskan permukaan gigi. Dilakukan setiap 6 bulan untuk menjaga kesehatan periodontal.",
+                doctorRec: "Sarah Mitchell Sp.KG"
+            },
+            {
+                id: 1,
+                title: "Tambal Gigi",
+                shortDesc: "Perawatan restorasi gigi berlubang dengan bahan berkualitas tinggi.",
+                price: "Rp 450.000 - Rp 850.000",
+                duration: "45-60 menit",
+                benefits: [
+                    "Mengembalikan fungsi mengunyah normal",
+                    "Mencegah kerusakan lebih lanjut",
+                    "Estetika gigi alami & tahan lama"
+                ],
+                fullDesc: "Restorasi komposit atau amalgam untuk mengisi kavitas karies. Pemilihan bahan disesuaikan dengan lokasi & kebutuhan pasien.",
+                doctorRec: "Sarah Mitchell Sp.KG"
+            },
+            {
+                id: 2,
+                title: "Cabut Gigi",
+                shortDesc: "Prosedur pencabutan gigi yang aman dan minim rasa sakit.",
+                price: "Rp 350.000",
+                duration: "20-30 menit",
+                benefits: [
+                    "Prosedur cepat & nyaman dengan anestesi lokal",
+                    "Pencegahan infeksi & komplikasi",
+                    "Persiapan untuk implan atau protesa"
+                ],
+                fullDesc: "Ekstraksi gigi dengan teknik atraumatic untuk mengurangi trauma jaringan. Dilengkapi perawatan pasca ekstraksi.",
+                doctorRec: "Michael Tan Sp.BM"
+            },
+            {
+                id: 3,
+                title: "Pemasangan Behel",
+                shortDesc: "Ortodonti untuk merapikan susunan gigi dengan hasil optimal.",
+                price: "Rp 15.000.000 - Rp 35.000.000",
+                duration: "12-24 bulan",
+                benefits: [
+                    "Memperbaiki oklusi & fungsi mengunyah",
+                    "Meningkatkan estetika senyum",
+                    "Pencegahan masalah periodontal masa depan"
+                ],
+                fullDesc: "Fixed orthodontic appliance dengan bracket metal/self-ligating atau clear aligner sesuai kasus maloklusi.",
+                doctorRec: "Jenny Wilson Sp.Ort"
+            },
+            {
+                id: 4,
+                title: "Veneer Gigi",
+                shortDesc: "Lapisan tipis untuk mempercantik tampilan gigi Anda.",
+                price: "Rp 8.000.000 - Rp 12.000.000 per gigi",
+                duration: "2 kunjungan",
+                benefits: [
+                    "Perubahan estetika dramatis dalam 1-2 kunjungan",
+                    "Hasil natural & tahan 10-15 tahun",
+                    "Minim pengikisan enamel"
+                ],
+                fullDesc: "Porcelain veneer atau composite veneer untuk menutupi cacat warna/bentuk gigi dengan presisi CAD/CAM.",
+                doctorRec: "David Chen Sp.Pros"
+            },
+            {
+                id: 5,
+                title: "Crown & Bridge",
+                shortDesc: "Restorasi gigi permanen dengan mahkota dan jembatan gigi.",
+                price: "Rp 4.500.000 - Rp 18.000.000",
+                duration: "2-3 kunjungan",
+                benefits: [
+                    "Kekuatan & daya tahan maksimal",
+                    "Fungsi mengunyah seperti gigi asli",
+                    "Solusi permanen untuk gigi hilang"
+                ],
+                fullDesc: "Full crown zirconia/metal-ceramic atau fixed bridge untuk mengganti 1-3 gigi hilang dengan retensi optimal.",
+                doctorRec: "David Chen Sp.Pros"
+            }
+        ];
+
+        const isLoggedIn = {{ Auth::check() ? 'true' : 'false' }};
+        const loginUrl = '{{ route("login") }}';
+        const registrationUrl = '{{ route("registration.form") }}';
+
+        // ========== TREATMENT MODAL FUNCTIONS ==========
+        function openTreatmentModal(id) {
+            const treatment = treatmentsData[id];
+            if (!treatment) return;
+            
+            // Populate modal - simplified
+            document.getElementById('treatmentTitle').textContent = treatment.title;
+            document.getElementById('treatmentPrice').textContent = treatment.price;
+            document.getElementById('treatmentShortDesc').textContent = treatment.shortDesc;
+            
+            // Show modal
+            document.getElementById('treatmentDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeTreatmentModal() {
+            document.getElementById('treatmentDetailModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openAllTreatmentsModal() {
+            const grid = document.getElementById('allTreatmentsGrid');
+            grid.innerHTML = treatmentsData.map(t => `
+                <div class="treatment-card-mini bg-gray-50 rounded-xl p-6 hover:bg-white border border-gray-200" onclick="openTreatmentModal(${t.id})">
+                    <img src="{{ asset('images/gigi.svg') }}" alt="${t.title}" class="w-16 h-16 mx-auto mb-4 object-contain">
+                    <h4 class="text-xl font-bold text-[#582C0C] mb-2 text-center">${t.title}</h4>
+                    <p class="text-[#C58F59] font-semibold text-lg mb-2 text-center">${t.price}</p>
+                    <p class="text-sm text-gray-600 text-center">${t.duration}</p>
+                </div>
+            `).join('');
+            
+            document.getElementById('allTreatmentsModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function goToRegistration() {
+            const url = isLoggedIn ? registrationUrl : loginUrl;
+            window.location.href = url;
+        }
+
+        // Close modal on overlay click
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'treatmentDetailModal') closeTreatmentModal();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeTreatmentModal();
+            }
+        });
     </script>
 
 </body>
