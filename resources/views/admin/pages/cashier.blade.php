@@ -1,4 +1,4 @@
-﻿@extends('admin.layout.admin')
+@extends('admin.layout.admin')
 @section('title', 'Kasir - HangLeKiu')
 
 @section('navbar')
@@ -113,7 +113,7 @@
                         </div>
                         <button class="cashier-btn btn-cokelat" style="padding: 8px 14px; font-size: 12px;" onclick="resetFilters()">Reset</button>
                     </div>
-                    <button class="cashier-btn btn-cokelat">+ Pembayaran Manual</button>
+                    <button class="cashier-btn btn-cokelat" onclick="openModalManual()">+ Pembayaran Manual</button>
                     <button class="cashier-btn cashier-btn-success">Export CSV</button>
                 </div>
 
@@ -359,6 +359,7 @@
 
 {{-- INCLUDE PENTING! MEMANGGIL MODAL --}}
 @include('admin.components.cashier.modal-payment')
+@include('admin.components.cashier.modal-payment-manual')
 @include('admin.components.cashier.nota')
 
 
