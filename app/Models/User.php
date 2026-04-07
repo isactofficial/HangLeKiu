@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -54,6 +55,11 @@ class User extends Authenticatable
             }
         });
     }
+
+    public function patient(): HasOne 
+    {
+        return $this->hasOne(Patient:: class, 'user_id');
+    } 
 
     // ── Relations ─────────────────────────────────────
     public function role()
