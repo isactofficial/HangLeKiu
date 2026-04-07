@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardUserController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
@@ -116,7 +117,11 @@ Route::middleware('auth')->group(function () {
 
     // ================= USER AREA =================
     Route::middleware('role:PAT')->prefix('user')->name('user.')->group(function () {
-        Route::get('/dashboard', fn() => view('user.pages.dashboard'))->name('dashboard');
+        Route::get('/dashboard', [DashboardUserController::class, 'index'])->name('dashboard');    
+        Route::get('/medical-history', [DashboardUserController::class, 'medicalHistory'])->name('medical-history');    
+        Route::get('/medical-history/{appointment}', [DashboardUserController::class, 'medicalHistoryDetail']) ->name('medical-history.detail');    
+        Route::get('/odontogram-history',[DashboardUserController::class, 'odontogramHistory'])->name('odontogram-history');
+        Route::get('/odontogram-history/{record}',[DashboardUserController::class, 'odontogramDetail'])->name('odontogram-history.detail');
     });
 
     // ================= DOCTOR AREA =================
