@@ -93,14 +93,7 @@
     <div id="navbarSpacer" class="h-0"></div>
 
     <main class="grow pb-12">
-        <section class="brand-surface text-white relative overflow-hidden">
-            <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px;"></div>
-            <div class="container mx-auto px-4 py-12 md:py-14 relative">
-                <p class="text-xs md:text-sm uppercase tracking-[0.24em] text-[#F4E9DF] mb-2">Portal Pasien</p>
-                <h1 class="text-3xl md:text-4xl font-bold">Dashboard Pasien</h1>
-                <p class="mt-3 text-[#F4E9DF] max-w-2xl">Kelola profil, pantau antrean aktif, cek riwayat medis registrasi, dan data odontogram dalam satu halaman.</p>
-            </div>
-        </section>
+        
 
         <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 py-8 -mt-8 relative z-20">
             @if(session('success'))
@@ -190,8 +183,15 @@
 
                     <div class="dash-card bg-white rounded-3xl overflow-hidden mb-10 relative">
                         <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
-                            <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2"><svg class="w-6 h-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg><span class="truncate">Daftar Kunjungan</span></h2>
-                            <button id="openVisitModal" type="button" class="shrink-0 px-4 py-2 rounded-lg bg-[#8B5E3C] hover:bg-[#734A2E] text-white font-medium transition text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>Tambah Kunjungan</button>
+                            <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
+                                <svg class="w-6 h-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                <span class="truncate">Daftar Kunjungan</span>
+                            </h2>
+                            
+                            <a href="{{ route('registration.form') }}" class="shrink-0 px-4 py-2 rounded-lg bg-[var(--font-color-primary)] hover:brightness-110 text-white font-medium transition text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Tambah Kunjungan
+                            </a>
                         </div>
                         <div class="p-8 lg:p-10 relative z-10">
                             @php
@@ -199,13 +199,13 @@
                             @endphp
                             <div class="overflow-x-auto rounded-2xl border border-[#EBDCCF] shadow-sm">
                                 <table class="min-w-full text-sm text-left w-full">
-                                    <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-4 py-4 text-center w-12">No</th><th class="px-4 py-4 whitespace-nowrap">Status</th><th class="px-4 py-4 whitespace-nowrap">Tgl Kunjungan</th><th class="px-4 py-4 whitespace-nowrap">Tgl Dibuat</th><th class="px-4 py-4 whitespace-nowrap">Poli</th><th class="px-4 py-4 min-w-[150px]">Nama Pasien</th><th class="px-4 py-4 min-w-[200px]">Rencana Tindakan</th><th class="px-4 py-4 min-w-[150px]">Dokter Pemeriksa</th><th class="px-4 py-4 whitespace-nowrap">Metode Bayar</th></tr></thead>
+                                    <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-4 py-4 text-center w-12">No</th><th class="px-4 py-4 whitespace-nowrap">Status</th><th class="px-4 py-4 whitespace-nowrap">Tgl Kunjungan</th><th class="px-4 py-4 whitespace-nowrap">Tgl Dibuat</th><th class="px-4 py-4 whitespace-nowrap">Poli</th><th class="px-4 py-4 min-w-[200px]">Rencana Tindakan</th><th class="px-4 py-4 min-w-[150px]">Dokter Pemeriksa</th><th class="px-4 py-4 whitespace-nowrap">Metode Bayar</th></tr></thead>
                                     <tbody class="divide-y divide-[#EFE3D7] bg-white">
                                         @forelse($activeRegistrations as $row)
                                             @php $activeStat = $statusFormat[strtolower($row->status)] ?? ['bg-slate-100', 'text-slate-800', ucfirst($row->status)]; @endphp
-                                            <tr class="hover:bg-slate-50 transition align-middle"><td class="px-4 py-3 text-center font-medium text-[var(--font-color-secondary)]">{{ $loop->iteration }}</td><td class="px-4 py-3 whitespace-nowrap"><span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-bold {{ $activeStat[0] }} {{ $activeStat[1] }}">{{ $activeStat[2] }}</span></td><td class="px-4 py-3 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($row->appointment_datetime)->format('d M Y - H:i') ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap">{{ optional($row->created_at)->format('d M Y') ?? '-' }}</td><td class="px-4 py-3 font-medium text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->poli->name ?? '-' }}</td><td class="px-4 py-3 font-semibold text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->patient->full_name ?? $patient->full_name ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-secondary)] max-w-[200px] truncate" title="{{ $row->procedure_plan ?? '-' }}">{{ $row->procedure_plan ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->doctor->full_name ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap"><span class="uppercase text-xs font-bold tracking-wide">{{ $row->paymentMethod->name ?? $row->payment_method ?? 'UMUM' }}</span></td></tr>
+                                            <tr class="hover:bg-slate-50 transition align-middle"><td class="px-4 py-3 text-center font-medium text-[var(--font-color-secondary)]">{{ $loop->iteration }}</td><td class="px-4 py-3 whitespace-nowrap"><span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-bold {{ $activeStat[0] }} {{ $activeStat[1] }}">{{ $activeStat[2] }}</span></td><td class="px-4 py-3 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($row->appointment_datetime)->format('d M Y - H:i') ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap">{{ optional($row->created_at)->format('d M Y') ?? '-' }}</td><td class="px-4 py-3 font-medium text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->poli->name ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-secondary)] max-w-[200px] truncate" title="{{ $row->procedure_plan ?? '-' }}">{{ $row->procedure_plan ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->doctor->full_name ?? '-' }}</td><td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap"><span class="uppercase text-xs font-bold tracking-wide">{{ $row->paymentMethod->name ?? $row->payment_method ?? 'UMUM' }}</span></td></tr>
                                         @empty
-                                            <tr><td colspan="9" class="px-4 py-12 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)] mb-1">Belum ada data kunjungan</p><p class="text-sm">Klik tombol "Tambah Kunjungan" untuk mendaftar antrean.</p></div></td></tr>
+                                            <tr><td colspan="8" class="px-4 py-12 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)] mb-1">Belum ada data kunjungan</p><p class="text-sm">Klik tombol "Tambah Kunjungan" untuk mendaftar antrean.</p></div></td></tr>
                                         @endforelse
                                     </tbody>
                                 </table>
@@ -213,7 +213,7 @@
                             @if($activeRegistrations->hasPages())
                             <div class="mt-5 px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl">
                                 <span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $activeRegistrations->firstItem() ?? 0 }} - {{ $activeRegistrations->lastItem() ?? 0 }} dari {{ $activeRegistrations->total() }} data</span>
-                                <div class="flex items-center gap-1">{{ $activeRegistrations->links('vendor.pagination.tailwind') }}</div>
+                                <div class="flex items-center gap-1">{{ $activeRegistrations->links('pagination::tailwind') }}</div>
                             </div>
                             @endif
                         </div>
@@ -230,22 +230,253 @@
 
                             <div id="tab-registrasi" class="history-tab-panel">
                                 <div class="rounded-2xl border border-[#EBDCCF] shadow-sm overflow-hidden flex flex-col">
-                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap">Tanggal Kunjungan</th><th class="px-6 py-5 whitespace-nowrap">Dokter</th><th class="px-6 py-5 min-w-[300px]">Tindakan Prosedur / Obat</th><th class="px-6 py-5 text-center whitespace-nowrap">No Gigi</th><th class="px-6 py-5 text-center whitespace-nowrap">Status</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">@forelse($medicalHistoryRows as $row)<tr class="hover:bg-slate-50 transition align-middle"><td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($row->appointment_datetime)->format('d M Y') ?? '-' }} <br><span class="text-xs text-[var(--font-color-secondary)] font-normal mt-0.5 inline-block">{{ optional($row->appointment_datetime)->format('H:i') ?? '' }} WIB</span></td><td class="px-6 py-5 font-medium text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->doctor->full_name ?? '-' }}</td><td class="px-6 py-5 text-[var(--font-color-secondary)] max-w-[300px] truncate leading-relaxed" title="{{ $row->procedure_plan ?? $row->complaint ?? '-' }}">{{ $row->procedure_plan ?? $row->complaint ?? '-' }}</td><td class="px-6 py-5 text-center font-semibold text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->tooth_number ?? '-' }}</td><td class="px-6 py-5 text-center whitespace-nowrap"><span class="inline-flex rounded-lg px-3 py-1.5 text-xs font-bold bg-emerald-100 text-emerald-800">Selesai</span></td></tr>@empty<tr><td colspan="5" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada riwayat kunjungan</p></div></td></tr>@endforelse</tbody></table></div>
-                                    @if($medicalHistoryRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $medicalHistoryRows->firstItem() ?? 0 }} - {{ $medicalHistoryRows->lastItem() ?? 0 }} dari {{ $medicalHistoryRows->total() }} data</span><div class="flex items-center gap-1">{{ $medicalHistoryRows->links('vendor.pagination.tailwind') }}</div></div>@endif
+                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap">Tanggal Kunjungan</th><th class="px-6 py-5 whitespace-nowrap">Dokter</th><th class="px-6 py-5 min-w-[300px]">Jenis Perawatan / Tindakan</th><th class="px-6 py-5 text-center whitespace-nowrap">No Gigi</th><th class="px-6 py-5 text-center whitespace-nowrap">Status</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
+                                    @forelse($medicalHistoryRows as $row)
+                                        <tr class="hover:bg-slate-50 transition align-middle">
+                                            <td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($row->appointment_datetime)->format('d M Y') ?? '-' }} <br><span class="text-xs text-[var(--font-color-secondary)] font-normal mt-0.5 inline-block">{{ optional($row->appointment_datetime)->format('H:i') ?? '' }} WIB</span></td>
+                                            <td class="px-6 py-5 font-medium text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->doctor->full_name ?? '-' }}
+                                                @if($row->medicalProcedures->count() > 0)
+                                                    @foreach($row->medicalProcedures->first()->assistants ?? [] as $assistant)
+                                                        <br><span class="text-sm text-[var(--font-color-secondary)]">> {{ $assistant->doctor->full_name ?? '-' }}</span>
+                                                    @endforeach
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-5 text-[var(--font-color-secondary)] max-w-[300px]">
+                                                @php
+                                                    $tindakanList = [];
+                                                    foreach($row->medicalProcedures as $proc) {
+                                                        // 1. AMBIL PROSEDUR (PROCEDURE ITEM)
+                                                        $items = \Illuminate\Support\Facades\DB::table('procedure_item')
+                                                            ->join('master_procedure', 'procedure_item.master_procedure_id', '=', 'master_procedure.id')
+                                                            ->where('procedure_item.procedure_id', $proc->id)
+                                                            ->select('master_procedure.procedure_name')
+                                                            ->get();
+                                                        foreach ($items as $item) {
+                                                            $tindakanList[] = $item->procedure_name ?? $item->name;
+                                                        }
+
+                                                        // 2. AMBIL OBAT (PROCEDURE MEDICINE)
+                                                        $medicines = \Illuminate\Support\Facades\DB::table('procedure_medicine')
+                                                            ->join('medicine', 'procedure_medicine.medicine_id', '=', 'medicine.id')
+                                                            ->where('procedure_medicine.procedure_id', $proc->id)
+                                                            ->select('medicine.medicine_name')
+                                                            ->get();
+                                                        foreach ($medicines as $med) {
+                                                            $tindakanList[] = $med->medicine_name;
+                                                        }
+
+                                                        // 3. AMBIL BHP (CONSUMABLE USAGE)
+                                                        $bhpUsages = \Illuminate\Support\Facades\DB::table('consumable_usage')
+                                                            ->join('consumable_items', 'consumable_usage.bhp_id', '=', 'consumable_items.id')
+                                                            ->where('consumable_usage.treatment_id', $proc->id)
+                                                            ->select('consumable_items.item_name')
+                                                            ->get();
+                                                        foreach ($bhpUsages as $bhp) {
+                                                            $tindakanList[] = $bhp->item_name;
+                                                        }
+                                                    }
+                                                @endphp
+                                                @if(count($tindakanList) > 0)
+                                                    {!! implode('<br>', $tindakanList) !!}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-5 text-center font-semibold text-[var(--font-color-primary)] whitespace-nowrap">
+                                                @php
+                                                    $teeth = [];
+                                                    foreach($row->medicalProcedures as $proc) {
+                                                        foreach($proc->items ?? [] as $item) {
+                                                            if($item->tooth_numbers) {
+                                                                $teeth[] = $item->tooth_numbers;
+                                                            }
+                                                        }
+                                                    }
+                                                @endphp
+                                                @if(count($teeth) > 0) {{ implode(', ', array_unique($teeth)) }} @else - @endif
+                                            </td>
+                                            <td class="px-6 py-5 text-center whitespace-nowrap"><span class="inline-flex rounded-lg px-3 py-1.5 text-xs font-bold bg-emerald-100 text-emerald-800">Selesai</span></td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="5" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada riwayat kunjungan</p></div></td></tr>
+                                    @endforelse
+                                    </tbody></table></div>
+                                    @if($medicalHistoryRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $medicalHistoryRows->firstItem() ?? 0 }} - {{ $medicalHistoryRows->lastItem() ?? 0 }} dari {{ $medicalHistoryRows->total() }} data</span><div class="flex items-center gap-1">{{ $medicalHistoryRows->links('pagination::tailwind') }}</div></div>@endif
                                 </div>
                             </div>
 
                             <div id="tab-catatan-dokter" class="history-tab-panel hidden">
                                 <div class="rounded-2xl border border-[#EBDCCF] shadow-sm overflow-hidden flex flex-col">
-                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-48">Tanggal</th><th class="px-6 py-5 whitespace-nowrap w-56">Dokter</th><th class="px-6 py-5 min-w-[360px]">Catatan</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">@forelse($doctorNotesRows as $noteRow)<tr class="hover:bg-slate-50 transition align-middle"><td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($noteRow->appointment_datetime)->format('d M Y') ?? '-' }} <br><span class="text-xs text-[var(--font-color-secondary)] font-normal mt-0.5 inline-block">{{ optional($noteRow->appointment_datetime)->format('H:i') ?? '' }} WIB</span></td><td class="px-6 py-5 font-medium text-[var(--font-color-primary)] whitespace-nowrap">{{ $noteRow->doctor_name ?? '-' }}</td><td class="px-6 py-5 text-[var(--font-color-secondary)] leading-relaxed max-w-[360px]" title="{{ $noteRow->notes ?: '-' }}">{{ $noteRow->notes ?: 'Tidak ada catatan dokter.' }}</td></tr>@empty<tr><td colspan="3" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada catatan dokter</p></div></td></tr>@endforelse</tbody></table></div>
-                                    @if($doctorNotesRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $doctorNotesRows->firstItem() ?? 0 }} - {{ $doctorNotesRows->lastItem() ?? 0 }} dari {{ $doctorNotesRows->total() }} data</span><div class="flex items-center gap-1">{{ $doctorNotesRows->links('vendor.pagination.tailwind') }}</div></div>@endif
+                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-48">Tanggal</th><th class="px-6 py-5 whitespace-nowrap w-56">Dokter</th><th class="px-6 py-5 min-w-[360px]">Catatan</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
+                                    @forelse($doctorNotesRows as $noteRow)
+                                        <tr class="hover:bg-slate-50 transition align-middle">
+                                            <td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($noteRow->appointment_datetime)->format('d M Y') ?? '-' }}</td>
+                                            <td class="px-6 py-5 font-medium text-[var(--font-color-primary)] whitespace-nowrap">
+                                                @if($noteRow->doctor)
+                                                    {{ $noteRow->doctor->full_name ?? '-' }}
+                                                    @foreach($noteRow->assistants ?? [] as $assistant)
+                                                        <br><span class="text-sm text-[var(--font-color-secondary)]">> {{ $assistant->doctor->full_name ?? '-' }}</span>
+                                                    @endforeach
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-5 text-[var(--font-color-secondary)] max-w-[360px]">
+                                                @php
+                                                    $notesText = $noteRow->notes ?? '';
+                                                    $sections = [];
+                                                    
+                                                    // Parse sections from notes text
+                                                    $lines = explode("\n", $notesText);
+                                                    $currentSection = null;
+                                                    $currentContent = '';
+                                                    
+                                                    foreach ($lines as $line) {
+                                                        $trimmedLine = trim($line);
+                                                        
+                                                        if (in_array($trimmedLine, ['Subjective:', 'Objective:', 'Plan:'])) {
+                                                            if ($currentSection && $currentContent !== '') {
+                                                                $sections[$currentSection] = trim($currentContent);
+                                                            }
+                                                            $currentSection = str_replace(':', '', $trimmedLine);
+                                                            $currentContent = '';
+                                                        } else {
+                                                            $currentContent .= $line . "\n";
+                                                        }
+                                                    }
+                                                    
+                                                    // Save last section
+                                                    if ($currentSection && $currentContent !== '') {
+                                                        $sections[$currentSection] = trim($currentContent);
+                                                    }
+                                                @endphp
+                                                
+                                                @if(count($sections) > 0)
+                                                    <div class="grid grid-cols-2 gap-4 items-start">
+                                                        @foreach(['Subjective', 'Objective', 'Plan'] as $label)
+                                                            @if(isset($sections[$label]) && $sections[$label] !== '')
+                                                                <div class="font-semibold text-[var(--font-color-secondary)] text-xs uppercase">{{ $label }}</div>
+                                                                <div class="text-sm text-[var(--font-color-primary)] whitespace-pre-wrap">{{ $sections[$label] }}</div>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    <div class="text-sm text-[var(--font-color-secondary)]">Tidak ada catatan dokter.</div>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="3" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada catatan dokter</p></div></td></tr>
+                                    @endforelse
+                                    </tbody></table></div>
+                                    @if($doctorNotesRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $doctorNotesRows->firstItem() ?? 0 }} - {{ $doctorNotesRows->lastItem() ?? 0 }} dari {{ $doctorNotesRows->total() }} data</span><div class="flex items-center gap-1">{{ $doctorNotesRows->links('pagination::tailwind') }}</div></div>@endif
                                 </div>
                             </div>
 
                             <div id="tab-odontogram" class="history-tab-panel hidden">
                                 <div class="rounded-2xl border border-[#EBDCCF] shadow-sm overflow-hidden flex flex-col">
-                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-48">Tanggal Periksa</th><th class="px-6 py-5 whitespace-nowrap w-56">Jumlah Gigi Dicatat</th><th class="px-6 py-5 min-w-[300px]">Catatan</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">@forelse($odontogramRows as $record)<tr class="hover:bg-slate-50 transition align-middle"><td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($record->examined_at)->format('d M Y') ?? '-' }} <br><span class="text-xs text-[var(--font-color-secondary)] font-normal mt-0.5 inline-block">{{ optional($record->examined_at)->format('H:i') ?? '' }} WIB</span></td><td class="px-6 py-5 font-medium text-[var(--font-color-primary)] whitespace-nowrap"><span class="px-3 py-1 bg-blue-50 text-blue-700 font-bold rounded-lg">{{ $record->teeth_count ?? 0 }} Gigi</span></td><td class="px-6 py-5 text-[var(--font-color-secondary)] leading-relaxed max-w-[300px] truncate" title="{{ $record->notes ?: '-' }}">{{ $record->notes ?: 'Tidak ada catatan khusus.' }}</td></tr>@empty<tr><td colspan="3" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada riwayat Odontogram</p></div></td></tr>@endforelse</tbody></table></div>
-                                    @if($odontogramRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $odontogramRows->firstItem() ?? 0 }} - {{ $odontogramRows->lastItem() ?? 0 }} dari {{ $odontogramRows->total() }} data</span><div class="flex items-center gap-1">{{ $odontogramRows->links('vendor.pagination.tailwind') }}</div></div>@endif
+                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-40">Tanggal Periksa</th><th class="px-6 py-5 min-w-[260px]">Diagnosa Gigi</th><th class="px-6 py-5 min-w-[200px]">Catatan</th><th class="px-6 py-5 min-w-[280px]"></th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
+                                    @forelse($odontogramRows as $record)
+                                        <tr class="hover:bg-slate-50 transition align-middle">
+                                            <td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($record->examined_at)->format('d M Y') ?? '-' }}</td>
+                                            <td class="px-6 py-5 text-sm text-[var(--font-color-primary)]">
+                                                @php
+                                                    $diagnosaRows = [];
+                                                    foreach($record->teeth->groupBy('tooth_number') as $toothNum => $teeth) {
+                                                        $tooth = $teeth->first();
+                                                        $diagnosa = trim((string) ($tooth->condition_label ?? ''));
+                                                        if($diagnosa === '') {
+                                                            $diagnosa = trim((string) ($tooth->surfaces ?? ''));
+                                                        }
+                                                        if($diagnosa === '') {
+                                                            $diagnosa = trim((string) ($tooth->condition_code ?? ''));
+                                                        }
+                                                        if($diagnosa !== '' && $diagnosa !== '-') {
+                                                            $diagnosaRows[] = $toothNum . ' : ' . $diagnosa;
+                                                        }
+                                                    }
+                                                @endphp
+                                                @if(count($diagnosaRows) > 0)
+                                                    {!! implode('<br>', $diagnosaRows) !!}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-5 text-xs font-semibold uppercase text-[var(--font-color-secondary)] align-top">
+                                                @php
+                                                    $noteText = trim((string) ($record->notes ?? ''));
+                                                    $labelMap = [
+                                                        'occlusi' => 'Occlusi',
+                                                        'torus palatinus' => 'Torus Palatinus',
+                                                        'diastema' => 'Diastema',
+                                                        'torus mandibularis' => 'Torus Mandibularis',
+                                                        'palatum' => 'Palatum',
+                                                        'gigi anomali' => 'Gigi Anomali',
+                                                        'd' => 'D',
+                                                        'm' => 'M',
+                                                        'f' => 'F',
+                                                        'catatan tambahan' => 'Catatan Tambahan',
+                                                    ];
+                                                    $parsedNotes = [];
+
+                                                    if($noteText !== '') {
+                                                        $pattern = '/(Occlusi|Torus Palatinus|Diastema|Torus Mandibularis|Palatum|Gigi Anomali|D|M|F|Catatan Tambahan)\s*:\s*/i';
+                                                        preg_match_all($pattern, $noteText, $matches, PREG_OFFSET_CAPTURE);
+
+                                                        if(!empty($matches[0])) {
+                                                            $totalMatches = count($matches[0]);
+                                                            for($i = 0; $i < $totalMatches; $i++) {
+                                                                $fullMatch = $matches[0][$i][0];
+                                                                $startOffset = $matches[0][$i][1] + strlen($fullMatch);
+                                                                $endOffset = $i + 1 < $totalMatches ? $matches[0][$i + 1][1] : strlen($noteText);
+                                                                $rawLabel = strtolower(trim($matches[1][$i][0]));
+                                                                $value = trim(substr($noteText, $startOffset, $endOffset - $startOffset));
+                                                                $value = trim($value, " \t\n\r\0\x0B,");
+
+                                                                if(isset($labelMap[$rawLabel]) && $value !== '' && $value !== '-') {
+                                                                    $parsedNotes[$labelMap[$rawLabel]] = $value;
+                                                                }
+                                                            }
+                                                        } elseif($noteText !== '-') {
+                                                            $parsedNotes['Catatan Tambahan'] = $noteText;
+                                                        }
+                                                    }
+
+                                                    $orderedLabels = ['Occlusi', 'Torus Palatinus', 'Diastema', 'Torus Mandibularis', 'Palatum', 'Gigi Anomali', 'D', 'M', 'F', 'Catatan Tambahan'];
+                                                    $visibleLabels = [];
+                                                    foreach($orderedLabels as $label) {
+                                                        if(isset($parsedNotes[$label]) && trim((string) $parsedNotes[$label]) !== '') {
+                                                            $visibleLabels[] = $label;
+                                                        }
+                                                    }
+                                                @endphp
+                                                @if(count($visibleLabels) > 0)
+                                                    <div class="space-y-2">
+                                                        @foreach($visibleLabels as $label)
+                                                            <div>{{ $label }}</div>
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-5 text-sm text-[var(--font-color-primary)] align-top">
+                                                @if(count($visibleLabels) > 0)
+                                                    <div class="space-y-2 whitespace-pre-wrap">
+                                                        @foreach($visibleLabels as $label)
+                                                            <div>{{ $parsedNotes[$label] }}</div>
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="4" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada riwayat Odontogram</p></div></td></tr>
+                                    @endforelse
+                                    </tbody></table></div>
+                                    @if($odontogramRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $odontogramRows->firstItem() ?? 0 }} - {{ $odontogramRows->lastItem() ?? 0 }} dari {{ $odontogramRows->total() }} data</span><div class="flex items-center gap-1">{{ $odontogramRows->links('pagination::tailwind') }}</div></div>@endif
                                 </div>
                             </div>
                         </div>
@@ -269,90 +500,159 @@
                     </div>
 
                     <div class="dash-card bg-white rounded-3xl p-8 border-t-4 border-t-red-500 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-red-50 opacity-60 rounded-bl-full pointer-events-none"></div>
-                        <h3 class="text-lg font-bold text-red-600 mb-2 relative z-10 flex items-center gap-2">Keluar Sistem</h3>
-                        <p class="text-sm text-[var(--font-color-secondary)] mb-6 relative z-10 leading-relaxed">Pastikan Anda telah mengecek semua jadwal dan informasi medis Anda sebelum keluar dari portal.</p>
+                       
                         <form action="{{ route('logout') }}" method="POST" class="relative z-10">@csrf<button type="submit" class="w-full bg-white border-2 border-red-500 text-red-600 hover:bg-red-500 hover:text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-sm hover:shadow-md">Logout Akun</button></form>
                     </div>
                 </aside>
             </div>
         </section>
 
-        <div id="visitModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 overflow-hidden">
-            <div id="visitBackdrop" class="absolute inset-0 bg-slate-900/45 backdrop-blur-sm transition-opacity"></div>
-            <div class="relative bg-[#FFFDFC] rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all h-[calc(100dvh-2rem)] sm:h-[calc(100dvh-3rem)] max-h-[920px] flex flex-col min-h-0 border border-[#EADBCF]">
-                <div class="px-6 sm:px-8 py-5 border-b border-[#E9DACA] flex items-center justify-between bg-gradient-to-r from-[#FEF9F3] to-[#FFFDFC] shrink-0">
-                    <div class="flex items-center gap-3">
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#8B5E3C] text-white shadow-sm"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></span>
-                        <div><h2 class="text-xl font-bold text-[var(--font-color-primary)]">Daftar Kunjungan</h2><p class="text-xs text-[var(--font-color-secondary)]">Tanda <span class="text-red-500">*</span> wajib diisi</p></div>
-                    </div>
-                    <button id="closeVisitModal" type="button" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-[var(--font-color-secondary)] hover:bg-red-100 hover:text-red-600 transition">&times;</button>
-                </div>
-                <form action="{{ route('appointments.store') }}" method="POST" class="p-6 sm:p-8 space-y-6 modal-scroll min-h-0 flex-1 overscroll-contain">
-                    @csrf
-                    <div class="rounded-2xl border border-[#E9DACA] bg-white p-5 sm:p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div class="hidden"><input name="patient_name" type="text" value="{{ $patient->full_name ?? $user->name }}" required><input name="patient_phone" type="text" value="{{ $patient->phone_number ?? '-' }}" required></div>
-                            <div><label class="block text-sm font-bold text-[var(--font-color-primary)] mb-1.5">Tenaga Medis <span class="text-red-500">*</span></label><select name="doctor_id" class="w-full rounded-xl border-[#D9C3AE] bg-slate-50 focus:bg-white focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]" required><option value="" disabled selected>Pilih dokter spesialis...</option>@foreach($doctors as $doctor)<option value="{{ $doctor->id }}">{{ $doctor->full_name }}</option>@endforeach</select></div>
-                            <div><label class="block text-sm font-bold text-[var(--font-color-primary)] mb-1.5">Layanan / Tindakan <span class="text-red-500">*</span></label><select name="treatment_id" class="w-full rounded-xl border-[#D9C3AE] bg-slate-50 focus:bg-white focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]" required><option value="" disabled selected>Pilih tindakan medis...</option>@foreach($treatments as $treatment)<option value="{{ $treatment->id }}">{{ $treatment->procedure_name }}</option>@endforeach</select></div>
-                            <div><label class="block text-sm font-bold text-[var(--font-color-primary)] mb-1.5">Tanggal Berobat <span class="text-red-500">*</span></label><input name="appointment_date" type="date" min="{{ now()->toDateString() }}" class="w-full rounded-xl border-[#D9C3AE] bg-slate-50 focus:bg-white focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]" required></div>
-                            <div><label class="block text-sm font-bold text-[var(--font-color-primary)] mb-1.5">Waktu Kunjungan <span class="text-red-500">*</span></label><input name="appointment_time" type="time" class="w-full rounded-xl border-[#D9C3AE] bg-slate-50 focus:bg-white focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]" required></div>
-                        </div>
-                    </div>
-                    <div class="rounded-2xl border border-[#E9DACA] bg-white p-5 sm:p-6"><label class="block text-sm font-bold text-[var(--font-color-primary)] mb-1.5">Keluhan Utama <span class="text-xs text-slate-400 font-normal">(Opsional)</span></label><textarea name="notes" rows="3" class="w-full rounded-xl border-[#D9C3AE] bg-slate-50 focus:bg-white focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]" placeholder="Ceritakan keluhan sakit yang Anda rasakan..."></textarea></div>
-                    <input type="hidden" name="payment_method" value="tunai">
-                    <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-5 border-t border-[#E9DACA]"><button id="cancelVisitModal" type="button" class="px-6 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">Batal</button><button type="submit" class="px-6 py-2.5 rounded-xl bg-[#8B5E3C] text-white font-bold hover:bg-[#734A2E] transition shadow-md">Simpan Pendaftaran</button></div>
-                </form>
-            </div>
-        </div>
-
         <div id="editAccountModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4 overflow-hidden">
-            <div id="editAccountBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"></div>
-            <div id="editAccountDialog" class="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl border border-[#EFE3D7] overflow-hidden transform transition-all flex flex-col min-h-0 max-h-full" style="height: min(920px, calc(100vh - 1rem));">
-                <div class="px-6 sm:px-8 py-4 sm:py-5 border-b border-[#EFE3D7] flex items-center justify-between bg-gradient-to-r from-[#FEFCFA] to-white shrink-0 sticky top-0 z-20"><h2 class="text-xl font-bold text-[var(--font-color-primary)]">Edit Profil</h2><button id="closeEditAccountModal" type="button" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-[var(--font-color-secondary)] hover:bg-red-100 hover:text-red-600 transition">&times;</button></div>
-                <div class="flex-1 min-h-0 modal-scroll overscroll-contain">
-                    <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" class="p-6 sm:p-8 space-y-5">
-                        @csrf
-                        @method('PUT')
-                        <div class="flex flex-col items-center justify-center mb-2">
-                            <div class="relative w-24 h-24 mb-3 group cursor-pointer" onclick="document.getElementById('photoInput').click()">
-                                <div class="w-full h-full rounded-full border-4 border-slate-100 overflow-hidden bg-slate-200 flex items-center justify-center">
-                                    @if(!empty($patient->photo))
-                                        <img id="photoPreview" src="{{ $patient->photo }}" alt="Foto" class="w-full h-full object-cover">
-                                    @else
-                                        <img id="photoPreview" src="" class="w-full h-full object-cover hidden">
-                                        <svg id="photoIcon" class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                    @endif
-                                </div>
-                                <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg></div>
-                            </div>
-                            <p class="text-xs font-semibold text-[var(--color-primary)] cursor-pointer" onclick="document.getElementById('photoInput').click()">Ubah Foto Profil</p>
-                            <input type="file" id="photoInput" name="photo" class="hidden" accept="image/*" onchange="previewImage(event)"><input type="hidden" id="photoBase64" name="photo_base64">
-                        </div>
-                        <div><label class="field-label">Nama Lengkap</label><input type="text" name="full_name" value="{{ $patient->full_name ?? $user->name }}" class="field-input" required></div>
-                        <div><label class="field-label">Email</label><input type="email" name="email" value="{{ $user->email }}" class="field-input" required></div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div><label class="field-label">No. WhatsApp</label><input type="text" name="phone_number" value="{{ $patient->phone_number ?? '' }}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="field-input"></div>
-                            <div><label class="field-label">Tanggal Lahir</label><input type="date" name="date_of_birth" value="{{ $patient?->date_of_birth ? $patient->date_of_birth->format('Y-m-d') : '' }}" class="field-input"></div>
-                            <div><label class="field-label">Jenis Kelamin</label><select name="gender" class="field-input"><option value="">Pilih</option><option value="Male" {{ ($patient?->gender === 'Male') ? 'selected' : '' }}>Laki-laki</option><option value="Female" {{ ($patient?->gender === 'Female') ? 'selected' : '' }}>Perempuan</option></select></div>
-                            <div><label class="field-label">Golongan Darah</label><select name="blood_type" class="field-input">@foreach(['A','B','AB','O','unknown'] as $bloodType)<option value="{{ $bloodType }}" {{ ($patient?->blood_type === $bloodType) ? 'selected' : '' }}>{{ strtoupper($bloodType) }}</option>@endforeach</select></div>
-                            <div><label class="field-label">Rhesus</label><select name="rhesus" class="field-input">@foreach(['+','-','unknown'] as $rhesus)<option value="{{ $rhesus }}" {{ ($patient?->rhesus === $rhesus) ? 'selected' : '' }}>{{ $rhesus }}</option>@endforeach</select></div>
-                            <div><label class="field-label">NIK</label><input type="text" name="id_card_number" value="{{ $patient->id_card_number ?? '' }}" class="field-input"></div>
-                            <div><label class="field-label">Kota</label><input type="text" name="city" value="{{ $patient->city ?? '' }}" class="field-input"></div>
-                            <div><label class="field-label">Agama</label><input type="text" name="religion" value="{{ $patient->religion ?? '' }}" class="field-input"></div>
-                            <div><label class="field-label">Pendidikan</label><input type="text" name="education" value="{{ $patient->education ?? '' }}" class="field-input"></div>
-                            <div><label class="field-label">Pekerjaan</label><input type="text" name="occupation" value="{{ $patient->occupation ?? '' }}" class="field-input"></div>
-                            <div><label class="field-label">Status Pernikahan</label><input type="text" name="marital_status" value="{{ $patient->marital_status ?? '' }}" class="field-input"></div>
-                            <div><label class="field-label">First Chat Date</label><input type="date" name="first_chat_date" value="{{ $patient?->first_chat_date ? $patient->first_chat_date->format('Y-m-d') : '' }}" class="field-input"></div>
-                        </div>
-                        <div><label class="field-label">Alamat</label><textarea name="address" rows="2" class="field-input">{{ $patient->address ?? '' }}</textarea></div>
-                        <div><label class="field-label">Riwayat Alergi</label><textarea name="allergy_history" rows="2" class="field-input">{{ $patient->allergy_history ?? '' }}</textarea></div>
-                        <div class="pt-5 border-t border-[#EFE3D7]"><p class="text-xs text-[var(--font-color-secondary)] mb-3 uppercase tracking-wider font-bold">Keamanan (Ubah Password)</p><div class="space-y-3"><input type="password" name="password" placeholder="Password Baru (Kosongkan jika tidak diubah)" class="field-input text-sm"><input type="password" name="password_confirmation" placeholder="Ketik Ulang Password Baru" class="field-input text-sm"></div></div>
-                        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-5 border-t border-[#EFE3D7]"><button id="cancelEditAccountModal" type="button" class="px-6 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">Batalkan</button><button type="submit" class="px-6 py-2.5 rounded-xl bg-[var(--font-color-primary)] text-white font-bold hover:brightness-110 transition shadow-md">Simpan Profil</button></div>
-                    </form>
-                </div>
-            </div>
+    <div id="editAccountBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"></div>
+    <div id="editAccountDialog" class="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl border border-[#EFE3D7] overflow-hidden transform transition-all flex flex-col min-h-0 max-h-full" style="height: min(920px, calc(100vh - 1rem));">
+        
+        <div class="px-6 sm:px-8 py-4 sm:py-5 border-b border-[#EFE3D7] flex items-center justify-between bg-gradient-to-r from-[#FEFCFA] to-white shrink-0 sticky top-0 z-20">
+            <h2 class="text-xl font-bold text-[var(--font-color-primary)]">Edit Profil</h2>
+            <button id="closeEditAccountModal" type="button" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-[var(--font-color-secondary)] hover:bg-red-100 hover:text-red-600 transition">&times;</button>
         </div>
+        
+        <div class="flex-1 min-h-0 modal-scroll overscroll-contain overflow-y-auto">
+            <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" autocomplete="off" class="p-6 sm:p-8 space-y-6">
+                @csrf
+                @method('PUT')
+                
+                <div class="flex flex-col items-center justify-center mb-4">
+                    <div class="relative w-28 h-28 mb-3 group cursor-pointer" onclick="document.getElementById('photoInput').click()">
+                        <div class="w-full h-full rounded-full border-4 border-[#F4E9DF] overflow-hidden bg-slate-100 flex items-center justify-center shadow-sm">
+                            @if(!empty($patient->photo))
+                                <img id="photoPreview" src="{{ $patient->photo }}" alt="Foto" class="w-full h-full object-cover">
+                            @else
+                                <img id="photoPreview" src="" class="w-full h-full object-cover hidden">
+                                <svg id="photoIcon" class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            @endif
+                        </div>
+                        <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                        </div>
+                    </div>
+                    <p class="text-sm font-bold text-[#8B5E3C] cursor-pointer hover:text-[#582c0c] transition" onclick="document.getElementById('photoInput').click()">Ubah Foto Profil</p>
+                    <input type="file" id="photoInput" name="photo" class="hidden" accept="image/*" onchange="previewImage(event)">
+                    <input type="hidden" id="photoBase64" name="photo_base64">
+                </div>
+
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Nama Lengkap</label>
+                        <input type="text" name="full_name" value="{{ $patient->full_name ?? $user->name }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Email</label>
+                        <input type="email" name="email" value="{{ $user->email }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">No. WhatsApp</label>
+                        <input type="text" name="phone_number" value="{{ $patient->phone_number ?? '' }}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Tanggal Lahir</label>
+                        <input type="date" name="date_of_birth" value="{{ $patient?->date_of_birth ? $patient->date_of_birth->format('Y-m-d') : '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Jenis Kelamin</label>
+                        <select name="gender" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                            <option value="">Pilih</option>
+                            <option value="Male" {{ ($patient?->gender === 'Male') ? 'selected' : '' }}>Laki-laki</option>
+                            <option value="Female" {{ ($patient?->gender === 'Female') ? 'selected' : '' }}>Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Golongan Darah</label>
+                        <select name="blood_type" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                            @foreach(['A','B','AB','O','unknown'] as $bloodType)
+                                <option value="{{ $bloodType }}" {{ ($patient?->blood_type === $bloodType) ? 'selected' : '' }}>{{ strtoupper($bloodType) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Rhesus</label>
+                        <select name="rhesus" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                            @foreach(['+','-','unknown'] as $rhesus)
+                                <option value="{{ $rhesus }}" {{ ($patient?->rhesus === $rhesus) ? 'selected' : '' }}>{{ $rhesus }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">NIK</label>
+                        <input type="text" name="id_card_number" value="{{ $patient->id_card_number ?? '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Kota</label>
+                        <input type="text" name="city" value="{{ $patient->city ?? '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Agama</label>
+                        <input type="text" name="religion" value="{{ $patient->religion ?? '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Pendidikan</label>
+                        <input type="text" name="education" value="{{ $patient->education ?? '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Pekerjaan</label>
+                        <input type="text" name="occupation" value="{{ $patient->occupation ?? '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Status Pernikahan</label>
+                        <input type="text" name="marital_status" value="{{ $patient->marital_status ?? '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">First Chat Date</label>
+                        <input type="date" name="first_chat_date" value="{{ $patient?->first_chat_date ? $patient->first_chat_date->format('Y-m-d') : '' }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                    </div>
+                </div>
+
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Alamat</label>
+                        <textarea name="address" rows="2" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">{{ $patient->address ?? '' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Riwayat Alergi</label>
+                        <textarea name="allergy_history" rows="2" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">{{ $patient->allergy_history ?? '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-[#EFE3D7]">
+                    <p class="text-xs text-[#8B5E3C] mb-4 uppercase tracking-wider font-extrabold flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Keamanan (Ubah Password)
+                    </p>
+                    <div class="space-y-4">
+                        <input type="password" name="password" value="" autocomplete="new-password" placeholder="Password Baru (Kosongkan jika tidak diubah)" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm">
+                        <input type="password" name="password_confirmation" value="" autocomplete="new-password" placeholder="Ketik Ulang Password Baru" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm">
+                    </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 py-5 px-6 sm:px-8 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 border-t border-[#EFE3D7] bg-white sticky bottom-0 z-20">
+                    <button id="cancelEditAccountModal" type="button" class="px-6 py-2.5 rounded-xl border-2 border-[#EBDCCF] text-[var(--font-color-primary)] font-bold hover:bg-[#F9F1EA] transition">
+                        Batalkan
+                    </button>
+                    <button type="submit" class="px-8 py-2.5 rounded-xl bg-[var(--font-color-primary)] hover:brightness-110 text-white font-bold transition shadow-md flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Simpan Profil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
     </main>
 
     <script>

@@ -61,14 +61,35 @@ class DashboardUserController extends Controller
 
             $medicalHistoryRows = Appointment::where('patient_id', $patient->id)
                 ->where('status', 'succeed')
-                ->with(['doctor', 'poli'])
+                ->with([
+                    'doctor',
+                    'poli',
+                    'medicalProcedures' => function($q) {
+                        $q->with([
+                            'doctor',
+                            'items.masterProcedure',
+                            'medicines.medicine',
+                            'assistants.doctor',
+                            'bhpUsages.item'
+                        ]);
+                    }
+                ])
                 ->latest('appointment_datetime')
                 ->paginate(7, ['*'], 'history_page');
 
             $doctorNotesCollection = collect();
             $completedAppointments = Appointment::where('patient_id', $patient->id)
                 ->where('status', 'succeed')
-                ->with(['doctor', 'medicalProcedures.doctorNotes.user'])
+                ->with([
+                    'doctor',
+                    'medicalProcedures' => function($q) {
+                        $q->with([
+                            'doctor',
+                            'assistants.doctor',
+                            'doctorNotes.user'
+                        ]);
+                    }
+                ])
                 ->latest('appointment_datetime')
                 ->get();
 
@@ -78,7 +99,8 @@ class DashboardUserController extends Controller
                         $doctorNotesCollection->push((object) [
                             'id' => $note->id,
                             'appointment_datetime' => $appointment->appointment_datetime,
-                            'doctor_name' => $procedure->doctor->full_name ?? $note->user->name ?? $appointment->doctor->full_name ?? '-',
+                            'doctor' => $procedure->doctor,
+                            'assistants' => $procedure->assistants,
                             'notes' => $note->notes,
                         ]);
                     }
@@ -88,7 +110,7 @@ class DashboardUserController extends Controller
             $doctorNotesRows = $this->paginateCollection($doctorNotesCollection, 7, 'notes_page');
 
             $odontogramRows = OdontogramRecord::where('patient_id', $patient->id)
-                ->withCount('teeth')
+                ->with(['teeth', 'patient'])
                 ->latest('examined_at')
                 ->paginate(7, ['*'], 'odontogram_page');
         }

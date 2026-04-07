@@ -34,11 +34,15 @@
 
             {{-- Auth Section --}}
             @auth
+                @php
+                    $navbarUser = Auth::user();
+                    $navbarPhoto = optional($navbarUser->patient)->photo ?: $navbarUser->avatar_url;
+                @endphp
                 <a href="{{ route('user.dashboard') }}" class="ml-2 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[#D9C3AE] bg-[#F4E9DF] text-[var(--font-color-primary)] hover:brightness-95 transition-all duration-200" title="Dashboard Pasien">
-                        @if(Auth::user()->avatar_url)
-                            <img src="{{ Auth::user()->avatar_url }}" alt="Foto Profil" class="w-full h-full object-cover">
+                        @if(!empty($navbarPhoto))
+                            <img src="{{ $navbarPhoto }}" alt="Foto Profil" class="w-full h-full object-cover">
                         @else
-                            <span class="text-sm font-semibold">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+                            <span class="text-sm font-semibold">{{ strtoupper(substr($navbarUser->name ?? 'U', 0, 1)) }}</span>
                         @endif
                 </a>
             @else
