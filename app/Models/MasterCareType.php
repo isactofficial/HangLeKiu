@@ -16,4 +16,9 @@ class MasterCareType extends Model
     public function scopeActive($query) {
         return $query->where('is_active', true);
     }
+
+    public function procedures()
+    {
+        return $this->hasMany(MasterProcedure::class, 'care_type_id', 'id');
+    }
 }
