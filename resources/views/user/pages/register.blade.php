@@ -68,7 +68,8 @@
             margin-bottom: 6px;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 10px 14px;
             border: 1.5px solid #C58F59;
@@ -86,7 +87,8 @@
             opacity: 0.6;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             border-color: #582C0C;
         }
 
@@ -213,6 +215,25 @@
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" name="email" id="email" placeholder="Email" value="{{ old('email') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone_number">No. HP</label>
+                <input type="text" name="phone_number" id="phone_number" placeholder="08xxxxxxxxxx" value="{{ old('phone_number') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="date_of_birth">Tanggal Lahir</label>
+                <input type="date" name="date_of_birth" id="date_of_birth" value="{{ old('date_of_birth') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Jenis Kelamin</label>
+                <select name="gender" id="gender" required>
+                    <option value="" disabled {{ old('gender') ? '' : 'selected' }}>Pilih jenis kelamin</option>
+                    <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Laki-laki</option>
+                    <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Perempuan</option>
+                </select>
             </div>
 
             <div class="form-group">

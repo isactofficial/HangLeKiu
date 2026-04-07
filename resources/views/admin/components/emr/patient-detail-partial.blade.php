@@ -809,7 +809,7 @@
 
         <div data-record-tab-content="rekam-medis">
             <div class="record-table-shell">
-                <div class="record-table-head" style="grid-template-columns:190px 170px 1fr 150px 130px;">
+                <div class="record-table-head" style="grid-template-columns:190px 260px 1fr 150px 130px;">
                     <div>Tanggal Kunjungan</div>
                     <div>Dokter</div>
                     <div>Tindakan Prosedur / Obat</div>
@@ -881,8 +881,8 @@
                             ->unique()
                             ->values();
                     @endphp
-                    <div class="record-table-row" style="grid-template-columns:190px 170px 1fr 150px 130px;">
-                        <div class="record-table-text" style="font-weight:600;">{{ optional($reg->created_at ?? $reg->appointment_datetime)->translatedFormat('d F Y H:i') }} WIB</div>
+                    <div class="record-table-row" style="grid-template-columns:190px 260px 1fr 150px 130px;">
+                        <div class="record-table-text" style="font-weight:600;">{{ optional($reg->created_at ?? $reg->appointment_datetime)->translatedFormat('d F Y') }}</div>
                         <div class="record-table-text" style="font-weight:600; line-height:1.5;">
                             @if($doctorDisplayNames->count() <= 1)
                                 <div>{{ $doctorDisplayNames->first() ?? '-' }}</div>
@@ -908,7 +908,7 @@
 
         <div class="hidden" data-record-tab-content="catatan-dokter">
             <div class="record-table-shell">
-                <div class="record-table-head" style="grid-template-columns:180px 220px 1fr;">
+                <div class="record-table-head" style="grid-template-columns:180px 300px 1fr;">
                     <div>Tanggal</div>
                     <div>Dokter</div>
                     <div>Catatan</div>
@@ -931,8 +931,16 @@
                             ->unique()
                             ->values();
                     @endphp
-                    <div class="record-table-row" style="grid-template-columns:180px 220px 1fr;">
-                        <div class="record-table-text" style="font-weight:600;">{{ $note['created_at_label'] ?? '-' }}</div>
+                    <div class="record-table-row" style="grid-template-columns:180px 300px 1fr;">
+                        <div class="record-table-text" style="font-weight:600;">
+                            @php
+                                $displayDate = optional($note['created_at'] ?? null)->translatedFormat('d F Y');
+                                if (!$displayDate && isset($note['created_at_label'])) {
+                                    $displayDate = \Carbon\Carbon::parse($note['created_at_label'])->translatedFormat('d F Y');
+                                }
+                            @endphp
+                            {{ $displayDate ?? '-' }}
+                        </div>
                         <div class="record-table-text" style="font-weight:700; line-height:1.5;">
                             <div>{{ $doctorName }}</div>
                             @foreach($assistantNames as $assistantName)
@@ -940,27 +948,15 @@
                             @endforeach
                         </div>
                         <div style="padding:10px 12px;">
-                            <div style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:6px 12px;">
-                                @if(($note['subjective'] ?? '') !== '')
-                                    <div>
-                                        <div style="font-size:11px; color:var(--brown-500); font-weight:800; text-transform:uppercase; margin-bottom:2px;">Subjectives</div>
-                                        <div class="record-table-text" style="line-height:1.35;">{{ $note['subjective'] }}</div>
-                                    </div>
-                                @endif
+                            <div style="display:grid; grid-template-columns:150px minmax(0, 1fr); gap:6px 12px; align-items:start;">
+                                <div style="font-size:11px; color:var(--brown-500); font-weight:800; text-transform:uppercase;">Subjectives</div>
+                                <div class="record-table-text" style="line-height:1.35;">{{ ($note['subjective'] ?? '') !== '' ? $note['subjective'] : '-' }}</div>
 
-                                @if(($note['objective'] ?? '') !== '')
-                                    <div>
-                                        <div style="font-size:11px; color:var(--brown-500); font-weight:800; text-transform:uppercase; margin-bottom:2px;">Objectives</div>
-                                        <div class="record-table-text" style="line-height:1.35;">{{ $note['objective'] }}</div>
-                                    </div>
-                                @endif
+                                <div style="font-size:11px; color:var(--brown-500); font-weight:800; text-transform:uppercase;">Objectives</div>
+                                <div class="record-table-text" style="line-height:1.35;">{{ ($note['objective'] ?? '') !== '' ? $note['objective'] : '-' }}</div>
 
-                                @if(($note['plan'] ?? '') !== '')
-                                    <div style="grid-column:1 / -1;">
-                                        <div style="font-size:11px; color:var(--brown-500); font-weight:800; text-transform:uppercase; margin-bottom:2px;">Plans</div>
-                                        <div class="record-table-text" style="line-height:1.35;">{{ $note['plan'] }}</div>
-                                    </div>
-                                @endif
+                                <div style="font-size:11px; color:var(--brown-500); font-weight:800; text-transform:uppercase;">Plans</div>
+                                <div class="record-table-text" style="line-height:1.35;">{{ ($note['plan'] ?? '') !== '' ? $note['plan'] : '-' }}</div>
                             </div>
                         </div>
                     </div>
