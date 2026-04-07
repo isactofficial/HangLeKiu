@@ -129,7 +129,7 @@
                         </div>
                         <div class="p-6">
                             <p class="text-sm text-slate-600">Untuk saat ini, silakan gunakan tombol di bawah untuk membuka modal Daftar Kunjungan.</p>
-                            <button id="openVisitModal" type="button" class="w-full mt-4 px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition">Daftar Kunjungan</button>
+                            <a href="{{ route('registration.form') }}" class="block text-center w-full mt-4 px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition">Daftar Kunjungan</a>
                         </div>
                     </div>
 
@@ -144,36 +144,6 @@
             </div>
         </section>
 
-        <div id="visitModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-            <div id="visitBackdrop" class="absolute inset-0 bg-slate-900/60"></div>
-            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl border border-slate-100">
-                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-slate-800">Daftar Kunjungan</h2>
-                    <button id="closeVisitModal" type="button" class="text-slate-500 hover:text-slate-700 text-xl leading-none">&times;</button>
-                </div>
-                <form class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Poli</label>
-                        <select class="w-full rounded-lg border-slate-300 focus:border-cyan-600 focus:ring-cyan-600">
-                            <option>Poli Gigi Umum</option>
-                            <option>Poli Bedah Mulut</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Kunjungan</label>
-                        <input type="date" class="w-full rounded-lg border-slate-300 focus:border-cyan-600 focus:ring-cyan-600" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Keluhan Singkat</label>
-                        <textarea rows="3" class="w-full rounded-lg border-slate-300 focus:border-cyan-600 focus:ring-cyan-600" placeholder="Tulis keluhan utama..."></textarea>
-                    </div>
-                    <div class="flex justify-end gap-3 pt-2">
-                        <button id="cancelVisitModal" type="button" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">Batal</button>
-                        <button type="button" class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700">Simpan (UI)</button>
-                    </div>
-                </form>
-            </div>
-        </div>
 
         {{-- Modal Edit Akun --}}
         <div id="editAccountModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
@@ -225,29 +195,6 @@
     </main>
 
     <script>
-        const visitModal = document.getElementById('visitModal');
-        const openVisitModal = document.getElementById('openVisitModal');
-        const closeVisitModal = document.getElementById('closeVisitModal');
-        const cancelVisitModal = document.getElementById('cancelVisitModal');
-        const visitBackdrop = document.getElementById('visitBackdrop');
-
-        const showModal = () => {
-            visitModal.classList.remove('hidden');
-            visitModal.classList.add('flex');
-            document.body.classList.add('overflow-hidden');
-        };
-
-        const hideModal = () => {
-            visitModal.classList.add('hidden');
-            visitModal.classList.remove('flex');
-            document.body.classList.remove('overflow-hidden');
-        };
-
-        openVisitModal.addEventListener('click', showModal);
-        closeVisitModal.addEventListener('click', hideModal);
-        cancelVisitModal.addEventListener('click', hideModal);
-        visitBackdrop.addEventListener('click', hideModal);
-
         // Edit Akun Logic
         const editAccountModal = document.getElementById('editAccountModal');
         const editAccountBackdrop = document.getElementById('editAccountBackdrop');
