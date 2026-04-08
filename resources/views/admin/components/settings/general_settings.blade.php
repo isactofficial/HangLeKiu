@@ -14,6 +14,8 @@
     @include('admin.components.settings.visit')
 @elseif ($submenu == 'Care')
     @include('admin.components.settings.care')
+@elseif ($submenu == 'Artikel')
+    @include('admin.components.settings.artikel')
 @elseif ($submenu == 'Procedure')
     @include('admin.components.settings.procedure')
 @elseif ($submenu == 'Payment Method')
@@ -25,6 +27,7 @@
 
     <div class="gs-list">
         @foreach ([
+            'Artikel',
             'Poli',
             'Guarantor',
             'Visit',
@@ -45,7 +48,7 @@
         ] as $item)
             @php
                 $isImplemented = in_array($item, [
-                    'Poli', 'Guarantor', 'Visit', 'Care',
+                    'Artikel', 'Poli', 'Guarantor', 'Visit', 'Care',
                     'Procedure', 'Payment Method', 'Testimonial',
                 ]);
                 $href = $isImplemented ? "?menu=general-settings&submenu={$item}" : "#";

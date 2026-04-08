@@ -24,6 +24,7 @@ use App\Http\Controllers\ConsumableUsageController;
 use App\Http\Controllers\ConsumableRestockController;
 use App\Http\Controllers\ConsumableExpiryLogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ArticleAdminController;
 use App\Http\Controllers\MasterTestimonialController;
 
 /*
@@ -125,7 +126,7 @@ Route::prefix('appointments')->group(function () {
 Route::prefix('medicine')->group(function () {
     Route::get('/', [MedicineController::class, 'index']);
     Route::post('/', [MedicineController::class, 'store']);
-    Route::get('/stock-mutations', [MedicineController::class, 'allStockMutations']); 
+    Route::get('/stock-mutations', [MedicineController::class, 'allStockMutations']);
     Route::get('/{id}', [MedicineController::class, 'show']);
     Route::put('/{id}', [MedicineController::class, 'update']);
     Route::delete('/{id}', [MedicineController::class, 'destroy']);
@@ -246,6 +247,15 @@ Route::prefix('bhp')->group(function () {
     Route::post('/expiry',        [ConsumableExpiryLogController::class, 'store']);
     Route::get('/expiry/{id}',    [ConsumableExpiryLogController::class, 'show']);
     Route::delete('/expiry/{id}', [ConsumableExpiryLogController::class, 'destroy']);
+});
+
+// ================= ADMIN ARTICLES =================
+Route::prefix('admin/articles')->middleware('auth:api')->group(function () {
+    Route::get('/', [ArticleAdminController::class, 'index']);
+    Route::post('/', [ArticleAdminController::class, 'store']);
+    Route::get('/{id}', [ArticleAdminController::class, 'show']);
+    Route::post('/{id}', [ArticleAdminController::class, 'update']);
+    Route::delete('/{id}', [ArticleAdminController::class, 'destroy']);
 });
 
 Route::prefix('admin')->group(function () {

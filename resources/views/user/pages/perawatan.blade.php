@@ -77,7 +77,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             @foreach($procedures as $procedure)
-                                <div class="glass-card p-8 rounded-3xl hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
+                                <div class="glass-card p-8 rounded-3xl hover:shadow-xl transition-all duration-300 group hover:-translate-y-1 flex flex-col h-full">
                                     <div class="w-12 h-12 bg-[var(--secondary-brown)]/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[var(--secondary-brown)] transition-colors duration-300">
                                         <svg class="w-6 h-6 text-[var(--secondary-brown)] group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
@@ -86,9 +86,19 @@
                                     <h3 class="text-xl font-bold text-[var(--primary-brown)] mb-3 leading-tight">
                                         {{ $procedure->name ?: $procedure->procedure_name }}
                                     </h3>
-                                    <p class="text-[var(--font-color-secondary)] text-sm md:text-base leading-relaxed opacity-80">
+                                    <p class="text-[var(--font-color-secondary)] text-sm md:text-base leading-relaxed opacity-80 mb-6 flex-grow">
                                         {{ $procedure->description ?: 'Layanan perawatan gigi berkualitas tinggi yang ditangani langsung oleh tim medis profesional kami.' }}
                                     </p>
+                                    <div class="mt-auto pt-5 border-t border-[var(--secondary-brown)]/10 flex items-center justify-between">
+                                        <span class="text-xs font-semibold text-[var(--secondary-brown)] uppercase tracking-wider">Harga</span>
+                                        <span class="text-lg font-bold text-[var(--primary-brown)]">
+                                            @if($procedure->price > 0)
+                                                Rp {{ number_format($procedure->price, 0, ',', '.') }}
+                                            @else
+                                                <span class="text-sm font-medium opacity-60 italic">Hubungi Kami</span>
+                                            @endif
+                                        </span>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
