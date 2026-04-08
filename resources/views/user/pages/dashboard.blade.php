@@ -90,23 +90,28 @@
 <body class="bg-[var(--color-background-primary)] text-[var(--font-color-primary)] flex flex-col min-h-screen font-sans">
     @include('user.components.navbarWelcome')
 
-    <div id="navbarSpacer" class="h-0"></div>
+    <div id="navbarSpacer" class="h-24 md:h-28 w-full shrink-0"></div>
 
     <main class="grow pb-12">
         
 
         <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 py-8 -mt-8 relative z-20">
             @if(session('success'))
-                <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-sm flex items-start gap-3">
+                <div id="toast-success" class="fixed top-28 right-6 z-50 w-full max-w-sm rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-xl flex items-start gap-3 transition-all duration-500 transform translate-x-0 opacity-100">
                     <svg class="w-6 h-6 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="font-medium">{{ session('success') }}</p>
+                    <div class="flex-1">
+                        <p class="font-medium">{{ session('success') }}</p>
+                    </div>
+                    <button onclick="closeToast('toast-success')" class="text-emerald-500 hover:text-emerald-800 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
             @endif
 
             @if($errors->any())
-                <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-800 shadow-sm flex items-start gap-3">
+                <div id="toast-error" class="fixed top-28 right-6 z-50 w-full max-w-sm rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-800 shadow-xl flex items-start gap-3 transition-all duration-500 transform translate-x-0 opacity-100">
                     <svg class="w-6 h-6 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <div>
+                    <div class="flex-1">
                         <p class="font-bold mb-1">Terjadi kesalahan:</p>
                         <ul class="list-disc pl-5 text-sm space-y-1">
                             @foreach($errors->all() as $error)
@@ -114,8 +119,12 @@
                             @endforeach
                         </ul>
                     </div>
+                    <button onclick="closeToast('toast-error')" class="text-red-500 hover:text-red-800 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
             @endif
+
 
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-x-8 gap-y-12">
                 <div class="xl:col-span-2">
@@ -141,11 +150,6 @@
                                             <span class="text-4xl font-bold text-slate-400 uppercase">{{ substr($patient->full_name ?? $user->name, 0, 1) }}</span>
                                         @endif
                                     </div>
-                                    @if($patient?->gender == 'Male')
-                                        <div class="absolute bottom-0 right-0 bg-blue-500 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white" title="Laki-laki"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a2 2 0 012 2v2.58l4.5 4.5V9a1 1 0 112 0v6a1 1 0 11-2 0v-2.58l-4.5-4.5V12a2 2 0 01-4 0v-1.58l-4.5 4.5V15a1 1 0 11-2 0V9a1 1 0 112 0v2.58l4.5-4.5V4a2 2 0 012-2z"></path></svg></div>
-                                    @elseif($patient?->gender == 'Female')
-                                        <div class="absolute bottom-0 right-0 bg-pink-500 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white" title="Perempuan"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21a2 2 0 01-2-2v-3.58l-4.5-4.5V13a1 1 0 11-2 0V7a1 1 0 112 0v1.58l4.5 4.5V15a2 2 0 014 0v-1.58l4.5-4.5V7a1 1 0 112 0v6a1 1 0 11-2 0v-2.08l-4.5 4.5V19a2 2 0 01-2 2z"></path></svg></div>
-                                    @endif
                                 </div>
                                 <div class="text-center md:text-left flex-1 mt-2">
                                     <h3 class="text-2xl font-extrabold text-[var(--font-color-primary)] mb-1">{{ $patient->full_name ?? $user->name }}</h3>
@@ -161,7 +165,7 @@
                                 <div class="profile-item"><p class="profile-item-label text-[var(--font-color-secondary)] font-medium mb-1">Email</p><p class="profile-item-value truncate font-semibold text-[var(--font-color-primary)]">{{ $user->email }}</p></div>
                                 <div class="profile-item"><p class="profile-item-label text-[var(--font-color-secondary)] font-medium mb-1">No. WhatsApp</p><p class="profile-item-value font-semibold text-[var(--font-color-primary)]">{{ $patient->phone_number ?? '-' }}</p></div>
                                 <div class="profile-item"><p class="profile-item-label text-[var(--font-color-secondary)] font-medium mb-1">Tanggal Lahir</p><p class="profile-item-value font-semibold text-[var(--font-color-primary)]">{{ $patient?->date_of_birth ? $patient->date_of_birth->format('d M Y') : '-' }}</p></div>
-                                <div class="profile-item"><p class="profile-item-label text-[var(--font-color-secondary)] font-medium mb-1">Jenis Kelamin</p><p class="profile-item-value font-semibold text-[var(--font-color-primary)]">{{ $patient->gender ?? '-' }}</p></div>
+                                <div class="profile-item"><p class="profile-item-label text-[var(--font-color-secondary)] font-medium mb-1">Jenis Kelamin</p><p class="profile-item-value font-semibold text-[var(--font-color-primary)]">{{ $patient->gender === 'Male' ? 'Laki-laki' : ($patient->gender === 'Female' ? 'Perempuan' : '-') }}</p></div>
                             </div>
 
                             <div id="patientMoreDetails" class="hidden mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm md:pl-2">
@@ -737,6 +741,39 @@
                 reader.readAsDataURL(file);
             }
         }
+
+    
+    function closeToast(id) {
+        const toast = document.getElementById(id);
+        if (toast) {
+            // Efek geser ke kanan dan menghilang
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('translate-x-full', 'opacity-0');
+            
+            // Hapus elemen dari HTML setelah animasi selesai (500ms)
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        }
+    }
+
+    // Auto-hide setelah beberapa detik
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hilangkan pesan sukses otomatis setelah 4 detik
+        if(document.getElementById('toast-success')) {
+            setTimeout(() => {
+                closeToast('toast-success');
+            }, 4000);
+        }
+
+        // Hilangkan pesan error otomatis setelah 6 detik (karena biasanya teksnya lebih panjang)
+        if(document.getElementById('toast-error')) {
+            setTimeout(() => {
+                closeToast('toast-error');
+            }, 6000);
+        }
+    });
+
     </script>
 </body>
 
