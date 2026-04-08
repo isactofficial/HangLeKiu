@@ -12,7 +12,10 @@
     <div class="icon">✅</div>
     <h2>Pendaftaran Berhasil!</h2>
     <p>Terima kasih telah mendaftar. Kami akan menghubungi kamu via WhatsApp untuk konfirmasi jadwal dalam 1×24 jam.</p>
-    <a href="{{ route('appointments.create') }}" class="btn">Daftar Lagi</a>
+    <div class="actions">
+        <a href="{{ route('appointments.create') }}" class="btn">Daftar Lagi</a>
+        <a href="{{ route('user.dashboard') }}" class="btn btn-secondary">Kembali ke Dashboard Akun</a>
+    </div>
 </div>
 </body>
 </html>

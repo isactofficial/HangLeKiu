@@ -34,10 +34,16 @@
 
             {{-- Auth Section --}}
             @auth
-                <a href="{{ route('user.dashboard') }}" class="ml-2 flex items-center justify-center w-10 h-10 bg-gray-200 text-gray-600 hover:bg-gray-300 rounded-full transition-colors duration-200">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                    </svg>
+                @php
+                    $navbarUser = Auth::user();
+                    $navbarPhoto = optional($navbarUser->patient)->photo ?: $navbarUser->avatar_url;
+                @endphp
+                <a href="{{ route('user.dashboard') }}" class="ml-2 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[#D9C3AE] bg-[#F4E9DF] text-[var(--font-color-primary)] hover:brightness-95 transition-all duration-200" title="Dashboard Pasien">
+                        @if(!empty($navbarPhoto))
+                            <img src="{{ $navbarPhoto }}" alt="Foto Profil" class="w-full h-full object-cover">
+                        @else
+                            <span class="text-sm font-semibold">{{ strtoupper(substr($navbarUser->name ?? 'U', 0, 1)) }}</span>
+                        @endif
                 </a>
             @else
                 <a href="{{ route('login') }}" class="ml-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-white text-[15px] font-normal rounded-full transition-all duration-200 hover:shadow-lg">

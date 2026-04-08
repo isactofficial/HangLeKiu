@@ -13,6 +13,8 @@ use App\Http\Controllers\PenggunaanObatController;
 use App\Http\Controllers\ConsumableItemController;
 use App\Http\Controllers\ConsumableUsageController;
 use App\Http\Controllers\TreatmentPageController;
+use App\Http\Controllers\CashierController;
+use App\Http\Controllers\DoctorPageController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
@@ -26,6 +28,7 @@ Route::get('/daftar',        [AppointmentController::class, 'create'])->name('ap
 Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
 Route::get('/pelayanan/perawatan', [TreatmentPageController::class, 'index'])->name('perawatan');
+Route::get('/pelayanan/dokter', [DoctorPageController::class, 'index'])->name('dokter.profile');
 
 // ================= ADMIN & DOCTOR AUTH =================
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
@@ -78,6 +81,9 @@ Route::middleware('auth')->group(function () {
         // Cashier
         Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
         Route::post('/cashier/store-payment', [EmrController::class, 'storePayment'])->name('cashier.storePayment');
+        Route::get('/cashier/search-patient', [CashierController::class, 'searchPatient'])->name('cashier.searchPatient');
+        Route::get('/cashier/search-item', [CashierController::class, 'searchItem'])->name('cashier.searchItem');
+        Route::post('/cashier/store-manual-payment', [CashierController::class, 'storeManualPayment'])->name('cashier.storeManualPayment');
         
         // Pendaftaran Backend (Admin)
         Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
@@ -120,6 +126,7 @@ Route::middleware('auth')->group(function () {
     // ================= USER AREA =================
     Route::middleware('role:PAT')->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', [DashboardUserController::class, 'index'])->name('dashboard');    
+        Route::put('/profile/update', [DashboardUserController::class, 'updateProfile'])->name('profile.update');
         Route::get('/medical-history', [DashboardUserController::class, 'medicalHistory'])->name('medical-history');    
         Route::get('/medical-history/{appointment}', [DashboardUserController::class, 'medicalHistoryDetail']) ->name('medical-history.detail');    
         Route::get('/odontogram-history',[DashboardUserController::class, 'odontogramHistory'])->name('odontogram-history');

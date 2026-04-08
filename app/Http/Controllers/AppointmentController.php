@@ -11,6 +11,7 @@ use App\Models\MasterPoli;
 use App\Models\MasterVisitType;
 use App\Models\Patient;
 use App\Models\Treatment;
+use App\Models\DoctorSchedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -26,10 +27,25 @@ class AppointmentController extends Controller
 
     public function create()
     {
-        $doctors    = Doctor::active()->orderBy('full_name')->get();
-        $treatments = Treatment::active()->orderBy('procedure_name')->get();
+        $doctors        = Doctor::with('schedules')->active()->orderBy('full_name')->get();
+        $treatments     = Treatment::active()->orderBy('procedure_name')->get();
+        $polis          = MasterPoli::active()->orderBy('name')->get();
+        $guarantorTypes = MasterGuarantorType::active()->orderBy('name')->get();
+        $paymentMethods = MasterPaymentMethod::active()->orderBy('name')->get();
+        $visitTypes     = MasterVisitType::active()->orderBy('name')->get();
+        $careTypes      = MasterCareType::active()->orderBy('name')->get();
+        $patient    = Auth::user()?->patient;
 
-        return view('user.components.create', compact('doctors', 'treatments'));
+        return view('user.components.create', compact(
+            'doctors',
+            'treatments',
+            'patient',
+            'polis',
+            'guarantorTypes',
+            'paymentMethods',
+            'visitTypes',
+            'careTypes'
+        ));
     }
     public function store(Request $request)
     {
@@ -38,44 +54,94 @@ class AppointmentController extends Controller
             'patient_phone'    => 'required|string|max:20',
             'date_of_birth'    => 'required|date|before:today',
             'gender'           => 'required|in:Male,Female',
+            'patient_type'     => 'required|in:non_rujuk,rujuk',
+            'guarantor_type_id'=> 'required|exists:master_guarantor_type,id',
+            'payment_method_id'=> 'required|exists:master_payment_method,id',
+            'visit_type_id'    => 'required|exists:master_visit_type,id',
+            'care_type_id'     => 'required|exists:master_care_type,id',
+            'poli_id'          => 'required|exists:master_poli,id',
             'doctor_id'        => 'required|exists:doctor,id',
-            'treatment_id'     => 'required|exists:master_procedure,id',
             'appointment_date' => 'required|date|after_or_equal:today',
             'appointment_time' => 'required|date_format:H:i',
-            'payment_method'   => 'required|in:tunai',
-            'notes'            => 'nullable|string|max:500',
+            'duration_minutes' => 'nullable|integer|min:1|max:480',
+            'complaint'        => 'nullable|string|max:500',
+            'procedure_plan'   => 'nullable|string|max:255',
+            'patient_condition'=> 'nullable|string|max:255',
             ]);
 
-            $patient = Patient::firstOrCreate(
-            ['phone_number' => $validated['patient_phone']],
-            [
-                'id'                => (string) Str::ulid(),            
-                'full_name'         => $validated['patient_name'],            
-                'medical_record_no' => 'MR' . str_pad(Patient::count() + 1, 6, '0', STR_PAD_LEFT),
-                'date_of_birth'     => $validated['date_of_birth'],
-                'gender'            => $validated['gender'],
-                ]
+            if (Auth::check() && Auth::user()->patient) {
+                $patient = Auth::user()->patient;
+            } else {
+                $patient = Patient::firstOrCreate(
+                    ['phone_number' => $validated['patient_phone']],
+                    [
+                        'id'                => (string) Str::ulid(),            
+                        'full_name'         => $validated['patient_name'],            
+                        'medical_record_no' => 'MR' . str_pad(Patient::count() + 1, 6, '0', STR_PAD_LEFT),
+                        'date_of_birth'     => $validated['date_of_birth'],
+                        'gender'            => $validated['gender'],
+                        'user_id'           => Auth::id()
+                    ]
                 );
 
-                $paymentMethod = MasterPaymentMethod::where('name', 'like', '%' . $validated['payment_method'] . '%')       
-                ->first();
+                if (Auth::check() && !$patient->user_id) {
+                    $patient->update(['user_id' => Auth::id()]);
+                }
+            }
 
                 $appointmentDateTime = Carbon::parse(
                 $validated['appointment_date'] . ' ' . $validated['appointment_time']
                 );
 
-                $treatment = Treatment::find($validated['treatment_id']);
+                $dayMap = [
+                    0 => 'sunday',
+                    1 => 'monday',
+                    2 => 'tuesday',
+                    3 => 'wednesday',
+                    4 => 'thursday',
+                    5 => 'friday',
+                    6 => 'saturday',
+                ];
+                $dayKey = $dayMap[(int) $appointmentDateTime->dayOfWeek];
+
+                $doctorSchedule = DoctorSchedule::where('doctor_id', $validated['doctor_id'])
+                    ->where('day', $dayKey)
+                    ->where('is_active', true)
+                    ->first();
+
+                if (!$doctorSchedule) {
+                    return back()->withInput()->withErrors([
+                        'appointment_date' => 'Dokter tidak memiliki jadwal praktek pada tanggal yang dipilih.',
+                    ]);
+                }
+
+                $selectedTime = $appointmentDateTime->format('H:i');
+                $startTime = Carbon::parse($doctorSchedule->start_time)->format('H:i');
+                $endTime = Carbon::parse($doctorSchedule->end_time)->format('H:i');
+
+                if ($selectedTime < $startTime || $selectedTime > $endTime) {
+                    return back()->withInput()->withErrors([
+                        'appointment_time' => "Jam kunjungan di luar jadwal praktek dokter ({$startTime} - {$endTime}).",
+                    ]);
+                }
 
                 Appointment::create([
                 'id'                   => (string) Str::ulid(),
                 'patient_id'           => $patient->id,
                 'doctor_id'            => $validated['doctor_id'],
+                'poli_id'              => $validated['poli_id'],
+                'guarantor_type_id'    => $validated['guarantor_type_id'],
+                'payment_method_id'    => $validated['payment_method_id'],
+                'visit_type_id'        => $validated['visit_type_id'],
+                'care_type_id'         => $validated['care_type_id'],
+                'patient_type'         => $validated['patient_type'],
                 'registration_date'    => $validated['appointment_date'],
                 'appointment_datetime' => $appointmentDateTime,
+                'duration_minutes'     => $validated['duration_minutes'] ?? 30,
                 'status'               => 'pending',        
-                'procedure_plan'       => $treatment?->procedure_name,        
-                'complaint'            => $validated['notes'] ?? null,        
-                'payment_method_id'    => $paymentMethod?->id,                
+                'procedure_plan'       => $validated['procedure_plan'] ?? null,
+                'complaint'            => $validated['complaint'] ?? null,
+                'patient_condition'    => $validated['patient_condition'] ?? null,
                 'admin_id'             => null,                            
                 ]);
         
