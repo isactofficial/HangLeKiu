@@ -120,11 +120,6 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Rating (0-5)</label>
-                            <input type="number" name="rating" class="form-input" step="0.1" min="0" max="5" required value="{{ old('rating', 0) }}">
-                        </div>
-
                         <div class="form-group" style="grid-column: span 2;">
                             <label class="form-label">Ringkasan</label>
                             <textarea name="description" class="form-input" rows="2" required placeholder="Tampilkan di card...">{{ old('description') }}</textarea>

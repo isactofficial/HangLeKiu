@@ -66,12 +66,7 @@
                         {{-- Keterangan di pojok kiri bawah (Overlap) + Rating --}}
                         <div class="absolute bottom-0 left-0 bg-[#FAF9F6] rounded-tr-[16px] flex items-center pr-4 shadow-sm">
                             <span class="inline-block px-[14px] py-[10px] text-[#C58F59] font-bold text-[16px]">{{ $article->category }}</span>
-                            <div class="flex items-center gap-1.5 text-[#FFB800] border-l border-[#C58F59]/20 pl-3">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                </svg>
-                                <span class="text-[15px] font-bold">{{ number_format($article->rating, 1) }}</span>
-                            </div>
+                        
                         </div>
                     </div>
 

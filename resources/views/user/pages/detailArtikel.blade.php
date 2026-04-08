@@ -49,12 +49,7 @@
                     <span class="bg-[#C58F59] text-white px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider">
                         {{ $article->category }}
                     </span>
-                    <div class="flex items-center gap-1.5 text-[#FFB800] bg-white px-3 py-1.5 rounded-full shadow-sm border border-gray-100">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                        </svg>
-                        <span class="text-[16px] font-bold">{{ number_format($article->rating, 1) }}</span>
-                    </div>
+                    
                 </div>
 
                 {{-- Judul --}}

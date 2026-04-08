@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('image', 255)->nullable();
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
-            $table->decimal('rating', 3, 1)->default(0.0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

@@ -27,7 +27,7 @@ class DoctorController extends Controller
         $staffRoleFilter = strtoupper((string) $request->query('staff_role', 'ALL'));
         $allowedStaffRoles = ['ADM', 'OWN', 'DCT'];
 
-        $staffAccountsQuery = User::with('role')
+        $staffAccountsQuery = User::with(['role', 'doctor'])
             ->whereHas('role', function ($query) use ($allowedStaffRoles) {
                 $query->whereIn('code', $allowedStaffRoles);
             });
@@ -51,6 +51,11 @@ class DoctorController extends Controller
             ->groupBy('role.code')
             ->pluck('total', 'role_code');
 
+        $availableDoctors = Doctor::query()
+            ->whereNull('user_id')
+            ->orderBy('full_name', 'asc')
+            ->get(['id', 'full_name', 'specialization']);
+
         $articles = [];
         if ($request->query('submenu') === 'Artikel') {
             $articles = Article::latest()->paginate(10);
@@ -62,6 +67,7 @@ class DoctorController extends Controller
             'staffAccounts' => $staffAccounts,
             'staffRoleFilter' => $staffRoleFilter,
             'staffCounts' => $staffCounts,
+            'availableDoctors' => $availableDoctors,
             'articles' => $articles,
         ]);
     }
@@ -73,8 +79,28 @@ class DoctorController extends Controller
             'email' => ['required', 'email', 'max:50', 'unique:user,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'access_type' => ['required', Rule::in(['ADM', 'OWN', 'DCT'])],
+            'doctor_id' => ['nullable', 'string', 'exists:doctor,id'],
             'is_active' => ['nullable', 'boolean'],
         ]);
+
+        if ($validated['access_type'] === 'DCT') {
+            if (empty($validated['doctor_id'])) {
+                return redirect()->route('admin.settings', ['menu' => 'manajemen-staff'])
+                    ->withErrors(['staff_account_create' => 'Data Dokter wajib dipilih untuk akun Doctor.'])
+                    ->withInput();
+            }
+
+            $selectedDoctor = Doctor::query()
+                ->where('id', $validated['doctor_id'])
+                ->whereNull('user_id')
+                ->first();
+
+            if (! $selectedDoctor) {
+                return redirect()->route('admin.settings', ['menu' => 'manajemen-staff'])
+                    ->withErrors(['staff_account_create' => 'Data dokter tidak tersedia atau sudah terhubung akun lain.'])
+                    ->withInput();
+            }
+        }
 
         $role = Role::where('code', $validated['access_type'])->first();
 
@@ -84,7 +110,7 @@ class DoctorController extends Controller
                 ->withInput();
         }
 
-        User::create([
+        $user = User::create([
             'id' => (string) Str::uuid(),
             'role_id' => $role->id,
             'name' => $validated['full_name'],
@@ -93,6 +119,12 @@ class DoctorController extends Controller
             'is_active' => $request->boolean('is_active', true),
             'is_verified' => true,
         ]);
+
+        if ($validated['access_type'] === 'DCT' && ! empty($validated['doctor_id'])) {
+            Doctor::where('id', $validated['doctor_id'])->update([
+                'user_id' => $user->id,
+            ]);
+        }
 
         return redirect()->route('admin.settings', ['menu' => 'manajemen-staff'])
             ->with('success', 'Akun staff berhasil dibuat.');
@@ -129,6 +161,72 @@ class DoctorController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengubah status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateStaffAccountDoctorLink(Request $request, $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'doctor_id' => ['nullable', 'string', 'exists:doctor,id'],
+        ]);
+
+        try {
+            $user = User::with(['role', 'doctor'])->findOrFail($id);
+
+            if (($user->role->code ?? null) !== 'DCT') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Hanya akun dengan tipe akses Doctor yang dapat dihubungkan ke data dokter.',
+                ], 422);
+            }
+
+            $targetDoctorId = $validated['doctor_id'] ?? null;
+
+            $updatedDoctor = DB::transaction(function () use ($user, $targetDoctorId) {
+                $currentDoctor = Doctor::query()->where('user_id', $user->id)->first();
+
+                if (empty($targetDoctorId)) {
+                    if ($currentDoctor) {
+                        $currentDoctor->update(['user_id' => null]);
+                    }
+
+                    return null;
+                }
+
+                $targetDoctor = Doctor::query()->findOrFail($targetDoctorId);
+
+                if (!empty($targetDoctor->user_id) && (string) $targetDoctor->user_id !== (string) $user->id) {
+                    throw new \RuntimeException('Data dokter sudah terhubung ke akun lain.');
+                }
+
+                if ($currentDoctor && (string) $currentDoctor->id !== (string) $targetDoctor->id) {
+                    $currentDoctor->update(['user_id' => null]);
+                }
+
+                if ((string) $targetDoctor->user_id !== (string) $user->id) {
+                    $targetDoctor->update(['user_id' => $user->id]);
+                }
+
+                return $targetDoctor->fresh();
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => $updatedDoctor ? 'Data dokter berhasil dihubungkan.' : 'Hubungan data dokter berhasil dilepas.',
+                'doctor_id' => $updatedDoctor?->id,
+                'doctor_name' => $updatedDoctor?->full_name,
+                'doctor_specialization' => $updatedDoctor?->specialization,
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui hubungan data dokter: ' . $e->getMessage(),
             ], 500);
         }
     }

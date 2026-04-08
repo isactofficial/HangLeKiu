@@ -1,4 +1,4 @@
-@push('styles')
+﻿@push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/manajemen_staff.css') }}">
     <style>
         :root {
@@ -407,6 +407,48 @@
             cursor: not-allowed;
             opacity: 1;
         }
+
+        .doctor-link-btn {
+            background: #f7f0e6;
+            color: #582c0c;
+            border: 1px solid #ecdcca;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+            margin-top: 6px;
+        }
+
+        .doctor-link-btn:hover {
+            background: #c58f59;
+            color: #ffffff;
+            border-color: #c58f59;
+        }
+
+        .ts-btn-secondary {
+            background: #ffffff;
+            color: #582c0c;
+            border: 1px solid #ecdcca;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .ts-btn-danger {
+            background: #fff3f3;
+            color: #a12626;
+            border: 1px solid #f5c2c2;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: auto;
+        }
     </style>
 @endpush
 
@@ -466,6 +508,18 @@
                     </div>
                 </div>
 
+                <div class="ts-form-group full" id="doctor-link-field" style="display: none;">
+                    <label class="ts-label" for="doctor_id">Data Dokter <span>*</span></label>
+                    <select class="ts-select" id="doctor_id" name="doctor_id">
+                        <option value="" disabled {{ old('doctor_id') ? '' : 'selected' }}>Pilih Data Dokter</option>
+                        @foreach(($availableDoctors ?? []) as $doctor)
+                            <option value="{{ $doctor->id }}" {{ old('doctor_id') === $doctor->id ? 'selected' : '' }}>
+                                {{ $doctor->full_name }}{{ $doctor->specialization ? ' - ' . $doctor->specialization : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="ts-grid-2">
                     <div class="ts-form-group">
                         <label class="ts-label" for="password">Password <span>*</span></label>
@@ -498,6 +552,33 @@
                 <button type="submit" class="ts-btn-primary">Simpan</button>
             </div>
         </form>
+    </div>
+</div>
+
+<div id="ms-link-doctor-modal" class="ts-modal-overlay" aria-hidden="true" data-link-url-template="{{ route('admin.settings.staff.account.doctor.link', ['id' => '__ID__']) }}">
+    <div class="ts-modal-content" role="dialog" aria-modal="true">
+        <div class="ts-modal-header">
+            <h3>Hubungkan Data Dokter</h3>
+            <button type="button" class="ts-close-btn" id="ms-close-link-doctor-modal" aria-label="Tutup">&times;</button>
+        </div>
+        <div class="ts-modal-body">
+            <div class="ts-form-group full">
+                <label class="ts-label">Akun Staff</label>
+                <input id="ms-link-account-name" class="ts-input" type="text" readonly>
+            </div>
+            <div class="ts-form-group full">
+                <label class="ts-label" for="ms-link-doctor-select">Data Dokter</label>
+                <select id="ms-link-doctor-select" class="ts-select">
+                    <option value="">Pilih Data Dokter</option>
+                </select>
+                <small style="color: var(--text-gray); font-size: 12px;">Hanya menampilkan dokter yang belum terhubung akun, serta data dokter yang sedang terhubung ke akun ini.</small>
+            </div>
+        </div>
+        <div class="ts-modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="ts-btn-danger" id="ms-unlink-doctor-btn" style="display: none;">Lepas Hubungan</button>
+            <button type="button" class="ts-btn-secondary" id="ms-cancel-link-doctor-btn">Batal</button>
+            <button type="button" class="ts-btn-primary" id="ms-save-link-doctor-btn">Simpan</button>
+        </div>
     </div>
 </div>
 
@@ -537,6 +618,7 @@
                     <th>Nama Staff</th>
                     <th>Status</th>
                     <th>Tipe Akses</th>
+                    <th>Data Dokter</th>
                     <th>Email</th>
                     <th>Aksi</th>
                 </tr>
@@ -562,6 +644,26 @@
                             </div>
                         </td>
                         <td>
+                            @if(($account->role->code ?? '') === 'DCT')
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <span class="doctor-name-text" style="font-weight: 600;">{{ $account->doctor->full_name ?? 'Belum terhubung' }}</span>
+                                    <button
+                                        type="button"
+                                        class="doctor-link-btn"
+                                        data-account-id="{{ $account->id }}"
+                                        data-account-name="{{ $account->name }}"
+                                        data-current-doctor-id="{{ $account->doctor->id ?? '' }}"
+                                        data-current-doctor-name="{{ $account->doctor->full_name ?? '' }}"
+                                        data-current-doctor-specialization="{{ $account->doctor->specialization ?? '' }}"
+                                    >
+                                        {{ $account->doctor ? 'Edit / Lepas' : 'Hubungkan' }}
+                                    </button>
+                                </div>
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td>
                             <span class="ms-email-masked">{{ $account->email }}</span>
                         </td>
                         <td>
@@ -584,7 +686,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align:center; padding: 60px 20px;">
+                        <td colspan="6" style="text-align:center; padding: 60px 20px;">
                             <div style="color: var(--text-gray);">
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 12px; opacity: 0.5;">
                                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -607,12 +709,162 @@
     </div>
 </div>
 
+@php
+    $doctorLinkOptions = ($availableDoctors ?? collect())
+        ->map(function ($doctor) {
+            return [
+                'id' => (string) $doctor->id,
+                'full_name' => $doctor->full_name,
+                'specialization' => $doctor->specialization,
+            ];
+        })
+        ->values();
+@endphp
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('ms-doctor-modal');
         const openBtn = document.getElementById('ms-open-doctor-modal');
         const closeBtn = document.getElementById('ms-close-doctor-modal');
+        const accessTypeField = document.getElementById('access_type');
+        const doctorLinkField = document.getElementById('doctor-link-field');
+        const doctorSelectField = document.getElementById('doctor_id');
+        const doctorLinkModal = document.getElementById('ms-link-doctor-modal');
+        const closeDoctorLinkModalBtn = document.getElementById('ms-close-link-doctor-modal');
+        const cancelDoctorLinkModalBtn = document.getElementById('ms-cancel-link-doctor-btn');
+        const saveDoctorLinkBtn = document.getElementById('ms-save-link-doctor-btn');
+        const unlinkDoctorBtn = document.getElementById('ms-unlink-doctor-btn');
+        const linkDoctorSelect = document.getElementById('ms-link-doctor-select');
+        const linkAccountNameField = document.getElementById('ms-link-account-name');
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const doctorOptions = @json($doctorLinkOptions);
+        let selectedDoctorLinkButton = null;
+
+        const syncDoctorLinkField = () => {
+            if (!accessTypeField || !doctorLinkField || !doctorSelectField) return;
+            const isDoctorAccess = accessTypeField.value === 'DCT';
+            doctorLinkField.style.display = isDoctorAccess ? 'flex' : 'none';
+            doctorSelectField.required = isDoctorAccess;
+            if (!isDoctorAccess) {
+                doctorSelectField.value = '';
+            }
+        };
+
+        if (accessTypeField) {
+            accessTypeField.addEventListener('change', syncDoctorLinkField);
+            syncDoctorLinkField();
+        }
+
+        const openDoctorLinkModal = (button) => {
+            if (!doctorLinkModal || !linkDoctorSelect || !linkAccountNameField) return;
+
+            selectedDoctorLinkButton = button;
+            const accountName = button.getAttribute('data-account-name') || '-';
+            const currentDoctorId = button.getAttribute('data-current-doctor-id') || '';
+            const currentDoctorName = button.getAttribute('data-current-doctor-name') || '';
+            const currentDoctorSpecialization = button.getAttribute('data-current-doctor-specialization') || '';
+
+            linkAccountNameField.value = accountName;
+            linkDoctorSelect.innerHTML = '<option value="">Pilih Data Dokter</option>';
+
+            doctorOptions.forEach((doctor) => {
+                const opt = document.createElement('option');
+                opt.value = doctor.id;
+                opt.textContent = doctor.specialization ? `${doctor.full_name} - ${doctor.specialization}` : doctor.full_name;
+                if (doctor.id === currentDoctorId) {
+                    opt.selected = true;
+                }
+                linkDoctorSelect.appendChild(opt);
+            });
+
+            if (currentDoctorId && !doctorOptions.some((doctor) => doctor.id === currentDoctorId)) {
+                const currentOpt = document.createElement('option');
+                currentOpt.value = currentDoctorId;
+                currentOpt.textContent = currentDoctorSpecialization
+                    ? `${currentDoctorName} - ${currentDoctorSpecialization}`
+                    : currentDoctorName;
+                currentOpt.selected = true;
+                linkDoctorSelect.appendChild(currentOpt);
+            }
+
+            unlinkDoctorBtn.style.display = currentDoctorId ? 'inline-flex' : 'none';
+            doctorLinkModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeDoctorLinkModal = () => {
+            if (!doctorLinkModal) return;
+            doctorLinkModal.classList.remove('show');
+            document.body.style.overflow = '';
+            selectedDoctorLinkButton = null;
+        };
+
+        document.querySelectorAll('.doctor-link-btn').forEach((button) => {
+            button.addEventListener('click', () => openDoctorLinkModal(button));
+        });
+
+        if (closeDoctorLinkModalBtn) {
+            closeDoctorLinkModalBtn.addEventListener('click', closeDoctorLinkModal);
+        }
+
+        if (cancelDoctorLinkModalBtn) {
+            cancelDoctorLinkModalBtn.addEventListener('click', closeDoctorLinkModal);
+        }
+
+        if (doctorLinkModal) {
+            doctorLinkModal.addEventListener('click', (event) => {
+                if (event.target === doctorLinkModal) {
+                    closeDoctorLinkModal();
+                }
+            });
+        }
+
+        const submitDoctorLinkUpdate = async (doctorId) => {
+            if (!selectedDoctorLinkButton || !doctorLinkModal) return;
+
+            const accountId = selectedDoctorLinkButton.getAttribute('data-account-id');
+            const urlTemplate = doctorLinkModal.getAttribute('data-link-url-template') || '';
+            const endpoint = urlTemplate.replace('__ID__', accountId);
+
+            const response = await fetch(endpoint, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ doctor_id: doctorId || null }),
+            });
+
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Gagal memperbarui data dokter.');
+            }
+
+            alert(result.message || 'Berhasil memperbarui data dokter.');
+            window.location.reload();
+        };
+
+        if (saveDoctorLinkBtn) {
+            saveDoctorLinkBtn.addEventListener('click', async () => {
+                try {
+                    await submitDoctorLinkUpdate(linkDoctorSelect?.value || null);
+                } catch (error) {
+                    alert(error.message || 'Gagal memperbarui data dokter.');
+                }
+            });
+        }
+
+        if (unlinkDoctorBtn) {
+            unlinkDoctorBtn.addEventListener('click', async () => {
+                if (!confirm('Lepas hubungan akun ini dari data dokter?')) return;
+                try {
+                    await submitDoctorLinkUpdate(null);
+                } catch (error) {
+                    alert(error.message || 'Gagal melepas data dokter.');
+                }
+            });
+        }
 
         if (modal && openBtn) {
             const openModal = () => {
@@ -640,6 +892,9 @@
             document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape' && modal.classList.contains('show')) {
                     closeModal();
+                }
+                if (event.key === 'Escape' && doctorLinkModal && doctorLinkModal.classList.contains('show')) {
+                    closeDoctorLinkModal();
                 }
             });
 
