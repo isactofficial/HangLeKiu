@@ -497,19 +497,7 @@
                     <!-- Dynamic testimonials loaded here -->
                 </div>
                 
-                {{-- Navigation Arrows - hidden until >3 testimonials --}}
-                <div class="testimonial-nav flex justify-center items-center gap-3 mt-8 md:mt-12 absolute -bottom-16 left-1/2 -translate-x-1/2">
-                    <button id="testimonial-prev" class="testimonial-arrow hidden px-4 py-3 bg-[#C58F59]/90 hover:bg-[#C58F59] text-white rounded-full shadow-lg transition-all duration-200 opacity-0 translate-y-4 group">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                    </button>
-                    <button id="testimonial-next" class="testimonial-arrow hidden px-4 py-3 bg-[#C58F59]/90 hover:bg-[#C58F59] text-white rounded-full shadow-lg transition-all duration-200 opacity-0 translate-y-4 group">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </button>
-                </div>
+
             </div>
 
             <div id="testimonial-empty" class="text-center py-16 opacity-50 hidden">
@@ -536,15 +524,7 @@
         @media (min-width: 768px) {
             .testimonial-card { flex: 0 0 calc(33.333% - 12px); }
         }
-        .testimonial-arrow { 
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-        }
-        .testimonial-arrow:hover { 
-            transform: scale(1.05) translateY(-2px); 
-            box-shadow: 0 8px 25px rgba(197, 143, 89, 0.4);
-        }
         .testimonial-nav { pointer-events: none; }
-        .testimonial-nav button { pointer-events: auto; }
 
         /* Treatment Modal Styles */
         #treatmentDetailModal, #allTreatmentsModal {
@@ -641,14 +621,9 @@
                 
                 const container = document.getElementById('testimonial-container');
                 const emptyState = document.getElementById('testimonial-empty');
-                const prevBtn = document.getElementById('testimonial-prev');
-                const nextBtn = document.getElementById('testimonial-next');
-                
                 if (testimonials.length === 0) {
                     container.innerHTML = '';
                     emptyState.classList.remove('hidden');
-                    prevBtn.classList.add('hidden');
-                    nextBtn.classList.add('hidden');
                     return;
                 }
                 
@@ -667,22 +642,6 @@
                         <p class="text-[15px] md:text-[16px] font-normal text-[#582C0C] leading-relaxed italic">"${testimonial.comment}"</p>
                     </div>
                 `).join('');
-                
-                // Show/hide carousel controls
-                const hasMultiple = testimonials.length > 3;
-                if (hasMultiple) {
-                    prevBtn.classList.remove('hidden');
-                    nextBtn.classList.remove('hidden');
-                    setTimeout(() => {
-                        prevBtn.style.opacity = '1';
-                        prevBtn.style.transform = 'translateY(0)';
-                        nextBtn.style.opacity = '1';
-                        nextBtn.style.transform = 'translateY(0)';
-                    }, 100);
-                } else {
-                    prevBtn.classList.add('hidden');
-                    nextBtn.classList.add('hidden');
-                }
             } catch (error) {
                 console.error('Failed to load testimonials:', error);
                 document.getElementById('testimonial-empty').innerHTML = '<p class="text-lg text-red-500">Gagal memuat testimonial</p>';
@@ -690,28 +649,12 @@
             }
         }
 
-        // Simple scroll carousel
+        // Auto-scroll carousel (no manual buttons needed)
         document.addEventListener('DOMContentLoaded', function() {
             loadTestimonials();
-
-            const prevBtn = document.getElementById('testimonial-prev');
-            const nextBtn = document.getElementById('testimonial-next');
             const container = document.getElementById('testimonial-container');
 
-            prevBtn?.addEventListener('click', () => {
-                container.scrollBy({ left: -container.offsetWidth, behavior: 'smooth' });
-            });
-
-            nextBtn?.addEventListener('click', () => {
-                container.scrollBy({ left: container.offsetWidth, behavior: 'smooth' });
-            });
-
-            // Auto-scroll every 5s if multiple testimonials
-            let autoScrollInterval;
-            container.addEventListener('scroll', () => {
-                clearInterval(autoScrollInterval);
-            });
-            
+            // Auto-scroll every 5s
             setInterval(() => {
                 if (container.scrollLeft < container.scrollWidth - container.clientWidth - 10) {
                     container.scrollBy({ left: container.offsetWidth * 0.8, behavior: 'smooth' });

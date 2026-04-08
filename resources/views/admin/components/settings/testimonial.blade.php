@@ -153,8 +153,8 @@
 <script>
 const TESTIMONIAL_API = '/api/master-testimonial';
 let testimonialCurrentPage = 1;
-const STORAGE_URL = '{{ asset('storage/') }}';
-const FALLBACK_IMG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="%23ccc" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+const STORAGE_URL = '{{ asset('storage') }}/';
+const FALLBACK_IMG = '/images/profile.svg';
 
 // ========== CROP ENGINE ==========
 let cropImg = null, cropScale = 1, cropOffsetX = 0, cropOffsetY = 0, cropDragging = false, cropLastX = 0, cropLastY = 0;
@@ -229,8 +229,8 @@ function initCropCanvas() {
         draw();
     }
 
-if (box) box.addEventListener('mousedown', e => { cropDragging = true; cropLastX = e.offsetX; cropLastY = e.offsetY; box.style.cursor = 'grabbing'; });
-if (box) box.addEventListener('mousemove', e => {
+    if (box) box.addEventListener('mousedown', e => { cropDragging = true; cropLastX = e.offsetX; cropLastY = e.offsetY; box.style.cursor = 'grabbing'; });
+    if (box) box.addEventListener('mousemove', e => {
         if (!cropDragging || !cropImg) return;
         cropOffsetX += e.offsetX - cropLastX;
         cropOffsetY += e.offsetY - cropLastY;
@@ -327,20 +327,20 @@ function renderTestimonialTable(paginator) {
 
     items.forEach(item => {
         const tr = document.createElement('tr');
-        const img = document.createElement('img');
-        img.className = 'table-photo';
-        img.alt = item.name;
-        img.src = item.photo ? (STORAGE_URL + item.photo) : FALLBACK_IMG;
-        img.onerror = function() { this.onerror = null; this.src = FALLBACK_IMG; };
+        // ✅ FIX: Semua cell termasuk foto dirender sekaligus lewat innerHTML
+        // Sebelumnya foto di-append dulu pakai appendChild, lalu tr.innerHTML += '...'
+        // yang menyebabkan seluruh DOM di-rebuild dan foto node hilang.
+        const photoSrc = item.photo ? (STORAGE_URL + item.photo) : '/images/profile.svg';
 
-        const photoTd = document.createElement('td');
-        const photoDiv = document.createElement('div');
-        photoDiv.className = 'photo-cell';
-        photoDiv.appendChild(img);
-        photoTd.appendChild(photoDiv);
-
-        tr.appendChild(photoTd);
-        tr.innerHTML += `
+        tr.innerHTML = `
+            <td>
+                <div class="photo-cell">
+                    <img class="table-photo"
+                         alt="${item.name}"
+                         src="${photoSrc}"
+                         onerror="this.onerror=null;this.src='/images/profile.svg';">
+                </div>
+            </td>
             <td><strong>${item.name}</strong></td>
             <td style="color:#6B7280;font-size:13px">${item.profession || '-'}</td>
             <td style="color:#2563EB;font-weight:500">#${item.order || 0}</td>
