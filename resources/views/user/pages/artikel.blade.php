@@ -60,28 +60,34 @@
                 @forelse ($articles as $article)
                 <article class="flex flex-col h-full bg-transparent">
                     {{-- Image with Cutout Label --}}
-                    <div class="relative w-full aspect-[4/3] rounded-t-[16px] overflow-hidden">
-                        <img src="{{ asset('images/artikel/' . $article['image']) }}" alt="{{ $article['title'] }}" class="w-full h-full object-cover">
+                    <div class="relative w-full aspect-[4/3] rounded-t-[24px] overflow-hidden group">
+                        <img src="{{ asset('images/artikel/' . ($article->image ?: 'placeholder.png')) }}" alt="{{ $article->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                         
-                        {{-- Keterangan di pojok kiri atas/bawah (Overlap) --}}
-                        <div class="absolute bottom-0 left-0 bg-[#FAF9F6] rounded-tr-[8px]">
-                            <span class="inline-block px-[8px] py-[8px] text-[#C58F59] font-medium text-[18.75px]">{{ $article['category'] }}</span>
+                        {{-- Keterangan di pojok kiri bawah (Overlap) + Rating --}}
+                        <div class="absolute bottom-0 left-0 bg-[#FAF9F6] rounded-tr-[16px] flex items-center pr-4 shadow-sm">
+                            <span class="inline-block px-[14px] py-[10px] text-[#C58F59] font-bold text-[16px]">{{ $article->category }}</span>
+                            <div class="flex items-center gap-1.5 text-[#FFB800] border-l border-[#C58F59]/20 pl-3">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                </svg>
+                                <span class="text-[15px] font-bold">{{ number_format($article->rating, 1) }}</span>
+                            </div>
                         </div>
                     </div>
 
                     {{-- Content --}}
-                    <div class="flex flex-col flex-grow mt-[16px]">
-                        <h3 class="font-bold text-[18.75px] text-[#582C0C] leading-snug">
-                            {{ $article['title'] }}
+                    <div class="flex flex-col flex-grow mt-[20px]">
+                        <h3 class="font-bold text-[20px] text-[#582C0C] leading-tight group-hover:text-[#C58F59] transition-colors">
+                            {{ $article->title }}
                         </h3>
-                        <p class="font-medium text-[12px] text-[#6B513E] leading-relaxed mt-[8px] flex-grow line-clamp-3">
-                            {{ $article['description'] }}
+                        <p class="font-medium text-[14px] text-[#6B513E] leading-relaxed mt-[10px] flex-grow line-clamp-3 opacity-80">
+                            {{ $article->description }}
                         </p>
                         
                         {{-- Button Selengkapnya --}}
-                        <a href="{{ route('artikel.show', $article['id']) }}" class="inline-flex items-center justify-center font-normal text-[18.75px] text-[#F7F7F7] bg-[#C58F59] rounded-xl px-[12px] py-[8px] mt-[20px] self-start transition-colors hover:bg-[#B37E4A]">
+                        <a href="{{ route('artikel.show', $article->slug) }}" class="inline-flex items-center justify-center font-bold text-[16px] text-[#F7F7F7] bg-[#C58F59] rounded-xl px-[20px] py-[10px] mt-[24px] self-start transition-all hover:bg-[#B37E4A] hover:shadow-lg hover:-translate-y-0.5">
                             Selengkapnya 
-                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path>
                             </svg>
                         </a>
@@ -89,8 +95,13 @@
                 </article>
                 @empty
                 <div class="col-span-full py-20 text-center flex flex-col items-center justify-center">
-                    <h3 class="text-2xl font-bold text-[#582C0C] mb-2">Artikel Tidak Ditemukan</h3>
-                    <p class="text-[#6B513E]">Silakan coba kata kunci atau kategori lain.</p>
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#582C0C] mb-2">Belum Ada Artikel</h3>
+                    <p class="text-[#6B513E]">Konten menarik sedang disiapkan untuk Anda.</p>
                 </div>
                 @endforelse
             </div>
@@ -100,7 +111,7 @@
             <div class="flex justify-center items-center gap-[10px] mt-[60px]">
                 {{-- Arrow Kiri --}}
                 @if ($articles->onFirstPage())
-                    <span class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-full border border-[#C58F59]/50 text-[#582C0C]/50 bg-transparent cursor-not-allowed">
+                    <span class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-full border border-[#C58F59]/20 text-[#582C0C]/30 bg-transparent cursor-not-allowed">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                         </svg>
@@ -116,13 +127,11 @@
                 {{-- Angka Halaman --}}
                 @foreach ($articles->getUrlRange(1, $articles->lastPage()) as $page => $url)
                     @if ($page == $articles->currentPage())
-                        {{-- Angka Aktif --}}
-                        <span class="inline-flex items-center justify-center min-w-[44px] h-[44px] rounded-full bg-[#C58F59] text-[#F7F7F7] font-bold text-[18.75px] px-[10px] py-[10px]">
+                        <span class="inline-flex items-center justify-center min-w-[44px] h-[44px] rounded-full bg-[#C58F59] text-[#F7F7F7] font-bold text-[18.75px] px-[10px] shadow-md">
                             {{ $page }}
                         </span>
                     @else
-                        {{-- Angka Inactive --}}
-                        <a href="{{ $url }}" class="inline-flex items-center justify-center min-w-[44px] h-[44px] rounded-full border border-[#C58F59] bg-transparent text-[#582C0C] font-bold text-[18.75px] px-[10px] py-[10px] hover:bg-[#E5D6C5] transition-colors">
+                        <a href="{{ $url }}" class="inline-flex items-center justify-center min-w-[44px] h-[44px] rounded-full border border-[#C58F59] bg-transparent text-[#582C0C] font-bold text-[18.75px] px-[10px] hover:bg-[#E5D6C5] transition-colors">
                             {{ $page }}
                         </a>
                     @endif
@@ -136,7 +145,7 @@
                         </svg>
                     </a>
                 @else
-                    <span class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-full border border-[#C58F59]/50 text-[#582C0C]/50 bg-transparent cursor-not-allowed">
+                    <span class="inline-flex items-center justify-center w-[44px] h-[44px] rounded-full border border-[#C58F59]/20 text-[#582C0C]/30 bg-transparent cursor-not-allowed">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
                         </svg>
@@ -159,10 +168,7 @@
 
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
-                    // Batalkan timer jika ada input yang terjadi
                     clearTimeout(resetTimer);
-                    
-                    // Jika input telah dikosongkan secara sadar dan dibiarkan (debounce 800ms)
                     if (this.value.trim() === '') {
                         resetTimer = setTimeout(() => {
                             window.location.href = "{{ route('artikel') }}";

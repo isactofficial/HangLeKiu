@@ -15,13 +15,14 @@ use App\Http\Controllers\ConsumableUsageController;
 use App\Http\Controllers\TreatmentPageController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\DoctorPageController;
+use App\Http\Controllers\ArticleAdminController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
 Route::get('/', fn() => view('welcome'))->name('home');
 Route::get('/klinik', fn() => view('user.pages.klinik'))->name('klinik');
 Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
-Route::get('/artikel/{id}', [ArticleController::class, 'show'])->name('artikel.show');
+Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('artikel.show');
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
@@ -97,6 +98,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])->name('settings.staff.doctor.store');
         Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
         Route::post('/patients',         [PatientController::class, 'storeFromAdmin'])->name('patients.store');
+        
+        // Manajemen Artikel
+        Route::resource('articles', ArticleAdminController::class)->names('articles');
         
         // ================= PHARMACY AREA (Sub-group Admin) =================
         Route::prefix('pharmacy')->name('pharmacy.')->group(function () {    
