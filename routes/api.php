@@ -24,6 +24,7 @@ use App\Http\Controllers\ConsumableUsageController;
 use App\Http\Controllers\ConsumableRestockController;
 use App\Http\Controllers\ConsumableExpiryLogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MasterTestimonialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -256,4 +257,13 @@ Route::prefix('admin')->group(function () {
     Route::get('/master/poli', fn() =>
         response()->json(DB::table('master_poli')->select('id', 'name')->get())
     );
+});
+
+// ================= MASTER TESTIMONIAL =================
+Route::prefix('master-testimonial')->group(function () {
+    Route::get('/', [MasterTestimonialController::class, 'index']);
+    Route::post('/', [MasterTestimonialController::class, 'store']);
+    Route::get('/{id}', [MasterTestimonialController::class, 'show']);
+    Route::put('/{id}', [MasterTestimonialController::class, 'update']);
+    Route::delete('/{id}', [MasterTestimonialController::class, 'destroy']);
 });

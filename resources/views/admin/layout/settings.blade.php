@@ -12,8 +12,9 @@
 @section('content')
 
     @php
-        $menuItems = [
+$menuItems = [
             'general-settings' => 'General Settings',
+            'testimonial' => 'Testimonial',
             'manajemen-staff' => 'Manajemen Staff',
             'hak-akses' => 'Hak Akses',
             'info-tenaga-medis' => 'Info Tenaga Medis',

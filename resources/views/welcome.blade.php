@@ -490,63 +490,31 @@
                     Personal.</p>
             </div>
 
-            {{-- Testimonial Cards --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                {{-- Card 1 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-md text-center md:text-left">
-                    <div class="flex flex-col md:flex-row items-center gap-4 mb-5">
-                        <img src="{{ asset('images/raffi.png') }}" alt="Raffi Ahmad"
-                            class="w-24 h-24 md:w-14 md:h-14 rounded-full object-cover">
-                        <div>
-                            <h4 class="text-[24px] md:text-[20px] font-bold text-[#582C0C]">Raffi Ahmad</h4>
-                            <p class="text-[15px] md:text-[16px] font-normal text-[#6B513E]">Artis</p>
-                        </div>
-                    </div>
-                    <p class="text-[15px] md:text-[16px] font-normal text-[#582C0C] leading-relaxed">
-                        "Sebagai orang yang sangat sibuk, saya butuh layanan yang serba cepat namun tetap privat dan
-                        profesional. Tim dokter di sini benar-benar ahli dalam merancang senyum yang natural dengan
-                        teknologi paling modern. Sekarang saya jauh lebih percaya diri saat tampil, karena kualitasnya
-                        memang kelas dunia."
-                    </p>
+            {{-- Testimonial Carousel --}}
+            <div class="testimonial-section relative">
+                {{-- Carousel Container --}}
+                <div id="testimonial-container" class="testimonial-track flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-4 md:pb-0">
+                    <!-- Dynamic testimonials loaded here -->
                 </div>
-
-                {{-- Card 2 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-md text-center md:text-left">
-                    <div class="flex flex-col md:flex-row items-center gap-4 mb-5">
-                        <img src="{{ asset('images/raffi.png') }}" alt="Raffi Ahmad"
-                            class="w-24 h-24 md:w-14 md:h-14 rounded-full object-cover">
-                        <div>
-                            <h4 class="text-[24px] md:text-[20px] font-bold text-[#582C0C]">Raffi Ahmad</h4>
-                            <p class="text-[15px] md:text-[16px] font-normal text-[#6B513E]">Artis</p>
-                        </div>
-                    </div>
-                    <p class="text-[15px] md:text-[16px] font-normal text-[#582C0C] leading-relaxed">
-                        "Sebagai orang yang sangat sibuk, saya butuh layanan yang serba cepat namun tetap privat dan
-                        profesional. Tim dokter di sini benar-benar ahli dalam merancang senyum yang natural dengan
-                        teknologi paling modern. Sekarang saya jauh lebih percaya diri saat tampil, karena kualitasnya
-                        memang kelas dunia."
-                    </p>
+                
+                {{-- Navigation Arrows - hidden until >3 testimonials --}}
+                <div class="testimonial-nav flex justify-center items-center gap-3 mt-8 md:mt-12 absolute -bottom-16 left-1/2 -translate-x-1/2">
+                    <button id="testimonial-prev" class="testimonial-arrow hidden px-4 py-3 bg-[#C58F59]/90 hover:bg-[#C58F59] text-white rounded-full shadow-lg transition-all duration-200 opacity-0 translate-y-4 group">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <button id="testimonial-next" class="testimonial-arrow hidden px-4 py-3 bg-[#C58F59]/90 hover:bg-[#C58F59] text-white rounded-full shadow-lg transition-all duration-200 opacity-0 translate-y-4 group">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
+            </div>
 
-                {{-- Card 3 --}}
-                <div class="bg-white rounded-2xl p-8 shadow-md text-center md:text-left">
-                    <div class="flex flex-col md:flex-row items-center gap-4 mb-5">
-                        <img src="{{ asset('images/raffi.png') }}" alt="Raffi Ahmad"
-                            class="w-24 h-24 md:w-14 md:h-14 rounded-full object-cover">
-                        <div>
-                            <h4 class="text-[24px] md:text-[20px] font-bold text-[#582C0C]">Raffi Ahmad</h4>
-                            <p class="text-[15px] md:text-[16px] font-normal text-[#6B513E]">Artis</p>
-                        </div>
-                    </div>
-                    <p class="text-[15px] md:text-[16px] font-normal text-[#582C0C] leading-relaxed">
-                        "Sebagai orang yang sangat sibuk, saya butuh layanan yang serba cepat namun tetap privat dan
-                        profesional. Tim dokter di sini benar-benar ahli dalam merancang senyum yang natural dengan
-                        teknologi paling modern. Sekarang saya jauh lebih percaya diri saat tampil, karena kualitasnya
-                        memang kelas dunia."
-                    </p>
-                </div>
-
+            <div id="testimonial-empty" class="text-center py-16 opacity-50 hidden">
+                <p class="text-lg text-[#582C0C]">Belum ada testimonial pasien</p>
+                <p class="text-sm text-[#6B513E] mt-2">Kelola melalui Admin Settings → Testimonial</p>
             </div>
 
         </div>
@@ -555,6 +523,29 @@
     {{-- Treatment Modals --}}
     {{-- Single Treatment Detail Modal --}}
     <style>
+        /* Testimonial Carousel Styles */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .testimonial-track { scroll-snap-type: x mandatory; }
+        .testimonial-card { 
+            scroll-snap-align: start; 
+            flex: 0 0 90%; 
+            max-width: 420px;
+            transition: transform 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            .testimonial-card { flex: 0 0 calc(33.333% - 12px); }
+        }
+        .testimonial-arrow { 
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+        }
+        .testimonial-arrow:hover { 
+            transform: scale(1.05) translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(197, 143, 89, 0.4);
+        }
+        .testimonial-nav { pointer-events: none; }
+        .testimonial-nav button { pointer-events: auto; }
+
         /* Treatment Modal Styles */
         #treatmentDetailModal, #allTreatmentsModal {
             backdrop-filter: blur(4px);
@@ -640,6 +631,95 @@
                 hero.style.height = 'calc(100vh - ' + navH + 'px)';
             }
         })();
+
+        // ========== Testimonial Carousel ==========
+        async function loadTestimonials() {
+            try {
+                const response = await fetch('/api/master-testimonial?active=1&per_page=20');
+                const result = await response.json();
+                const testimonials = result.data.data || [];
+                
+                const container = document.getElementById('testimonial-container');
+                const emptyState = document.getElementById('testimonial-empty');
+                const prevBtn = document.getElementById('testimonial-prev');
+                const nextBtn = document.getElementById('testimonial-next');
+                
+                if (testimonials.length === 0) {
+                    container.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    prevBtn.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    return;
+                }
+                
+                emptyState.classList.add('hidden');
+                
+                container.innerHTML = testimonials.map(testimonial => `
+                    <div class="testimonial-card bg-white rounded-2xl p-8 shadow-md flex-shrink-0 w-full max-w-sm snap-center text-center md:text-left">
+                        <div class="flex flex-col md:flex-row items-center gap-4 mb-5">
+                            <img src="${testimonial.photo ? '/storage/' + testimonial.photo : '/images/raffi.png'}" alt="${testimonial.name}" 
+                                 class="w-24 h-24 md:w-14 md:h-14 rounded-full object-cover shadow-lg mx-auto md:mx-0">
+                            <div>
+                                <h4 class="text-[24px] md:text-[20px] font-bold text-[#582C0C]">${testimonial.name}</h4>
+                                <p class="text-[15px] md:text-[16px] font-normal text-[#6B513E]">${testimonial.profession || ''}</p>
+                            </div>
+                        </div>
+                        <p class="text-[15px] md:text-[16px] font-normal text-[#582C0C] leading-relaxed italic">"${testimonial.comment}"</p>
+                    </div>
+                `).join('');
+                
+                // Show/hide carousel controls
+                const hasMultiple = testimonials.length > 3;
+                if (hasMultiple) {
+                    prevBtn.classList.remove('hidden');
+                    nextBtn.classList.remove('hidden');
+                    setTimeout(() => {
+                        prevBtn.style.opacity = '1';
+                        prevBtn.style.transform = 'translateY(0)';
+                        nextBtn.style.opacity = '1';
+                        nextBtn.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    prevBtn.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Failed to load testimonials:', error);
+                document.getElementById('testimonial-empty').innerHTML = '<p class="text-lg text-red-500">Gagal memuat testimonial</p>';
+                document.getElementById('testimonial-empty').classList.remove('hidden');
+            }
+        }
+
+        // Simple scroll carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTestimonials();
+
+            const prevBtn = document.getElementById('testimonial-prev');
+            const nextBtn = document.getElementById('testimonial-next');
+            const container = document.getElementById('testimonial-container');
+
+            prevBtn?.addEventListener('click', () => {
+                container.scrollBy({ left: -container.offsetWidth, behavior: 'smooth' });
+            });
+
+            nextBtn?.addEventListener('click', () => {
+                container.scrollBy({ left: container.offsetWidth, behavior: 'smooth' });
+            });
+
+            // Auto-scroll every 5s if multiple testimonials
+            let autoScrollInterval;
+            container.addEventListener('scroll', () => {
+                clearInterval(autoScrollInterval);
+            });
+            
+            setInterval(() => {
+                if (container.scrollLeft < container.scrollWidth - container.clientWidth - 10) {
+                    container.scrollBy({ left: container.offsetWidth * 0.8, behavior: 'smooth' });
+                } else {
+                    container.scrollTo({ left: 0, behavior: 'smooth' });
+                }
+            }, 5000);
+        });
 
         // ========== Doctor Character-Select Carousel ==========
         (function() {

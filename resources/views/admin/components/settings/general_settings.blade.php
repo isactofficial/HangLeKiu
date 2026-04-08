@@ -18,6 +18,8 @@
     @include('admin.components.settings.procedure')
 @elseif ($submenu == 'Payment Method')
     @include('admin.components.settings.payment_method')
+@elseif ($submenu == 'Testimonial')
+    @include('admin.components.settings.testimonial')
 @else
     <h2 class="gs-title">General Settings</h2>
 
@@ -29,6 +31,7 @@
             'Care',
             'Procedure',
             'Payment Method',
+            'Testimonial',
             'Apotek',
             'Kasir',
             'Tooltip',
@@ -41,12 +44,16 @@
             'Manajemen Password',
         ] as $item)
             @php
-                $isImplemented = in_array($item, ['Poli', 'Guarantor', 'Visit', 'Care', 'Procedure', 'Payment Method']);
-                $href = $isImplemented ? "?menu=general-settings&submenu=$item" : "#";
+                $isImplemented = in_array($item, [
+                    'Poli', 'Guarantor', 'Visit', 'Care',
+                    'Procedure', 'Payment Method', 'Testimonial',
+                ]);
+                $href = $isImplemented ? "?menu=general-settings&submenu={$item}" : "#";
             @endphp
-            <a href="{{ $href }}" class="gs-item">
+            <a href="{{ $href }}" class="gs-item {{ !$isImplemented ? 'gs-item--disabled' : '' }}">
                 <span class="gs-item-label">{{ $item }}</span>
-                <svg class="gs-item-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <svg class="gs-item-arrow" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M9 18l6-6-6-6"/>
                 </svg>
             </a>
