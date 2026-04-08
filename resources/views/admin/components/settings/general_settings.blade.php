@@ -14,6 +14,8 @@
     @include('admin.components.settings.visit')
 @elseif ($submenu == 'Care')
     @include('admin.components.settings.care')
+@elseif ($submenu == 'Artikel')
+    @include('admin.components.settings.artikel')
 @elseif ($submenu == 'Procedure')
     @include('admin.components.settings.procedure')
 @elseif ($submenu == 'Payment Method')
@@ -23,6 +25,7 @@
 
     <div class="gs-list">
         @foreach ([
+            'Artikel',
             'Poli',
             'Guarantor',
             'Visit',
@@ -38,12 +41,12 @@
             'Notifikasi',
             'Data Masking',
             'Ubah Bahasa',
-            'Manajemen Password',
+            'Manajemen Password',            
         ] as $item)
-            @php
-                $isImplemented = in_array($item, ['Poli', 'Guarantor', 'Visit', 'Care', 'Procedure', 'Payment Method']);
-                $href = $isImplemented ? "?menu=general-settings&submenu=$item" : "#";
-            @endphp
+@php
+    $isImplemented = in_array($item, ['Poli', 'Guarantor', 'Visit', 'Care', 'Procedure', 'Payment Method', 'Artikel']);
+    $href = $isImplemented ? "?menu=general-settings&submenu=$item" : "#";
+@endphp
             <a href="{{ $href }}" class="gs-item">
                 <span class="gs-item-label">{{ $item }}</span>
                 <svg class="gs-item-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">

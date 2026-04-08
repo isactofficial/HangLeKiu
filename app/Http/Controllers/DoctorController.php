@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Doctor;
 use App\Models\DoctorSchedule;
+use App\Models\Article;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -50,12 +51,18 @@ class DoctorController extends Controller
             ->groupBy('role.code')
             ->pluck('total', 'role_code');
 
+        $articles = [];
+        if ($request->query('submenu') === 'Artikel') {
+            $articles = Article::latest()->paginate(10);
+        }
+
         return view('admin.layout.settings', [
             'menu' => $menu,
             'doctors' => $doctors,
             'staffAccounts' => $staffAccounts,
             'staffRoleFilter' => $staffRoleFilter,
             'staffCounts' => $staffCounts,
+            'articles' => $articles,
         ]);
     }
 
