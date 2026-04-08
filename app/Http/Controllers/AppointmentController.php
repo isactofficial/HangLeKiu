@@ -69,16 +69,25 @@ class AppointmentController extends Controller
             'patient_condition'=> 'nullable|string|max:255',
             ]);
 
-            $patient = Patient::firstOrCreate(
-            ['phone_number' => $validated['patient_phone']],
-            [
-                'id'                => (string) Str::ulid(),            
-                'full_name'         => $validated['patient_name'],            
-                'medical_record_no' => 'MR' . str_pad(Patient::count() + 1, 6, '0', STR_PAD_LEFT),
-                'date_of_birth'     => $validated['date_of_birth'],
-                'gender'            => $validated['gender'],
-                ]
+            if (Auth::check() && Auth::user()->patient) {
+                $patient = Auth::user()->patient;
+            } else {
+                $patient = Patient::firstOrCreate(
+                    ['phone_number' => $validated['patient_phone']],
+                    [
+                        'id'                => (string) Str::ulid(),            
+                        'full_name'         => $validated['patient_name'],            
+                        'medical_record_no' => 'MR' . str_pad(Patient::count() + 1, 6, '0', STR_PAD_LEFT),
+                        'date_of_birth'     => $validated['date_of_birth'],
+                        'gender'            => $validated['gender'],
+                        'user_id'           => Auth::id()
+                    ]
                 );
+
+                if (Auth::check() && !$patient->user_id) {
+                    $patient->update(['user_id' => Auth::id()]);
+                }
+            }
 
                 $appointmentDateTime = Carbon::parse(
                 $validated['appointment_date'] . ' ' . $validated['appointment_time']
