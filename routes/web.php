@@ -142,5 +142,6 @@ Route::middleware('auth')->group(function () {
     // ================= DOCTOR AREA =================
     Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', [DashboardDoctorController::class, 'index'])->name('dashboard');
+        Route::put('/profile/update', [DashboardDoctorController::class, 'updateProfile'])->name('profile.update');
     });
 });
