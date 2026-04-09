@@ -493,7 +493,7 @@
             {{-- Testimonial Carousel --}}
             <div class="testimonial-section relative">
                 {{-- Carousel Container --}}
-                <div id="testimonial-container" class="testimonial-track flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-4 md:pb-0">
+                <div id="testimonial-container" class="testimonial-track flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-6 px-4">
                     <!-- Dynamic testimonials loaded here -->
                 </div>
                 
@@ -520,6 +520,12 @@
             flex: 0 0 90%; 
             max-width: 420px;
             transition: transform 0.3s ease;
+            height: auto;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0ece8;
         }
         @media (min-width: 768px) {
             .testimonial-card { flex: 0 0 calc(33.333% - 12px); }
@@ -562,6 +568,9 @@
                 margin: 0 !important; border-radius: 24px 24px 0 0 !important;
                 max-width: none !important;
             }
+        }
+        .testimonial-section {
+            overflow: visible;
         }
     </style>
 
