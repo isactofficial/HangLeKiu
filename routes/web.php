@@ -17,6 +17,7 @@ use App\Http\Controllers\TreatmentPageController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\DoctorPageController;
 use App\Http\Controllers\ArticleAdminController;
+use App\Http\Controllers\DoctorEmrController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
@@ -146,6 +147,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', [DashboardDoctorController::class, 'index'])->name('dashboard');
         Route::put('/profile/update', [DashboardDoctorController::class, 'updateProfile'])->name('profile.update');
+        Route::get('/emr', [DoctorEmrController::class, 'index'])->name('emr');
+        Route::get('/emr/{id}', [DoctorEmrController::class, 'show'])->name('emr.show');
+        Route::post('/emr/{appointment}/doctor-note', [DoctorEmrController::class, 'storeDoctorNote'])->name('emr.storeDoctorNote');
+        Route::patch('/emr/{id}/status', [DoctorEmrController::class, 'updateStatus'])->name('emr.updateStatus');
     });
 
 });

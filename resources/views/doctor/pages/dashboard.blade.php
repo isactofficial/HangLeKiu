@@ -1,3 +1,4 @@
+@extends('doctor.layout.doctor')
 <!DOCTYPE html>
 <html lang="en">
 

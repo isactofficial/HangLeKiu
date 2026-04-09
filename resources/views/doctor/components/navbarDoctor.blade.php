@@ -8,16 +8,31 @@
         </a>
 
         {{-- Hamburger Button --}}
-        <button id="mobile-menu-btn" class="md:hidden p-2 text-white rounded-[8px] bg-[#582C0C] transition-colors">
+        <button id="mobile-menu-btn" class="md:hidden p-2 text-white rounded-[8px] bg-[#582C0C] transition-colors " style="display:none;">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
         </button>
 
         {{-- Right: Navigation + Profile --}}
-        <div class="hidden md:flex items-center gap-8">
-            <a href="{{ route('doctor.dashboard') }}" class="text-[15px] font-normal {{ request()->routeIs('doctor.dashboard') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">Dashboard</a>
-            
+        <div class="flex items-center gap-8">
+            <a href="{{ route('doctor.dashboard') }}"
+               class="text-[15px] font-normal {{ request()->routeIs('doctor.dashboard') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }} hover:text-primary transition-colors duration-200">
+                Dashboard
+            </a>
+
+            {{-- ── LINK EMR (baru) ── --}}
+            <a href="{{ route('doctor.emr') }}"
+               class="text-[15px] font-normal flex items-center gap-1.5
+                      {{ request()->routeIs('doctor.emr*') ? 'text-[var(--font-color-primary)] font-semibold' : 'text-[var(--font-color-secondary)]' }}
+                      hover:text-primary transition-colors duration-200">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                EMR
+            </a>
+
             {{-- Auth Section --}}
             @auth
                 @php
@@ -25,7 +40,7 @@
                     $navbarPhoto = optional($navbarUser->doctor)->foto_profil ?: $navbarUser->avatar_url;
                 @endphp
                 <div class="flex items-center gap-4 border-l border-gray-200 pl-8">
-                    <div class="text-right hidden lg:block">
+                    <div class="text-right">
                         <p class="text-xs font-bold text-[var(--font-color-primary)] leading-none mb-1">{{ $navbarUser->name }}</p>
                         <p class="text-[10px] font-medium text-[var(--font-color-secondary)] tracking-wider uppercase">Dokter Spesialis</p>
                     </div>
@@ -41,7 +56,9 @@
                              <form method="POST" action="{{ route('logout') }}" class="w-full">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    </svg>
                                     Keluar
                                 </button>
                             </form>
@@ -54,7 +71,23 @@
 
     {{-- Mobile Dropdown Menu --}}
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg flex-col">
-        <a href="{{ route('doctor.dashboard') }}" class="px-6 py-4 text-[24px] font-medium border-b border-gray-50 text-[var(--font-color-primary)]">Dashboard</a>
+        <a href="{{ route('doctor.dashboard') }}"
+           class="px-6 py-4 text-[24px] font-medium border-b border-gray-50 text-[var(--font-color-primary)]">
+            Dashboard
+        </a>
+
+        {{-- ── LINK EMR mobile (baru) ── --}}
+        <a href="{{ route('doctor.emr') }}"
+           class="px-6 py-4 text-[24px] font-medium border-b border-gray-50
+                  {{ request()->routeIs('doctor.emr*') ? 'text-[#582C0C] font-semibold' : 'text-[var(--font-color-primary)]' }}
+                  flex items-center gap-3">
+            <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            EMR
+        </a>
+
         @auth
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
@@ -66,9 +99,9 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const btn = document.getElementById('mobile-menu-btn');
+        const btn  = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
-        if(btn && menu) {
+        if (btn && menu) {
             btn.addEventListener('click', () => {
                 menu.classList.toggle('hidden');
                 menu.classList.toggle('flex');
