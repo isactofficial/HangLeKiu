@@ -26,7 +26,8 @@
     <h2 class="gs-title">General Settings</h2>
 
     <div class="gs-list">
-        @foreach ([
+@foreach ([
+            'Testimonial',
             'Artikel',
             'Poli',
             'Guarantor',
@@ -47,8 +48,8 @@
             'Manajemen Password',
         ] as $item)
             @php
-                $isImplemented = in_array($item, [
-                    'Artikel', 'Poli', 'Guarantor', 'Visit', 'Care',
+$isImplemented = in_array($item, [
+                    'Testimonial', 'Artikel', 'Poli', 'Guarantor', 'Visit', 'Care',
                     'Procedure', 'Payment Method', 'Testimonial',
                 ]);
                 $href = $isImplemented ? "?menu=general-settings&submenu={$item}" : "#";
