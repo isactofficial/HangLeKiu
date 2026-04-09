@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardUserController;
+use App\Http\Controllers\DashboardDoctorController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
@@ -140,6 +141,6 @@ Route::middleware('auth')->group(function () {
 
     // ================= DOCTOR AREA =================
     Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
-        Route::get('/dashboard', fn() => view('doctor.pages.dashboard'))->name('dashboard');
+        Route::get('/dashboard', [DashboardDoctorController::class, 'index'])->name('dashboard');
     });
 });
