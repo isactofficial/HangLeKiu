@@ -60,6 +60,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
         Route::get('/registration', [AppointmentController::class, 'index'])->name('registration.index');
         
+        Route::get('/notifications', function () { return view('admin.pages.notifications');
+        })->name('notifications');
+
         // Route EMR Memanggil Controller
         Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
         Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
@@ -144,4 +147,5 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardDoctorController::class, 'index'])->name('dashboard');
         Route::put('/profile/update', [DashboardDoctorController::class, 'updateProfile'])->name('profile.update');
     });
+
 });
