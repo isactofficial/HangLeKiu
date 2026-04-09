@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\MasterGuarantorType;
+use App\Models\MasterPaymentMethod;
+use App\Models\MasterVisitType;
+use App\Models\MasterCareType;
+use App\Models\MasterPoli;
+use App\Models\Doctor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,12 +47,25 @@ class DashboardDoctorController extends Controller
                 ->count();
         }
 
+        $guarantorTypes = MasterGuarantorType::all();
+        $paymentMethods = MasterPaymentMethod::all();
+        $visitTypes     = MasterVisitType::all();
+        $careTypes      = MasterCareType::all();
+        $polis          = MasterPoli::all();
+        $doctors        = Doctor::where('is_active', true)->get();
+
         return view('doctor.pages.dashboard', compact(
             'user',
             'doctor',
             'todayAppointments',
             'nextPatient',
-            'totalPatientsTreated'
+            'totalPatientsTreated',
+            'guarantorTypes',
+            'paymentMethods',
+            'visitTypes',
+            'careTypes',
+            'polis',
+            'doctors'
         ));
     }
     public function updateProfile(Request $request)

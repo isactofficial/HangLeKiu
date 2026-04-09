@@ -228,9 +228,9 @@
                         <strong>{{ Auth::check() ? Auth::user()->name : 'Admin' }}</strong>
                         <small>{{ Auth::check() ? Auth::user()->email : 'admin@hds.com' }}</small>
                     </div>
-                    <a href="#" class="dropdown-item">Pengaturan Profil</a>
+                    <a href="{{ route('admin.profile') }}" class="dropdown-item">Pengaturan Profil</a>
                     <div class="dropdown-divider"></div>
-                    <form method="POST" action="#">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item dropdown-logout">Logout</button>
                     </form>
