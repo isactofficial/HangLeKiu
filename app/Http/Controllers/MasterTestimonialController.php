@@ -14,9 +14,16 @@ class MasterTestimonialController extends Controller
         try {
             $query = Testimonial::query();
 
-            if ($request->filled('active')) {
-                $query->where('is_active', (bool)(int) $request->active);
+            // ✅ FIXED: Always filter active=1 for home page, use scope for consistency
+            if ($request->filled('active') && (bool)(int) $request->active) {
+                $query->active(); // Uses model scopeActive()
             }
+
+            // Log for debugging
+            \Log::info('Testimonial index called', [
+                'active_param' => $request->get('active'),
+                'total_before_filter' => $query->count(),
+            ]);
 
             if ($request->filled('search')) {
                 $keyword = $request->search;

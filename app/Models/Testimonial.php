@@ -40,4 +40,10 @@ class Testimonial extends Model
     {
         return $query->where('is_active', true);
     }
+
+    // ✅ ADDED: For home page - only active, ordered
+    public function scopeForHomepage($query)
+    {
+        return $query->active()->orderBy('order')->limit(20);
+    }
 }

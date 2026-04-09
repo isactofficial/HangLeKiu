@@ -612,9 +612,11 @@
         // ========== Testimonial Carousel ==========
         async function loadTestimonials() {
             try {
-                const response = await fetch('/api/master-testimonial?active=1&per_page=20');
+                console.log('🔄 Fetching active testimonials...'); // DEBUG
+                const response = await fetch('/api/master-testimonial?active=1&per_page=20&t=' + Date.now()); // Cache bust
                 const result = await response.json();
-                const testimonials = result.data.data || [];
+                console.log('📊 Testimonials loaded:', result.data.data?.length || 0, result.data.data); // DEBUG statuses
+                const testimonials = (result.data?.data || []).filter(t => t.is_active); // Double-check client-side
                 
                 const container = document.getElementById('testimonial-container');
                 const emptyState = document.getElementById('testimonial-empty');
