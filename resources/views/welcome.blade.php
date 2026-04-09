@@ -566,7 +566,7 @@
     </style>
 
     <div id="treatmentDetailModal" class="fixed inset-0 bg-black/60 z-[9999] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full md:max-w-2xl lg:max-w-4xl h-[95vh] md:h-auto max-h-[95vh] overflow-y-auto shadow-2xl mx-4 md:mx-auto">
+        <div class="bg-white rounded-2xl w-full md:max-w-lg lg:max-w-xl h-[95vh] md:h-auto max-h-[95vh] overflow-y-auto shadow-2xl mx-4 md:mx-auto">
             <div class="p-6 md:p-12 border-b border-gray-200">
                 <div class="flex items-center justify-between">
                     <h3 id="treatmentTitle" class="text-3xl md:text-4xl lg:text-5xl font-bold text-[#582C0C]"></h3>
@@ -576,13 +576,10 @@
             <div class="p-6 md:p-8">
                 <div class="text-center mb-8">
                     <img src="{{ asset('images/gigi.svg') }}" alt="Treatment Icon" class="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 mx-auto mb-8 object-contain">
-                    <div id="treatmentPrice" class="text-3xl md:text-4xl lg:text-5xl font-bold text-[#C58F59] mb-4"></div>
                 </div>
-                
+
                 <div class="mb-12 space-y-6">
                     <p id="treatmentShortDesc" class="text-xl md:text-2xl lg:text-3xl text-[#582C0C] leading-relaxed text-center font-medium"></p>
-                    <!-- treatmentDetails removed per feedback -->
-                    <div id="treatmentBenefits" class="bg-[#E5D6C5]/30 p-6 rounded-2xl"></div>
                 </div>
                 
                 <div class="text-center">
@@ -1076,18 +1073,7 @@
             
             // Populate modal - enhanced
             document.getElementById('treatmentTitle').textContent = treatment.title;
-            document.getElementById('treatmentPrice').textContent = treatment.price;
             document.getElementById('treatmentShortDesc').textContent = treatment.shortDesc;
-            
-            // Populate benefits only (no treatmentDetails/treatmentBenefits elements needed)
-            const benefitsHtml = treatment.benefits.map(b => `<li class="py-1">${b}</li>`).join('');
-            const benefitsSection = document.getElementById('treatmentBenefits');
-            if (benefitsSection) {
-                benefitsSection.innerHTML = `
-                    <h4 class="font-bold text-[#582C0C] mb-6 text-2xl md:text-3xl text-center">Manfaat Perawatan</h4>
-                    <ul class="space-y-3 text-lg md:text-xl text-[#582C0C] max-h-64 overflow-y-auto">${benefitsHtml}</ul>
-                `;
-            }
             
             // Show modal
             document.getElementById('treatmentDetailModal').classList.remove('hidden');
