@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Dashboard - Hanglekiu Dental Specialist</title>
     @vite('resources/css/app.css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/registration-shared.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pasien-baru.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/pendaftaran-baru.css') }}">
     <style>
         .brand-surface {
             background:
@@ -125,8 +129,25 @@
                 </div>
             @endif
 
+            {{-- Registration Actions --}}
+            <div class="dash-card bg-white p-8 rounded-3xl flex items-center justify-between gap-6 mb-10 border-l-8 border-l-[var(--color-primary)]">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-[var(--color-primary)]">
+                        <i class="fas fa-calendar-plus text-3xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-[var(--font-color-primary)]">Kunjungan Pasien</h3>
+                        <p class="text-[var(--font-color-secondary)] font-medium">Lakukan pendaftaran baru atau buat kunjungan pasien hari ini</p>
+                    </div>
+                </div>
+                <button onclick="openRegModal('modalPendaftaranBaru')" class="px-10 py-4 bg-[var(--color-primary)] text-white rounded-2xl font-bold hover:brightness-110 transition-all shadow-xl active:scale-95 flex items-center gap-2">
+                    <i class="fas fa-user-plus"></i>
+                    Pendaftaran Baru
+                </button>
+            </div>
+
             {{-- Stats Overview --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 <div class="dash-card bg-white p-6 rounded-3xl flex items-center gap-5">
                     <div class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -143,15 +164,6 @@
                     <div>
                         <p class="text-[var(--font-color-secondary)] text-sm font-medium">Jadwal Hari Ini</p>
                         <p class="text-2xl font-bold text-[var(--font-color-primary)]">{{ $todayAppointments->count() }}</p>
-                    </div>
-                </div>
-                <div class="dash-card bg-white p-6 rounded-3xl flex items-center gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <div>
-                        <p class="text-[var(--font-color-secondary)] text-sm font-medium">Selesai Hari Ini</p>
-                        <p class="text-2xl font-bold text-[var(--font-color-primary)]">{{ $todayAppointments->where('status', 'succeed')->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -309,7 +321,7 @@
                     <div class="dash-card bg-[#F9EFE4] border-[#EFE3D7] rounded-3xl p-6 text-left">
                         <h4 class="font-bold text-[var(--font-color-primary)] mb-4 flex items-center gap-2">
                             <svg class="w-5 h-5 text-[var(--color-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Jadwal Praktik Rutin
+                            Jadwal Praktik Mingguan
                         </h4>
                         <div class="space-y-3">
                             @php
@@ -466,7 +478,50 @@
 
         // Auto hide success toast
         setTimeout(() => closeToast('toast-success'), 5000);
+
+        // Core Window Functions for Admin Components
+        window.openRegModal = function(modalId) {
+            let modal = document.getElementById(modalId);
+            if(modal) {
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            }
+        };
+        
+        window.closeRegModal = function(modalId) {
+            let modal = document.getElementById(modalId);
+            if(modal) {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        };
+
+        // Pasien Baru Modal
+        window.openNewPatientModal = function() {
+            const modal = document.getElementById('modalPasienBaru');
+            if (modal) {
+                modal.style.display = 'flex';
+                const form = document.getElementById('pasienBaruForm');
+                if (form) form.reset();
+            }
+        };
+
+        window.closePasienBaruModal = function() {
+            const modal = document.getElementById('modalPasienBaru');
+            if (modal) modal.style.display = 'none';
+        };
+
+        window.addEventListener('patientCreatedInModal', function (e) {
+            const newPatient = e.detail?.patient;
+            if (newPatient && typeof selectPatient === 'function') {
+                selectPatient(newPatient);
+                closePasienBaruModal();
+            }
+        });
     </script>
+    
+    @include('admin.components.pendaftaran-baru')
+    @include('admin.components.pasien-baru')
 </body>
 
 </html>
