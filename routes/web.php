@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
             
             // Cashier
             Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
+            Route::get('/cashier/export-csv', [CashierController::class, 'exportCsv'])->name('cashier.exportCsv');
             Route::post('/cashier/store-payment', [EmrController::class, 'storePayment'])->name('cashier.storePayment');
             Route::get('/cashier/search-patient', [CashierController::class, 'searchPatient'])->name('cashier.searchPatient');
             Route::get('/cashier/search-item', [CashierController::class, 'searchItem'])->name('cashier.searchItem');
