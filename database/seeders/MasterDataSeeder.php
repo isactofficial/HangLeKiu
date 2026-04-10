@@ -13,20 +13,20 @@ class MasterDataSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        // Master Poli
+        // Master Poli (no code column exists - using name only)
         DB::table('master_poli')->updateOrInsert(['name' => 'Poli Gigi Umum'],     ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_poli')->updateOrInsert(['name' => 'Poli Orthodonti'],     ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_poli')->updateOrInsert(['name' => 'Poli Bedah Mulut'],    ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_poli')->updateOrInsert(['name' => 'Poli Anak'],           ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_poli')->updateOrInsert(['name' => 'Poli Periodonti'],     ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
 
-        // Master Guarantor Type
+        // Master Guarantor Type (no code column exists - using name only)
         DB::table('master_guarantor_type')->updateOrInsert(['name' => 'Umum'],                ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_guarantor_type')->updateOrInsert(['name' => 'BPJS'],                ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_guarantor_type')->updateOrInsert(['name' => 'Asuransi Swasta'],     ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_guarantor_type')->updateOrInsert(['name' => 'Perusahaan'],          ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
 
-        // Master Payment Method
+        // Master Payment Method (no code column exists - using name only)
         DB::table('master_payment_method')->updateOrInsert(['name' => 'Tunai'],               ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_payment_method')->updateOrInsert(['name' => 'Transfer Bank'],       ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
         DB::table('master_payment_method')->updateOrInsert(['name' => 'QRIS'],                ['id' => Str::uuid(), 'is_active' => 1, 'created_at' => $now]);
