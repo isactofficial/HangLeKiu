@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Doctor;
 use App\Models\DoctorNote;
 use App\Models\MedicalProcedure;
 use Illuminate\Http\Request;
@@ -14,6 +15,15 @@ use Carbon\Carbon;
 
 class DoctorEmrController extends Controller
 {
+    private function resolveDoctorFeeSnapshot(?string $doctorId): float
+    {
+        if (! $doctorId) {
+            return 0.0;
+        }
+
+        return (float) (Doctor::where('id', $doctorId)->value('default_fee_percentage') ?? 0);
+    }
+
     /**
      * Ambil doctor_id dari user yang login via guard 'web' (role DCT).
      * Coba relasi user->doctor dulu, fallback ke user->id.
@@ -180,7 +190,7 @@ class DoctorEmrController extends Controller
             $procedure = $appointment->medicalProcedures()->orderByDesc('created_at')->first();
 
             if (! $procedure) {
-                $procedure = MedicalProcedure::create([
+                $procedurePayload = [
                     'id'              => (string) Str::uuid(),
                     'registration_id' => $appointment->id,
                     'patient_id'      => $appointment->patient_id,
@@ -189,7 +199,13 @@ class DoctorEmrController extends Controller
                     'discount_value'  => 0,
                     'total_amount'    => 0,
                     'notes'           => 'Auto-created for doctor note entry',
-                ]);
+                ];
+
+                if (Schema::hasColumn('medical_procedure', 'doctor_fee_percentage_snapshot')) {
+                    $procedurePayload['doctor_fee_percentage_snapshot'] = $this->resolveDoctorFeeSnapshot($appointment->doctor_id);
+                }
+
+                $procedure = MedicalProcedure::create($procedurePayload);
             }
 
             $sections = [];

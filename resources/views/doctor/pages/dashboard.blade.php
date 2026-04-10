@@ -278,10 +278,36 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 {{-- Right Side (Sidebar) --}}
                 <aside class="xl:sticky xl:top-24 h-max w-full">
+                    {{-- Practice Schedule --}}
+                    <div class="dash-card bg-[#F9EFE4] border-[#EFE3D7] rounded-3xl p-8 mb-8">
+                        <h4 class="font-bold text-[var(--font-color-primary)] mb-5 flex items-center gap-2 text-base">
+                            <i class="fas fa-clock text-[var(--color-primary)]"></i>
+                            Jadwal Praktek Anda
+                        </h4>
+                        <div class="space-y-3">
+                            @php
+                                $orderedDays = ['monday' => 'Senin', 'tuesday' => 'Selasa', 'wednesday' => 'Rabu', 'thursday' => 'Kamis', 'friday' => 'Jumat', 'saturday' => 'Sabtu', 'sunday' => 'Minggu'];
+                                $doctorSchedules = $doctor ? $doctor->schedules->groupBy('day') : collect();
+                            @endphp
+                            @foreach($orderedDays as $dayKey => $dayName)
+                            <div class="flex justify-between items-center bg-white/50 px-4 py-3 rounded-2xl text-sm">
+                                <span class="font-medium text-[var(--font-color-secondary)]">{{ $dayName }}</span>
+                                <span class="font-bold text-[var(--font-color-primary)]">
+                                    @if($doctorSchedules->has($dayKey))
+                                        {{ \Carbon\Carbon::parse($doctorSchedules[$dayKey]->first()->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($doctorSchedules[$dayKey]->first()->end_time)->format('H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </span>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                     
                     {{-- Next Patient Card --}}
                     @if($nextPatient)
@@ -324,7 +350,7 @@
                                     <i class="fas fa-users text-2xl"></i>
                                 </div>
                                 <div>
-                                    <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Total Dilayani</p>
+                                    <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Total Dilayani Hari Ini</p>
                                     <p class="text-2xl font-black text-[var(--font-color-primary)]">{{ $totalPatientsTreated }} <span class="text-xs font-semibold text-[var(--font-color-secondary)]">Pasien</span></p>
                                 </div>
                             </div>
@@ -340,42 +366,77 @@
                         </div>
                     </div>
 
-                    {{-- Practice Schedule --}}
-                    <div class="dash-card bg-[#F9EFE4] border-[#EFE3D7] rounded-3xl p-8 mb-8">
-                        <h4 class="font-bold text-[var(--font-color-primary)] mb-5 flex items-center gap-2 text-base">
-                            <i class="fas fa-clock text-[var(--color-primary)]"></i>
-                            Jadwal Praktek Anda
-                        </h4>
-                        <div class="space-y-3">
-                            @php
-                                $orderedDays = ['monday' => 'Senin', 'tuesday' => 'Selasa', 'wednesday' => 'Rabu', 'thursday' => 'Kamis', 'friday' => 'Jumat', 'saturday' => 'Sabtu', 'sunday' => 'Minggu'];
-                                $doctorSchedules = $doctor ? $doctor->schedules->groupBy('day') : collect();
-                            @endphp
-                            @foreach($orderedDays as $dayKey => $dayName)
-                            <div class="flex justify-between items-center bg-white/50 px-4 py-3 rounded-2xl text-sm">
-                                <span class="font-medium text-[var(--font-color-secondary)]">{{ $dayName }}</span>
-                                <span class="font-bold text-[var(--font-color-primary)]">
-                                    @if($doctorSchedules->has($dayKey))
-                                        {{ \Carbon\Carbon::parse($doctorSchedules[$dayKey]->first()->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($doctorSchedules[$dayKey]->first()->end_time)->format('H:i') }}
-                                    @else
-                                        -
-                                    @endif
-                                </span>
+                    {{-- Doctor Income Statistics --}}
+                    <div class="dash-card bg-white rounded-3xl overflow-hidden relative mb-8">
+                        <div class="px-6 py-5 border-b border-[#EFE3D7]/60 relative z-10">
+                            <h3 class="text-lg font-bold text-[var(--font-color-primary)] flex items-center gap-2 mb-4">
+                                <i class="fas fa-chart-line text-[var(--color-primary)]"></i>
+                                Statistik Pendapatan Dokter
+                            </h3>
+                            <form method="GET" action="{{ route('doctor.dashboard') }}" class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label for="month" class="field-label">Bulan</label>
+                                    <select id="month" name="month" class="field-input px-3 py-2.5">
+                                        @for($month = 1; $month <= 12; $month++)
+                                            <option value="{{ $month }}" {{ $selectedMonth === $month ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::createFromDate($selectedYear, $month, 1)->translatedFormat('F') }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="year" class="field-label">Tahun</label>
+                                    <select id="year" name="year" class="field-input px-3 py-2.5">
+                                        @for($year = now()->year - 3; $year <= now()->year + 1; $year++)
+                                            <option value="{{ $year }}" {{ $selectedYear === $year ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <button type="submit" class="col-span-2 px-4 py-2.5 rounded-xl bg-[var(--color-primary)] text-white font-bold hover:brightness-110 transition text-sm">
+                                    Terapkan Filter
+                                </button>
+                            </form>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="soft-panel rounded-2xl p-4">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--font-color-secondary)]">Total Pendapatan Dokter</p>
+                                <p class="text-xl font-black text-[var(--font-color-primary)] mt-1">Rp {{ number_format($doctorIncomeTotal ?? 0, 0, ',', '.') }}</p>
                             </div>
-                            @endforeach
+                            <div class="soft-panel rounded-2xl p-4">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-[var(--font-color-secondary)]">Jumlah Tindakan</p>
+                                <p class="text-xl font-black text-[var(--font-color-primary)] mt-1">{{ number_format($totalProcedureActions ?? 0, 0, ',', '.') }}</p>
+                            </div>
+
+                            <div class="overflow-x-auto rounded-2xl border border-[#EBDCCF]">
+                                <table class="min-w-full text-xs text-left">
+                                    <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase tracking-wider font-bold">
+                                        <tr>
+                                            <th class="px-4 py-3">Prosedur</th>
+                                            <th class="px-4 py-3 text-center">Item</th>
+                                            <th class="px-4 py-3 text-right">Fee</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-[#EFE3D7] bg-white text-[var(--font-color-primary)]">
+                                        @forelse($doctorProcedureSummary as $stat)
+                                            <tr>
+                                                <td class="px-4 py-3 font-semibold">{{ $stat->procedure_name }}</td>
+                                                <td class="px-4 py-3 text-center">{{ number_format((int)$stat->total_actions, 0, ',', '.') }}</td>
+                                                <td class="px-4 py-3 text-right font-bold text-emerald-700">Rp {{ number_format((float)$stat->doctor_income, 0, ',', '.') }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="px-4 py-6 text-center text-slate-400">
+                                                    Belum ada data pada periode ini.
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
-                    {{-- Logout Card --}}
-                    <div class="dash-card bg-white rounded-3xl p-8 border-t-4 border-t-red-500 relative overflow-hidden">
-                        <form action="{{ route('logout') }}" method="POST" class="relative z-10">
-                            @csrf
-                            <button type="submit" class="w-full bg-white border-2 border-red-500 text-red-600 hover:bg-red-500 hover:text-white font-bold py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Keluar Aplikasi
-                            </button>
-                        </form>
-                    </div>
+                
                 </aside>
             </div>
         </section>
