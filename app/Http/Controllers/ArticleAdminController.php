@@ -45,7 +45,6 @@ class ArticleAdminController extends Controller
             'category' => 'required|string',
             'description' => 'required|string',
             'content' => 'required|string',
-            'rating' => 'nullable|numeric|min:0|max:5',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -119,7 +118,6 @@ class ArticleAdminController extends Controller
             'category' => 'required|string',
             'description' => 'required|string',
             'content' => 'required|string',
-            'rating' => 'required|numeric|min:0|max:5',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
