@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin/pages/admin-login.css') }}">
+
+    
 </head>
 <body>
     <div class="card">
@@ -31,12 +33,12 @@
 
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" name="email" id="email" placeholder="Email Admin" value="{{ old('email') }}" required autofocus>
+                <input type="email" name="email" id="email" placeholder="Email Admin" value="{{ old('email') }}" required autofocus style="color: #6B3A2A;">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Password Admin" required autocomplete="current-password">
+                <input type="password" name="password" id="password" placeholder="Password Admin" required autocomplete="current-password" style="color: #6B3A2A;">
                 <button type="button" class="password-toggle" onclick="togglePassword('password', 'eye-icon')">
                     <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>

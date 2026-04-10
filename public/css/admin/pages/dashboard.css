@@ -229,7 +229,7 @@
         gap: 8px;
     }
     .legend-item .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .legend-item strong { color: #111827; margin-left: auto; }
+    .legend-item strong { color: #582C0C; margin-left: auto; }
 
     /* Stat Cards */
     .dash-stat-card, .dash-mini-card {
@@ -251,10 +251,11 @@
         align-items: center;
         gap: 13px;
     }
+    
     .stat-value {
         font-size: 18.75px;
         font-weight: 700;
-        color: #111827;
+        color: #582C0C;
     }
     .stat-desc {
         font-size: 13px;
