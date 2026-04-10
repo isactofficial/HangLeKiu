@@ -1,4 +1,4 @@
-﻿/* ==========================================================
+/* ==========================================================
    Extracted from: resources\views\admin\components\office\akun.blade.php
    ========================================================== */
 
@@ -71,3 +71,48 @@
     .akun-x { position: absolute; left: 52px; right: 0; bottom: 0; height: 32px; display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
     .akun-x span { font-size: 13px; color: #9CA3AF; }
 
+    /* ══════════ Responsive: Mobile ══════════ */
+    @media (max-width: 768px) {
+        .akun-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            flex-wrap: nowrap;
+            gap: 12px;
+            padding-bottom: 0;
+            width: 100%;
+        }
+        .akun-btn-edit { width: 100%; max-width: none; text-align: center; }
+        .akun-date-row { width: 100%; justify-content: space-between; margin-top: 0; }
+        .akun-date-input { width: 40%; }
+        .akun-btn-refresh { flex-shrink: 0; }
+
+        .akun-cards-row { 
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 0;
+            width: 100%;
+        }
+        .akun-card {
+            min-width: 0;
+            padding: 16px 12px;
+            width: 100%;
+            flex: none;
+        }
+        .akun-card-total { font-size: 16px; word-break: break-all; }
+
+        .akun-chart-wrap { 
+            width: 100%; 
+            max-width: 100%; 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+            padding: 8px 0 0; 
+        }
+        .akun-chart-inner { height: 220px; min-width: 500px; }
+        .akun-y { width: 40px; }
+        .akun-y span { font-size: 11px; padding-right: 4px; }
+        .akun-plot { left: 40px; }
+        .akun-x { left: 40px; }
+        .akun-x span { font-size: 10px; }
+    }

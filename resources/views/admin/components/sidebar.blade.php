@@ -80,8 +80,7 @@
     ];
 @endphp
 
-{{-- Backdrop --}}
-<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+{{-- No extra backdrop needed, handled by admin.blade.php's #sidebarOverlay --}}
 
 <aside class="sidebar" id="appSidebar">
     {{-- Logo Container --}}
@@ -122,34 +121,19 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const toggle   = document.getElementById('sidebarToggle');
-    const sidebar  = document.getElementById('appSidebar');
-    const backdrop = document.getElementById('sidebarBackdrop');
-    if (!sidebar) return;
-
-    function open()  {
-        sidebar.classList.add('open');
-        if (backdrop) backdrop.classList.add('show');
-        if (toggle) {
-            toggle.style.opacity = '0';
-            toggle.style.pointerEvents = 'none';
-        }
-    }
-    function close() {
-        sidebar.classList.remove('open');
-        if (backdrop) backdrop.classList.remove('show');
-        if (toggle) {
-            toggle.style.opacity = '1';
-            toggle.style.pointerEvents = 'auto';
-        }
-    }
-
-    if (toggle) {
-        toggle.addEventListener('click', () => sidebar.classList.contains('open') ? close() : open());
-    }
-    if (backdrop) backdrop.addEventListener('click', close);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-    document.querySelectorAll('.sidebar-item').forEach(el => el.addEventListener('click', close));
+    // Pada mode seluler, tutup sidebar jika nav item diklik
+    document.querySelectorAll('.sidebar-item').forEach(el => {
+        el.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                document.body.classList.remove('sidebar-open');
+                const overlay = document.getElementById('sidebarOverlay');
+                if (overlay) {
+                    overlay.classList.remove('show');
+                    setTimeout(() => overlay.style.display = 'none', 300);
+                }
+            }
+        });
+    });
 
     function syncCashierBadge() {
         const cashierLink = document.querySelector('[data-cashier-link="1"]');

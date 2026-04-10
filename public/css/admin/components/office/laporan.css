@@ -1,4 +1,4 @@
-﻿/* ==========================================================
+/* ==========================================================
    Extracted from: resources\views\admin\components\office\laporan.blade.php
    ========================================================== */
 
@@ -34,3 +34,14 @@
     .lap-item-arrow { color: #C58F59; flex-shrink: 0; margin-top: 1px; }
     .lap-item-desc  { font-size: 13px; color: #6B513E; margin: 0; }
 
+    /* ══════════ Responsive: Mobile ══════════ */
+    @media (max-width: 768px) {
+        .lap-tabs { gap: 6px; }
+        .lap-tab { padding: 7px 16px; font-size: 12px; }
+
+        .lap-grid { grid-template-columns: 1fr; }
+        .lap-item:nth-child(odd) { border-right: none; }
+        .lap-item { padding: 14px 16px; }
+        .lap-item-title { font-size: 13px; }
+        .lap-item-desc { font-size: 12px; }
+    }

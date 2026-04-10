@@ -5,7 +5,7 @@
 {{-- resources/views/admin/office/keuangan.blade.php --}}
 @php $tab = request('tab', 'ikhtisar'); @endphp
 {{-- Tab Bar + Date Filter --}}
-<div style="display:flex; align-items:center; gap:4px; margin-bottom:20px; flex-wrap:wrap;" class="keu-topbar">
+<div class="keu-topbar">
     <div class="keu-tabs">
         @foreach (['ikhtisar'=>'Ikhtisar','pemasukan'=>'Pemasukan','pengeluaran'=>'Pengeluaran','klaim'=>'Klaim'] as $key=>$label)
             <a href="?menu=keuangan&tab={{ $key }}&start_date={{ $startDate }}&end_date={{ $endDate }}" class="keu-tab {{ $tab===$key ? 'active' : 'inactive' }}">{{ $label }}</a>

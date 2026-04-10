@@ -61,3 +61,60 @@
     .dsh-labarugi-card.saldo  .dsh-labarugi-amount { color: #3B82F6; }
     .dsh-labarugi-sub { font-size: 13px; color: #9CA3AF; margin: 0; }
 
+    /* ══════════ Responsive: Mobile ══════════ */
+    @media (max-width: 768px) {
+        .dsh-section-title { font-size: 16px; }
+        .dsh-section-header { flex-direction: column; align-items: stretch; gap: 10px; }
+        .dsh-btn-export { width: 100%; justify-content: center; }
+
+        .dsh-stat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .dsh-stat-card { padding: 12px 14px; }
+        .dsh-stat-number { font-size: 22px; }
+        .dsh-stat-label { font-size: 12px; }
+
+        .dsh-card { width: 100%; max-width: 100%; min-width: 0; }
+        .dsh-tabs { gap: 6px; padding: 12px 14px; }
+        .dsh-tab { padding: 7px 14px; font-size: 12px; }
+
+        /* Filter col becomes horizontal scrollable pills on mobile */
+        .dsh-detail-body { flex-direction: column; }
+        .dsh-filter-col {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #E5D6C5;
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 14px;
+            gap: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .dsh-filter-col::-webkit-scrollbar { display: none; }
+        .dsh-filter-item {
+            border-bottom: none;
+            border-left: none !important;
+            padding: 7px 14px;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            background: #F3EDE6;
+        }
+        .dsh-filter-item.active {
+            border-left: none !important;
+            background: #C58F59;
+            color: #fff;
+        }
+        .dsh-chart-area { padding: 20px 14px; min-height: 160px; }
+
+        .dsh-breakdown-grid { grid-template-columns: 1fr; gap: 10px; }
+        .dsh-breakdown-card { padding: 14px 16px; }
+        .dsh-breakdown-row { font-size: 12px; }
+
+        .dsh-labarugi-grid { grid-template-columns: 1fr; gap: 10px; }
+        .dsh-labarugi-card { padding: 16px; }
+        .dsh-labarugi-amount { font-size: 20px; }
+    }
+
+    @media (max-width: 400px) {
+        .dsh-stat-grid { grid-template-columns: 1fr; }
+        .dsh-stat-number { font-size: 20px; }
+    }
