@@ -13,7 +13,8 @@
 
     @php
 $menuItems = [
-            'general-settings' => 'General Settings',
+'general-settings' => 'General Settings',
+            'beranda-settings' => 'Beranda Settings',
             'manajemen-staff' => 'Manajemen Staff',
             'hak-akses' => 'Hak Akses',
             'info-tenaga-medis' => 'Info Tenaga Medis',
