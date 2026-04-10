@@ -123,11 +123,32 @@
 
 <div class="doctor-management">
 
-  <!-- Top title (matches project style) -->
-  <div style="margin-bottom: 24px;">
-    <h2 style="font-size: 24px; font-weight: 600; color: #1a1a1a; margin: 0 0 8px 0;">Manajemen Dokter Carousel</h2>
-    <p style="font-size: 14px; color: #9B7B62; margin: 0;">Kelola dokter yang ditampilkan di homepage carousel</p>
-  </div>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin/components/settings/master_crud.css') }}">
+@endpush
+
+<div class="mc-header-row">
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="?menu=beranda-settings" class="mc-btn-icon" title="Kembali ke Beranda Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+            <h2 class="mc-title">Manajemen Dokter Carousel</h2>
+            <p class="mc-subtitle">Kelola dokter yang ditampilkan di homepage carousel</p>
+        </div>
+    </div>
+    <button class="mc-btn-primary" onclick="openAdd()">+ Tambah Dokter</button>
+</div>
+
+<div class="mc-actions-row">
+    <div class="mc-search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Cari nama atau spesialisasi..." oninput="filterTable()">
+    </div>
+</div>
 
   <!-- Stats -->
   <div class="stats-grid">
@@ -517,26 +538,37 @@ function openEdit(id) {
 function saveDoctor() {
   const name = document.getElementById('f_name').value.trim();
   if (!name) { alert('Nama dokter wajib diisi.'); return; }
-  const data = {
-    name,
-    str: document.getElementById('f_str').value.trim(),
-    spec: document.getElementById('f_spec').value,
-    exp: document.getElementById('f_exp').value.trim(),
-    lulus: document.getElementById('f_lulus').value.trim(),
-    bio: document.getElementById('f_bio').value.trim(),
-    ig: document.getElementById('f_ig').value.trim(),
-    li: document.getElementById('f_li').value.trim(),
-    order: parseInt(document.getElementById('f_order').value) || 1,
-    status: document.getElementById('f_status').value,
-  };
-  if (editingId) {
-    const idx = doctors.findIndex(d => d.id === editingId);
-    doctors[idx] = { ...doctors[idx], ...data };
-  } else {
-    doctors.push({ id: nextId++, ...data });
-  }
-  closeOverlay('formOverlay');
-  filterTable();
+  const formData = new FormData();
+  formData.append('full_name', name);
+  formData.append('specialization', document.getElementById('f_spec').value);
+  formData.append('phone_number', document.getElementById('f_str').value.trim());
+  formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content') || '');
+  
+  // Map other fields
+  ['f_exp', 'f_lulus', 'f_bio', 'f_ig', 'f_li', 'f_order', 'f_status'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el.value.trim()) formData.append(el.id.replace('f_', ''), el.value.trim());
+  });
+  
+  const url = editingId ? `/settings/doctor/${editingId}` : '/settings/manajemen-staff/doctor';
+  const method = editingId ? 'PUT' : 'POST';
+  
+  fetch(url, {
+    method,
+    body: formData,
+    headers: editingId ? { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') } : {},
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('Dokter berhasil disimpan!');
+      closeOverlay('formOverlay');
+      loadDoctors(); // Reload list
+    } else {
+      alert('Error: ' + (data.message || 'Gagal simpan'));
+    }
+  })
+  .catch(err => alert('Error: ' + err.message));
 }
 
 function openDelete(id) {
@@ -586,8 +618,20 @@ function setUploadLabel(inputId, labelId) {
   if (f) document.getElementById(labelId).textContent = f.name;
 }
 
+function loadDoctors() {
+  fetch('/admin/settings/doctor', { // Note: need index endpoint
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    doctors = data.doctors || [];
+    renderTable(doctors);
+  })
+  .catch(() => renderTable([])); // Fallback mock
+}
+
 // Init
-renderTable(doctors);
+loadDoctors();
 updateStats();
 
 // Close modals on overlay click / escape
