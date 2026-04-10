@@ -657,24 +657,9 @@
         if (photoPlaceholder) { photoPlaceholder.style.display = 'block'; }
     };
 
-    /* ============================================================
-       NEW PATIENT MODAL
-    ============================================================ */
-    window.openNewPatientModal = function () {
-        const modal = document.getElementById('modalPasienBaru');
-        if (modal) {
-            modal.style.display = 'flex';
-            // Reset form if needed
-            const form = document.getElementById('pasienBaruForm');
-            if (form) form.reset();
-        }
-    };
-
-    // Listen for new patient created event to auto-select it
     window.addEventListener('patientCreatedInModal', function (e) {
         const newPatient = e.detail?.patient;
         if (newPatient) {
-            // Auto-select the newly created patient
             selectPatient(newPatient);
         }
     });
