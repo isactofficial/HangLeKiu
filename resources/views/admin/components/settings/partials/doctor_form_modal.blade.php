@@ -80,6 +80,13 @@
                                 <label for="estimasi_konsultasi" style="color: #8A6B52; font-weight: 700; font-size: 11px; text-transform: uppercase;">Estimasi (Menit)</label>
                                 <input id="estimasi_konsultasi" name="estimasi_konsultasi" type="number" value="{{ old('estimasi_konsultasi', 15) }}" style="border-bottom: 1px solid #C58F59;">
                             </div>
+                            <div class="ms-field">
+                                <label for="default_fee_percentage" style="color: #8A6B52; font-weight: 700; font-size: 11px; text-transform: uppercase;">Fee Dokter Default (%)</label>
+                                <input id="default_fee_percentage" name="default_fee_percentage" type="number" step="0.01" min="0" max="100" value="{{ old('default_fee_percentage', 0) }}" style="border-bottom: 1px solid #C58F59;">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             {{-- Placeholder TTD Digital --}}
                             <div class="ms-field">
                                 <label style="font-size: 11px; color: #8A6B52; font-weight: 700; margin-bottom: 5px; display: block; text-transform: uppercase;">TTD Digital</label>

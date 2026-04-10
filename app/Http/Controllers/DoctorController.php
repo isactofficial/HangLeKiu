@@ -316,7 +316,11 @@ class DoctorController extends Controller
         $doctor = Doctor::with('schedules')->find($id);
         if (!$doctor) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 
-        return response()->json(['success' => true, 'doctor' => $doctor]);
+        $doctorData = $doctor->toArray();
+        $doctorData['str_expiry_date'] = optional($doctor->str_expiry_date)->format('Y-m-d');
+        $doctorData['sip_expiry_date'] = optional($doctor->sip_expiry_date)->format('Y-m-d');
+
+        return response()->json(['success' => true, 'doctor' => $doctorData]);
     }
 
     // ================= HELPER FUNCTIONS =================
@@ -331,6 +335,7 @@ class DoctorController extends Controller
             'job_title'           => 'nullable|string|max:50',
             'specialization'      => 'nullable|string|max:100',
             'subspecialization'   => 'nullable|string|max:100',
+            'default_fee_percentage' => 'nullable|numeric|min:0|max:100',
             'estimasi_konsultasi' => 'nullable|integer|min:1|max:600',
             'license_no'          => 'nullable|string|max:50',
             'str_number'          => 'nullable|string|max:50',

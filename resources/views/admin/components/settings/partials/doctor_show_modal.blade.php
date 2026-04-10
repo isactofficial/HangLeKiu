@@ -50,6 +50,22 @@
 
     function renderDoctorDetail(doctor) {
         const content = document.getElementById('show-modal-content');
+        const formatDisplayDate = (value) => {
+            if (!value) return '-';
+            const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
+                ? new Date(`${value}T00:00:00`)
+                : new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
+
+            return new Intl.DateTimeFormat('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            }).format(date);
+        };
         
         // Render List Jadwal
         let scheduleHtml = '';
@@ -132,6 +148,14 @@
                             </div>
                         </div>
 
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                            <div>
+                                <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block;">Fee Dokter Default</label>
+                                <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${Number(doctor.default_fee_percentage || 0).toFixed(2)}%</div>
+                            </div>
+                            <div></div>
+                        </div>
+
                         <div style="margin-top: 10px;">
                             <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block; margin-bottom:5px;">Tanda Tangan Digital</label>
                             <div style="width: 150px; height: 60px; border: 1px solid #C58F59; border-radius: 6px; padding: 5px; background: white;">
@@ -188,11 +212,11 @@
                     <div></div> {{-- Spacer --}}
                     <div>
                         <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block;">Masa Berlaku STR</label>
-                        <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${doctor.str_expiry_date || '-'}</div>
+                        <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${formatDisplayDate(doctor.str_expiry_date)}</div>
                     </div>
                     <div>
                         <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block;">Masa Berlaku SIP</label>
-                        <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${doctor.sip_expiry_date || '-'}</div>
+                        <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${formatDisplayDate(doctor.sip_expiry_date)}</div>
                     </div>
                 </div>
             </section>

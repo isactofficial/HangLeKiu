@@ -65,7 +65,7 @@
                 <div class="itm-info">
                     {{-- Menampilkan Nama Lengkap dengan Gelar Depan jika ada --}}
                     <p class="itm-name">
-                        {{ $doctor->title_prefix ? $doctor->title_prefix . ' ' : '' }}{{ $doctor->full_name }}
+                        {{ $doctor->full_name }}
                     </p>
                     
                     {{-- Menampilkan Jabatan atau Spesialisasi --}}

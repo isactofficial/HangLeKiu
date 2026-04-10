@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ConsumableItem;
 use App\Models\ConsumableUsage;
+use App\Models\Doctor;
 use App\Models\Medicine;
 use App\Models\MedicalProcedure;
 use App\Models\ProcedureItem;
@@ -12,10 +13,20 @@ use App\Models\StockMutation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class MedicalProcedureController extends Controller
 {
+    private function resolveDoctorFeeSnapshot(?string $doctorId): float
+    {
+        if (! $doctorId) {
+            return 0.0;
+        }
+
+        return (float) (Doctor::where('id', $doctorId)->value('default_fee_percentage') ?? 0);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -49,21 +60,29 @@ class MedicalProcedureController extends Controller
         try {
             $medicalProcedure = DB::transaction(function () use ($validated) {
                 $registrationId = $validated['registration_id'] ?? null;
+                $hasFeeSnapshotColumn = Schema::hasColumn('medical_procedure', 'doctor_fee_percentage_snapshot');
                 $medicalProcedure = $registrationId
                     ? MedicalProcedure::where('registration_id', $registrationId)->first()
                     : null;
 
                 if ($medicalProcedure) {
-                    $medicalProcedure->update([
+                    $updatePayload = [
                         'patient_id' => $validated['patient_id'] ?? $medicalProcedure->patient_id,
                         'doctor_id' => $validated['doctor_id'] ?? null,
                         'discount_type' => $validated['discount_type'] ?? null,
                         'discount_value' => $validated['discount_value'] ?? null,
                         'total_amount' => $validated['total_amount'] ?? null,
                         'notes' => $validated['notes'] ?? null,
-                    ]);
+                    ];
+
+                    if ($hasFeeSnapshotColumn) {
+                        $updatePayload['doctor_fee_percentage_snapshot'] = $medicalProcedure->doctor_fee_percentage_snapshot
+                            ?? $this->resolveDoctorFeeSnapshot($validated['doctor_id'] ?? $medicalProcedure->doctor_id);
+                    }
+
+                    $medicalProcedure->update($updatePayload);
                 } else {
-                    $medicalProcedure = MedicalProcedure::create([
+                    $createPayload = [
                         'id' => (string) Str::uuid(),
                         'registration_id' => $registrationId,
                         'patient_id' => $validated['patient_id'] ?? null,
@@ -72,7 +91,13 @@ class MedicalProcedureController extends Controller
                         'discount_value' => $validated['discount_value'] ?? null,
                         'total_amount' => $validated['total_amount'] ?? null,
                         'notes' => $validated['notes'] ?? null,
-                    ]);
+                    ];
+
+                    if ($hasFeeSnapshotColumn) {
+                        $createPayload['doctor_fee_percentage_snapshot'] = $this->resolveDoctorFeeSnapshot($validated['doctor_id'] ?? null);
+                    }
+
+                    $medicalProcedure = MedicalProcedure::create($createPayload);
                 }
 
                 // Sync assistants: replace all
@@ -261,6 +286,14 @@ class MedicalProcedureController extends Controller
         ]);
 
         try {
+            if (
+                array_key_exists('doctor_id', $validated)
+                && Schema::hasColumn('medical_procedure', 'doctor_fee_percentage_snapshot')
+                && empty($medicalProcedure->doctor_fee_percentage_snapshot)
+            ) {
+                $validated['doctor_fee_percentage_snapshot'] = $this->resolveDoctorFeeSnapshot($validated['doctor_id']);
+            }
+
             $medicalProcedure->update($validated);
             $medicalProcedure->refresh();
 
