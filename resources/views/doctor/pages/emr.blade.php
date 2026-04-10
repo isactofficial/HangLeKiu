@@ -16,7 +16,7 @@
     .patient-card:hover { border-color:#C58F59; transform:translateY(-2px); }
     .patient-card.active { border-color:#C58F59; background:rgba(197,143,89,.05); border-left:4px solid #C58F59; }
     .p-card-top,.p-card-bottom { display:flex; justify-content:space-between; align-items:center; }
-    .p-name { font-weight:700; color:#333; font-size:12px; }
+    .p-name { font-weight:700; color:#8e6a45; font-size:12px; }
     .p-date,.p-mr { font-size:10px; color:#888; font-weight:600; }
     .status-badge { font-size:9px; padding:2px 6px; border-radius:6px; color:#fff; font-weight:800; text-transform:uppercase; }
 
@@ -42,6 +42,17 @@
     .emr-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
 
     .hidden { display:none !important; }
+
+
+    #js-sidebar-search:-webkit-autofill {
+    -webkit-text-fill-color: #582C0C !important;
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+    }
+
+    #js-sidebar-search::placeholder {
+    color: #C58F59;
+    opacity: 1;
+    }
 </style>
 @endpush
 
@@ -82,8 +93,7 @@
 
             {{-- Search --}}
             <input type="text" id="js-sidebar-search" placeholder="Cari nama pasien..."
-                style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; outline:none; margin-bottom:10px; box-sizing:border-box;">
-
+            style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; outline:none; margin-bottom:10px; box-sizing:border-box; color: #582C0C;">
             <div class="emr-patient-list" id="emrPatientList">
                 @php $statusColors = ['pending'=>'#6B7280','confirmed'=>'#F59E0B','waiting'=>'#8B5CF6','engaged'=>'#3B82F6','succeed'=>'#84CC16','failed'=>'#EF4444']; @endphp
 
