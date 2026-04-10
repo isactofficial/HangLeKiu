@@ -206,4 +206,101 @@ class CashierController extends Controller
             ], 500);
         }
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. EXPORT CSV — GET /admin/cashier/export-csv
+    //    Mengekspor data pembayaran (invoices) berdasarkan filter.
+    // ─────────────────────────────────────────────────────────────────────────
+    public function exportCsv(Request $request)
+    {
+        $q = trim($request->get('q', ''));
+        $fromDate = $request->get('from_date');
+        $toDate = $request->get('to_date');
+
+        // Gunakan tabel invoices sebagai dasar yang valid
+        $query = Invoice::query()
+            ->with(['registration.patient', 'registration.doctor', 'admin'])
+            ->whereIn('status', ['paid', 'partial']);
+
+        // Filter Pendaftaran / Invoice Range Waktu
+        if ($fromDate) {
+            $query->whereDate('created_at', '>=', $fromDate);
+        }
+        if ($toDate) {
+            $query->whereDate('created_at', '<=', $toDate);
+        }
+
+        // Filter Keyword
+        if ($q !== '') {
+            $query->where(function($subQuery) use ($q) {
+                $subQuery->where('invoice_number', 'like', "%{$q}%")
+                ->orWhereHas('registration.patient', function($pQuery) use ($q) {
+                    $pQuery->where('full_name', 'like', "%{$q}%")
+                           ->orWhere('medical_record_no', 'like', "%{$q}%");
+                });
+            });
+        }
+
+        // Tembak Data
+        $invoices = $query->orderBy('created_at', 'desc')->get();
+
+        $filename = "Export_Kasir_" . date('Ymd_His') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = [
+            'No Invoice',
+            'Tanggal Input',
+            'Nama Pasien',
+            'No RM',
+            'Dokter', 
+            'Metode Pembayaran',
+            'Status',
+            'Total Tagihan (Rp)',
+            'Jumlah Dibayar (Rp)',
+            'Kembalian (Rp)',
+            'Sisa Hutang (Rp)',
+            'Catatan'
+        ];
+
+        $callback = function() use($invoices, $columns) {
+            $file = fopen('php://output', 'w');
+            
+            // Tambahkan BOM untuk excel
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            fputcsv($file, $columns, ';'); // Gunakan semicolon untuk CSV Indonesia (Excel)
+
+            foreach ($invoices as $inv) {
+                $patientName = $inv->registration ? ($inv->registration->patient->full_name ?? '-') : ($inv->patient_name ?? 'Manual/Tidak Dikenal');
+                $rmNumber = $inv->registration ? ($inv->registration->patient->medical_record_no ?? '-') : '-';
+                $doctorName = $inv->registration ? ($inv->registration->doctor->full_name ?? '-') : '-';
+                $statusLabel = $inv->status === 'paid' ? 'Lunas' : ($inv->status === 'partial' ? 'Belum Lunas' : $inv->status);
+
+                fputcsv($file, [
+                    $inv->invoice_number,
+                    $inv->created_at->format('d-m-Y H:i'),
+                    $patientName,
+                    $rmNumber,
+                    $doctorName,
+                    strtoupper($inv->payment_method),
+                    $statusLabel,
+                    (float) ($inv->amount_paid + $inv->debt_amount - $inv->change_amount), // Approximate Total if no rounding column exists
+                    (float) $inv->amount_paid,
+                    (float) $inv->change_amount,
+                    (float) $inv->debt_amount,
+                    $inv->notes ?? '-'
+                ], ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/cashier/search-patient', [CashierController::class, 'searchPatient'])->name('cashier.searchPatient');
         Route::get('/cashier/search-item', [CashierController::class, 'searchItem'])->name('cashier.searchItem');
         Route::post('/cashier/store-manual-payment', [CashierController::class, 'storeManualPayment'])->name('cashier.storeManualPayment');
+        Route::get('/cashier/export-csv', [CashierController::class, 'exportCsv'])->name('cashier.exportCsv');
         
         // Pendaftaran Backend (Admin)
         Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
