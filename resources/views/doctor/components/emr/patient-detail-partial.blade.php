@@ -19,7 +19,7 @@
         gap:20px 40px; width:100%;
     }
     .info-group { display:flex; flex-direction:column; }
-    .info-group label { display:flex; align-items:center; gap:6px; font-size:10px; color:#111827; font-weight:800; text-transform:uppercase; margin-bottom:4px; }
+    .info-group label { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--brown-800); font-weight:800; text-transform:uppercase; margin-bottom:4px; }
     .info-group label i { color:var(--brown-300); font-size:11px; cursor:pointer; }
     .info-group label i.is-active { color:var(--brown-700); }
     .info-value { font-size:14px; color:var(--brown-600); font-weight:600; line-height:1.4; }

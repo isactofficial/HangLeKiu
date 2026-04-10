@@ -11,9 +11,11 @@ class DatabaseSeeder extends Seeder
 $this->call([
             RoleSeeder::class, // harus urutan pertama, karena UserSeeder butuh role_id
             UserSeeder::class,
-            // MasterDataSeeder::class, // temporarily disabled due to code field error
+            MasterDataSeeder::class, // Enabled - fixed code field issue
             DoctorSeeder::class, // Add doctors after master data
             TestimonialSeeder::class,
+            PatientDummySeeder::class, // Add dummy patients + appointments
+            FinanceSeeder::class, // Finance dummy data last (needs appointments)
         ]);
     }
 }

@@ -584,6 +584,7 @@
             let m = document.getElementById(modalId);
             if(m) {
                 m.classList.remove('open');
+                m.style.display = '';
                 document.body.style.overflow = '';
             }
         };

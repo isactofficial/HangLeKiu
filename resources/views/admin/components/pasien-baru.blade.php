@@ -659,7 +659,8 @@ window.closePasienModalAndBackToReg = function() {
         pasienModal.style.display = 'none';
     }
     if (regModal) {
-        regModal.style.display = 'flex';
+        regModal.classList.add('open');
+        regModal.style.display = ''; 
     }
 };
 </script>

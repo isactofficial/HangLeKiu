@@ -38,6 +38,7 @@ Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('
 Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
 Route::get('/admin/register', [AuthController::class, 'showAdminRegister'])->name('admin.register');
 Route::post('/admin/register',[AuthController::class, 'adminRegister'])->name('admin.register.post');
+// Dokter login
 Route::get('/doctor/login',   [AuthController::class, 'showDoctorLogin'])->name('doctor.login');
 Route::post('/doctor/login',  [AuthController::class, 'doctorLogin'])->name('doctor.login.post');
 
@@ -54,86 +55,94 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // ================= ADMIN AREA =================
-    Route::middleware('role:ADM')->prefix('admin')->name('admin.')->group(function () {
+    // ================= ADMIN & SHARED AREA — ALLOW ADM & DCT =================
+    Route::middleware('role:ADM,DCT')->prefix('admin')->name('admin.')->group(function () {
 
-        Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
-        Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
-        Route::get('/registration', [AppointmentController::class, 'index'])->name('registration.index');
-        
-        Route::get('/notifications', function () { return view('admin.pages.notifications');
-        })->name('notifications');
-
-        // Route EMR Memanggil Controller
-        Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
-        Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
-        Route::post('/emr/{appointment}/doctor-note', [EmrController::class, 'storeDoctorNote'])->name('emr.doctor-note.store');
-        
-        // Lain-lain
-        Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
-        Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
-        
-        Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
-        Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
-        Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
-        Route::get('/office',       [OfficeController::class, 'index'])->name('office');
-        
-        // Settings & Doctor Management
-        Route::get('/settings', [DoctorController::class, 'index'])->name('settings');
-        Route::get('/settings/doctor/{id}', [DoctorController::class, 'showJson'])->name('settings.doctor.show_json'); 
-        Route::put('/settings/doctor/{id}', [DoctorController::class, 'update'])->name('settings.doctor.update');
-        Route::delete('/settings/doctor/{id}', [DoctorController::class, 'destroy'])->name('settings.doctor.destroy');
-        
-        // Cashier
-        Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
-        Route::post('/cashier/store-payment', [EmrController::class, 'storePayment'])->name('cashier.storePayment');
-        Route::get('/cashier/search-patient', [CashierController::class, 'searchPatient'])->name('cashier.searchPatient');
-        Route::get('/cashier/search-item', [CashierController::class, 'searchItem'])->name('cashier.searchItem');
-        Route::post('/cashier/store-manual-payment', [CashierController::class, 'storeManualPayment'])->name('cashier.storeManualPayment');
-        
-        // Pendaftaran Backend (Admin)
-        Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
-        Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])->name('appointments.store');
-        Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->name('appointments.show');
-        Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
-
-        // Manajemen Staff & Pasien
-        Route::post('/settings/manajemen-staff/account', [DoctorController::class, 'storeStaffAccountFromAdmin'])->name('settings.staff.account.store');
-        Route::patch('/settings/manajemen-staff/account/{id}/toggle-status', [DoctorController::class, 'toggleStaffAccountStatus'])->name('settings.staff.account.toggle-status');
-        Route::patch('/settings/manajemen-staff/account/{id}/doctor-link', [DoctorController::class, 'updateStaffAccountDoctorLink'])->name('settings.staff.account.doctor.link');
-        Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])->name('settings.staff.doctor.store');
+        // --- SHARED ROUTES (ADM & DCT) ---
+        // Pencarian pasien dan pembuatan pasien
         Route::get('/patients/search',  [PatientController::class, 'search'])->name('patients.search');
         Route::post('/patients',         [PatientController::class, 'storeFromAdmin'])->name('patients.store');
         
-        // Manajemen Artikel
-        Route::resource('articles', ArticleAdminController::class)->names('articles');
+        // Simpan pendaftaran baru
+        Route::post('/appointments/store', [AppointmentController::class, 'storeAdmin'])->name('appointments.store');
         
-        // ================= PHARMACY AREA (Sub-group Admin) =================
-        Route::prefix('pharmacy')->name('pharmacy.')->group(function () {    
-            Route::get('/medicine', [MedicineController::class, 'index'])->name('medicine.index');
-            Route::post('/medicine', [MedicineController::class, 'store'])->name('medicine.store');   
-            Route::get('/medicine/{id}', [MedicineController::class, 'show'])->name('medicine.show');
-            Route::put('/medicine/{id}', [MedicineController::class, 'update'])->name('medicine.update');    
-            Route::delete('/medicine/{id}', [MedicineController::class, 'destroy'])->name('medicine.destroy');    
-            Route::post('/medicine/{id}/stock-in', [MedicineController::class, 'stockIn'])->name('medicine.stockIn');
-            Route::delete('/medicine/{medicineId}/stock-mutation/{mutationId}', [MedicineController::class, 'destroyMutation']);            
-            Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
+        // Jadwal dokter 
+        Route::get('/settings/doctor/{id}', [DoctorController::class, 'showJson'])->name('settings.doctor.show_json');
 
-            // BHP (Bahan Habis Pakai)
-            Route::get('/bhp/items', [ConsumableItemController::class, 'index']);    
-            Route::post('/bhp/items', [ConsumableItemController::class, 'store']);    
-            Route::get('/bhp/items/{id}', [ConsumableItemController::class, 'show']);    
-            Route::put('/bhp/items/{id}', [ConsumableItemController::class, 'update']);    
-            Route::delete('/bhp/items/{id}', [ConsumableItemController::class, 'destroy']);
+        // --- ADMIN ONLY AREA ---
+        Route::middleware('role:ADM')->group(function() {
+            Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
+            Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
+            Route::get('/registration', [AppointmentController::class, 'index'])->name('registration.index');
+            
+            Route::get('/notifications', function () { return view('admin.pages.notifications'); })->name('notifications');
 
-            Route::get('/bhp/usage',          [ConsumableUsageController::class, 'index']);
-            Route::post('/bhp/usage',         [ConsumableUsageController::class, 'store']);
-            Route::get('/bhp/usage/{id}',     [ConsumableUsageController::class, 'show']);
-            Route::delete('/bhp/usage/{id}',  [ConsumableUsageController::class, 'destroy']);
+            // Route EMR Admin
+            Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
+            Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
+            Route::post('/emr/{appointment}/doctor-note', [EmrController::class, 'storeDoctorNote'])->name('emr.doctor-note.store');
+            
+            // View-only Registration components
+            Route::get('/registration/pendaftaran-baru', fn() => view('admin.pages.pendaftaran-baru'))->name('registration.pendaftaran-baru');
+            Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
+            
+            Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
+            Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
+            Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
+            Route::get('/office',       [OfficeController::class, 'index'])->name('office');
+            
+            // Master Settings & Doctor Management
+            Route::get('/settings', [DoctorController::class, 'index'])->name('settings');
+            Route::put('/settings/doctor/{id}', [DoctorController::class, 'update'])->name('settings.doctor.update');
+            Route::delete('/settings/doctor/{id}', [DoctorController::class, 'destroy'])->name('settings.doctor.destroy');
+            
+            // Cashier
+            Route::get('/cashier', [EmrController::class, 'indexCashier'])->name('cashier');
+            Route::get('/cashier/export-csv', [CashierController::class, 'exportCsv'])->name('cashier.exportCsv');
+            Route::post('/cashier/store-payment', [EmrController::class, 'storePayment'])->name('cashier.storePayment');
+            Route::get('/cashier/search-patient', [CashierController::class, 'searchPatient'])->name('cashier.searchPatient');
+            Route::get('/cashier/search-item', [CashierController::class, 'searchItem'])->name('cashier.searchItem');
+            Route::post('/cashier/store-manual-payment', [CashierController::class, 'storeManualPayment'])->name('cashier.storeManualPayment');
+            
+            // Appointment Extra Management
+            Route::get('/appointments/create', [AppointmentController::class, 'createFromSchedule'])->name('appointments.create');
+            Route::get('/appointments/{id}', [AppointmentController::class, 'show'])->name('appointments.show');
+            Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointments.updateStatus');
+
+            // Staff Account Management
+            Route::post('/settings/manajemen-staff/account', [DoctorController::class, 'storeStaffAccountFromAdmin'])->name('settings.staff.account.store');
+            Route::patch('/settings/manajemen-staff/account/{id}/toggle-status', [DoctorController::class, 'toggleStaffAccountStatus'])->name('settings.staff.account.toggle-status');
+            Route::patch('/settings/manajemen-staff/account/{id}/doctor-link', [DoctorController::class, 'updateStaffAccountDoctorLink'])->name('settings.staff.account.doctor.link');
+            Route::post('/settings/manajemen-staff/doctor', [DoctorController::class, 'storeFromAdmin'])->name('settings.staff.doctor.store');
+            
+            // Article Management
+            Route::resource('articles', ArticleAdminController::class)->names('articles');
+            
+            // Pharmacy & BHP
+            Route::prefix('pharmacy')->name('pharmacy.')->group(function () {    
+                Route::get('/medicine', [MedicineController::class, 'index'])->name('medicine.index');
+                Route::post('/medicine', [MedicineController::class, 'store'])->name('medicine.store');   
+                Route::get('/medicine/{id}', [MedicineController::class, 'show'])->name('medicine.show');
+                Route::put('/medicine/{id}', [MedicineController::class, 'update'])->name('medicine.update');    
+                Route::delete('/medicine/{id}', [MedicineController::class, 'destroy'])->name('medicine.destroy');    
+                Route::post('/medicine/{id}/stock-in', [MedicineController::class, 'stockIn'])->name('medicine.stockIn');
+                Route::delete('/medicine/{medicineId}/stock-mutation/{mutationId}', [MedicineController::class, 'destroyMutation']);            
+                Route::get('/penggunaan-obat', [PenggunaanObatController::class, 'index'])->name('penggunaan-obat.index');
+
+                Route::get('/bhp/items', [ConsumableItemController::class, 'index']);    
+                Route::post('/bhp/items', [ConsumableItemController::class, 'store']);    
+                Route::get('/bhp/items/{id}', [ConsumableItemController::class, 'show']);    
+                Route::put('/bhp/items/{id}', [ConsumableItemController::class, 'update']);    
+                Route::delete('/bhp/items/{id}', [ConsumableItemController::class, 'destroy']);
+                Route::get('/bhp/usage',          [ConsumableUsageController::class, 'index']);
+                Route::post('/bhp/usage',         [ConsumableUsageController::class, 'store']);
+                Route::get('/bhp/usage/{id}',     [ConsumableUsageController::class, 'show']);
+                Route::delete('/bhp/usage/{id}',  [ConsumableUsageController::class, 'destroy']);
+            });
         });
     });
 
-    // ================= USER AREA =================
+    // ================= PATIENT/USER AREA =================
     Route::middleware('role:PAT')->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', [DashboardUserController::class, 'index'])->name('dashboard');    
         Route::put('/profile/update', [DashboardUserController::class, 'updateProfile'])->name('profile.update');
@@ -147,6 +156,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:DCT')->prefix('doctor')->name('doctor.')->group(function () {
         Route::get('/dashboard', [DashboardDoctorController::class, 'index'])->name('dashboard');
         Route::put('/profile/update', [DashboardDoctorController::class, 'updateProfile'])->name('profile.update');
+        
+        // EMR & Notes for Doctor
         Route::get('/emr', [DoctorEmrController::class, 'index'])->name('emr');
         Route::get('/emr/{id}', [DoctorEmrController::class, 'show'])->name('emr.show');
         Route::post('/emr/{appointment}/doctor-note', [DoctorEmrController::class, 'storeDoctorNote'])->name('emr.storeDoctorNote');

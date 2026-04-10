@@ -4,7 +4,7 @@
 
 <div class="mc-header-row">
     <div style="display: flex; align-items: center; gap: 16px;">
-        <a href="?menu=general-settings" class="mc-btn-icon" title="Kembali ke General Settings">
+        <a href="?menu=beranda-settings" class="mc-btn-icon" title="Kembali ke Beranda Settings">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </a>
         <div>

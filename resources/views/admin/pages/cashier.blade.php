@@ -114,7 +114,9 @@
                         <button class="cashier-btn btn-cokelat" style="padding: 8px 14px; font-size: 12px;" onclick="resetFilters()">Reset</button>
                     </div>
                     <button class="cashier-btn btn-cokelat" onclick="openModalManual()">+ Pembayaran Manual</button>
-                    <button class="cashier-btn cashier-btn-success">Export CSV</button>
+                    <button class="cashier-btn cashier-btn-success" id="btnExportCsv" onclick="exportCashierCsv()">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
                 </div>
 
                 {{-- Tabel Antrean Pembayaran --}}
@@ -862,6 +864,23 @@
         document.getElementById('filterFromDate').value = '';
         document.getElementById('filterToDate').value = '';
         applyCashierFilters();
+    }
+
+    // ──── EXPORT CSV ─────────────────────────────
+    function exportCashierCsv() {
+        const searchTerm = document.getElementById('cashierSearch').value;
+        const fromDate = document.getElementById('filterFromDate').value;
+        const toDate = document.getElementById('filterToDate').value;
+
+        // Gunakan parameter URL untuk GET Request ke endpoint export CSV
+        let url = '{{ route("admin.cashier.exportCsv") }}?';
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('q', searchTerm);
+        if (fromDate) params.append('from_date', fromDate);
+        if (toDate) params.append('to_date', toDate);
+
+        // Download by setting window.location
+        window.location.href = url + params.toString();
     }
 
     // INIT: Load semua rows on page load

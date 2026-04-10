@@ -74,7 +74,7 @@
         
         .p-card-top, .p-card-bottom { display: flex; justify-content: space-between; align-items: center; }
         
-        .p-name { font-weight: 700; color: #333; font-size: 12px; }
+        .p-name { font-weight: 700; color: #8e6a45; font-size: 12px; }
         .p-date, .p-mr { font-size: 10px; color: #888; font-weight: 600; }
         
         .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; color: white; font-weight: 800; text-transform: uppercase; }

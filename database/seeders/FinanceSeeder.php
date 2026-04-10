@@ -7,10 +7,11 @@ use App\Models\Invoice;
 use App\Models\ConsumableRestock;
 use App\Models\ConsumableItem;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
-class FinanceDummySeeder extends Seeder
+class FinanceSeeder extends Seeder
 {
     public function run(): void
     {
@@ -34,10 +35,17 @@ class FinanceDummySeeder extends Seeder
             $amountPaid = $isPaid ? $totalBill : ($totalBill * 0.5);
             $debtAmount = $totalBill - $amountPaid;
 
-            Invoice::create([
+                // Fetch dynamic admin_id (like UserSeeder)
+                $adminId = DB::table('user')->where('email', 'admin@hanglekiu.com')->value('id');
+                if (!$adminId) {
+                    $this->command->warn('⚠️ Admin user not found, skipping invoice for ' . $appt->id);
+                    continue;
+                }
+
+                Invoice::create([
                 'id'              => (string) Str::uuid(),
                 'registration_id' => $appt->id,
-                'admin_id'        => '49f9ad75-bd0b-43ca-8a19-a9adebfd0c5f', // Fallback Admin ID
+                'admin_id'        => $adminId,
                 'invoice_number'  => 'INV-' . $appt->appointment_datetime->format('Ymd') . '-' . strtoupper(Str::random(4)),
                 'status'          => $isPaid ? 'paid' : 'partial',
                 'receipt_number'  => 'REC-' . $appt->appointment_datetime->format('Ymd') . '-' . strtoupper(Str::random(4)),

@@ -20,14 +20,12 @@
     @include('admin.components.settings.procedure')
 @elseif ($submenu == 'Payment Method')
     @include('admin.components.settings.payment_method')
-@elseif ($submenu == 'Testimonial')
-    @include('admin.components.settings.testimonial')
+
 @else
     <h2 class="gs-title">General Settings</h2>
 
     <div class="gs-list">
 @foreach ([
-            'Testimonial',
             'Artikel',
             'Poli',
             'Guarantor',
@@ -49,8 +47,8 @@
         ] as $item)
             @php
 $isImplemented = in_array($item, [
-                    'Testimonial', 'Artikel', 'Poli', 'Guarantor', 'Visit', 'Care',
-                    'Procedure', 'Payment Method', 'Testimonial',
+                    'Artikel', 'Poli', 'Guarantor', 'Visit', 'Care',
+                    'Procedure', 'Payment Method',
                 ]);
                 $href = $isImplemented ? "?menu=general-settings&submenu={$item}" : "#";
             @endphp

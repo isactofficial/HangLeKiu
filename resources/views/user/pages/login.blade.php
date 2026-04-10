@@ -225,6 +225,11 @@
             color: #582C0C;
         }
 
+        .form-group input:-webkit-autofill {
+            -webkit-text-fill-color: #582C0C !important;
+            -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+        }
+
         .error {
             background-color: #fef2f2;
             color: #b91c1c;
