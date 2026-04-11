@@ -29,6 +29,7 @@ Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('artikel
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
+Route::get('/appointments/check-slot', [AppointmentController::class, 'checkSlot'])->name('appointments.checkSlot');
 Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
 Route::get('/pelayanan/perawatan', [TreatmentPageController::class, 'index'])->name('perawatan');
