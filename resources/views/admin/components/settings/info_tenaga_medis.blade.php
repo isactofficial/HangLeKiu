@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F3EF; color: #1a1a1a; font-size: 14px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F3EF; color: #582C0C; font-size: 14px; }
   a { text-decoration: none; }
   .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: #fff; border: 0.5px solid #e0dbd4; border-radius: 10px; padding: 14px 16px; }
   .stat-label { font-size: 11px; color: #9B7B62; margin-bottom: 6px; font-weight: 500; }
-  .stat-value { font-size: 26px; font-weight: 500; color: #1a1a1a; }
+  .stat-value { font-size: 26px; font-weight: 500; color: #582C0C; }
   .stat-sub { font-size: 11px; color: #B0998A; margin-top: 3px; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid #d4ccc5; background: #fff; color: #1a1a1a; transition: all 0.15s; line-height: 1; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 0.5px solid #d4ccc5; background: #fff; color: #582C0C; transition: all 0.15s; line-height: 1; }
   .btn:hover { background: #F5F3EF; }
   .btn-primary { background: #C58F59; color: #fff; border-color: #C58F59; }
   .btn-primary:hover { background: #A0703E; border-color: #A0703E; }
@@ -21,7 +21,7 @@
   .table-toolbar { display: flex; gap: 10px; align-items: center; padding: 14px 16px; border-bottom: 0.5px solid #e0dbd4; }
   .search-wrap { position: relative; flex: 1; }
   .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #B0998A; pointer-events: none; }
-  .search-input { width: 100%; padding: 8px 12px 8px 32px; border: 0.5px solid #d4ccc5; border-radius: 8px; font-size: 13px; background: #FAF8F5; color: #1a1a1a; outline: none; transition: border 0.15s; }
+  .search-input { width: 100%; padding: 8px 12px 8px 32px; border: 0.5px solid #d4ccc5; border-radius: 8px; font-size: 13px; background: #FAF8F5; color: #582C0C; outline: none; transition: border 0.15s; }
   .search-input:focus { border-color: #C58F59; background: #fff; }
   .filter-select { padding: 8px 12px; border: 0.5px solid #d4ccc5; border-radius: 8px; font-size: 13px; background: #FAF8F5; color: #6B513E; outline: none; cursor: pointer; }
   .filter-select:focus { border-color: #C58F59; }
@@ -35,12 +35,12 @@
   col.c-status { width: 80px; }
   col.c-aksi { width: 140px; }
   th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600; color: #9B7B62; text-transform: uppercase; letter-spacing: 0.05em; background: #FAF8F5; border-bottom: 0.5px solid #e0dbd4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  td { padding: 13px 14px; border-bottom: 0.5px solid #F0EBE5; color: #1a1a1a; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  td { padding: 13px 14px; border-bottom: 0.5px solid #F0EBE5; color: #582C0C; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: #FDFAF7; }
   .avatar { width: 34px; height: 34px; border-radius: 50%; background: #E5D6C5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #582C0C; flex-shrink: 0; }
   .doc-info { display: flex; align-items: center; gap: 10px; }
-  .doc-name { font-weight: 500; font-size: 13px; color: #1a1a1a; }
+  .doc-name { font-weight: 500; font-size: 13px; color: #582C0C; }
   .doc-str { font-size: 11px; color: #9B7B62; margin-top: 1px; }
   .badge { display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 500; }
   .badge-spec { background: #FAF0E4; color: #7A4C1D; }
@@ -49,7 +49,7 @@
   .actions { display: flex; gap: 5px; }
   .empty-state { text-align: center; padding: 60px 20px; }
   .empty-icon { width: 48px; height: 48px; margin: 0 auto 14px; background: #FAF0E4; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-  .empty-title { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 6px; }
+  .empty-title { font-size: 15px; font-weight: 500; color: #582C0C; margin-bottom: 6px; }
   .empty-sub { font-size: 13px; color: #9B7B62; margin-bottom: 20px; }
   .pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 0.5px solid #e0dbd4; }
   .page-info { font-size: 12px; color: #9B7B62; }
@@ -63,7 +63,7 @@
   .modal { background: #fff; border-radius: 14px; border: 0.5px solid #e0dbd4; width: 100%; max-width: 900px; max-height: 92vh; display: flex; flex-direction: column; }
   .modal-sm { max-width: 400px; }
   .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 0.5px solid #e0dbd4; flex-shrink: 0; }
-  .modal-title { font-size: 15px; font-weight: 500; color: #1a1a1a; }
+  .modal-title { font-size: 15px; font-weight: 500; color: #582C0C; }
   .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: #9B7B62; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: background 0.15s; }
   .modal-close:hover { background: #F5F3EF; }
   .modal-body { padding: 0; overflow-y: auto; flex: 1; }
@@ -73,7 +73,7 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
   .form-label { font-size: 12px; font-weight: 500; color: #6B513E; }
-  .form-input { padding: 8px 12px; border: 0.5px solid #d4ccc5; border-radius: 8px; font-size: 13px; background: #fff; color: #1a1a1a; outline: none; transition: border 0.15s, box-shadow 0.15s; font-family: inherit; width: 100%; }
+  .form-input { padding: 8px 12px; border: 0.5px solid #d4ccc5; border-radius: 8px; font-size: 13px; background: #fff; color: #582C0C; outline: none; transition: border 0.15s, box-shadow 0.15s; font-family: inherit; width: 100%; }
   .form-input:focus { border-color: #C58F59; box-shadow: 0 0 0 3px rgba(197,143,89,0.12); }
   textarea.form-input { resize: vertical; min-height: 76px; line-height: 1.5; }
   select.form-input { cursor: pointer; }
@@ -84,16 +84,16 @@
   .upload-hint { font-size: 11px; color: #B0998A; margin-top: 2px; }
   .delete-body { text-align: center; padding: 24px 20px 20px; }
   .delete-icon-wrap { width: 48px; height: 48px; border-radius: 50%; background: #FEF2F2; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
-  .delete-title { font-size: 15px; font-weight: 500; color: #1a1a1a; margin-bottom: 8px; }
+  .delete-title { font-size: 15px; font-weight: 500; color: #582C0C; margin-bottom: 8px; }
   .delete-msg { font-size: 13px; color: #6B7280; line-height: 1.6; }
   .detail-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
   .detail-avatar { width: 50px; height: 50px; border-radius: 50%; background: #E5D6C5; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: #582C0C; flex-shrink: 0; }
   .detail-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .detail-table td { padding: 9px 0; border-bottom: 0.5px solid #F0EBE5; }
   .detail-table td:first-child { color: #9B7B62; width: 38%; }
-  .detail-table td:last-child { font-weight: 500; color: #1a1a1a; }
+  .detail-table td:last-child { font-weight: 500; color: #582C0C; }
   .detail-table tr:last-child td { border-bottom: none; }
-  .detail-bio { margin-top: 16px; padding: 14px; background: #FAF8F5; border-radius: 8px; font-size: 13px; color: #3D2B1F; line-height: 1.6; }
+  .detail-bio { margin-top: 16px; padding: 14px; background: #FAF8F5; border-radius: 8px; font-size: 13px; color: #582C0C; line-height: 1.6; }
   .ms-modal-form { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .ms-modal-form input[type="file"] { display: none; }
 </style>
@@ -101,8 +101,8 @@
 <div class="doctor-management">
   <div class="mc-header-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div>
-          <h2 class="mc-title" style="font-size:24px;font-weight:700;color:#1a1a1a;">Manajemen Tenaga Medis</h2>
-          <p class="mc-subtitle" style="color:#6B513E;">Kelola daftar dokter dan jadwal praktek</p>
+          <h2 class="mc-title" style="font-size:24px;font-weight:700;color:#582C0C;">Manajemen Tenaga Medis</h2>
+          <p class="mc-subtitle" style="color:#C58F59;">Kelola daftar dokter dan jadwal praktek</p>
       </div>
       <button class="btn btn-primary" onclick="openAdd()">+ Tambah Tenaga Medis</button>
   </div>

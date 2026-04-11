@@ -33,17 +33,6 @@
             'Care',
             'Procedure',
             'Payment Method',
-            'Testimonial',
-            'Apotek',
-            'Kasir',
-            'Tooltip',
-            'Message Center',
-            'Manajemen Approval',
-            'Reset Data',
-            'Notifikasi',
-            'Data Masking',
-            'Ubah Bahasa',
-            'Manajemen Password',
         ] as $item)
             @php
 $isImplemented = in_array($item, [
