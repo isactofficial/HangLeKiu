@@ -29,7 +29,7 @@
 /* ── Page Wrapper ── */
 body, .page-wrapper {
     font-family: 'Instrument Sans', sans-serif;
-    background: var(--cream-50);
+    background: linear-gradient(155deg, #4a2710 0%, #6f4322 22%, #d8b895 58%, #fdf9f5 100%);
 }
 
 .page-wrapper {
@@ -288,7 +288,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(74, 39, 16, 0.56);
     z-index: 1050;
     align-items: center;
     justify-content: center;
@@ -345,7 +345,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     color: var(--text-gray);
     transition: all var(--transition);
     z-index: 10;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(88, 44, 12, 0.14);
 }
 
 @media (max-width: 768px) {

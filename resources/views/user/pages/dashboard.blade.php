@@ -84,6 +84,126 @@
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
         }
+
+        .history-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #c9a98d #f4e9df;
+        }
+
+        .history-scroll::-webkit-scrollbar {
+            height: 10px;
+            width: 10px;
+        }
+
+        .history-scroll::-webkit-scrollbar-track {
+            background: #f4e9df;
+            border-radius: 9999px;
+        }
+
+        .history-scroll::-webkit-scrollbar-thumb {
+            background: #c9a98d;
+            border-radius: 9999px;
+            border: 2px solid #f4e9df;
+        }
+
+        .history-scroll::-webkit-scrollbar-thumb:hover {
+            background: #b88d68;
+        }
+
+        .history-pagination nav > div:first-child > span,
+        .history-pagination nav > div:first-child a,
+        .history-pagination nav > div:last-child > span,
+        .history-pagination nav > div:last-child a {
+            border-radius: 0.6rem;
+            border-color: #e5cdb8;
+            background: #fff;
+            color: #7a5a42;
+            box-shadow: none;
+        }
+
+        .history-pagination nav > div:first-child a:hover,
+        .history-pagination nav > div:last-child a:hover {
+            background: #f9f1ea;
+            color: #5d3a20;
+        }
+
+        .history-pagination nav > div:first-child span[aria-disabled="true"],
+        .history-pagination nav > div:last-child span[aria-disabled="true"] {
+            color: #c3a892;
+            background: #fdf7f1;
+            border-color: #efdccc;
+        }
+
+        .history-pagination nav > div:last-child span[aria-current="page"] {
+            background: #6b3b14;
+            border-color: #6b3b14;
+            color: #fff;
+        }
+
+        .history-pagination nav svg {
+            color: inherit;
+        }
+
+        .visit-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #c9a98d #f4e9df;
+        }
+
+        .visit-scroll::-webkit-scrollbar {
+            height: 10px;
+            width: 10px;
+        }
+
+        .visit-scroll::-webkit-scrollbar-track {
+            background: #f4e9df;
+            border-radius: 9999px;
+        }
+
+        .visit-scroll::-webkit-scrollbar-thumb {
+            background: #c9a98d;
+            border-radius: 9999px;
+            border: 2px solid #f4e9df;
+        }
+
+        .visit-scroll::-webkit-scrollbar-thumb:hover {
+            background: #b88d68;
+        }
+
+        .visit-pagination nav > div:first-child > span,
+        .visit-pagination nav > div:first-child a,
+        .visit-pagination nav > div:last-child > span,
+        .visit-pagination nav > div:last-child a,
+        .visit-pagination nav span,
+        .visit-pagination nav a {
+            border-radius: 0.6rem;
+            border-color: #e5cdb8;
+            background: #fff;
+            color: #7a5a42;
+            box-shadow: none;
+        }
+
+        .visit-pagination nav > div:first-child a:hover,
+        .visit-pagination nav > div:last-child a:hover {
+            background: #f9f1ea;
+            color: #5d3a20;
+        }
+
+        .visit-pagination nav > div:first-child span[aria-disabled="true"],
+        .visit-pagination nav > div:last-child span[aria-disabled="true"] {
+            color: #c3a892;
+            background: #fdf7f1;
+            border-color: #efdccc;
+        }
+
+        .visit-pagination nav > div:last-child span[aria-current="page"] {
+            background: #6b3b14;
+            border-color: #6b3b14;
+            color: #fff;
+        }
+
+        .visit-pagination nav svg {
+            color: inherit;
+        }
     </style>
 </head>
 
@@ -201,7 +321,7 @@
                             @php
                                 $statusFormat = ['pending' => ['bg-amber-100', 'text-amber-800', 'Menunggu'], 'confirmed' => ['bg-blue-100', 'text-blue-800', 'Terkonfirmasi'], 'waiting' => ['bg-indigo-100', 'text-indigo-800', 'Dalam Antrean'], 'engaged' => ['bg-cyan-100', 'text-cyan-800', 'Sedang Dilayani'], 'done' => ['bg-emerald-100', 'text-emerald-800', 'Selesai'], 'cancelled' => ['bg-red-100', 'text-red-800', 'Batal']];
                             @endphp
-                            <div class="overflow-x-auto rounded-2xl border border-[#EBDCCF] shadow-sm">
+                            <div class="overflow-x-auto visit-scroll rounded-2xl border border-[#EBDCCF] shadow-sm">
                                 <table class="min-w-full text-sm text-left w-full">
                                     <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-4 py-4 text-center w-12">No</th><th class="px-4 py-4 whitespace-nowrap">Status</th><th class="px-4 py-4 whitespace-nowrap">Tgl Kunjungan</th><th class="px-4 py-4 whitespace-nowrap">Tgl Dibuat</th><th class="px-4 py-4 whitespace-nowrap">Poli</th><th class="px-4 py-4 min-w-[200px]">Rencana Tindakan</th><th class="px-4 py-4 min-w-[150px]">Dokter Pemeriksa</th><th class="px-4 py-4 whitespace-nowrap">Metode Bayar</th></tr></thead>
                                     <tbody class="divide-y divide-[#EFE3D7] bg-white">
@@ -217,7 +337,7 @@
                             @if($activeRegistrations->hasPages())
                             <div class="mt-5 px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl">
                                 <span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $activeRegistrations->firstItem() ?? 0 }} - {{ $activeRegistrations->lastItem() ?? 0 }} dari {{ $activeRegistrations->total() }} data</span>
-                                <div class="flex items-center gap-1">{{ $activeRegistrations->links('pagination::tailwind') }}</div>
+                                <div class="flex items-center gap-1 visit-pagination">{{ $activeRegistrations->links('pagination::tailwind') }}</div>
                             </div>
                             @endif
                         </div>
@@ -234,7 +354,7 @@
 
                             <div id="tab-registrasi" class="history-tab-panel">
                                 <div class="rounded-2xl border border-[#EBDCCF] shadow-sm overflow-hidden flex flex-col">
-                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap">Tanggal Kunjungan</th><th class="px-6 py-5 whitespace-nowrap">Dokter</th><th class="px-6 py-5 min-w-[300px]">Jenis Perawatan / Tindakan</th><th class="px-6 py-5 text-center whitespace-nowrap">No Gigi</th><th class="px-6 py-5 text-center whitespace-nowrap">Status</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
+                                    <div class="overflow-x-auto history-scroll"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap">Tanggal Kunjungan</th><th class="px-6 py-5 whitespace-nowrap">Dokter</th><th class="px-6 py-5 min-w-[300px]">Jenis Perawatan / Tindakan</th><th class="px-6 py-5 text-center whitespace-nowrap">No Gigi</th><th class="px-6 py-5 text-center whitespace-nowrap">Status</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
                                     @forelse($medicalHistoryRows as $row)
                                         <tr class="hover:bg-slate-50 transition align-middle">
                                             <td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($row->appointment_datetime)->format('d M Y') ?? '-' }} <br><span class="text-xs text-[var(--font-color-secondary)] font-normal mt-0.5 inline-block">{{ optional($row->appointment_datetime)->format('H:i') ?? '' }} WIB</span></td>
@@ -305,13 +425,13 @@
                                         <tr><td colspan="5" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada riwayat kunjungan</p></div></td></tr>
                                     @endforelse
                                     </tbody></table></div>
-                                    @if($medicalHistoryRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $medicalHistoryRows->firstItem() ?? 0 }} - {{ $medicalHistoryRows->lastItem() ?? 0 }} dari {{ $medicalHistoryRows->total() }} data</span><div class="flex items-center gap-1">{{ $medicalHistoryRows->links('pagination::tailwind') }}</div></div>@endif
+                                    @if($medicalHistoryRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $medicalHistoryRows->firstItem() ?? 0 }} - {{ $medicalHistoryRows->lastItem() ?? 0 }} dari {{ $medicalHistoryRows->total() }} data</span><div class="history-pagination flex items-center gap-1">{{ $medicalHistoryRows->links('pagination::tailwind') }}</div></div>@endif
                                 </div>
                             </div>
 
                             <div id="tab-catatan-dokter" class="history-tab-panel hidden">
                                 <div class="rounded-2xl border border-[#EBDCCF] shadow-sm overflow-hidden flex flex-col">
-                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-48">Tanggal</th><th class="px-6 py-5 whitespace-nowrap w-56">Dokter</th><th class="px-6 py-5 min-w-[360px]">Catatan</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
+                                    <div class="overflow-x-auto history-scroll"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-48">Tanggal</th><th class="px-6 py-5 whitespace-nowrap w-56">Dokter</th><th class="px-6 py-5 min-w-[360px]">Catatan</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
                                     @forelse($doctorNotesRows as $noteRow)
                                         <tr class="hover:bg-slate-50 transition align-middle">
                                             <td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($noteRow->appointment_datetime)->format('d M Y') ?? '-' }}</td>
@@ -373,13 +493,13 @@
                                         <tr><td colspan="3" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada catatan dokter</p></div></td></tr>
                                     @endforelse
                                     </tbody></table></div>
-                                    @if($doctorNotesRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $doctorNotesRows->firstItem() ?? 0 }} - {{ $doctorNotesRows->lastItem() ?? 0 }} dari {{ $doctorNotesRows->total() }} data</span><div class="flex items-center gap-1">{{ $doctorNotesRows->links('pagination::tailwind') }}</div></div>@endif
+                                    @if($doctorNotesRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $doctorNotesRows->firstItem() ?? 0 }} - {{ $doctorNotesRows->lastItem() ?? 0 }} dari {{ $doctorNotesRows->total() }} data</span><div class="history-pagination flex items-center gap-1">{{ $doctorNotesRows->links('pagination::tailwind') }}</div></div>@endif
                                 </div>
                             </div>
 
                             <div id="tab-odontogram" class="history-tab-panel hidden">
                                 <div class="rounded-2xl border border-[#EBDCCF] shadow-sm overflow-hidden flex flex-col">
-                                    <div class="overflow-x-auto"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-40">Tanggal Periksa</th><th class="px-6 py-5 min-w-[260px]">Diagnosa Gigi</th><th class="px-6 py-5 min-w-[200px]">Catatan</th><th class="px-6 py-5 min-w-[280px]"></th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
+                                    <div class="overflow-x-auto history-scroll"><table class="min-w-full text-sm text-left w-full"><thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold"><tr><th class="px-6 py-5 whitespace-nowrap w-36">Tanggal Periksa</th><th class="px-6 py-5 min-w-[220px]">Diagnosa Gigi</th><th class="pl-3 pr-6 py-5 min-w-[440px]">Catatan</th></tr></thead><tbody class="divide-y divide-[#EFE3D7] bg-white">
                                     @forelse($odontogramRows as $record)
                                         <tr class="hover:bg-slate-50 transition align-middle">
                                             <td class="px-6 py-5 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($record->examined_at)->format('d M Y') ?? '-' }}</td>
@@ -406,7 +526,7 @@
                                                     -
                                                 @endif
                                             </td>
-                                            <td class="px-6 py-5 text-xs font-semibold uppercase text-[var(--font-color-secondary)] align-top">
+                                            <td class="pl-3 pr-6 py-5 align-top">
                                                 @php
                                                     $noteText = trim((string) ($record->notes ?? ''));
                                                     $labelMap = [
@@ -457,18 +577,10 @@
                                                 @if(count($visibleLabels) > 0)
                                                     <div class="space-y-2">
                                                         @foreach($visibleLabels as $label)
-                                                            <div>{{ $label }}</div>
-                                                        @endforeach
-                                                    </div>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-5 text-sm text-[var(--font-color-primary)] align-top">
-                                                @if(count($visibleLabels) > 0)
-                                                    <div class="space-y-2 whitespace-pre-wrap">
-                                                        @foreach($visibleLabels as $label)
-                                                            <div>{{ $parsedNotes[$label] }}</div>
+                                                            <div class="flex items-start justify-between gap-4">
+                                                                <div class="w-40 shrink-0 font-semibold text-[var(--font-color-secondary)] text-xs uppercase leading-relaxed">{{ $label }}</div>
+                                                                <div class="flex-1 text-sm text-[var(--font-color-primary)] leading-relaxed whitespace-pre-wrap break-words text-right">{{ $parsedNotes[$label] }}</div>
+                                                            </div>
                                                         @endforeach
                                                     </div>
                                                 @else
@@ -477,10 +589,10 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <tr><td colspan="4" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada riwayat Odontogram</p></div></td></tr>
+                                        <tr><td colspan="3" class="px-6 py-14 text-center text-[var(--font-color-secondary)]"><div class="flex flex-col items-center justify-center"><div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><p class="font-bold text-[var(--font-color-primary)]">Belum ada riwayat Odontogram</p></div></td></tr>
                                     @endforelse
                                     </tbody></table></div>
-                                    @if($odontogramRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $odontogramRows->firstItem() ?? 0 }} - {{ $odontogramRows->lastItem() ?? 0 }} dari {{ $odontogramRows->total() }} data</span><div class="flex items-center gap-1">{{ $odontogramRows->links('pagination::tailwind') }}</div></div>@endif
+                                    @if($odontogramRows->hasPages())<div class="px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4"><span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $odontogramRows->firstItem() ?? 0 }} - {{ $odontogramRows->lastItem() ?? 0 }} dari {{ $odontogramRows->total() }} data</span><div class="history-pagination flex items-center gap-1">{{ $odontogramRows->links('pagination::tailwind') }}</div></div>@endif
                                 </div>
                             </div>
                         </div>
@@ -705,6 +817,62 @@
         document.getElementById('editAccountBackdrop')?.addEventListener('click', () => toggleModal(editAccountModal, false));
 
         tabButtons.forEach((button) => button.addEventListener('click', () => activateHistoryTab(button.dataset.tab)));
+
+        const historyContainer = document.querySelector('.history-tab-panel')?.closest('.dash-card');
+
+        const refreshHistoryPanel = async (url, panelId) => {
+            const currentPanel = document.getElementById(panelId);
+            if (!currentPanel) return;
+
+            currentPanel.style.opacity = '0.6';
+            currentPanel.style.pointerEvents = 'none';
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Gagal memuat halaman riwayat medis.');
+                }
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const nextPanel = doc.getElementById(panelId);
+
+                if (!nextPanel) {
+                    throw new Error('Panel riwayat medis tidak ditemukan.');
+                }
+
+                currentPanel.innerHTML = nextPanel.innerHTML;
+                activateHistoryTab(panelId.replace('tab-', ''));
+                history.replaceState({}, '', url);
+
+                if (historyContainer) {
+                    historyContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } catch (error) {
+                window.alert('Gagal memuat data. Coba lagi.');
+            } finally {
+                currentPanel.style.opacity = '1';
+                currentPanel.style.pointerEvents = 'auto';
+            }
+        };
+
+        document.addEventListener('click', (event) => {
+            const paginationLink = event.target.closest('.history-pagination a[href]');
+            if (!paginationLink) return;
+
+            const parentPanel = paginationLink.closest('.history-tab-panel');
+            if (!parentPanel) return;
+
+            event.preventDefault();
+            refreshHistoryPanel(paginationLink.href, parentPanel.id);
+        });
 
         if (togglePatientDetails && patientMoreDetails) {
             togglePatientDetails.addEventListener('click', () => {

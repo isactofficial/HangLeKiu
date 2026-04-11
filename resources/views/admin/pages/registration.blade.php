@@ -472,7 +472,7 @@
             modal.id = 'appointmentDetailModal';
             modal.style.cssText = `
                 position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-                background: rgba(0,0,0,0.5); z-index: 9999; display: none; 
+                background: rgba(74,39,16,0.52); z-index: 9999; display: none; 
                 align-items: center; justify-content: center; overflow-y: auto;
             `;
             modal.onclick = function(e) {
@@ -532,7 +532,7 @@
         const currentMode = 'view'; // Default mode
 
         return `
-            <div style="background: white; border-radius: 12px; max-width: 700px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative;">
+            <div style="background: #fffaf5; border-radius: 12px; max-width: 700px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(88,44,12,0.26); position: relative; border: 1px solid #E5D6C5;">
                 
                 {{-- Header --}}
                 <div style="background: linear-gradient(135deg, #C58F59 0%, #A67C52 100%); padding: 25px; border-radius: 12px 12px 0 0; color: white; display: flex; justify-content: space-between; align-items: center;">
@@ -674,7 +674,7 @@
                                 <button type="button" onclick="toggleDetailEditMode('${appointment.id}')" style="flex: 1; padding: 12px; background: #E5D6C5; color: #582C0C; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                     <i class="fas fa-times"></i> Batal
                                 </button>
-                                <button type="submit" style="flex: 1; padding: 12px; background: #2C8659; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <button type="submit" style="flex: 1; padding: 12px; background: #A67C52; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                     <i class="fas fa-save"></i> Simpan
                                 </button>
                             </div>
@@ -762,7 +762,7 @@
             modal.id = 'detailCropperModal';
             modal.style.cssText = `
                 position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                background: rgba(0,0,0,0.7); z-index: 10000; display: flex;
+                background: rgba(74,39,16,0.62); z-index: 10000; display: flex;
                 align-items: center; justify-content: center;
             `;
             document.body.appendChild(modal);
@@ -772,14 +772,14 @@
         modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
         modal.innerHTML = `
-            <div style="background: white; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%;">
-                <h3 style="margin-top: 0;">Atur Foto Profil</h3>
-                <canvas id="detailCropperCanvas" style="border: 1px solid #E5D6C5; width: 100%; max-height: 400px; display: block; margin-bottom: 15px; background: #000;"></canvas>
+            <div style="background: #fffaf5; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(88, 44, 12, 0.24); border: 1px solid #E5D6C5;">
+                <h3 style="margin-top: 0; color: #582C0C;">Atur Foto Profil</h3>
+                <canvas id="detailCropperCanvas" style="border: 1px solid #E5D6C5; width: 100%; max-height: 400px; display: block; margin-bottom: 15px; background: #6b3f22;"></canvas>
                 <div style="display: flex; gap: 10px;">
                     <button type="button" onclick="document.getElementById('detailCropperModal').style.display='none';" style="flex: 1; padding: 10px; background: #E5D6C5; border: none; border-radius: 4px; cursor: pointer;">
                         Batal
                     </button>
-                    <button type="button" onclick="applyDetailCrop()" style="flex: 1; padding: 10px; background: #2C8659; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <button type="button" onclick="applyDetailCrop()" style="flex: 1; padding: 10px; background: #A67C52; color: white; border: none; border-radius: 4px; cursor: pointer;">
                         Crop
                     </button>
                 </div>
@@ -824,8 +824,8 @@
         // Draw image
         ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
         
-        // Draw dark overlay
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        // Draw soft brown overlay
+        ctx.fillStyle = 'rgba(74, 39, 16, 0.45)';
         ctx.fillRect(0, 0, displayWidth, displayHeight);
         
         // Clear frame area (make it visible)

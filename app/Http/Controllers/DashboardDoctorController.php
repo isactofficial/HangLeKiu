@@ -62,9 +62,12 @@ class DashboardDoctorController extends Controller
 
             $doctorProcedureSummary = DB::table('procedure_item as pi')
                 ->join('medical_procedure as mp', 'pi.procedure_id', '=', 'mp.id')
+                ->join('registration as ap', 'mp.registration_id', '=', 'ap.id')
                 ->leftJoin('doctor as d', 'mp.doctor_id', '=', 'd.id')
                 ->leftJoin('master_procedure as mpr', 'pi.master_procedure_id', '=', 'mpr.id')
                 ->where('mp.doctor_id', $doctor->id)
+                ->where('ap.status', 'succeed')
+                ->whereNull('ap.deleted_at')
                 ->whereNull('mp.deleted_at')
                 ->whereNull('pi.deleted_at')
                 ->whereMonth('mp.created_at', $selectedMonth)

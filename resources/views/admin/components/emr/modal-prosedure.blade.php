@@ -116,7 +116,7 @@
 
 #modalTambahProsedur .prosedur-row {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) 92px 74px 120px 190px;
+  grid-template-columns: minmax(240px, 1fr) 92px 74px 120px 88px 190px;
   gap: 10px;
 }
 
@@ -136,6 +136,7 @@
 #modalTambahProsedur .field-gigi,
 #modalTambahProsedur .field-qty,
 #modalTambahProsedur .field-price,
+#modalTambahProsedur .field-doctor-share,
 #modalTambahProsedur .field-actions,
 #modalTambahProsedur .field-obat,
 #modalTambahProsedur .field-obat-qty,
@@ -423,7 +424,7 @@
 /* RESPONSIVE FIX */
 @media (max-width: 1024px) {
   #modalTambahProsedur .prosedur-row {
-    grid-template-columns: 1fr 92px 74px 120px;
+    grid-template-columns: 1fr 92px 74px 120px 88px;
   }
 
   #modalTambahProsedur .field-actions {
@@ -618,6 +619,11 @@
                 />
               </div>
 
+              <div class="field-doctor-share">
+                <label class="label-small">% Dokter</label>
+                <div class="input-underline text-center bg-[#f7f3ef] font-semibold doctor-percent-value"><div class="text-[11px] text-[#8e6a45] font-semibold">Rp0</div></div>
+              </div>
+
               <!-- Diskon -->
               <div class="field-actions action-pack">
                 <div>
@@ -773,12 +779,12 @@
               <label class="section-heading">Tenaga Medis Utama</label>
               <select
                 id="prosedur-doctor-select"
-                onchange="syncAssistantDoctorChoices()"
+                onchange="syncAssistantDoctorChoices(); hitungTotalHarga();"
                 class="input-underline text-sm cursor-pointer appearance-none bg-white font-medium"
               >
                 <option value="">-- Pilih Tenaga Medis --</option>
                 @foreach(\App\Models\Doctor::where('is_active', true)->orderBy('full_name')->get() as $doc)
-                    <option value="{{ $doc->id }}">{{ $doc->full_name }}</option>
+                    <option value="{{ $doc->id }}" data-fee-percentage="{{ (float) ($doc->default_fee_percentage ?? 0) }}">{{ $doc->full_name }}</option>
                 @endforeach
               </select>
 
@@ -1453,6 +1459,11 @@
                     <input type="text" value="Rp0" class="input-underline text-gray-400 input-harga-jual" readonly>
                 </div>
 
+                <div class="field-doctor-share">
+                  <label class="label-small text-gray-400">% Dokter</label>
+                  <div class="input-underline text-center bg-[#f7f3ef] font-semibold doctor-percent-value"><div class="text-[11px] text-[#8e6a45] font-semibold">Rp0</div></div>
+                </div>
+
                 <!-- Diskon -->
                 <div class="field-actions action-pack">
                   <div>
@@ -1504,9 +1515,15 @@
 
       function hitungTotalHarga() {
           let total = 0;
+          const doctorSelect = document.getElementById('prosedur-doctor-select');
+          const selectedDoctorOption = doctorSelect?.selectedOptions?.[0] || null;
+          const doctorFeePercent = Number(selectedDoctorOption?.dataset?.feePercentage || 0);
+
           const prosedurRows = document.querySelectorAll('.prosedur-row');
           prosedurRows.forEach(row => {
               const inputProsedur = row.querySelector('.search-prosedur');
+              const doctorPercentEle = row.querySelector('.doctor-percent-value');
+
               if (inputProsedur && inputProsedur.dataset.masterId) {
                   const qtyInput = row.querySelectorAll('input[type="number"]')[0];
                   const diskonInput = row.querySelector('.input-diskon');
@@ -1514,11 +1531,19 @@
                   const qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
                   const basePrice = parseFloat(inputProsedur.dataset.basePrice || 0);
                   const diskonVal = parseFloat(diskonInput ? diskonInput.value : 0) || 0;
+              const grossSubtotal = basePrice * qty;
                   
-                  let subtotal = (basePrice * qty) - diskonVal;
+              let subtotal = grossSubtotal - diskonVal;
                   if (subtotal < 0) subtotal = 0;
                   
                   total += subtotal;
+
+              if (doctorPercentEle) {
+                const doctorIncomePerRow = grossSubtotal * (doctorFeePercent / 100);
+                doctorPercentEle.innerHTML = `<div class="text-[11px] text-[#8e6a45] font-semibold">Rp${new Intl.NumberFormat('id-ID').format(doctorIncomePerRow)}</div>`;
+              }
+            } else if (doctorPercentEle) {
+              doctorPercentEle.innerHTML = `<div class="text-[11px] text-[#8e6a45] font-semibold">Rp0</div>`;
               }
           });
           
