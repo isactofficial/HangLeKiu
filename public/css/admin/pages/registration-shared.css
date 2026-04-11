@@ -27,7 +27,7 @@
 * { box-sizing: border-box; }
 
 /* ── Page Wrapper ── */
-body, .page-wrapper {
+.page-wrapper {
     font-family: 'Instrument Sans', sans-serif;
     background: linear-gradient(155deg, #4a2710 0%, #6f4322 22%, #d8b895 58%, #fdf9f5 100%);
 }
