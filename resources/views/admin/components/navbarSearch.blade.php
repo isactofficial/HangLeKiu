@@ -95,7 +95,7 @@
             </div>
             <a href="#" class="dropdown-item">Pengaturan Profil</a>
             <div class="dropdown-divider"></div>
-            <form method="POST" action="#">
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="dropdown-item dropdown-logout">Logout</button>
             </form>
