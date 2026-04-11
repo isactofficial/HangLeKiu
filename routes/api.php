@@ -26,6 +26,7 @@ use App\Http\Controllers\ConsumableExpiryLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ArticleAdminController;
 use App\Http\Controllers\MasterTestimonialController;
+use App\Http\Controllers\InsurancePartnerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -276,4 +277,13 @@ Route::prefix('master-testimonial')->group(function () {
     Route::get('/{id}', [MasterTestimonialController::class, 'show']);
     Route::put('/{id}', [MasterTestimonialController::class, 'update']);
     Route::delete('/{id}', [MasterTestimonialController::class, 'destroy']);
+});
+
+// ================= INSURANCE PARTNER =================
+Route::prefix('insurance-partners')->group(function () {
+    Route::get('/', [InsurancePartnerController::class, 'index']);
+    Route::post('/', [InsurancePartnerController::class, 'store']);
+    Route::get('/{id}', [InsurancePartnerController::class, 'show']);
+    Route::put('/{id}', [InsurancePartnerController::class, 'update']);
+    Route::delete('/{id}', [InsurancePartnerController::class, 'destroy']);
 });

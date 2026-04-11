@@ -20,7 +20,10 @@
     @include('admin.components.settings.procedure')
 @elseif ($submenu == 'Payment Method')
     @include('admin.components.settings.payment_method')
-
+@elseif ($submenu == 'Testimonial')
+    @include('admin.components.settings.testimonial')
+@elseif ($submenu == 'Partner Asuransi')
+    @include('admin.components.settings.insurance_partner')
 @else
     <h2 class="gs-title">General Settings</h2>
 
@@ -33,6 +36,7 @@
             'Care',
             'Procedure',
             'Payment Method',
+            'Partner Asuransi',
             'Testimonial',
             'Apotek',
             'Kasir',
@@ -48,7 +52,7 @@
             @php
 $isImplemented = in_array($item, [
                     'Artikel', 'Poli', 'Guarantor', 'Visit', 'Care',
-                    'Procedure', 'Payment Method',
+                    'Procedure', 'Payment Method', 'Testimonial', 'Partner Asuransi'
                 ]);
                 $href = $isImplemented ? "?menu=general-settings&submenu={$item}" : "#";
             @endphp

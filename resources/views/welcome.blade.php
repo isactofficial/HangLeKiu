@@ -424,53 +424,8 @@
             </div>
 
             {{-- Semua logo digabung dalam satu flex-wrap agar nyamping dan otomatis turun --}}
-            <div class="flex flex-wrap justify-center gap-4">
-
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/Admedika 1.svg') }}" alt="AdMedika"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/Avrist 1.svg') }}" alt="Avrist"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/Chubb 1.svg') }}" alt="Chubb"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/Fullerton 2.svg') }}" alt="Fullerton Health Indonesia"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/Generali 1.svg') }}" alt="Generali"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/GlobalExcel 1.svg') }}" alt="GlobalExcel"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/GreatEastern 1.svg') }}" alt="Great Eastern"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/LippoLife 1.svg') }}" alt="Lippo Life"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/copy-of-copy-of-garda-medika-01-melinda-nitbani-1200x480 1.svg') }}"
-                        alt="Garda Medika" class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/MedikaPlaza 1.svg') }}" alt="Medika Plaza"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-                <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                    <img src="{{ asset('images/Meditap 1.svg') }}" alt="Meditap"
-                        class="w-18 h-18 md:w-24 md:h-24 object-contain">
-                </div>
-
+            <div id="partner-container" class="flex flex-wrap justify-center gap-4">
+                <!-- Dynamic partners loaded here -->
             </div>
 
         </div>
@@ -657,9 +612,34 @@
             }
         }
 
+        async function loadInsurancePartners() {
+            try {
+                const response = await fetch('/api/insurance-partners?active=1&per_page=50&t=' + Date.now());
+                const result = await response.json();
+                const partners = result.data?.data || [];
+                const container = document.getElementById('partner-container');
+                
+                if (partners.length === 0) {
+                    container.closest('section').classList.add('hidden');
+                    return;
+                }
+
+                container.innerHTML = partners.map(partner => `
+                    <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
+                        <img src="${partner.logo ? '/storage/' + partner.logo : '/images/gigi.svg'}" 
+                             alt="${partner.name}" 
+                             class="w-18 h-18 md:w-24 md:h-24 object-contain">
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load insurance partners:', error);
+            }
+        }
+
         // Auto-scroll carousel (no manual buttons needed)
         document.addEventListener('DOMContentLoaded', function() {
             loadTestimonials();
+            loadInsurancePartners();
             const container = document.getElementById('testimonial-container');
 
             // Auto-scroll every 5s
