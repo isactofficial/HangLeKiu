@@ -23,7 +23,7 @@ class ArticleAdminController extends Controller
             ]);
         }
         
-        return redirect()->route('admin.settings', ['menu' => 'general-settings', 'submenu' => 'Artikel']);
+        return redirect()->route('admin.settings', ['menu' => 'beranda-settings', 'submenu' => 'Artikel']);
     }
 
     /**
@@ -66,7 +66,7 @@ class ArticleAdminController extends Controller
             ], 201);
         }
 
-        return redirect()->route('admin.settings', ['menu' => 'general-settings', 'submenu' => 'Artikel'])->with('success', 'Artikel berhasil dibuat.');
+        return redirect()->route('admin.settings', ['menu' => 'beranda-settings', 'submenu' => 'Artikel'])->with('success', 'Artikel berhasil dibuat.');
     }
 
     /**
@@ -144,7 +144,7 @@ class ArticleAdminController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.settings', ['menu' => 'general-settings', 'submenu' => 'Artikel'])->with('success', 'Artikel berhasil diperbarui.');
+        return redirect()->route('admin.settings', ['menu' => 'beranda-settings', 'submenu' => 'Artikel'])->with('success', 'Artikel berhasil diperbarui.');
     }
 
     /**
@@ -173,6 +173,6 @@ class ArticleAdminController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.settings', ['menu' => 'general-settings', 'submenu' => 'Artikel'])->with('success', 'Artikel berhasil dihapus.');
+        return redirect()->route('admin.settings', ['menu' => 'beranda-settings', 'submenu' => 'Artikel'])->with('success', 'Artikel berhasil dihapus.');
     }
 }

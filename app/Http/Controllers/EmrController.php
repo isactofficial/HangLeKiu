@@ -6,7 +6,8 @@ use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\DoctorNote;
 use App\Models\MedicalProcedure;
-use App\Models\OndotogramTooth;
+use App\Models\OdontogramTooth;
+use App\Models\OdontogramRecord;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -150,9 +151,14 @@ class EmrController extends Controller
             ->sortByDesc('created_at')
             ->values();
 
+        $odontogramRecords = OdontogramRecord::with('teeth')
+            ->where('patient_id', $appointment->patient_id)
+            ->orderByDesc('examined_at')
+            ->get();
+
         // Jika request datang dari AJAX (klik sidebar), kirimkan isi tengah saja
         if ($request->ajax()) {
-            return view('admin.components.emr.patient-detail-partial', compact('appointment', 'doctorNotes', 'patientRegistrations'))->render();
+            return view('admin.components.emr.patient-detail-partial', compact('appointment', 'doctorNotes', 'patientRegistrations', 'odontogramRecords'))->render();
         }
 
         return redirect()->route('admin.emr');

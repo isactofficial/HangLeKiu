@@ -857,13 +857,22 @@
               }
             }
 
-          // 2. Set tanggal hari ini
+          // 2. Set tanggal hari ini (default)
           const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
           document.getElementById('odonto-date-display').innerText = new Date().toLocaleDateString('id-ID', dateOptions);
 
+          const recordIdToLoad = patientData?.record_id;
           const registrationIdToLoad = document.getElementById('odontogramVisitId')?.value?.trim();
+
+          const titleEl = document.querySelector('.odonto-title');
+          if (titleEl) {
+            titleEl.textContent = recordIdToLoad ? "Riwayat Odontogram" : "Tambah Odontogram";
+          }
+
           clearOdontogramState();
-          if (registrationIdToLoad) {
+          if (recordIdToLoad) {
+            loadSpecificOdontogram(recordIdToLoad);
+          } else if (registrationIdToLoad) {
             loadLatestOdontogramToForm(registrationIdToLoad);
           }
 
@@ -1148,6 +1157,36 @@
           }
         } catch (err) {
           console.warn('Gagal memuat data odontogram terakhir:', err?.message || err);
+        }
+      }
+
+      async function loadSpecificOdontogram(recordId) {
+        if (!recordId) return;
+
+        try {
+          const response = await fetch(`/api/odontogram/${recordId}`, {
+            headers: { 'Accept': 'application/json' }
+          });
+          const data = await response.json();
+
+          if (!response.ok || data.status !== 'success') {
+            throw new Error(data.message || 'Gagal memuat riwayat odontogram');
+          }
+
+          // Perbaikan: data.data pada endpoint show berisi { record: ..., tooth_map: ... }
+          const record = data.data?.record || data.data || null;
+          if (record) {
+            hydrateOdontogramFromRecord(record);
+
+            // Update date display jika ada examined_at dari riwayat pemeriksaan
+            if (record.examined_at) {
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const dateStr = new Date(record.examined_at).toLocaleDateString('id-ID', dateOptions);
+                document.getElementById('odonto-date-display').innerText = dateStr;
+            }
+          }
+        } catch (err) {
+          console.warn('Gagal memuat data odontogram spesifik:', err?.message || err);
         }
       }
 

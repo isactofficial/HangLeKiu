@@ -1,8 +1,15 @@
 <div class="article-settings-wrap">
     <div class="gs-header">
-        <div>
-            <h2 class="gs-title">Manajemen Artikel</h2>
-            <p class="gs-subtitle">Kelola konten wawasan kesehatan gigi Anda</p>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="?menu=beranda-settings" class="gs-back-icon" title="Kembali ke Beranda Settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </a>
+            <div>
+                <h2 class="gs-title">Manajemen Artikel</h2>
+                <p class="gs-subtitle">Kelola konten wawasan kesehatan gigi Anda</p>
+            </div>
         </div>
         <a href="{{ route('admin.articles.create') }}" class="gs-add-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -71,6 +78,21 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 24px;
+    }
+    .gs-back-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        color: #B09A85;
+        transition: all 0.2s ease;
+    }
+    .gs-back-icon:hover {
+        background: #F7F0E6;
+        color: var(--color-primary);
+        transform: translateX(-3px);
     }
     .gs-title {
         font-size: 20px;

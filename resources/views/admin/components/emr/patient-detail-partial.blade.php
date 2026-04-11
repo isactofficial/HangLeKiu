@@ -805,6 +805,7 @@
         <div style="display:flex; gap:12px; border-bottom:1px solid #e5e7eb; margin-bottom:14px;">
             <button class="record-tab-btn active" data-record-tab="rekam-medis" style="border:none; background:none; padding:10px 4px; font-weight:700; border-bottom:2px solid var(--brown-700); cursor:pointer;">REKAM MEDIS</button>
             <button class="record-tab-btn" data-record-tab="catatan-dokter" style="border:none; background:none; padding:10px 4px; font-weight:700; border-bottom:2px solid transparent; cursor:pointer;">CATATAN DOKTER</button>
+            <button class="record-tab-btn" data-record-tab="odontogram-history" style="border:none; background:none; padding:10px 4px; font-weight:700; border-bottom:2px solid transparent; cursor:pointer;">ODONTOGRAM</button>
         </div>
 
         <div data-record-tab-content="rekam-medis">
@@ -962,6 +963,45 @@
                     </div>
                 @empty
                     <div id="doctor-note-empty" class="record-empty-state">Belum ada catatan dokter untuk kunjungan ini.</div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="hidden" data-record-tab-content="odontogram-history">
+            <div class="record-table-shell">
+                <div class="record-table-head" style="grid-template-columns:180px 250px 1fr 120px;">
+                    <div>Tanggal Periksa</div>
+                    <div>Pemeriksa</div>
+                    <div>Catatan</div>
+                    <div>Aksi</div>
+                </div>
+
+                @forelse($odontogramRecords ?? [] as $rec)
+                    <div class="record-table-row" style="grid-template-columns:180px 250px 1fr 120px;">
+                        <div class="record-table-text" style="font-weight:600;">
+                            {{ $rec->examined_at ? \Carbon\Carbon::parse($rec->examined_at)->translatedFormat('d F Y') : '-' }}
+                        </div>
+                        <div class="record-table-text" style="font-weight:700;">{{ $rec->examined_by ?? '-' }}</div>
+                        <div class="record-table-text">{{ $rec->notes ?? '-' }}</div>
+                        <div class="record-table-text">
+                            <button type="button" 
+                                    style="padding:6px 12px; background:var(--brown-700); color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700;"
+                                    onclick="toggleOdontogramModal(true, {
+                                        name: @js($patient->full_name ?? '-'),
+                                        rm: @js($patient->medical_record_no ?? '-'),
+                                        gender: @js($patientGenderLabel),
+                                        age: @js($patientAgeNumber . ' Tahun'),
+                                        payment: @js($paymentLabel),
+                                        patient_id: @js($appointment->patient_id ?? ''),
+                                        registration_id: @js($rec->visit_id ?? ''),
+                                        record_id: @js($rec->id)
+                                    })">
+                                <i class="fa fa-eye"></i> LIHAT
+                            </button>
+                        </div>
+                    </div>
+                @empty
+                    <div class="record-empty-state">Belum ada riwayat odontogram pasien.</div>
                 @endforelse
             </div>
         </div>

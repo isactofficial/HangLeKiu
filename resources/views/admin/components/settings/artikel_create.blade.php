@@ -97,8 +97,11 @@
     <div class="stg-body">
         {{-- Sidebar --}}
         <div class="stg-sidebar">
-            <a href="{{ route('admin.settings', ['menu' => 'general-settings']) }}" class="stg-menu-item active">
+            <a href="{{ route('admin.settings', ['menu' => 'general-settings']) }}" class="stg-menu-item">
                 <span>General Settings</span>
+            </a>
+            <a href="{{ route('admin.settings', ['menu' => 'beranda-settings']) }}" class="stg-menu-item active">
+                <span>Beranda Settings</span>
             </a>
             <a href="{{ route('admin.settings', ['menu' => 'manajemen-staff']) }}" class="stg-menu-item">
                 <span>Manajemen Staff</span>
@@ -112,7 +115,7 @@
         </div>
 
         <div class="stg-main">
-            <a href="{{ route('admin.settings', ['menu' => 'general-settings', 'submenu' => 'Artikel']) }}" class="btn-back">
+            <a href="{{ route('admin.settings', ['menu' => 'beranda-settings', 'submenu' => 'Artikel']) }}" class="btn-back">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
