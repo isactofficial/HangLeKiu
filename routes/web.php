@@ -19,6 +19,7 @@ use App\Http\Controllers\CashierController;
 use App\Http\Controllers\DoctorPageController;
 use App\Http\Controllers\ArticleAdminController;
 use App\Http\Controllers\DoctorEmrController;
+use App\Http\Controllers\AdminNotificationController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
@@ -77,8 +78,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
             Route::get('/registration', [AppointmentController::class, 'index'])->name('registration.index');
             
-            Route::get('/notifications', function () { return view('admin.pages.notifications'); })->name('notifications');
-
+            Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications');
+            Route::post('/notifications/{appointment}/confirm', [AdminNotificationController::class, 'confirm'])->name('notifications.confirm');
+            Route::post('/notifications/{appointment}/reschedule', [AdminNotificationController::class, 'reschedule'])->name('notifications.reschedule');
+            Route::post('/notifications/mark-all-read', [AdminNotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
             // Route EMR Admin
             Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
             Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
