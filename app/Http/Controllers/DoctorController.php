@@ -75,6 +75,7 @@ class DoctorController extends Controller
                         'bio' => $d->bio,
                         'order' => $d->carousel_order ?? 99,
                         'status' => $d->is_active ? 'active' : 'inactive',
+                        'show_in_carousel' => (bool)$d->show_in_carousel,
                         'ig' => $d->instagram_url,
                         'li' => $d->linkedin_url,
                         'foto' => $d->foto_profil,
@@ -265,15 +266,18 @@ class DoctorController extends Controller
 
         try {
             DB::transaction(function () use ($validated, $request) {
-                $doctor = Doctor::create(array_merge($validated, [
+                $dataToSave = array_merge($validated, [
                     'id' => (string) Str::uuid(),
-                    'is_active' => $request->has('is_active') ? (bool)$request->is_active : true,
+                    'is_active' => $request->boolean('is_active'),
+                    'show_in_carousel' => $request->boolean('show_in_carousel'),
                     'foto_profil' => $request->hasFile('foto_profil') ? $this->uploadFile($request->file('foto_profil'), 'doctor_profiles') : null,
                     'shadow_image' => $request->hasFile('shadow_image') ? $this->uploadFile($request->file('shadow_image'), 'doctor_profiles') : null,
                     'badge_1' => $request->hasFile('badge_1') ? $this->uploadFile($request->file('badge_1'), 'doctor_profiles') : null,
                     'badge_2' => $request->hasFile('badge_2') ? $this->uploadFile($request->file('badge_2'), 'doctor_profiles') : null,
                     'ttd' => $request->hasFile('ttd') ? $this->uploadFile($request->file('ttd'), 'doctor_signatures') : null,
-                ]));
+                ]);
+
+                $doctor = Doctor::create($dataToSave);
 
                 $this->syncDoctorSchedules($doctor, $this->normalizeSchedules($request->schedules ?? []));
             });
@@ -299,6 +303,9 @@ class DoctorController extends Controller
     {
         $doctor = Doctor::findOrFail($id);
         $validated = $this->validateRequest($request, $id);
+        
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['show_in_carousel'] = $request->boolean('show_in_carousel');
 
         try {
             DB::transaction(function () use ($validated, $request, $doctor) {
@@ -409,6 +416,7 @@ class DoctorController extends Controller
             'linkedin_url'        => 'nullable|url|max:150',
             'carousel_order'      => 'nullable|integer',
             'is_active'           => 'nullable|boolean',
+            'show_in_carousel'    => 'nullable|boolean',
         ]);
     }
 

@@ -49,6 +49,7 @@ class Doctor extends Model
         'instagram_url',
         'linkedin_url',
         'carousel_order',
+        'show_in_carousel',
     ];
 
     protected $casts = [

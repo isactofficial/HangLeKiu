@@ -9,7 +9,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $doctors = Doctor::where('is_active', true)
+        $doctors = Doctor::where('is_active', true)->where('show_in_carousel', true)
             ->orderByRaw('carousel_order IS NULL, carousel_order ASC')
             ->orderBy('full_name') // secondary sort
             ->get([

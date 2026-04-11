@@ -3,7 +3,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F5F3EF; color: #1a1a1a; font-size: 14px; }
   a { text-decoration: none; }
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: #fff; border: 0.5px solid #e0dbd4; border-radius: 10px; padding: 14px 16px; }
   .stat-label { font-size: 11px; color: #9B7B62; margin-bottom: 6px; font-weight: 500; }
   .stat-value { font-size: 26px; font-weight: 500; color: #1a1a1a; }
@@ -123,6 +123,11 @@
       <div class="stat-value" id="statActive">0</div>
       <div class="stat-sub">Beroperasi saat ini</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-label">Di Carousel</div>
+      <div class="stat-value" id="statCarousel">0</div>
+      <div class="stat-sub">Muncul di Beranda</div>
+    </div>
   </div>
 
   <div class="table-card">
@@ -238,7 +243,14 @@
                                 <input class="form-input" name="carousel_order" type="number">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Aktif</label>
+                                <label class="form-label">Tampil di Carousel Depan</label>
+                                <select class="form-input" name="show_in_carousel">
+                                    <option value="1">Ya</option>
+                                    <option value="0">Tidak</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Aktif (Bisa Praktik)</label>
                                 <select class="form-input" name="is_active">
                                     <option value="1">Ya</option>
                                     <option value="0">Tidak</option>
@@ -410,6 +422,7 @@ function updateStats() {
   document.getElementById('statTotal').textContent = doctors.length;
   document.getElementById('statSpec').textContent = [...new Set(doctors.map(d => d.spec).filter(Boolean))].length;
   document.getElementById('statActive').textContent = doctors.filter(d => d.status === 'active').length;
+  document.getElementById('statCarousel').textContent = doctors.filter(d => d.show_in_carousel).length;
 }
 
 function filterTable() {
@@ -453,7 +466,12 @@ function renderTable(data) {
       <td style="font-size:12px;color:#6B513E;">${d.lulus || '—'}</td>
       <td style="font-size:12px;color:#6B513E;">${d.exp || '—'}</td>
       <td style="font-size:12px;color:#6B513E;text-align:center;">#${d.order || d.id}</td>
-      <td><span class="badge ${d.status === 'active' ? 'badge-active' : 'badge-inactive'}">${d.status === 'active' ? 'Aktif' : 'Nonaktif'}</span></td>
+      <td>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span class="badge ${d.status === 'active' ? 'badge-active' : 'badge-inactive'}">${d.status === 'active' ? 'Aktif' : 'Nonaktif'}</span>
+            <span class="badge ${d.show_in_carousel ? 'badge-spec' : 'badge-inactive'}" style="font-size: 10px;">${d.show_in_carousel ? 'Carousel' : 'Sembunyi'}</span>
+        </div>
+      </td>
       <td>
         <div class="actions">
           <button class="btn btn-sm" onclick="openEdit('${d.id}')">Edit</button>
@@ -509,8 +527,9 @@ function openEdit(id) {
           f.experience.value = doc.experience || '';
           f.alma_mater.value = doc.alma_mater || '';
           f.bio.value = doc.bio || '';
-          f.carousel_order.value = doc.carousel_order || '';
+          f.carousel_order.value = (doc.order === 99) ? '' : doc.order;
           f.is_active.value = doc.is_active ? "1" : "0";
+          f.show_in_carousel.value = doc.show_in_carousel ? "1" : "0";
           f.estimasi_konsultasi.value = doc.estimasi_konsultasi || '15';
           f.str_number.value = doc.str_number || '';
           f.str_institution.value = doc.str_institution || '';
