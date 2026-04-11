@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardDoctorController extends Controller
@@ -121,7 +122,7 @@ class DashboardDoctorController extends Controller
             'phone_number'   => 'nullable|string|max:20',
             'sip_number'     => 'nullable|string|max:50',
             'license_no'     => 'nullable|string|max:50',
-            'photo_base64'   => 'nullable|string',
+            'foto_profil'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'password'       => 'nullable|string|min:8|confirmed',
         ]);
 
@@ -142,8 +143,11 @@ class DashboardDoctorController extends Controller
                 'license_no'   => $validated['license_no'],
             ];
 
-            if ($request->filled('photo_base64')) {
-                $doctorData['foto_profil'] = $validated['photo_base64'];
+            if ($request->hasFile('foto_profil')) {
+                if ($doctor->foto_profil) {
+                    Storage::disk('public')->delete($doctor->foto_profil);
+                }
+                $doctorData['foto_profil'] = $request->file('foto_profil')->store('doctor_profiles', 'public');
             }
 
             $doctor->update($doctorData);

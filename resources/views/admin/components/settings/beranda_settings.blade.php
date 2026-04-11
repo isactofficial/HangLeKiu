@@ -8,15 +8,12 @@
 
 @if ($submenu == 'Testimonial')
     @include('admin.components.settings.testimonial')
-@elseif ($submenu == 'Dokter Carousel')
-    @include('admin.components.settings.partials.doctor_carousel_management')
 @else
     <h2 class="gs-title">Beranda Settings</h2>
 
     <div class="gs-list">
 @foreach ([
-'Testimonial',
-            'Dokter Carousel'
+'Testimonial'
         ] as $item)
             @php
                 $href = "?menu=beranda-settings&submenu={$item}";

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('doctor', function (Blueprint $table) {
-            $table->longText('foto_profil')->nullable()->change();
+            $table->boolean('show_in_carousel')->default(false)->after('carousel_order');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('doctor', function (Blueprint $table) {
-            $table->string('foto_profil', 255)->nullable()->change();
+            $table->dropColumn('show_in_carousel');
         });
     }
 };

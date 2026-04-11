@@ -39,7 +39,17 @@ class Doctor extends Model
         'sip_institution',
         'sip_number',
         'sip_expiry_date',
-        'job_title'
+        'job_title',
+        'experience',
+        'alma_mater',
+        'bio',
+        'shadow_image',
+        'badge_1',
+        'badge_2',
+        'instagram_url',
+        'linkedin_url',
+        'carousel_order',
+        'show_in_carousel',
     ];
 
     protected $casts = [

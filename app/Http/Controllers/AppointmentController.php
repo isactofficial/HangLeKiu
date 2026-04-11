@@ -47,6 +47,38 @@ class AppointmentController extends Controller
             'careTypes'
         ));
     }
+    public function checkSlot(Request $request)
+    {
+        $doctorId = $request->get('doctor_id');
+        $date     = $request->get('date');
+        $time     = $request->get('time');
+        if (!$doctorId || !$date || !$time) {
+            return response()->json(['available' => true]);
+        }
+        
+        // Snap ke 15 menit
+        [$h, $m]       = explode(':', $time);
+        $roundedMinute = floor((int)$m / 15) * 15;
+        $snappedTime   = sprintf('%02d:%02d:00', (int)$h, $roundedMinute);
+        
+        $exists = Appointment::where('doctor_id', $doctorId)
+        ->whereRaw("DATE(appointment_datetime) = ?", [$date])
+        ->whereRaw("TIME_FORMAT(
+            SEC_TO_TIME(
+                FLOOR(TIME_TO_SEC(TIME(appointment_datetime)) / 900) * 900
+                ), '%H:%i:%s') = ?", [$snappedTime])
+        ->whereNotIn('status', ['failed'])
+        ->exists();
+
+        return response()->json([
+            'available' => !$exists,
+            'message'   => $exists
+                ? 'Slot ini sudah terisi oleh pasien lain. Silakan pilih jam yang berbeda.'
+                : null,
+        ]);
+    }
+
+    
     public function store(Request $request)
     {
         $validated = $request->validate([

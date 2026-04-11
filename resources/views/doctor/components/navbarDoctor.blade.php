@@ -37,7 +37,7 @@
             @auth
                 @php
                     $navbarUser  = Auth::user();
-                    $navbarPhoto = optional($navbarUser->doctor)->foto_profil ?: $navbarUser->avatar_url;
+                    $navbarPhoto = ($navbarUser->doctor && $navbarUser->doctor->foto_profil) ? $navbarUser->doctor->foto_profil : null;
                 @endphp
                 <div class="flex items-center gap-4 border-l border-gray-200 pl-8">
                     <div class="text-right">
@@ -46,10 +46,10 @@
                     </div>
                     <div class="relative group">
                         <button class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[#D9C3AE] bg-[#F4E9DF] text-[var(--font-color-primary)] hover:brightness-95 transition-all duration-200">
-                            @if(!empty($navbarPhoto))
-                                <img src="{{ $navbarPhoto }}" alt="Foto Profil" class="w-full h-full object-cover">
+                            @if($navbarPhoto)
+                                <img src="{{ str_starts_with($navbarPhoto, 'http') ? $navbarPhoto : asset('storage/' . $navbarPhoto) }}" alt="{{ $navbarUser->name }}" class="w-full h-full object-cover">
                             @else
-                                <span class="text-sm font-semibold">{{ strtoupper(substr($navbarUser->name ?? 'D', 0, 1)) }}</span>
+                                <span class="text-sm font-semibold">{{ substr($navbarUser->name, 0, 1) }}</span>
                             @endif
                         </button>
                         <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 py-2">

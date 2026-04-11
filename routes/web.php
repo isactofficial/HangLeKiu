@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardUserController;
 use App\Http\Controllers\DashboardDoctorController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
@@ -21,13 +22,14 @@ use App\Http\Controllers\DoctorEmrController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
-Route::get('/', fn() => view('welcome'))->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/klinik', fn() => view('user.pages.klinik'))->name('klinik');
 Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
 Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('artikel.show');
 
 Route::get('/registration',  [AppointmentController::class, 'create'])->name('registration.form');
 Route::get('/daftar',        [AppointmentController::class, 'create'])->name('appointments.create');
+Route::get('/appointments/check-slot', [AppointmentController::class, 'checkSlot'])->name('appointments.checkSlot');
 Route::post('/daftar',       [AppointmentController::class, 'store'])->name('appointments.store');
 Route::get('/daftar/sukses', [AppointmentController::class, 'success'])->name('appointments.success');
 Route::get('/pelayanan/perawatan', [TreatmentPageController::class, 'index'])->name('perawatan');
