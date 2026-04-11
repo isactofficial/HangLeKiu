@@ -61,6 +61,31 @@ class DoctorController extends Controller
             $articles = Article::latest()->paginate(10);
         }
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'doctors' => $doctors->map(function ($d) {
+                    return [
+                        'id' => $d->id,
+                        'name' => $d->full_name,
+                        'str' => $d->str_number,
+                        'spec' => $d->specialization,
+                        'exp' => $d->experience,
+                        'lulus' => $d->alma_mater,
+                        'bio' => $d->bio,
+                        'order' => $d->carousel_order ?? 99,
+                        'status' => $d->is_active ? 'active' : 'inactive',
+                        'ig' => $d->instagram_url,
+                        'li' => $d->linkedin_url,
+                        'foto' => $d->foto_profil,
+                        'shadow' => $d->shadow_image,
+                        'badge1' => $d->badge_1,
+                        'badge2' => $d->badge_2,
+                    ];
+                })
+            ]);
+        }
+
         return view('admin.layout.settings', [
             'menu' => $menu,
             'doctors' => $doctors,
@@ -234,7 +259,7 @@ class DoctorController extends Controller
     /**
      * Simpan data baru
      */
-    public function storeFromAdmin(Request $request): RedirectResponse
+    public function storeFromAdmin(Request $request)
     {
         $validated = $this->validateRequest($request);
 
@@ -244,15 +269,25 @@ class DoctorController extends Controller
                     'id' => (string) Str::uuid(),
                     'is_active' => $request->has('is_active') ? (bool)$request->is_active : true,
                     'foto_profil' => $request->hasFile('foto_profil') ? $this->uploadFile($request->file('foto_profil'), 'doctor_profiles') : null,
+                    'shadow_image' => $request->hasFile('shadow_image') ? $this->uploadFile($request->file('shadow_image'), 'doctor_profiles') : null,
+                    'badge_1' => $request->hasFile('badge_1') ? $this->uploadFile($request->file('badge_1'), 'doctor_profiles') : null,
+                    'badge_2' => $request->hasFile('badge_2') ? $this->uploadFile($request->file('badge_2'), 'doctor_profiles') : null,
                     'ttd' => $request->hasFile('ttd') ? $this->uploadFile($request->file('ttd'), 'doctor_signatures') : null,
                 ]));
 
                 $this->syncDoctorSchedules($doctor, $this->normalizeSchedules($request->schedules ?? []));
             });
 
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Data tenaga medis berhasil disimpan.']);
+            }
+
             return redirect()->route('admin.settings', ['menu' => 'info-tenaga-medis'])
                              ->with('success', 'Data tenaga medis berhasil disimpan.');
         } catch (\Exception $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Gagal simpan: ' . $e->getMessage()], 500);
+            }
             return redirect()->back()->withErrors(['doctor_create' => 'Gagal simpan: ' . $e->getMessage()])->withInput();
         }
     }
@@ -271,6 +306,21 @@ class DoctorController extends Controller
                 if ($request->hasFile('foto_profil')) {
                     if ($doctor->foto_profil) Storage::disk('public')->delete($doctor->foto_profil);
                     $validated['foto_profil'] = $this->uploadFile($request->file('foto_profil'), 'doctor_profiles');
+                }
+                
+                if ($request->hasFile('shadow_image')) {
+                    if ($doctor->shadow_image) Storage::disk('public')->delete($doctor->shadow_image);
+                    $validated['shadow_image'] = $this->uploadFile($request->file('shadow_image'), 'doctor_profiles');
+                }
+
+                if ($request->hasFile('badge_1')) {
+                    if ($doctor->badge_1) Storage::disk('public')->delete($doctor->badge_1);
+                    $validated['badge_1'] = $this->uploadFile($request->file('badge_1'), 'doctor_profiles');
+                }
+
+                if ($request->hasFile('badge_2')) {
+                    if ($doctor->badge_2) Storage::disk('public')->delete($doctor->badge_2);
+                    $validated['badge_2'] = $this->uploadFile($request->file('badge_2'), 'doctor_profiles');
                 }
 
                 // Cek TTD Baru
@@ -301,6 +351,9 @@ class DoctorController extends Controller
             
             // Hapus file fisik
             if ($doctor->foto_profil) Storage::disk('public')->delete($doctor->foto_profil);
+            if ($doctor->shadow_image) Storage::disk('public')->delete($doctor->shadow_image);
+            if ($doctor->badge_1) Storage::disk('public')->delete($doctor->badge_1);
+            if ($doctor->badge_2) Storage::disk('public')->delete($doctor->badge_2);
             if ($doctor->ttd) Storage::disk('public')->delete($doctor->ttd);
 
             $doctor->delete();
@@ -340,7 +393,16 @@ class DoctorController extends Controller
             'sip_institution'     => 'nullable|string|max:50',
             'sip_expiry_date'     => 'nullable|date',
             'foto_profil'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'shadow_image'        => 'nullable|image|mimes:png,webp|max:2048',
+            'badge_1'             => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
+            'badge_2'             => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
             'ttd'                 => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'experience'          => 'nullable|string|max:50',
+            'alma_mater'          => 'nullable|string|max:150',
+            'bio'                 => 'nullable|string|max:500',
+            'instagram_url'       => 'nullable|url|max:150',
+            'linkedin_url'        => 'nullable|url|max:150',
+            'carousel_order'      => 'nullable|integer',
         ]);
     }
 

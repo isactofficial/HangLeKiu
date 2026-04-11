@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardUserController;
 use App\Http\Controllers\DashboardDoctorController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
@@ -21,7 +22,7 @@ use App\Http\Controllers\DoctorEmrController;
 use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
-Route::get('/', fn() => view('welcome'))->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/klinik', fn() => view('user.pages.klinik'))->name('klinik');
 Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
 Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('artikel.show');

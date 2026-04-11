@@ -401,39 +401,7 @@
 </div>
 
 <script>
-let doctors = [
-  {
-    id: 1,
-    name: 'Jenny Wilson Sp.Ort',
-    str: '3122100318012345',
-    spec: 'Spesialis Orthodonti',
-    exp: '12+ tahun',
-    lulus: 'Universitas Indonesia, University of Adelaide',
-    bio: 'Spesialis orthodonti dengan pengalaman lebih dari 12 tahun dalam perawatan gigi berengsel dan koreksi maloklusi.',
-    order: 1,
-    status: 'active'
-  },
-  {
-    id: 2,
-    name: 'Albert Flores Sp.KG',
-    str: '3122100318012346',
-    spec: 'Spesialis Konservasi Gigi',
-    exp: '15+ tahun',
-    lulus: 'Universitas Gadjah Mada',
-    order: 2,
-    status: 'active'
-  },
-  {
-    id: 3,
-    name: 'Sarah Johnson Sp.Per',
-    str: '3122100318012347',
-    spec: 'Spesialis Periodonti',
-    exp: '8+ tahun',
-    lulus: 'Universitas Airlangga',
-    order: 3,
-    status: 'inactive'
-  }
-];
+let doctors = [];
 let editingId = null;
 let deletingId = null;
 let nextId = 4;
@@ -545,18 +513,40 @@ function saveDoctor() {
   formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content') || '');
   
   // Map other fields
-  ['f_exp', 'f_lulus', 'f_bio', 'f_ig', 'f_li', 'f_order', 'f_status'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el.value.trim()) formData.append(el.id.replace('f_', ''), el.value.trim());
-  });
+  if (document.getElementById('f_exp').value.trim()) formData.append('experience', document.getElementById('f_exp').value.trim());
+  if (document.getElementById('f_lulus').value.trim()) formData.append('alma_mater', document.getElementById('f_lulus').value.trim());
+  if (document.getElementById('f_bio').value.trim()) formData.append('bio', document.getElementById('f_bio').value.trim());
+  if (document.getElementById('f_ig').value.trim()) formData.append('instagram_url', document.getElementById('f_ig').value.trim());
+  if (document.getElementById('f_li').value.trim()) formData.append('linkedin_url', document.getElementById('f_li').value.trim());
+  if (document.getElementById('f_order').value.trim()) formData.append('carousel_order', document.getElementById('f_order').value.trim());
+  if (document.getElementById('f_status').value.trim() === 'active') formData.append('is_active', 1);
+  else formData.append('is_active', 0);
+
+  // Images
+  const fotoFile = document.getElementById('upFoto').files[0];
+  if (fotoFile) formData.append('foto_profil', fotoFile);
+
+  const shadowFile = document.getElementById('upShadow').files[0];
+  if (shadowFile) formData.append('shadow_image', shadowFile);
+
+  const badge1File = document.getElementById('upBadge1').files[0];
+  if (badge1File) formData.append('badge_1', badge1File);
+
+  const badge2File = document.getElementById('upBadge2').files[0];
+  if (badge2File) formData.append('badge_2', badge2File);
   
-  const url = editingId ? `/settings/doctor/${editingId}` : '/settings/manajemen-staff/doctor';
-  const method = editingId ? 'PUT' : 'POST';
+  if (editingId) formData.append('_method', 'PUT');
+
+  const url = editingId ? `/admin/settings/doctor/${editingId}` : '/admin/settings/manajemen-staff/doctor';
+  const method = 'POST'; // Since we are using FormData, we send POST with _method=PUT to handle multipart files
   
   fetch(url, {
     method,
     body: formData,
-    headers: editingId ? { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') } : {},
+    headers: { 
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json'
+    },
   })
   .then(res => res.json())
   .then(data => {
@@ -565,10 +555,19 @@ function saveDoctor() {
       closeOverlay('formOverlay');
       loadDoctors(); // Reload list
     } else {
-      alert('Error: ' + (data.message || 'Gagal simpan'));
+      let errorMsg = data.message || 'Gagal simpan';
+      if (data.errors) {
+        // format validation errors
+        const errs = Object.values(data.errors).flat().join('\n');
+        errorMsg += '\n\n' + errs;
+      }
+      alert('Error: ' + errorMsg);
     }
   })
-  .catch(err => alert('Error: ' + err.message));
+  .catch(err => {
+    alert('Error: ' + err.message);
+    console.error(err);
+  });
 }
 
 function openDelete(id) {
@@ -579,9 +578,21 @@ function openDelete(id) {
 }
 
 function confirmDelete() {
-  doctors = doctors.filter(d => d.id !== deletingId);
-  closeOverlay('deleteOverlay');
-  filterTable();
+  fetch(`/admin/settings/doctor/${deletingId}`, {
+    method: 'DELETE',
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      'Accept': 'application/json'
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      closeOverlay('deleteOverlay');
+      loadDoctors();
+    } else alert('Gagal hapus: ' + data.message);
+  })
+  .catch(err => alert('Error: ' + err.message));
 }
 
 function viewDoctor(id) {
@@ -619,7 +630,7 @@ function setUploadLabel(inputId, labelId) {
 }
 
 function loadDoctors() {
-  fetch('/admin/settings/doctor', { // Note: need index endpoint
+  fetch('/admin/settings', { // The route is /admin/settings for DoctorController@index
     headers: { 'Accept': 'application/json' }
   })
   .then(res => res.json())
