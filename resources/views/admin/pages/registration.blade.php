@@ -255,8 +255,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" style="text-align: center; padding: 30px; color: #666;">
-                                    <i class="fas fa-search" style="font-size: 24px; color: #ccc; margin-bottom: 10px; display: block;"></i>
+<td colspan="11" style="text-align: center; padding: 30px; color: #6B513E;">
+                                    <i class="fas fa-search" style="font-size: 24px; color: #A38C7A; margin-bottom: 10px; display: block;"></i>
                                     Data pendaftaran tidak ditemukan.
                                 </td>
                             </tr>
@@ -558,13 +558,13 @@
                                 }
                             </div>
                             <div>
-                                <div style="font-weight: 600; color: #2C1810; margin-bottom: 3px; font-size: 16px;">
+                                <div style="font-weight: 600; color: #582C0C; margin-bottom: 3px; font-size: 16px;">
                                     ${appointment.patient?.full_name || 'N/A'}
                                 </div>
-                                <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
+                                <div style="font-size: 12px; color: #6B513E; margin-bottom: 8px;">
                                     <strong>MR:</strong> ${appointment.patient?.medical_record_no || 'N/A'}
                                 </div>
-                                <div style="font-size: 12px; color: #666;">
+                                <div style="font-size: 12px; color: #6B513E;">
                                     <strong>Tanggal Lahir:</strong> ${appointment.patient?.date_of_birth ? new Date(appointment.patient.date_of_birth).toLocaleDateString('id-ID') : 'N/A'}
                                 </div>
                             </div>
@@ -573,14 +573,14 @@
                         {{-- Doctor & Poli Info --}}
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                             <div style="padding: 12px; background: #f9f7f4; border-radius: 6px;">
-                                <div style="font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 5px;">Tenaga Medis</div>
-                                <div style="font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 11px; color: #A38C7A; text-transform: uppercase; margin-bottom: 5px;">Tenaga Medis</div>
+                                <div style="font-weight: 600; color: #582C0C;">
                                     ${appointment.doctor?.full_name || 'N/A'}
                                 </div>
                             </div>
                             <div style="padding: 12px; background: #f9f7f4; border-radius: 6px;">
-                                <div style="font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 5px;">Poli</div>
-                                <div style="font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 11px; color: #A38C7A; text-transform: uppercase; margin-bottom: 5px;">Poli</div>
+                                <div style="font-weight: 600; color: #582C0C;">
                                     ${appointment.poli?.name || 'N/A'}
                                 </div>
                             </div>
@@ -589,14 +589,14 @@
                         {{-- Appointment Details --}}
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                             <div>
-                                <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Tanggal & Jam</div>
-                                <div style="font-size: 14px; font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Tanggal & Jam</div>
+                                <div style="font-size: 14px; font-weight: 600; color: #582C0C;">
                                     ${new Date(appointment.appointment_datetime).toLocaleDateString('id-ID')} ${new Date(appointment.appointment_datetime).toLocaleTimeString('id-ID')}
                                 </div>
                             </div>
                             <div>
-                                <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Status</div>
-                                <div style="font-size: 14px; font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Status</div>
+                                <div style="font-size: 14px; font-weight: 600; color: #582C0C;">
                                     ${appointment.status || 'N/A'}
                                 </div>
                             </div>
@@ -604,16 +604,16 @@
 
                         {{-- Complaint --}}
                         <div style="margin-bottom: 20px;">
-                            <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Keluhan</div>
-                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #2C1810; min-height: 50px;">
+                            <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Keluhan</div>
+                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #582C0C; min-height: 50px;">
                                 ${appointment.complaint || '(Tidak ada keluhan)'}
                             </div>
                         </div>
 
                         {{-- Procedure Plan --}}
                         <div style="margin-bottom: 20px;">
-                            <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Prosedur Rencana</div>
-                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #2C1810; min-height: 50px;">
+                            <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Prosedur Rencana</div>
+                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #582C0C; min-height: 50px;">
                                 ${appointment.procedure_plan || '(Tidak ada rencana)'}
                             </div>
                         </div>
@@ -623,7 +623,7 @@
                             <button onclick="toggleDetailEditMode('${appointment.id}')" style="flex: 1; padding: 12px; background: #C58F59; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button onclick="closeDetailModal()" style="flex: 1; padding: 12px; background: #E5D6C5; color: #2C1810; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            <button onclick="closeDetailModal()" style="flex: 1; padding: 12px; background: #E5D6C5; color: #582C0C; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                 Tutup
                             </button>
                         </div>
@@ -634,19 +634,19 @@
                         <form id="detailEditForm" data-appointment-id="${appointment.id}">
                             {{-- Complaint --}}
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 5px; text-transform: uppercase;">Keluhan</label>
+                                <label style="display: block; font-size: 12px; color: #A38C7A; margin-bottom: 5px; text-transform: uppercase;">Keluhan</label>
                                 <textarea name="complaint" style="width: 100%; padding: 10px; border: 1px solid #E5D6C5; border-radius: 6px; font-family: inherit; font-size: 14px;" rows="3">${appointment.complaint || ''}</textarea>
                             </div>
 
                             {{-- Procedure Plan --}}
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 5px; text-transform: uppercase;">Prosedur Rencana</label>
+                                <label style="display: block; font-size: 12px; color: #A38C7A; margin-bottom: 5px; text-transform: uppercase;">Prosedur Rencana</label>
                                 <textarea name="procedure_plan" style="width: 100%; padding: 10px; border: 1px solid #E5D6C5; border-radius: 6px; font-family: inherit; font-size: 14px;" rows="3">${appointment.procedure_plan || ''}</textarea>
                             </div>
 
                             {{-- Photo Section --}}
                             <div style="margin-bottom: 20px; padding: 15px; background: #f9f7f4; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 10px;">Foto Profil</div>
+                                <div style="font-size: 12px; color: #A38C7A; text-transform: uppercase; margin-bottom: 10px;">Foto Profil</div>
                                 <div style="display: flex; gap: 15px; align-items: flex-start;">
                                     <div id="editPhotoBox" style="width: 100px; height: 100px; border-radius: 50%; background: #E5D6C5; border: 2px solid #C58F59; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; position: relative; flex-shrink: 0;">
                                         ${patientPhoto ? 
@@ -671,7 +671,7 @@
 
                             {{-- Action Buttons --}}
                             <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #E5D6C5;">
-                                <button type="button" onclick="toggleDetailEditMode('${appointment.id}')" style="flex: 1; padding: 12px; background: #E5D6C5; color: #2C1810; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <button type="button" onclick="toggleDetailEditMode('${appointment.id}')" style="flex: 1; padding: 12px; background: #E5D6C5; color: #582C0C; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                     <i class="fas fa-times"></i> Batal
                                 </button>
                                 <button type="submit" style="flex: 1; padding: 12px; background: #2C8659; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
