@@ -279,18 +279,46 @@ function renderBarChart(chart) {
                          <small>dari Bulan lalu</small>`;
 }
 
-// ── Donut ─────────────────────────────────────────────────────────────────
+// Donut
+const DONUT_COLORS = ['#582C0C', '#C58F59', '#E5D6C5', '#9B7B62', '#6B513E', '#D4A574'];
+
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text == null ? '' : String(text);
+    return d.innerHTML;
+}
+
 function renderDonut(donut) {
-    document.querySelector('.donut-number').textContent = donut.total;
+    const total = Number(donut.total) || 0;
+    document.querySelector('.donut-number').textContent = total;
 
-    const typeMap = {};
-    donut.breakdown.forEach(b => typeMap[b.visit_type] = b.total);
+    const legend = document.querySelector('.dash-donut-legend');
+    const chartEl = document.querySelector('.dash-donut-chart');
+    const rows = Array.isArray(donut.breakdown) ? donut.breakdown : [];
 
-    const order = ['Rawat Jalan', 'Rawat Inap', 'Kunjungan Sehat', 'Apotek'];
-    document.querySelectorAll('.legend-item').forEach((el, i) => {
-        const strong = el.querySelector('strong');
-        if (strong) strong.textContent = typeMap[order[i]] ?? 0;
+    if (!rows.length || total === 0) {
+        legend.innerHTML = '<div class="legend-item"><span class="dot" style="background:#E5D6C5;"></span> <span>Belum ada kunjungan pada bulan ini</span> <strong>0</strong></div>';
+        chartEl.style.background = '#E5D6C5';
+        return;
+    }
+
+    legend.innerHTML = rows.map((b, i) => {
+        const n = Number(b.total) || 0;
+        const label = b.visit_type ?? b.name ?? 'Lainnya';
+        const color = DONUT_COLORS[i % DONUT_COLORS.length];
+        return `<div class="legend-item"><span class="dot" style="background:${color};"></span> ${escapeHtml(label)} <strong>${n}</strong></div>`;
+    }).join('');
+
+    let acc = 0;
+    const parts = rows.map((b, i) => {
+        const n = Number(b.total) || 0;
+        const pct = total > 0 ? (n / total) * 100 : 0;
+        const start = acc;
+        acc += pct;
+        const color = DONUT_COLORS[i % DONUT_COLORS.length];
+        return `${color} ${start}% ${acc}%`;
     });
+    chartEl.style.background = `conic-gradient(${parts.join(', ')})`;
 }
 
 // ── Stats Cards ───────────────────────────────────────────────────────────
