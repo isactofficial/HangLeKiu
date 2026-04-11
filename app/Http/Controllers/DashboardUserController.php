@@ -49,7 +49,7 @@ class DashboardUserController extends Controller
             $activeRegistrations = Appointment::where('patient_id', $patient->id)
                 ->whereIn('status', ['pending', 'confirmed', 'waiting', 'engaged'])
                 ->with(['doctor', 'poli', 'paymentMethod'])
-                ->orderBy('appointment_datetime')
+                ->latest('appointment_datetime')
                 ->paginate(7, ['*'], 'active_page');
 
             $recentAppointments = Appointment::where('patient_id', $patient->id)

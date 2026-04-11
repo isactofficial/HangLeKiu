@@ -32,6 +32,7 @@
                 <th>Nama</th>
                 <th>Jenis Perawatan</th>
                 <th>Harga</th>
+                <th>Deskripsi</th>
                 <th>Status</th>
                 <th>Aksi</th>
             </tr>
@@ -100,7 +101,8 @@
             .then(data => {
                 const select = document.getElementById('procedure-care-type');
                 select.innerHTML = '<option value="">-- Pilih Jenis Perawatan --</option>';
-                data.data.data.forEach(care => {
+                const careRows = data?.data?.data || data?.data || [];
+                careRows.forEach(care => {
                     const opt = document.createElement('option');
                     opt.value = care.id;
                     opt.textContent = care.name;
@@ -133,17 +135,21 @@
         tbody.innerHTML = '';
 
         if (!data.data || data.data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#9CA3AF">Data tidak ditemukan</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#B08968">Data tidak ditemukan</td></tr>';
             return;
         }
 
         data.data.forEach(item => {
             const tr = document.createElement('tr');
-            const careName = careTypeMap[item.care_type_id] || '-';
+            const name = item.name || item.procedure_name || '-';
+            const careName = item?.care_type?.name || careTypeMap[item.care_type_id] || '-';
+            const rawPrice = item.price ?? item.base_price ?? 0;
+            const description = (item.description || '-').toString();
             tr.innerHTML = `
-                <td><strong>${item.name || item.procedure_name}</strong></td>
-                <td style="color:#6B7280; font-size:13px">${careName}</td>
-                <td style="color:#2563EB; font-weight:600">${formatCurrency(item.price || 0)}</td>
+                <td><strong>${name}</strong></td>
+                <td style="color:#B08968; font-size:13px">${careName}</td>
+                <td style="color:#2563EB; font-weight:600">${formatCurrency(rawPrice)}</td>
+                <td style="color:#B08968; font-size:13px; max-width:260px; white-space:normal; word-break:break-word;">${description}</td>
                 <td>
                     <span class="mc-badge ${item.is_active ? 'mc-badge-active' : 'mc-badge-inactive'}">
                         ${item.is_active ? 'Aktif' : 'Tidak Aktif'}
@@ -215,7 +221,7 @@
                     document.getElementById('procedure-id').value = res.data.id;
                     document.getElementById('procedure-name').value = res.data.name || res.data.procedure_name;
                     document.getElementById('procedure-care-type').value = res.data.care_type_id || '';
-                    document.getElementById('procedure-price').value = res.data.price || 0;
+                    document.getElementById('procedure-price').value = res.data.price ?? res.data.base_price ?? 0;
                     document.getElementById('procedure-description').value = res.data.description || '';
                     document.getElementById('procedure-active').value = res.data.is_active ? "1" : "0";
                 });
@@ -243,8 +249,10 @@
 
         const data = {
             name: document.getElementById('procedure-name').value,
+            procedure_name: document.getElementById('procedure-name').value,
             care_type_id: careTypeSelect.value,
             price: parseFloat(document.getElementById('procedure-price').value) || 0,
+            base_price: parseFloat(document.getElementById('procedure-price').value) || 0,
             description: document.getElementById('procedure-description').value,
             is_active: document.getElementById('procedure-active').value === "1"
         };
