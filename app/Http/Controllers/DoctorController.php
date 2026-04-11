@@ -403,6 +403,7 @@ class DoctorController extends Controller
             'instagram_url'       => 'nullable|url|max:150',
             'linkedin_url'        => 'nullable|url|max:150',
             'carousel_order'      => 'nullable|integer',
+            'is_active'           => 'nullable|boolean',
         ]);
     }
 

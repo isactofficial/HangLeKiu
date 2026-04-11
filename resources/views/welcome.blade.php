@@ -952,14 +952,14 @@
                     const newDocIdx = ci(currentIndex + 4);
                     const doc = doctors[newDocIdx];
                     const img = slots[6].querySelector('img');
-                    img.src = getDoctorImageUrl(doc);
+                    img.src = getDoctorImageUrl(doc, true);
                     img.alt = doc ? (doc.full_name || '') : '';
                     applyPos(slots[6], positions[6], false);
                 } else {
                     const newDocIdx = ci(currentIndex - 4);
                     const doc = doctors[newDocIdx];
                     const img = slots[0].querySelector('img');
-                    img.src = getDoctorImageUrl(doc);
+                    img.src = getDoctorImageUrl(doc, true);
                     img.alt = doc ? (doc.full_name || '') : '';
                     applyPos(slots[0], positions[0], false);
                 }
@@ -981,7 +981,7 @@
                     const newCenterSlot = direction > 0 ? slots[4] : slots[2];
                     const newCenterDocIdx = ci(currentIndex + direction);
                     const img = newCenterSlot.querySelector('img');
-                    img.src = getDoctorImageUrl(doctors[newCenterDocIdx]);
+                    img.src = getDoctorImageUrl(doctors[newCenterDocIdx], false);
                     img.style.filter = '';
                 }, 200);
 

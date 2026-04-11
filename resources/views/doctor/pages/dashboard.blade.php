@@ -153,7 +153,7 @@
                                 <div class="relative w-28 h-28 shrink-0">
                                     <div class="w-full h-full rounded-full avatar-ring overflow-hidden bg-white flex items-center justify-center border-4 border-white shadow-md">
                                         @if($doctor && $doctor->foto_profil)
-                                            <img src="{{ $doctor->foto_profil }}" alt="{{ $doctor->full_name }}" class="w-full h-full object-cover">
+                                            <img src="{{ str_starts_with($doctor->foto_profil, 'http') ? $doctor->foto_profil : asset('storage/' . $doctor->foto_profil) }}" alt="{{ $doctor->full_name }}" class="w-full h-full object-cover">
                                         @else
                                             <span class="text-4xl font-bold text-slate-300">{{ substr($user->name, 0, 1) }}</span>
                                         @endif
@@ -403,7 +403,7 @@
                     <div class="flex flex-col items-center justify-center mb-4">
                         <div class="relative w-28 h-28 mb-3 group cursor-pointer" onclick="document.getElementById('photo_input').click()">
                             <div class="w-full h-full rounded-full border-4 border-[#F4E9DF] overflow-hidden bg-slate-100 flex items-center justify-center shadow-sm">
-                                <img id="photoPreview" src="{{ ($doctor && $doctor->foto_profil) ? $doctor->foto_profil : asset('images/user-placeholder.jpg') }}" class="w-full h-full object-cover">
+                                <img id="photoPreview" src="{{ ($doctor && $doctor->foto_profil) ? (str_starts_with($doctor->foto_profil, 'http') ? $doctor->foto_profil : asset('storage/' . $doctor->foto_profil)) : asset('images/user-placeholder.jpg') }}" class="w-full h-full object-cover">
                             </div>
                             <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
