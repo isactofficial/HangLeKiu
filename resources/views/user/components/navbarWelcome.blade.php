@@ -37,8 +37,14 @@
                 @php
                     $navbarUser = Auth::user();
                     $navbarPhoto = optional($navbarUser->patient)->photo ?: $navbarUser->avatar_url;
+                    $navbarRoleCode = strtoupper((string) optional($navbarUser->role)->code);
+                    $dashboardRoute = match ($navbarRoleCode) {
+                        'ADM' => route('admin.dashboard'),
+                        'DCT' => route('doctor.dashboard'),
+                        default => route('user.dashboard'),
+                    };
                 @endphp
-                <a href="{{ route('user.dashboard') }}" class="ml-2 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[#D9C3AE] bg-[#F4E9DF] text-[var(--font-color-primary)] hover:brightness-95 transition-all duration-200" title="Dashboard Pasien">
+                <a href="{{ $dashboardRoute }}" class="ml-2 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[#D9C3AE] bg-[#F4E9DF] text-[var(--font-color-primary)] hover:brightness-95 transition-all duration-200" title="Dashboard Akun">
                         @if(!empty($navbarPhoto))
                             <img src="{{ $navbarPhoto }}" alt="Foto Profil" class="w-full h-full object-cover">
                         @else
@@ -71,7 +77,15 @@
         <a href="{{ route('klinik') }}" class="px-6 py-4 text-[24px] font-medium border-b border-gray-50 text-[var(--font-color-secondary)]">Klinik</a>
         <a href="{{ route('artikel') }}" class="px-6 py-4 text-[24px] font-medium border-b border-gray-50 text-[var(--font-color-secondary)]">Artikel</a>
         @auth
-            <a href="{{ route('user.dashboard') }}" class="px-6 py-4 text-[24px] font-medium text-[var(--font-color-primary)] bg-gray-50">Dashboard Akun</a>
+            @php
+                $navbarMobileRoleCode = strtoupper((string) optional(Auth::user()->role)->code);
+                $navbarMobileDashboardRoute = match ($navbarMobileRoleCode) {
+                    'ADM' => route('admin.dashboard'),
+                    'DCT' => route('doctor.dashboard'),
+                    default => route('user.dashboard'),
+                };
+            @endphp
+            <a href="{{ $navbarMobileDashboardRoute }}" class="px-6 py-4 text-[24px] font-medium text-[var(--font-color-primary)] bg-gray-50">Dashboard Akun</a>
         @else
             <a href="{{ route('login') }}" class="px-6 py-4 text-[24px] font-medium text-white bg-primary text-center">Masuk</a>
         @endauth

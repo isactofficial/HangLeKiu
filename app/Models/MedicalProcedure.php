@@ -23,6 +23,7 @@ class MedicalProcedure extends Model
         'registration_id',
         'patient_id',
         'doctor_id',
+        'doctor_fee_percentage_snapshot',
         'discount_type',
         'discount_value',
         'total_amount',
@@ -30,6 +31,7 @@ class MedicalProcedure extends Model
     ];
 
     protected $casts = [
+        'doctor_fee_percentage_snapshot' => 'decimal:2',
         'discount_value' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'deleted_at' => 'datetime',

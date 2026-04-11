@@ -68,7 +68,8 @@
             body * {
                 visibility: hidden;
             }
-            .no-print {
+            .no-print,
+            .modal-overlay {
                 display: none !important;
             }
             #nota-cetak, #nota-cetak * {
@@ -114,7 +115,9 @@
                         <button class="cashier-btn btn-cokelat" style="padding: 8px 14px; font-size: 12px;" onclick="resetFilters()">Reset</button>
                     </div>
                     <button class="cashier-btn btn-cokelat" onclick="openModalManual()">+ Pembayaran Manual</button>
-                    <button class="cashier-btn cashier-btn-success">Export CSV</button>
+                    <button class="cashier-btn cashier-btn-success" id="btnExportCsv" onclick="exportCashierCsv()">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
                 </div>
 
                 {{-- Tabel Antrean Pembayaran --}}
@@ -528,22 +531,29 @@
         if (!activeData || !activeData.inv) return;
         const showDetail = document.getElementById('m-cb-detail')?.checked !== false;
         const metodeText = document.getElementById('m-metode')?.options[document.getElementById('m-metode')?.selectedIndex]?.text || 'Tunai';
-        // Jika showDetail=false, tampilkan array kosong agar item tidak muncul di nota
-        prepareAndPrint(
-            activeData.inv,
-            activeData.nama,
-            activeData.dokter,
-            showDetail ? activeData.tindakanArray : [],
-            showDetail ? activeData.pricesArray   : [],
-            showDetail ? activeData.qtyArray       : [],
-            showDetail ? activeData.diskonArray    : [],
-            showDetail ? activeData.subtotalArray  : [],
-            showDetail ? activeData.gigiArray      : [],
-            metodeText,
-            activeData.tglInput,
-            document.getElementById('m-notes')?.value || '-',
-            'unpaid', 0, 0, 0
-        );
+        const notesText = document.getElementById('m-notes')?.value || '-';
+
+        // Tutup modal dulu agar tidak mengganggu rendering print
+        closePayment();
+
+        // Beri waktu agar animasi close modal selesai, baru panggil print
+        setTimeout(() => {
+            prepareAndPrint(
+                activeData.inv,
+                activeData.nama,
+                activeData.dokter,
+                showDetail ? activeData.tindakanArray : [],
+                showDetail ? activeData.pricesArray   : [],
+                showDetail ? activeData.qtyArray       : [],
+                showDetail ? activeData.diskonArray    : [],
+                showDetail ? activeData.subtotalArray  : [],
+                showDetail ? activeData.gigiArray      : [],
+                metodeText,
+                activeData.tglInput,
+                notesText,
+                'unpaid', 0, 0, 0
+            );
+        }, 350);
     }
 
     async function prosesDone() {
@@ -554,7 +564,7 @@
         const amountPaid = parseFloat(inputBayarRaw) || 0;
         
         if (amountPaid <= 0) {
-            alert('Silakan masukkan nominal uang yang diterima terlebih dahulu.');
+            showWarningPopup('Silakan masukkan nominal uang yang diterima terlebih dahulu.');
             document.getElementById('m-input-bayar').focus();
             return;
         }
@@ -603,14 +613,37 @@
             const result = await response.json();
 
             if (result.success) {
-                // Sembunyikan modal
                 closePayment();
-                
-                // Tampilkan notifikasi sukses
-                alert("✓ Pembayaran Berhasil Disimpan!\nNomor Invoice: " + result.invoice_number);
 
-                // REFRESH HALAMAN AGAR BARIS TABEL BERUBAH STATUSNYA
-                window.location.reload(); 
+                showSuccessPopup("Pembayaran Berhasil Disimpan!<br>Nomor Invoice: <b>" + result.invoice_number + "</b>", function() {
+                    const showDetail = document.getElementById('m-cb-detail')?.checked !== false;
+                    
+                    // Auto-reload halaman SETELAH print dialog ditutup oleh user
+                    // Aman karena modal sudah ditutup (closePayment) dan CSS print 
+                    // sudah menambahkan .modal-overlay { display: none !important }
+                    window.onafterprint = function() {
+                        window.location.reload();
+                    };
+
+                    prepareAndPrint(
+                        result.invoice_number,
+                        activeData.nama,
+                        activeData.dokter,
+                        showDetail ? activeData.tindakanArray : [],
+                        showDetail ? activeData.pricesArray   : [],
+                        showDetail ? activeData.qtyArray       : [],
+                        showDetail ? activeData.diskonArray    : [],
+                        showDetail ? activeData.subtotalArray  : [],
+                        showDetail ? activeData.gigiArray      : [],
+                        paymentMethodName,
+                        activeData.tglInput,
+                        notes,
+                        statusKasir,
+                        amountPaid,
+                        changeAmount,
+                        debtAmount
+                    );
+                });
 
             } else {
                 alert("Gagal: " + result.message);
@@ -623,6 +656,115 @@
             btnSimpan.innerHTML = originalText;
             btnSimpan.disabled = false;
         }
+    }
+
+    function showSuccessPopup(message, callback) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay open';
+        overlay.style.zIndex = '10000';
+        
+        const container = document.createElement('div');
+        container.className = 'modal-container';
+        container.style.background = '#fff';
+        container.style.borderRadius = '10px';
+        container.style.padding = '30px 24px';
+        container.style.maxWidth = '360px';
+        container.style.textAlign = 'center';
+        container.style.boxShadow = '0 20px 60px rgba(0,0,0,0.25)';
+        
+        const icon = document.createElement('div');
+        icon.innerHTML = '<i class="fa fa-check-circle"></i>';
+        icon.style.fontSize = '50px';
+        icon.style.color = '#15803d'; // Green
+        icon.style.marginBottom = '16px';
+        
+        const text = document.createElement('p');
+        text.innerHTML = message;
+        text.style.fontSize = '14px';
+        text.style.color = '#374151';
+        text.style.marginBottom = '26px';
+        text.style.lineHeight = '1.5';
+        
+        const btn = document.createElement('button');
+        btn.innerHTML = '<i class="fa fa-print" style="margin-right:6px;"></i> Cetak Nota & Selesai';
+        btn.style.background = '#8B5E3C';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.padding = '10px 24px';
+        btn.style.borderRadius = '6px';
+        btn.style.fontSize = '13px';
+        btn.style.fontWeight = '700';
+        btn.style.cursor = 'pointer';
+        btn.style.width = '100%';
+        btn.style.transition = 'background 0.2s';
+        
+        btn.onmouseover = () => btn.style.background = '#7a5234';
+        btn.onmouseout = () => btn.style.background = '#8B5E3C';
+        
+        btn.onclick = () => {
+            document.body.removeChild(overlay);
+            if (callback) callback();
+        };
+        
+        container.appendChild(icon);
+        container.appendChild(text);
+        container.appendChild(btn);
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+    }
+
+    function showWarningPopup(message) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay open';
+        overlay.style.zIndex = '10000';
+        
+        const container = document.createElement('div');
+        container.className = 'modal-container';
+        container.style.background = '#fff';
+        container.style.borderRadius = '10px';
+        container.style.padding = '30px 24px';
+        container.style.maxWidth = '360px';
+        container.style.textAlign = 'center';
+        container.style.boxShadow = '0 20px 60px rgba(0,0,0,0.25)';
+        
+        const icon = document.createElement('div');
+        icon.innerHTML = '<i class="fa fa-exclamation-triangle"></i>';
+        icon.style.fontSize = '50px';
+        icon.style.color = '#C58F59';
+        icon.style.marginBottom = '16px';
+        
+        const text = document.createElement('p');
+        text.innerHTML = message;
+        text.style.fontSize = '14px';
+        text.style.color = '#374151';
+        text.style.marginBottom = '26px';
+        text.style.lineHeight = '1.5';
+        
+        const btn = document.createElement('button');
+        btn.innerHTML = 'Mengerti';
+        btn.style.background = '#8B5E3C';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.padding = '10px 24px';
+        btn.style.borderRadius = '6px';
+        btn.style.fontSize = '13px';
+        btn.style.fontWeight = '700';
+        btn.style.cursor = 'pointer';
+        btn.style.width = '100%';
+        btn.style.transition = 'background 0.2s';
+        
+        btn.onmouseover = () => btn.style.background = '#7a5234';
+        btn.onmouseout = () => btn.style.background = '#8B5E3C';
+        
+        btn.onclick = () => {
+            document.body.removeChild(overlay);
+        };
+        
+        container.appendChild(icon);
+        container.appendChild(text);
+        container.appendChild(btn);
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
     }
 
     // PARAMETER DITAMBAH: statusInv, amtPaid, amtChange, amtDebt
@@ -862,6 +1004,23 @@
         document.getElementById('filterFromDate').value = '';
         document.getElementById('filterToDate').value = '';
         applyCashierFilters();
+    }
+
+    // ──── EXPORT CSV ─────────────────────────────
+    function exportCashierCsv() {
+        const searchTerm = document.getElementById('cashierSearch').value;
+        const fromDate = document.getElementById('filterFromDate').value;
+        const toDate = document.getElementById('filterToDate').value;
+
+        // Gunakan parameter URL untuk GET Request ke endpoint export CSV
+        let url = '{{ route("admin.cashier.exportCsv") }}?';
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('q', searchTerm);
+        if (fromDate) params.append('from_date', fromDate);
+        if (toDate) params.append('to_date', toDate);
+
+        // Download by setting window.location
+        window.location.href = url + params.toString();
     }
 
     // INIT: Load semua rows on page load

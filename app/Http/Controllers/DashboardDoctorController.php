@@ -12,8 +12,10 @@ use App\Models\Doctor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardDoctorController extends Controller
 {
@@ -21,10 +23,15 @@ class DashboardDoctorController extends Controller
     {
         $user   = Auth::user();
         $doctor = $user->doctor;
+        $selectedMonth = (int) request()->input('month', Carbon::now()->month);
+        $selectedYear = (int) request()->input('year', Carbon::now()->year);
 
         $todayAppointments = collect();
         $totalPatientsTreated = 0;
         $nextPatient = null;
+        $doctorProcedureSummary = collect();
+        $doctorIncomeTotal = 0;
+        $totalProcedureActions = 0;
 
         if ($doctor) {
             // Antrian Hari Ini
@@ -42,10 +49,40 @@ class DashboardDoctorController extends Controller
                 ->orderBy('appointment_datetime')
                 ->first();
 
-            // Total Pasien Pernah Dilayani
+            // Total Pasien Dilayani Hari Ini
             $totalPatientsTreated = Appointment::where('doctor_id', $doctor->id)
+                ->whereDate('appointment_datetime', Carbon::today())
                 ->where('status', 'succeed')
                 ->count();
+
+            $netSubtotalExpression = 'COALESCE(pi.subtotal, (COALESCE(pi.unit_price, 0) * COALESCE(pi.quantity, 0)))';
+            $hasFeeSnapshotColumn = Schema::hasColumn('medical_procedure', 'doctor_fee_percentage_snapshot');
+            $doctorFeePercentageExpression = $hasFeeSnapshotColumn
+                ? 'COALESCE(mp.doctor_fee_percentage_snapshot, d.default_fee_percentage, 0)'
+                : 'COALESCE(d.default_fee_percentage, 0)';
+
+            $doctorProcedureSummary = DB::table('procedure_item as pi')
+                ->join('medical_procedure as mp', 'pi.procedure_id', '=', 'mp.id')
+                ->join('registration as ap', 'mp.registration_id', '=', 'ap.id')
+                ->leftJoin('doctor as d', 'mp.doctor_id', '=', 'd.id')
+                ->leftJoin('master_procedure as mpr', 'pi.master_procedure_id', '=', 'mpr.id')
+                ->where('mp.doctor_id', $doctor->id)
+                ->where('ap.status', 'succeed')
+                ->whereNull('ap.deleted_at')
+                ->whereNull('mp.deleted_at')
+                ->whereNull('pi.deleted_at')
+                ->whereMonth('mp.created_at', $selectedMonth)
+                ->whereYear('mp.created_at', $selectedYear)
+                ->selectRaw('COALESCE(mpr.procedure_name, "Prosedur Tanpa Nama") as procedure_name')
+                ->selectRaw('COUNT(pi.id) as total_actions')
+                ->selectRaw("SUM({$netSubtotalExpression}) as gross_total")
+                ->selectRaw("SUM(({$netSubtotalExpression}) * (({$doctorFeePercentageExpression}) / 100)) as doctor_income")
+                ->groupBy('mpr.procedure_name')
+                ->orderByDesc('doctor_income')
+                ->get();
+
+            $doctorIncomeTotal = (float) $doctorProcedureSummary->sum('doctor_income');
+            $totalProcedureActions = (int) $doctorProcedureSummary->sum('total_actions');
         }
 
         $guarantorTypes = MasterGuarantorType::all();
@@ -61,6 +98,11 @@ class DashboardDoctorController extends Controller
             'todayAppointments',
             'nextPatient',
             'totalPatientsTreated',
+            'doctorProcedureSummary',
+            'doctorIncomeTotal',
+            'totalProcedureActions',
+            'selectedMonth',
+            'selectedYear',
             'guarantorTypes',
             'paymentMethods',
             'visitTypes',

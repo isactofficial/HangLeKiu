@@ -255,8 +255,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" style="text-align: center; padding: 30px; color: #666;">
-                                    <i class="fas fa-search" style="font-size: 24px; color: #ccc; margin-bottom: 10px; display: block;"></i>
+<td colspan="11" style="text-align: center; padding: 30px; color: #6B513E;">
+                                    <i class="fas fa-search" style="font-size: 24px; color: #A38C7A; margin-bottom: 10px; display: block;"></i>
                                     Data pendaftaran tidak ditemukan.
                                 </td>
                             </tr>
@@ -472,7 +472,7 @@
             modal.id = 'appointmentDetailModal';
             modal.style.cssText = `
                 position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-                background: rgba(0,0,0,0.5); z-index: 9999; display: none; 
+                background: rgba(74,39,16,0.52); z-index: 9999; display: none; 
                 align-items: center; justify-content: center; overflow-y: auto;
             `;
             modal.onclick = function(e) {
@@ -532,7 +532,7 @@
         const currentMode = 'view'; // Default mode
 
         return `
-            <div style="background: white; border-radius: 12px; max-width: 700px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative;">
+            <div style="background: #fffaf5; border-radius: 12px; max-width: 700px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(88,44,12,0.26); position: relative; border: 1px solid #E5D6C5;">
                 
                 {{-- Header --}}
                 <div style="background: linear-gradient(135deg, #C58F59 0%, #A67C52 100%); padding: 25px; border-radius: 12px 12px 0 0; color: white; display: flex; justify-content: space-between; align-items: center;">
@@ -558,13 +558,13 @@
                                 }
                             </div>
                             <div>
-                                <div style="font-weight: 600; color: #2C1810; margin-bottom: 3px; font-size: 16px;">
+                                <div style="font-weight: 600; color: #582C0C; margin-bottom: 3px; font-size: 16px;">
                                     ${appointment.patient?.full_name || 'N/A'}
                                 </div>
-                                <div style="font-size: 12px; color: #666; margin-bottom: 8px;">
+                                <div style="font-size: 12px; color: #6B513E; margin-bottom: 8px;">
                                     <strong>MR:</strong> ${appointment.patient?.medical_record_no || 'N/A'}
                                 </div>
-                                <div style="font-size: 12px; color: #666;">
+                                <div style="font-size: 12px; color: #6B513E;">
                                     <strong>Tanggal Lahir:</strong> ${appointment.patient?.date_of_birth ? new Date(appointment.patient.date_of_birth).toLocaleDateString('id-ID') : 'N/A'}
                                 </div>
                             </div>
@@ -573,14 +573,14 @@
                         {{-- Doctor & Poli Info --}}
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                             <div style="padding: 12px; background: #f9f7f4; border-radius: 6px;">
-                                <div style="font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 5px;">Tenaga Medis</div>
-                                <div style="font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 11px; color: #A38C7A; text-transform: uppercase; margin-bottom: 5px;">Tenaga Medis</div>
+                                <div style="font-weight: 600; color: #582C0C;">
                                     ${appointment.doctor?.full_name || 'N/A'}
                                 </div>
                             </div>
                             <div style="padding: 12px; background: #f9f7f4; border-radius: 6px;">
-                                <div style="font-size: 11px; color: #999; text-transform: uppercase; margin-bottom: 5px;">Poli</div>
-                                <div style="font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 11px; color: #A38C7A; text-transform: uppercase; margin-bottom: 5px;">Poli</div>
+                                <div style="font-weight: 600; color: #582C0C;">
                                     ${appointment.poli?.name || 'N/A'}
                                 </div>
                             </div>
@@ -589,14 +589,14 @@
                         {{-- Appointment Details --}}
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                             <div>
-                                <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Tanggal & Jam</div>
-                                <div style="font-size: 14px; font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Tanggal & Jam</div>
+                                <div style="font-size: 14px; font-weight: 600; color: #582C0C;">
                                     ${new Date(appointment.appointment_datetime).toLocaleDateString('id-ID')} ${new Date(appointment.appointment_datetime).toLocaleTimeString('id-ID')}
                                 </div>
                             </div>
                             <div>
-                                <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Status</div>
-                                <div style="font-size: 14px; font-weight: 600; color: #2C1810;">
+                                <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Status</div>
+                                <div style="font-size: 14px; font-weight: 600; color: #582C0C;">
                                     ${appointment.status || 'N/A'}
                                 </div>
                             </div>
@@ -604,16 +604,16 @@
 
                         {{-- Complaint --}}
                         <div style="margin-bottom: 20px;">
-                            <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Keluhan</div>
-                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #2C1810; min-height: 50px;">
+                            <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Keluhan</div>
+                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #582C0C; min-height: 50px;">
                                 ${appointment.complaint || '(Tidak ada keluhan)'}
                             </div>
                         </div>
 
                         {{-- Procedure Plan --}}
                         <div style="margin-bottom: 20px;">
-                            <div style="font-size: 12px; color: #999; margin-bottom: 5px;">Prosedur Rencana</div>
-                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #2C1810; min-height: 50px;">
+                            <div style="font-size: 12px; color: #A38C7A; margin-bottom: 5px;">Prosedur Rencana</div>
+                            <div style="padding: 10px; background: #f9f7f4; border-radius: 6px; font-size: 14px; color: #582C0C; min-height: 50px;">
                                 ${appointment.procedure_plan || '(Tidak ada rencana)'}
                             </div>
                         </div>
@@ -623,7 +623,7 @@
                             <button onclick="toggleDetailEditMode('${appointment.id}')" style="flex: 1; padding: 12px; background: #C58F59; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button onclick="closeDetailModal()" style="flex: 1; padding: 12px; background: #E5D6C5; color: #2C1810; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            <button onclick="closeDetailModal()" style="flex: 1; padding: 12px; background: #E5D6C5; color: #582C0C; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                 Tutup
                             </button>
                         </div>
@@ -634,19 +634,19 @@
                         <form id="detailEditForm" data-appointment-id="${appointment.id}">
                             {{-- Complaint --}}
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 5px; text-transform: uppercase;">Keluhan</label>
+                                <label style="display: block; font-size: 12px; color: #A38C7A; margin-bottom: 5px; text-transform: uppercase;">Keluhan</label>
                                 <textarea name="complaint" style="width: 100%; padding: 10px; border: 1px solid #E5D6C5; border-radius: 6px; font-family: inherit; font-size: 14px;" rows="3">${appointment.complaint || ''}</textarea>
                             </div>
 
                             {{-- Procedure Plan --}}
                             <div style="margin-bottom: 20px;">
-                                <label style="display: block; font-size: 12px; color: #999; margin-bottom: 5px; text-transform: uppercase;">Prosedur Rencana</label>
+                                <label style="display: block; font-size: 12px; color: #A38C7A; margin-bottom: 5px; text-transform: uppercase;">Prosedur Rencana</label>
                                 <textarea name="procedure_plan" style="width: 100%; padding: 10px; border: 1px solid #E5D6C5; border-radius: 6px; font-family: inherit; font-size: 14px;" rows="3">${appointment.procedure_plan || ''}</textarea>
                             </div>
 
                             {{-- Photo Section --}}
                             <div style="margin-bottom: 20px; padding: 15px; background: #f9f7f4; border-radius: 8px;">
-                                <div style="font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 10px;">Foto Profil</div>
+                                <div style="font-size: 12px; color: #A38C7A; text-transform: uppercase; margin-bottom: 10px;">Foto Profil</div>
                                 <div style="display: flex; gap: 15px; align-items: flex-start;">
                                     <div id="editPhotoBox" style="width: 100px; height: 100px; border-radius: 50%; background: #E5D6C5; border: 2px solid #C58F59; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; position: relative; flex-shrink: 0;">
                                         ${patientPhoto ? 
@@ -671,10 +671,10 @@
 
                             {{-- Action Buttons --}}
                             <div style="display: flex; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #E5D6C5;">
-                                <button type="button" onclick="toggleDetailEditMode('${appointment.id}')" style="flex: 1; padding: 12px; background: #E5D6C5; color: #2C1810; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <button type="button" onclick="toggleDetailEditMode('${appointment.id}')" style="flex: 1; padding: 12px; background: #E5D6C5; color: #582C0C; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                     <i class="fas fa-times"></i> Batal
                                 </button>
-                                <button type="submit" style="flex: 1; padding: 12px; background: #2C8659; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                <button type="submit" style="flex: 1; padding: 12px; background: #A67C52; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
                                     <i class="fas fa-save"></i> Simpan
                                 </button>
                             </div>
@@ -762,7 +762,7 @@
             modal.id = 'detailCropperModal';
             modal.style.cssText = `
                 position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                background: rgba(0,0,0,0.7); z-index: 10000; display: flex;
+                background: rgba(74,39,16,0.62); z-index: 10000; display: flex;
                 align-items: center; justify-content: center;
             `;
             document.body.appendChild(modal);
@@ -772,14 +772,14 @@
         modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
         modal.innerHTML = `
-            <div style="background: white; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%;">
-                <h3 style="margin-top: 0;">Atur Foto Profil</h3>
-                <canvas id="detailCropperCanvas" style="border: 1px solid #E5D6C5; width: 100%; max-height: 400px; display: block; margin-bottom: 15px; background: #000;"></canvas>
+            <div style="background: #fffaf5; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(88, 44, 12, 0.24); border: 1px solid #E5D6C5;">
+                <h3 style="margin-top: 0; color: #582C0C;">Atur Foto Profil</h3>
+                <canvas id="detailCropperCanvas" style="border: 1px solid #E5D6C5; width: 100%; max-height: 400px; display: block; margin-bottom: 15px; background: #6b3f22;"></canvas>
                 <div style="display: flex; gap: 10px;">
                     <button type="button" onclick="document.getElementById('detailCropperModal').style.display='none';" style="flex: 1; padding: 10px; background: #E5D6C5; border: none; border-radius: 4px; cursor: pointer;">
                         Batal
                     </button>
-                    <button type="button" onclick="applyDetailCrop()" style="flex: 1; padding: 10px; background: #2C8659; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    <button type="button" onclick="applyDetailCrop()" style="flex: 1; padding: 10px; background: #A67C52; color: white; border: none; border-radius: 4px; cursor: pointer;">
                         Crop
                     </button>
                 </div>
@@ -824,8 +824,8 @@
         // Draw image
         ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
         
-        // Draw dark overlay
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        // Draw soft brown overlay
+        ctx.fillStyle = 'rgba(74, 39, 16, 0.45)';
         ctx.fillRect(0, 0, displayWidth, displayHeight);
         
         // Clear frame area (make it visible)

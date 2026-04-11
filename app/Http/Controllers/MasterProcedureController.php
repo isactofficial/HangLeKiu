@@ -32,8 +32,8 @@ class MasterProcedureController extends BaseMasterController
             $query->where('care_type_id', $request->care_type_id);
         }
 
-        // FIX: timestamps = false, tidak bisa pakai latest()
-        $data = $query->orderBy('name')->paginate(10);
+        // Gunakan fallback agar data lama (name null) tetap terurut rapi.
+        $data = $query->orderByRaw('COALESCE(name, procedure_name) asc')->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -55,20 +55,25 @@ class MasterProcedureController extends BaseMasterController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'         => 'required|string|max:100',
-            'care_type_id' => 'required|string|exists:master_care_type,id',
+            'name'         => 'nullable|string|max:100|required_without:procedure_name',
+            'procedure_name' => 'nullable|string|max:150|required_without:name',
+            'care_type_id' => 'nullable|string|exists:master_care_type,id',
             'price'        => 'nullable|numeric|min:0',
+            'base_price'   => 'nullable|numeric|min:0',
             'description'  => 'nullable|string|max:255',
             'is_active'    => 'nullable|boolean',
         ]);
 
+        $procedureName = trim((string) ($validated['name'] ?? $validated['procedure_name'] ?? ''));
+        $price = $validated['price'] ?? $validated['base_price'] ?? 0;
+
         $item = MasterProcedure::create([
             'id'             => (string) Str::uuid(),
-            'name'           => $validated['name'],
-            'procedure_name' => $validated['name'], // sync kedua kolom
-            'care_type_id'   => $validated['care_type_id'],
-            'price'          => $validated['price'] ?? 0,
-            'base_price'     => $validated['price'] ?? 0,
+            'name'           => $procedureName,
+            'procedure_name' => $procedureName,
+            'care_type_id'   => $validated['care_type_id'] ?? null,
+            'price'          => $price,
+            'base_price'     => $price,
             'description'    => $validated['description'] ?? '',
             'is_active'      => isset($validated['is_active']) ? (bool) $validated['is_active'] : true,
         ]);
@@ -85,19 +90,24 @@ class MasterProcedureController extends BaseMasterController
         $item = MasterProcedure::findOrFail($id);
 
         $validated = $request->validate([
-            'name'         => 'required|string|max:100',
-            'care_type_id' => 'required|string|exists:master_care_type,id',
+            'name'         => 'nullable|string|max:100|required_without:procedure_name',
+            'procedure_name' => 'nullable|string|max:150|required_without:name',
+            'care_type_id' => 'nullable|string|exists:master_care_type,id',
             'price'        => 'nullable|numeric|min:0',
+            'base_price'   => 'nullable|numeric|min:0',
             'description'  => 'nullable|string|max:255',
             'is_active'    => 'nullable|boolean',
         ]);
 
+        $procedureName = trim((string) ($validated['name'] ?? $validated['procedure_name'] ?? $item->name ?? $item->procedure_name ?? ''));
+        $price = $validated['price'] ?? $validated['base_price'] ?? $item->price ?? $item->base_price ?? 0;
+
         $item->update([
-            'name'           => $validated['name'],
-            'procedure_name' => $validated['name'], // sync kedua kolom
-            'care_type_id'   => $validated['care_type_id'],
-            'price'          => $validated['price'] ?? $item->price,
-            'base_price'     => $validated['price'] ?? $item->base_price,
+            'name'           => $procedureName,
+            'procedure_name' => $procedureName,
+            'care_type_id'   => $validated['care_type_id'] ?? $item->care_type_id,
+            'price'          => $price,
+            'base_price'     => $price,
             'description'    => $validated['description'] ?? $item->description,
             'is_active'      => isset($validated['is_active']) ? (bool) $validated['is_active'] : $item->is_active,
         ]);

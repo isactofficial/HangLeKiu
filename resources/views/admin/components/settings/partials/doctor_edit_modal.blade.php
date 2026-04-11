@@ -75,6 +75,13 @@
                                     <input id="edit_estimasi_konsultasi" name="estimasi_konsultasi" type="number" style="width:100%; border:none; border-bottom: 1px solid #C58F59; outline:none; padding:5px 0;">
                                 </div>
                                 <div class="ms-field">
+                                    <label style="color: #8A6B52; font-weight: 700; font-size: 11px; text-transform: uppercase;">Fee Dokter Default (%)</label>
+                                    <input id="edit_default_fee_percentage" name="default_fee_percentage" type="number" step="0.01" min="0" max="100" style="width:100%; border:none; border-bottom: 1px solid #C58F59; outline:none; padding:5px 0;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="ms-field">
                                     <label style="font-size: 11px; color: #8A6B52; font-weight: 700; margin-bottom: 5px; display: block; text-transform: uppercase;">TTD Digital</label>
                                     <div id="edit-box-ttd" style="width: 100%; height: 45px; border: 2px dashed #C58F59; border-radius: 8px; background: #fdfaf8; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
                                         <i class="fa fa-signature" id="edit-icon-ttd" style="color: #d2b48c; font-size: 18px;"></i>
@@ -156,6 +163,16 @@
 </div>
 
 <script>
+    function normalizeDateInput(value) {
+        if (!value) return '';
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+
+        return date.toISOString().slice(0, 10);
+    }
+
     function closeEditModal() {
         document.getElementById('ms-doctor-edit-modal').style.display = 'none';
         document.body.style.overflow = 'auto';
@@ -181,6 +198,7 @@
                     document.getElementById('edit_job_title').value = d.job_title || '';
                     document.getElementById('edit_specialization').value = d.specialization || '';
                     document.getElementById('edit_estimasi_konsultasi').value = d.estimasi_konsultasi;
+                    document.getElementById('edit_default_fee_percentage').value = d.default_fee_percentage ?? 0;
                     
                     // Legalitas
                     document.getElementById('edit_license_no').value = d.license_no || '';
@@ -188,8 +206,8 @@
                     document.getElementById('edit_sip_number').value = d.sip_number || '';
                     document.getElementById('edit_str_institution').value = d.str_institution || '';
                     document.getElementById('edit_sip_institution').value = d.sip_institution || '';
-                    document.getElementById('edit_str_expiry_date').value = d.str_expiry_date || '';
-                    document.getElementById('edit_sip_expiry_date').value = d.sip_expiry_date || '';
+                    document.getElementById('edit_str_expiry_date').value = normalizeDateInput(d.str_expiry_date);
+                    document.getElementById('edit_sip_expiry_date').value = normalizeDateInput(d.sip_expiry_date);
 
                     // Foto & TTD
                     if(d.foto_profil) setupEditPreview('edit-foto-profil-preview', 'edit-icon-foto', 'edit-box-foto', d.foto_profil);

@@ -20,8 +20,10 @@
             --secondary-color: #A98467;
             --bg-color: #F9F4EF;
             --card-bg: #FFFFFF;
-            --text-main: #333333;
-            --text-muted: #777777;
+            --text-main: #5B321B;
+            --text-muted: #B08968;
+            --label-dark-brown: #8B5E3C;
+            --value-soft-brown: #A98467;
             --border-color: #EBDCCF;
         }
 
@@ -127,7 +129,7 @@
         .form-group label {
             font-size: 0.85rem;
             font-weight: 700;
-            color: var(--text-main);
+            color: var(--label-dark-brown);
             margin-bottom: 0.6rem;
         }
 
@@ -147,9 +149,13 @@
             font-family: inherit;
             font-size: 0.95rem;
             font-weight: 500;
-            color: var(--text-main);
+            color: var(--value-soft-brown);
             transition: all 0.3s ease;
             box-sizing: border-box;
+        }
+
+        .form-group input::placeholder {
+            color: #C4A288;
         }
 
         .form-group input:focus, .form-group select:focus {

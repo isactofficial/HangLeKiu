@@ -2,7 +2,7 @@
     <div class="modal-container" style="background:#fff; border-radius:10px; width:100%; max-width:980px; max-height:92vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.25);">
 
         {{-- ===== HEADER ===== --}}
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid #e5d6c5;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid #e5d6c5; position:sticky; top:0; background:#fff; z-index:50; border-radius:10px 10px 0 0; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
             <h2 style="margin:0; font-size:16px; font-weight:800; color:#582C0C; letter-spacing:0.5px;">REVIEW &amp; PROSES PEMBAYARAN</h2>
             <button onclick="closePayment()" style="background:none; border:none; cursor:pointer; color:#9ca3af; font-size:18px; line-height:1; padding:4px;">
                 <i class="fa fa-times"></i>
