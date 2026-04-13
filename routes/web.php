@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/notifications/{appointment}/confirm', [AdminNotificationController::class, 'confirm'])->name('notifications.confirm');
             Route::post('/notifications/{appointment}/reschedule', [AdminNotificationController::class, 'reschedule'])->name('notifications.reschedule');
             Route::post('/notifications/mark-all-read', [AdminNotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+            Route::get('/notifications/count', [AdminNotificationController::class, 'count'])->name('notifications.count');
             // Route EMR Admin
             Route::get('/emr',          [EmrController::class, 'index'])->name('emr');
             Route::get('/emr/{id}',     [EmrController::class, 'show'])->name('emr.show');
