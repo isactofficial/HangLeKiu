@@ -80,6 +80,38 @@
     .diagnosa-item:hover { background:var(--brown-100); }
 
     .hidden { display:none !important; }
+
+    /* ── Modal Pop Up Detail Pasien ── */
+    .patient-detail-modal {
+        position: fixed; inset: 0; background: rgba(28, 22, 14, 0.45); backdrop-filter: blur(4px);
+        display: none; align-items: center; justify-content: center; padding: 20px; z-index: 2147483001;
+    }
+    .patient-detail-modal-card {
+        width: min(100%, 760px); max-height: calc(100vh - 40px); overflow: hidden; display: flex; flex-direction: column;
+        border-radius: 14px; background: #fff; border: 1px solid var(--brown-200); box-shadow: 0 20px 48px rgba(59, 51, 30, 0.28);
+    }
+    .patient-detail-modal-head {
+        display: flex; align-items: center; justify-content: center; padding: 14px 16px; border-bottom: 1px solid var(--brown-200);
+        background: linear-gradient(180deg, #fdf7f1 0%, #ffffff 100%); position: relative;
+    }
+    .patient-detail-modal-title { margin: 0; font-size: 15px; color: var(--brown-800); font-weight: 800; }
+    .patient-detail-modal-close {
+        position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+        color: var(--brown-700); font-size: 20px; text-decoration: none; font-weight: 700;
+    }
+    .patient-detail-modal-body { padding: 20px; overflow-y: auto; }
+    .patient-detail-photo-wrap {
+        display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--brown-200);
+    }
+    .patient-detail-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 1px solid var(--brown-200); background: var(--brown-50); }
+    .patient-detail-photo-name { font-size: 16px; font-weight: 800; color: var(--brown-800); }
+    .patient-detail-photo-rm { font-size: 12px; font-weight: 700; color: var(--brown-500); margin-top: 4px; }
+    .pd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .pd-item { border: 1px solid var(--brown-200); border-radius: 10px; padding: 12px; background: var(--brown-50); }
+    .pd-item.full { grid-column: 1 / -1; }
+    .pd-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--brown-500); margin-bottom: 6px; }
+    .pd-value { font-size: 13px; color: var(--brown-800); font-weight: 600; line-height: 1.4; }
+    @media (max-width: 768px) { .pd-grid { grid-template-columns: 1fr; } }
 </style>
 
 @php
@@ -150,6 +182,9 @@
                          id="patientAddressValue"
                          data-sensitive-original="{{ e($patient->address ?? '-') }}"
                          data-sensitive-visible="1">{{ e($patient->address ?? '-') }}</div>
+                    <div class="info-link" style="text-align: left; margin-top: 8px;">
+                        <a href="javascript:void(0)" onclick="document.getElementById('patientDetailModal').style.display='flex'">Lihat detail lainnya &gt;</a>
+                    </div>
                 </div>
                 <div class="info-group">
                     <label>
@@ -459,6 +494,48 @@
                 @empty
                     <div id="doctor-note-empty" class="record-empty-state">Belum ada catatan dokter.</div>
                 @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="patientDetailModal" class="patient-detail-modal">
+    <div class="patient-detail-modal-card">
+        <div class="patient-detail-modal-head">
+            <h3 class="patient-detail-modal-title">Detail Lengkap Pasien</h3>
+            <a href="javascript:void(0)" class="patient-detail-modal-close" title="Tutup" onclick="document.getElementById('patientDetailModal').style.display='none'">✕</a>
+        </div>
+        <div class="patient-detail-modal-body">
+            <div class="patient-detail-photo-wrap">
+                <img src="{{ $patientPhotoSrc }}" alt="Foto pasien" class="patient-detail-photo">
+                <div>
+                    <div class="patient-detail-photo-name">{{ $patient->full_name ?? '-' }}</div>
+                    <div class="patient-detail-photo-rm">RM: {{ $patient->medical_record_no ?? '-' }}</div>
+                </div>
+            </div>
+
+            <div class="pd-grid">
+                <div class="pd-item"><div class="pd-label">ID Pasien</div><div class="pd-value">{{ $patient->id ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Email</div><div class="pd-value">{{ $patient->email ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Tanggal Lahir</div><div class="pd-value">{{ $patientDobText }} ({{ $patientAgeText }})</div></div>
+                <div class="pd-item"><div class="pd-label">Jenis Kelamin</div><div class="pd-value">{{ $patientGenderLabel }}</div></div>
+                <div class="pd-item"><div class="pd-label">Golongan Darah</div><div class="pd-value">{{ $patient->blood_type ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Rhesus</div><div class="pd-value">{{ $patient->rhesus ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Nomor HP</div><div class="pd-value">{{ $patient->phone_number ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Nomor KTP</div><div class="pd-value">{{ $patient->id_card_number ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Kota</div><div class="pd-value">{{ $patient->city ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Agama</div><div class="pd-value">{{ $patient->religion ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Pendidikan</div><div class="pd-value">{{ $patient->education ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Pekerjaan</div><div class="pd-value">{{ $patient->occupation ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Status Perkawinan</div><div class="pd-value">{{ $patient->marital_status ?? '-' }}</div></div>
+                <div class="pd-item"><div class="pd-label">Tgl. Chat Pertama</div><div class="pd-value">{{ $patient->first_chat_date ? \Carbon\Carbon::parse($patient->first_chat_date)->translatedFormat('d F Y') : '-' }}</div></div>
+                
+                <div class="pd-item full"><div class="pd-label">Alamat Lengkap</div><div class="pd-value">{{ $patient->address ?? '-' }}</div></div>
+                <div class="pd-item full"><div class="pd-label">Riwayat Alergi</div><div class="pd-value" style="color: #d97706;">{{ $patient->allergy_history ?: 'Tidak ada riwayat alergi' }}</div></div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <a href="javascript:void(0)" onclick="document.getElementById('patientDetailModal').style.display='none'" style="background: var(--brown-800); color: #fff; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 13px; text-decoration: none;">Tutup</a>
             </div>
         </div>
     </div>

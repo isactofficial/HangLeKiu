@@ -57,10 +57,6 @@
         z-index: 2147483001;
     }
 
-    .patient-detail-modal:target {
-        display: flex;
-    }
-
     .patient-detail-modal-card {
         width: min(100%, 760px);
         max-height: calc(100vh - 40px);
@@ -613,7 +609,7 @@
                          data-sensitive-original="{{ e($patient->address ?? '-') }}"
                          data-sensitive-visible="1">{{ e($patient->address ?? '-') }}</div>
                     <div class="info-link" style="text-align: left; margin-top: 8px;">
-                        <a href="#patientDetailModal">Lihat data lainnya &gt;</a>
+                        <a href="javascript:void(0)" onclick="document.getElementById('patientDetailModal').style.display='flex'">Lihat data lainnya &gt;</a>
                     </div>
                 </div>
                 <div class="info-group">
@@ -1013,7 +1009,7 @@
     <div class="patient-detail-modal-card">
         <div class="patient-detail-modal-head">
             <h3 class="patient-detail-modal-title">Detail Data Pasien</h3>
-            <a href="#" class="patient-detail-modal-close">✕</a>
+            <a href="javascript:void(0)" class="patient-detail-modal-close" onclick="document.getElementById('patientDetailModal').style.display='none'">✕</a>
         </div>
         <div class="patient-detail-modal-body">
             <input type="hidden" id="patientDetailPatientId" value="{{ $patient->id ?? '' }}">
@@ -1163,7 +1159,7 @@
             </div>
 
             <div class="patient-detail-actions">
-                <a href="#" class="patient-detail-btn secondary">Tutup</a>
+                <a href="javascript:void(0)" class="patient-detail-btn secondary" onclick="document.getElementById('patientDetailModal').style.display='none'">Tutup</a>
                 <button type="button" id="patientDetailEditBtn" class="patient-detail-btn primary" onclick="togglePatientDetailEdit(true)">Edit Data</button>
                 <button type="button" id="patientDetailCancelBtn" class="patient-detail-btn secondary hidden" onclick="togglePatientDetailEdit(false)">Batal</button>
                 <button type="button" id="patientDetailSaveBtn" class="patient-detail-btn success hidden" onclick="savePatientDetailFromModal()">Simpan</button>
