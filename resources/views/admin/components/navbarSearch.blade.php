@@ -71,12 +71,25 @@
         </button>
 
         {{-- Notifications --}}
-        <button class="navbar-icon-btn" title="Notifikasi" onclick="alert('Notifikasi akan segera hadir!')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/>
-                <path d="M9 17v1a3 3 0 0 0 6 0v-1"/>
-            </svg>
-        </button>
+        @php
+        $pendingCount = \App\Models\Appointment::where('status','pending')
+        ->whereNull('admin_id')
+        ->whereHas('patient')
+        ->count();
+        @endphp
+        <a href="{{ route('admin.notifications') }}" style="position:relative; display:inline-flex;">
+            <button class="navbar-icon-btn" title="Notifikasi">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/>
+                    <path d="M9 17v1a3 3 0 0 0 6 0v-1"/>
+                 </svg>
+                    @if($pendingCount > 0)
+                        <span style="position:absolute; top:-4px; right:-4px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:16px; height:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; padding:0 4px; line-height:1;">
+                            {{ $pendingCount > 99 ? '99+' : $pendingCount }}
+                        </span>
+                    @endif
+            </button>
+        </a>
 
         {{-- Profile --}}
         <button class="navbar-icon-btn" title="Profil" onclick="toggleDropdown('profileMenu')">
@@ -103,6 +116,38 @@
     </div>
 </header>
 <script>
+    (function() {
+    // Cek setiap 30 detik
+    const INTERVAL = 30000;
+
+    async function checkNotifCount() {
+        try {
+            const res  = await fetch('/admin/notifications/count', {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            const count = data.count || 0;
+
+            // Update semua badge notif yang ada di halaman
+            document.querySelectorAll('.notif-badge-count').forEach(el => {
+                if (count > 0) {
+                    el.textContent = count > 99 ? '99+' : count;
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        } catch (err) {
+            console.warn('Notif check failed:', err);
+        }
+    }
+
+    // Cek pertama saat load
+    checkNotifCount();
+
+    // Cek terus tiap 30 detik
+    setInterval(checkNotifCount, INTERVAL);
+})();
     function toggleDropdown(menuId) {
         const menu = document.getElementById(menuId);
         const allMenus = document.querySelectorAll('.navbar-dropdown-menu');

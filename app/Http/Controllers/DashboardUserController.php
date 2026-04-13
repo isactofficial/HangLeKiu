@@ -113,6 +113,24 @@ class DashboardUserController extends Controller
                 ->with(['teeth', 'patient'])
                 ->latest('examined_at')
                 ->paginate(7, ['*'], 'odontogram_page');
+
+            $odontogramData = $odontogramRows->getCollection()->map(function($rec) {
+                return [
+                    'id'          => $rec->id,
+                    'date'        => optional($rec->examined_at)->format('d M Y') ?? '-',
+                    'examined_by' => $rec->examined_by ?? '-',
+                    'notes'       => $rec->notes ?? '-',
+                    'teeth'       => $rec->teeth->sortBy('tooth_number')->map(function($t) {
+                        return [
+                            'tooth_number'    => $t->tooth_number,
+                            'condition_label' => $t->condition_label ?? '-',
+                            'surfaces'        => $t->surfaces ?? '-',
+                            'condition_code'  => $t->condition_code ?? '-',
+                        ];
+                    })->values(),
+                ];
+            })->toArray();
+
         }
 
         return view('user.pages.dashboard', compact(
@@ -125,6 +143,7 @@ class DashboardUserController extends Controller
             'medicalHistoryRows',
             'doctorNotesRows',
             'odontogramRows',
+            'odontogramData',
             'doctors',
             'treatments'
         ));

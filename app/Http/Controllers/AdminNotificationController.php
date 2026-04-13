@@ -26,10 +26,13 @@ class AdminNotificationController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        // 30 hari ke depan — tidak hilang walau ganti hari
+        // whereHas('patient') — fix bug null patient
         $sistemNotifs = Appointment::with(['patient','doctor','poli','paymentMethod','admin'])
             ->whereNotNull('admin_id')
             ->whereHas('patient')
-            ->whereDate('created_at', today())
+            ->where('appointment_datetime', '>=', now()->startOfDay())
+            ->where('appointment_datetime', '<=', now()->addDays(30))
             ->orderByDesc('created_at')
             ->get();
 
@@ -69,12 +72,12 @@ class AdminNotificationController extends Controller
 
         $appointment->update([
             'appointment_datetime' => $request->appointment_datetime,
-            'admin_id' => auth()->id(),
+            'admin_id'             => auth()->id(),
         ]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Jadwal berhasil diubah.',
+            'success'      => true,
+            'message'      => 'Jadwal berhasil diubah.',
             'new_datetime' => $appointment->appointment_datetime,
         ]);
     }
@@ -82,5 +85,15 @@ class AdminNotificationController extends Controller
     public function markAllRead()
     {
         return response()->json(['success' => true]);
+    }
+
+    // NotificationController.php — tambah method
+    public function count()
+    {
+        $count = Appointment::where('status', 'pending')
+            ->whereNull('admin_id')
+            ->whereHas('patient')
+            ->count();
+        return response()->json(['count' => $count]);
     }
 }

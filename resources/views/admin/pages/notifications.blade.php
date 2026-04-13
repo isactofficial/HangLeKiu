@@ -514,6 +514,47 @@ let currentAptId    = null;
 let currentAptData  = null;
 let rescheduleAptId = null;
 
+// ============================================================
+// POLLING — cek notif baru setiap 30 detik
+// ============================================================
+(function() {
+    const INTERVAL = 30000;
+
+    async function checkNotifCount() {
+        try {
+            const res  = await fetch('/admin/notifications/count', {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            const count = data.count || 0;
+
+            // Update badge di tab
+            ['badge-semua', 'badge-janji'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (count > 0) el.textContent = count;
+                else el.remove();
+            });
+
+            // Update badge di navbar (semua navbar)
+            document.querySelectorAll('.notif-badge-count').forEach(el => {
+                if (count > 0) {
+                    el.textContent = count > 99 ? '99+' : count;
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+
+        } catch (err) {
+            console.warn('Notif polling failed:', err);
+        }
+    }
+
+    checkNotifCount();
+    setInterval(checkNotifCount, INTERVAL);
+})();
+
 function openPanel(aptId, cardEl) {
     currentAptId   = aptId;
     const d        = cardEl.dataset;
