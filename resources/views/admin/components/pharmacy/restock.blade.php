@@ -541,8 +541,13 @@ document.addEventListener('DOMContentLoaded', function () {
             // POST data baru
             let url, body;
             if (kategori === 'obat') {
-                url  = `/api/medicine/${itemId}/stock-${jenis === 'restock' ? 'in' : 'out'}`;
-                body = { qty: jumlah, unit_price: harga, note: notes };
+                if (jenis === 'restock') {
+                    url  = `/api/medicine/${itemId}/stock-in`;
+                    body = { qty: jumlah, unit_price: harga, note: notes };
+                } else {
+                    url  = `/api/medicine/${itemId}/stock-out`;
+                    body = { qty: jumlah, note: `RETURN: ${notes}` }; 
+                }
             } else {
                 url  = '/api/bhp/restock';
                 body = {

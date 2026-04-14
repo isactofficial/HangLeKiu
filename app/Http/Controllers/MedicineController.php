@@ -280,31 +280,39 @@ class MedicineController extends Controller
     }
 
     public function allStockMutations()
-    {
-        $mutations = \App\Models\StockMutation::with('medicine')
+{
+    $mutations = \App\Models\StockMutation::with('medicine')
+        ->where('type', 'in')
+        ->where(function ($q) {
+            $q->whereNull('notes')
+              ->orWhere(function ($q2) {
+                  $q2->where('notes', 'not like', 'PROCEDURE:%')
+                     ->where('notes', 'not like', 'RESEP:%')
+                     ->where('notes', 'not like', 'RETURN:%');
+              });
+        })
         ->orderByDesc('created_at')
         ->get()
         ->map(function ($m) {
-            $harga = $m->unit_price ?? $m->medicine->purchase_price ?? 0;
             return [
                 'id'                => $m->id,
-                'restock_type'      => $m->type === 'in' ? 'restock' : 'return',
+                'restock_type'      => 'restock',
                 'created_at'        => $m->created_at,
                 'purchase_price'    => $m->unit_price ?? 0,
-                'quantity_added'    => $m->type === 'in'  ? $m->quantity : 0,
-                'quantity_returned' => $m->type === 'out' ? $m->quantity : 0,
+                'quantity_added'    => $m->quantity,
+                'quantity_returned' => 0,
                 'notes'             => $m->notes,
                 'batch_number'      => null,
                 '_source'           => 'obat',
-                'medicine_id'       => $m->medicine_id, 
+                'medicine_id'       => $m->medicine_id,
                 'item'              => [
                     'item_name' => $m->medicine->medicine_name ?? '-',
                 ],
             ];
         });
-    
-        return response()->json(['data' => $mutations]);
-        }
+
+    return response()->json(['data' => $mutations]);
+    }
 
     // ── PRIVATE HELPER ───────────────────────────────────────
     private function hitungMargin(Medicine $medicine): float|null
