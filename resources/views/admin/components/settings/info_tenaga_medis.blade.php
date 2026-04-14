@@ -257,9 +257,15 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Estimasi Konsultasi (Menit)</label>
-                            <input class="form-input" name="estimasi_konsultasi" type="number" value="15">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Estimasi Konsultasi (Menit)</label>
+                                <input class="form-input" name="estimasi_konsultasi" type="number" value="15">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fee Pasien / Tindakan (%)</label>
+                                <input class="form-input" name="default_fee_percentage" type="number" step="0.01" value="0">
+                            </div>
                         </div>
                     </div>
 
@@ -531,6 +537,7 @@ function openEdit(id) {
           f.is_active.value = doc.is_active ? "1" : "0";
           f.show_in_carousel.value = doc.show_in_carousel ? "1" : "0";
           f.estimasi_konsultasi.value = doc.estimasi_konsultasi || '15';
+          f.default_fee_percentage.value = doc.default_fee_percentage || '0';
           f.str_number.value = doc.str_number || '';
           f.str_institution.value = doc.str_institution || '';
           if(doc.str_expiry_date) f.str_expiry_date.value = doc.str_expiry_date.split(' ')[0];
