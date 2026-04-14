@@ -138,12 +138,12 @@
                     {{-- Informasi Dokter (Profil) --}}
                     <div class="dash-card bg-white rounded-3xl overflow-hidden relative mb-10">
                         <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#F4E9DF] to-transparent opacity-40 rounded-bl-full pointer-events-none"></div>
-                        <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
-                            <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
+                        <div class="px-6 sm:px-8 lg:px-10 py-5 sm:py-6 border-b border-[#EFE3D7]/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+                            <h2 class="text-lg sm:text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
                                 <i class="fas fa-user-md text-[var(--color-primary)]"></i>
                                 <span class="truncate">Profil Profesional Dokter</span>
                             </h2>
-                            <button id="openEditProfileModal" type="button" class="shrink-0 px-4 py-2 rounded-lg bg-[var(--font-color-primary)] hover:bg-[var(--color-primary)] text-white font-medium transition text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                            <button id="openEditProfileModal" type="button" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[var(--font-color-primary)] hover:bg-[var(--color-primary)] text-white font-bold transition text-xs shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
                                 <i class="fas fa-edit"></i>
                                 Edit Profil
                             </button>
@@ -232,17 +232,17 @@
                     </div>
 
                     {{-- Registration Actions --}}
-                    <div class="dash-card bg-white p-8 rounded-3xl flex items-center justify-between gap-6 mb-10 border-l-8 border-l-[var(--color-primary)]">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-[var(--color-primary)]">
+                    <div class="dash-card bg-white p-6 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6 mb-10 border-l-8 border-l-[var(--color-primary)]">
+                        <div class="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-[var(--color-primary)] shrink-0">
                                 <i class="fas fa-calendar-plus text-3xl"></i>
                             </div>
                             <div>
-                                <h3 class="text-2xl font-bold text-[var(--font-color-primary)]">Kunjungan Pasien</h3>
-                                <p class="text-[var(--font-color-secondary)] font-medium text-sm">Lakukan pendaftaran baru untuk kunjungan hari ini</p>
+                                <h3 class="text-xl sm:text-2xl font-bold text-[var(--font-color-primary)]">Kunjungan Pasien</h3>
+                                <p class="text-[var(--font-color-secondary)] font-medium text-xs sm:text-sm">Lakukan pendaftaran baru kunjungan hari ini</p>
                             </div>
                         </div>
-                        <button onclick="openRegModal('modalPendaftaranBaru')" class="px-10 py-4 bg-[var(--color-primary)] text-white rounded-2xl font-bold hover:brightness-110 transition-all shadow-xl active:scale-95 flex items-center gap-2">
+                        <button onclick="openRegModal('modalPendaftaranBaru')" class="w-full sm:w-auto px-10 py-4 bg-[var(--color-primary)] text-white rounded-2xl font-bold hover:brightness-110 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2">
                             <i class="fas fa-user-plus"></i>
                             Pendaftaran Baru
                         </button>
@@ -250,15 +250,42 @@
 
                     {{-- Today's Schedule Table --}}
                     <div class="dash-card bg-white rounded-3xl overflow-hidden relative">
-                        <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
-                            <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
-                                <svg class="w-6 h-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <span class="truncate">Jadwal Praktik Hari Ini</span>
+                        <div class="px-6 sm:px-8 lg:px-10 py-5 sm:py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
+                            <h2 class="text-lg sm:text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
+                                <i class="fas fa-clipboard-list text-[var(--color-primary)]"></i>
+                                <span class="truncate">Antrean Pasien Hari Ini</span>
                             </h2>
-                            <span class="text-xs font-bold text-[var(--font-color-secondary)] uppercase bg-slate-50 px-3 py-1 rounded-full">{{ \Carbon\Carbon::today()->format('d M Y') }}</span>
+                            <span class="text-[10px] sm:text-xs font-bold text-[var(--font-color-secondary)] uppercase bg-slate-50 px-3 py-1 rounded-full whitespace-nowrap">{{ \Carbon\Carbon::today()->format('d M Y') }}</span>
                         </div>
-                        <div class="p-8 lg:p-10">
-                            <div class="overflow-x-auto rounded-2xl border border-[#EBDCCF] shadow-sm">
+                        <div class="p-6 sm:p-8 lg:p-10">
+                            {{-- Mobile Card List (Hidden on sm+) --}}
+                            <div class="block sm:hidden space-y-4">
+                                @forelse($todayAppointments as $apt)
+                                <div class="p-4 rounded-2xl border border-[#EBDCCF] bg-[#FEFCFA]/30 space-y-3">
+                                    <div class="flex justify-between items-start">
+                                        <div class="text-lg font-black text-[var(--font-color-primary)]">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</div>
+                                        <span class="inline-flex px-2 py-0.5 rounded-lg text-[10px] font-black uppercase {{ $statusClasses[$apt->status] ?? 'bg-slate-100' }}">
+                                            {{ $statusLabels[$apt->status] ?? $apt->status }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-[var(--font-color-primary)]">{{ $apt->patient->full_name }}</div>
+                                        <div class="text-[10px] text-[var(--font-color-secondary)] uppercase tracking-widest font-bold">{{ $apt->patient->medical_record_no ?? '-' }} • {{ $apt->patient->gender === 'Male' ? 'Laki-laki' : 'Perempuan' }}</div>
+                                    </div>
+                                    <div class="pt-2 border-t border-[#EFE3D7] flex items-center gap-2 text-xs font-medium text-[var(--font-color-secondary)]">
+                                        <i class="fas fa-tag"></i> {{ $apt->poli->name ?? 'Gigi Umum' }}
+                                    </div>
+                                </div>
+                                @empty
+                                <div class="py-10 text-center text-slate-400">
+                                    <i class="fas fa-calendar-day text-3xl opacity-20 mb-2"></i>
+                                    <p class="text-sm">Belum ada antrean hari ini.</p>
+                                </div>
+                                @endforelse
+                            </div>
+
+                            {{-- Desktop Table (Hidden on smaller screens) --}}
+                            <div class="hidden sm:block overflow-x-auto rounded-2xl border border-[#EBDCCF] shadow-sm">
                                 <table class="min-w-full text-sm text-left">
                                     <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold">
                                         <tr>
@@ -275,7 +302,7 @@
                                             <td class="px-6 py-4 font-bold">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</td>
                                             <td class="px-6 py-4">
                                                 <div class="font-bold">{{ $apt->patient->full_name }}</div>
-                                                <div class="text-[10px] text-[var(--font-color-secondary)] uppercase tracking-tight">{{ $apt->patient->gender === 'Male' ? 'Laki-laki' : 'Perempuan' }}</div>
+                                                <div class="text-[10px] text-[var(--font-color-secondary)] uppercase tracking-tight font-bold">{{ $apt->patient->gender === 'Male' ? 'Laki-laki' : 'Perempuan' }}</div>
                                             </td>
                                             <td class="px-6 py-4 text-center font-medium">{{ $apt->patient->medical_record_no ?? '-' }}</td>
                                             <td class="px-6 py-4">
@@ -294,8 +321,8 @@
                                                     $statusLabels = [
                                                         'pending'   => 'Menunggu',
                                                         'confirmed' => 'Dikonfirmasi',
-                                                        'waiting'   => 'Menunggu Antrean',
-                                                        'engaged'   => 'Sedang Dilayani',
+                                                        'waiting'   => 'Antrean',
+                                                        'engaged'   => 'Dilayani',
                                                         'succeed'   => 'Selesai',
                                                         'failed'    => 'Batal',
                                                     ];
@@ -308,8 +335,8 @@
                                         @empty
                                         <tr>
                                             <td colspan="5" class="px-6 py-12 text-center text-slate-400">
-                                                <svg class="w-12 h-12 mx-auto mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                                Belum ada jadwal pendaftaran untuk hari ini.
+                                                <i class="fas fa-calendar-day text-3xl opacity-20 mb-3"></i>
+                                                Belum ada jadwal pendaftaran hari ini.
                                             </td>
                                         </tr>
                                         @endforelse
@@ -413,26 +440,29 @@
                                 <i class="fas fa-chart-line text-[var(--color-primary)]"></i>
                                 Statistik Pendapatan Dokter
                             </h3>
-                            <form method="GET" action="{{ route('doctor.dashboard') }}" class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label for="month" class="field-label">Bulan</label>
-                                    <select id="month" name="month" class="field-input px-3 py-2.5">
-                                        @for($month = 1; $month <= 12; $month++)
-                                            <option value="{{ $month }}" {{ $selectedMonth === $month ? 'selected' : '' }}>
-                                                {{ \Carbon\Carbon::createFromDate($selectedYear, $month, 1)->translatedFormat('F') }}
-                                            </option>
-                                        @endfor
-                                    </select>
+                             <form method="GET" action="{{ route('doctor.dashboard') }}" class="flex flex-col gap-4 mt-2">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label for="month" class="field-label px-1">Bulan</label>
+                                        <select id="month" name="month" class="field-input px-3 py-3 border-[#EFE3D7]">
+                                            @for($month = 1; $month <= 12; $month++)
+                                                <option value="{{ $month }}" {{ $selectedMonth === $month ? 'selected' : '' }}>
+                                                    {{ \Carbon\Carbon::createFromDate($selectedYear, $month, 1)->translatedFormat('F') }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="year" class="field-label px-1">Tahun</label>
+                                        <select id="year" name="year" class="field-input px-3 py-3 border-[#EFE3D7]">
+                                            @for($year = now()->year - 3; $year <= now()->year + 1; $year++)
+                                                <option value="{{ $year }}" {{ $selectedYear === $year ? 'selected' : '' }}>{{ $year }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="year" class="field-label">Tahun</label>
-                                    <select id="year" name="year" class="field-input px-3 py-2.5">
-                                        @for($year = now()->year - 3; $year <= now()->year + 1; $year++)
-                                            <option value="{{ $year }}" {{ $selectedYear === $year ? 'selected' : '' }}>{{ $year }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <button type="submit" class="col-span-2 px-4 py-2.5 rounded-xl bg-[var(--color-primary)] text-white font-bold hover:brightness-110 transition text-sm">
+                                <button type="submit" class="w-full px-4 py-3 rounded-2xl bg-[var(--color-primary)] text-white font-bold hover:brightness-110 transition shadow-lg active:scale-95 text-sm flex items-center justify-center gap-2">
+                                    <i class="fas fa-filter text-xs"></i>
                                     Terapkan Filter
                                 </button>
                             </form>
