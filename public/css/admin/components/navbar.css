@@ -1,7 +1,3 @@
-/* ==========================================================
-   Extracted from: resources\views\admin\components\navbar.blade.php
-   ========================================================== */
-
 /* ===== NAVBAR ===== */
 .admin-navbar {
     display: flex;
@@ -50,7 +46,6 @@
     background: rgba(197, 143, 89, 0.1);
 }
 
-/* HDS Logo */
 .navbar-hds-logo {
     width: 36px;
     height: 36px;
@@ -68,7 +63,6 @@
     filter: brightness(0) invert(1);
 }
 
-/* Dropdown button */
 .navbar-dropdown {
     position: relative;
 }
@@ -98,7 +92,6 @@
     flex-shrink: 0;
 }
 
-/* Dropdown menu */
 .navbar-dropdown-menu {
     position: absolute;
     top: calc(100% + 8px);
@@ -119,15 +112,8 @@
 }
 
 @keyframes dropdownFade {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdown-item {
@@ -189,7 +175,6 @@
     background: rgba(220, 38, 38, 0.08) !important;
 }
 
-/* Divider */
 .navbar-divider {
     width: 1px;
     height: 24px;
@@ -197,7 +182,6 @@
     margin: 0 4px;
 }
 
-/* Icon buttons */
 .navbar-icon-btn {
     width: 36px;
     height: 36px;
@@ -222,7 +206,6 @@
     height: 20px;
 }
 
-/* Profile menu positioning */
 .navbar-profile-menu {
     top: 48px;
     right: 0;
@@ -246,6 +229,11 @@
         border-bottom: 1px solid #E5D6C5;
     }
 
+    .navbar-left {
+        display: flex !important;
+        align-items: center;
+    }
+
     .navbar-hamburger-btn {
         display: flex;
         align-items: center;
@@ -253,11 +241,16 @@
     }
 
     .navbar-right {
-        justify-content: space-between;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; 
+        width: 100%;
     }
-
     .navbar-actions {
+        display: flex;
+        align-items: center;
         gap: 4px;
+        margin-left: auto; 
     }
 
     .navbar-dropdown-btn {
@@ -292,8 +285,7 @@
     }
 
     .navbar-hds-logo {
-        display: none !important;
-        /* Disembunyikan karena sudah ada hamburger icon */
+        display: flex !important;
     }
 
     .navbar-dropdown-menu {

@@ -89,7 +89,7 @@
                     Lokasi & Jam Operasional
                 </h2>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start lg:h-[450px]">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
                     {{-- Left Side: Info Card & Contact Button (Spans 4/12 cols) --}}
                     <div class="lg:col-span-5 flex flex-col gap-4">
@@ -114,12 +114,48 @@
                                 </ul>
                             </div>
                             
-                            <a href="#" class="inline-flex text-white hover:text-white/80 transition-colors items-center gap-1.5 text-[14px] font-medium w-max">
-                                Info Lengkapnya 
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button id="toggle-schedule" class="inline-flex text-white hover:text-white/80 transition-all items-center gap-1.5 text-[14px] font-medium w-max group outline-none">
+                                <span>Info Lengkapnya</span>
+                                <svg id="toggle-icon" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
-                            </a>
+                            </button>
+
+                            {{-- Full Schedule (Initially Hidden) --}}
+                            <div id="full-schedule" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
+                                <div class="mt-4 pt-4 border-t border-[#582C0C]/10">
+                                    <ul class="space-y-2 text-[13px] lg:text-[14px] font-medium opacity-90">
+                                        <li class="flex justify-between items-center">
+                                            <span>Senin</span>
+                                            <span>10.00 - 19.00</span>
+                                        </li>
+                                        <li class="flex justify-between items-center">
+                                            <span>Selasa</span>
+                                            <span>10.00 - 19.00</span>
+                                        </li>
+                                        <li class="flex justify-between items-center">
+                                            <span>Rabu</span>
+                                            <span>10.00 - 19.00</span>
+                                        </li>
+                                        <li class="flex justify-between items-center">
+                                            <span>Kamis</span>
+                                            <span>10.00 - 19.00</span>
+                                        </li>
+                                        <li class="flex justify-between items-center">
+                                            <span>Jumat</span>
+                                            <span>10.00 - 19.00</span>
+                                        </li>
+                                        <li class="flex justify-between items-center">
+                                            <span>Sabtu</span>
+                                            <span>10.00 - 13.00</span>
+                                        </li>
+                                        <li class="flex justify-between items-center">
+                                            <span>Minggu</span>
+                                            <span>10.00 - 13.00</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Contact Button --}}
@@ -155,11 +191,35 @@
 
     <script>
         (function() {
+            // Navbar Margin adjustment
             const nav = document.querySelector('nav');
             const hero = document.getElementById('hero-section');
             if (nav && hero) {
                 const navH = nav.offsetHeight;
                 hero.style.marginTop = navH + 'px';
+            }
+
+            // Schedule Toggle functionality
+            const toggleBtn = document.getElementById('toggle-schedule');
+            const fullSchedule = document.getElementById('full-schedule');
+            const toggleIcon = document.getElementById('toggle-icon');
+
+            if (toggleBtn && fullSchedule && toggleIcon) {
+                toggleBtn.addEventListener('click', function() {
+                    const isExpanded = fullSchedule.style.maxHeight && fullSchedule.style.maxHeight !== '0px';
+                    
+                    if (!isExpanded) {
+                        // Expand
+                        fullSchedule.style.maxHeight = fullSchedule.scrollHeight + "px";
+                        fullSchedule.style.opacity = "1";
+                        toggleIcon.style.transform = "rotate(180deg)";
+                    } else {
+                        // Collapse
+                        fullSchedule.style.maxHeight = "0px";
+                        fullSchedule.style.opacity = "0";
+                        toggleIcon.style.transform = "rotate(0deg)";
+                    }
+                });
             }
         })();
     </script>

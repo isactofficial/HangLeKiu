@@ -39,8 +39,6 @@ Route::get('/pelayanan/dokter', [DoctorPageController::class, 'index'])->name('d
 // ================= ADMIN & DOCTOR AUTH =================
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
-Route::get('/admin/register', [AuthController::class, 'showAdminRegister'])->name('admin.register');
-Route::post('/admin/register',[AuthController::class, 'adminRegister'])->name('admin.register.post');
 // Dokter login
 Route::get('/doctor/login',   [AuthController::class, 'showDoctorLogin'])->name('doctor.login');
 Route::post('/doctor/login',  [AuthController::class, 'doctorLogin'])->name('doctor.login.post');
