@@ -27,6 +27,9 @@
                     <div id="patientSearchResults" style="display:none; position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #E5D6C5; border-radius:8px; z-index:100; max-height:200px; overflow-y:auto; box-shadow:0 4px 12px rgba(88,44,12,0.1);"></div>
                 </div>
                 <button type="button" class="btn-solid" onclick="searchPatient()">Cari</button>
+                <button type="button" class="btn-solid btn-add-patient" onclick="openPasienBaruModal()" title="Tambah Pasien Baru" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-color: #10B981; color: white; font-weight: 600; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: inherit;">
+                    <i class="fas fa-plus" style="margin-right: 4px; font-size: inherit;"></i>New Pasien
+                </button>
             </div>
             <div class="req-notice">Tanda <span>*</span> wajib diisi!</div>
         </div>
@@ -680,6 +683,23 @@
     document.addEventListener('click', function (e) {
         if (e.target !== searchInput) resultsBox.style.display = 'none';
     });
+
+    /* ============================================================
+       + PASIEN BUTTON FUNCTION - NEW
+    ============================================================ */
+    window.openPasienBaruModal = function() {
+        // Close current Daftar Kunjungan modal
+        closeRegModal('modalPendaftaranBaru');
+        
+        // Open Tambah Pasien Baru modal
+        const pasienModal = document.getElementById('modalPasienBaru');
+        if (pasienModal) {
+            pasienModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        console.log('Switched to Tambah Pasien Baru modal');
+    };
 
     /* ============================================================
        FORM SUBMIT
