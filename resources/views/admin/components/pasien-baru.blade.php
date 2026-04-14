@@ -72,7 +72,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nomor KTP</label>
-                            <input type="text" name="id_card_number" class="input-line" maxlength="20">
+                            <input type="text" name="id_card_number" class="input-line" maxlength="20" onkeypress="return onlyNumbers(event)" pattern="[0-9]*" placeholder="Hanya angka">
                         </div>
                     </div>
 
@@ -663,4 +663,12 @@ window.closePasienModalAndBackToReg = function() {
         regModal.style.display = ''; 
     }
 };
+
+// Only allow numbers in KTP input
+function onlyNumbers(e) {
+    if (e.which) {
+        return /[0-9]/.test(String.fromCharCode(e.which));
+    }
+    return true;
+}
 </script>

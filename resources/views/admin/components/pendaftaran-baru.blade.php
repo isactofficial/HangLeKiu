@@ -27,9 +27,6 @@
                     <div id="patientSearchResults" style="display:none; position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #E5D6C5; border-radius:8px; z-index:100; max-height:200px; overflow-y:auto; box-shadow:0 4px 12px rgba(88,44,12,0.1);"></div>
                 </div>
                 <button type="button" class="btn-solid" onclick="searchPatient()">Cari</button>
-                <button type="button" class="btn-solid" onclick="openNewPatientModal()" style="background-color:#2C8659; border-color:#2C8659;">
-                    <i class="fas fa-plus" style="margin-right:6px;"></i> New Pasien
-                </button>
             </div>
             <div class="req-notice">Tanda <span>*</span> wajib diisi!</div>
         </div>
