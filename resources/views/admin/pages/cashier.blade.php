@@ -7,6 +7,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/pages/cashier.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/pages/cashier-mobile.css') }}">
     <style>
         /* Modal Overlay — sama persis dengan obat.css */
         .modal-overlay {

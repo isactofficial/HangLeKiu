@@ -1,3 +1,5 @@
+ <link rel="stylesheet" href="{{ asset('css/admin/pages/cashier-mobile.css') }}">
+ 
 <div id="modalPayment" class="modal-overlay">
     <div class="modal-container" style="background:#fff; border-radius:10px; width:100%; max-width:980px; max-height:92vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.25);">
 
