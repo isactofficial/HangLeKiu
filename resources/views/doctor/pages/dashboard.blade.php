@@ -98,7 +98,7 @@
     <div id="navbarSpacer" class="h-24 md:h-28 w-full shrink-0"></div>
 
     <main class="grow pb-12">
-        <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 py-8 -mt-8 relative z-20">
+        <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 pt-10 pb-8 relative z-20">
             
             {{-- Toast Notifications --}}
             @if(session('success'))
