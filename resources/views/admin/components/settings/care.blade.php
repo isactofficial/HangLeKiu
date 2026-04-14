@@ -2,6 +2,8 @@
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/master_crud.css') }}">
 @endpush
 
+@include('admin.components.settings.partials.flash_success')
+
 <div class="mc-header-row">
     <div style="display: flex; align-items: center; gap: 16px;">
         <a href="?menu=general-settings" class="mc-btn-icon" title="Kembali ke General Settings">
@@ -9,11 +11,13 @@
         </a>
         <div>
             <h2 class="mc-title">Manajemen Jenis Perawatan</h2>
-            <p class="mc-subtitle">Kelola data jenis perawatan dan tarif di sistem hanglekiu</p>
+            <p class="mc-subtitle">Kelola data jenis perawatan di sistem hanglekiu</p>
         </div>
     </div>
     <button class="mc-btn-primary" onclick="openCareModal()">+ Tambah Jenis Perawatan</button>
 </div>
+
+@include('admin.components.settings.partials.inline_notice')
 
 <div class="mc-actions-row">
     <div class="mc-search-box">
@@ -30,7 +34,6 @@
         <thead>
             <tr>
                 <th>Nama</th>
-                <th>Harga</th>
                 <th>Status</th>
                 <th>Aksi</th>
             </tr>
@@ -57,10 +60,6 @@
                     <input type="text" id="care-input-name" class="mc-input" placeholder="Masukkan nama jenis perawatan" required>
                 </div>
                 <div class="mc-form-group">
-                    <label class="mc-label">Harga (Rp)</label>
-                    <input type="number" id="care-input-price" class="mc-input" placeholder="Masukkan harga" min="0" step="0.01" required>
-                </div>
-                <div class="mc-form-group">
                     <label class="mc-label">Deskripsi (Opsional)</label>
                     <textarea id="care-input-description" class="mc-input" placeholder="Masukkan deskripsi" rows="3"></textarea>
                 </div>
@@ -85,6 +84,43 @@
         let currentPage = 1;
         const apiUrl = '/api/master-care-type';
 
+        function showCareToast(message, type = 'success') {
+            window.showSettingsInlineNotice?.(message, type);
+        }
+
+        function showCareConfirm(message) {
+            return new Promise((resolve) => {
+                const old = document.getElementById('care-confirm-overlay');
+                if (old) old.remove();
+
+                const overlay = document.createElement('div');
+                overlay.id = 'care-confirm-overlay';
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,27,16,.46);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;box-sizing:border-box;';
+                overlay.innerHTML = `
+                    <div style="width:min(100%,620px);max-height:calc(100vh - 32px);overflow:auto;background:#FFFDFB;border-radius:18px;box-shadow:0 26px 56px rgba(47,29,17,.28);border:1px solid #E9D8C8;padding:28px 24px;box-sizing:border-box;text-align:center;">
+                        <div style="font-size:24px;font-weight:700;line-height:1.15;color:#2B1609;margin-bottom:14px;">Konfirmasi Hapus</div>
+                        <div style="font-size:20px;color:#5E3A24;line-height:1.45;max-width:90%;margin:0 auto;">${message}</div>
+                        <div style="display:flex;justify-content:center;gap:14px;margin-top:32px;">
+                            <button type="button" data-action="cancel" style="border:1px solid #D3BCA7;background:#FFF8F2;color:#4A2D1A;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Batal</button>
+                            <button type="button" data-action="ok" style="border:none;background:#4A2B1B;color:#fff;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Ya, Hapus</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                const close = (val) => {
+                    overlay.remove();
+                    resolve(val);
+                };
+
+                overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => close(false));
+                overlay.querySelector('[data-action="ok"]').addEventListener('click', () => close(true));
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) close(false);
+                });
+            });
+        }
+
         window.fetchCareData = function(page = 1) {
             currentPage = page;
             const search = document.getElementById('care-search').value;
@@ -97,14 +133,12 @@
                     tbody.innerHTML = '';
 
                     if (data.data.data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Data tidak ditemukan</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">Data tidak ditemukan</td></tr>';
                     } else {
                         data.data.data.forEach(item => {
                             const tr = document.createElement('tr');
-                            const price = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price);
                             tr.innerHTML = `
                                 <td>${item.name}</td>
-                                <td>${price}</td>
                                 <td>
                                     <span class="mc-badge ${item.is_active ? 'mc-badge-active' : 'mc-badge-inactive'}">
                                         ${item.is_active ? 'Aktif' : 'Tidak Aktif'}
@@ -147,7 +181,6 @@
                         const data = res.data;
                         document.getElementById('care-id').value = data.id;
                         document.getElementById('care-input-name').value = data.name;
-                        document.getElementById('care-input-price').value = data.price;
                         document.getElementById('care-input-description').value = data.description || '';
                         document.getElementById('care-input-active').value = data.is_active ? "1" : "0";
                     });
@@ -170,30 +203,41 @@
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: JSON.stringify({
                     name: document.getElementById('care-input-name').value,
-                    price: parseFloat(document.getElementById('care-input-price').value),
+                    price: 0,
                     description: document.getElementById('care-input-description').value,
                     is_active: document.getElementById('care-input-active').value === "1"
                 })
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success) { closeCareModal(); fetchCareData(currentPage); }
-                else alert('Gagal menyimpan data');
+                if (data.success) {
+                    closeCareModal();
+                    fetchCareData(currentPage);
+                    showCareToast(id ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan');
+                } else {
+                    showCareToast(data.message || 'Gagal menyimpan data', 'error');
+                }
             });
         };
 
-        window.deleteCareData = function(id) {
-            if (confirm('Yakin ingin menghapus data ini?')) {
-                fetch(`${apiUrl}/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-                })
-                .then(r => r.json())
-                .then(data => { 
-                    if (data.success) fetchCareData(currentPage); 
-                    else alert(data.message); // <-- PERUBAHAN DI SINI
-                });
-            }
+        window.deleteCareData = async function(id) {
+            const confirmed = await showCareConfirm('Data yang dihapus tidak dapat dikembalikan. Lanjutkan?');
+            if (!confirmed) return;
+
+            fetch(`${apiUrl}/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(r => r.json())
+            .then(data => { 
+                if (data.success) {
+                    fetchCareData(currentPage);
+                    showCareToast('Data berhasil dihapus');
+                } else {
+                    showCareToast(data.message || 'Gagal menghapus data', 'error');
+                }
+            })
+            .catch(() => showCareToast('Terjadi kesalahan saat menghapus data', 'error'));
         };
 
         function createPageBtn(html, disabled, onclick, active = false) {

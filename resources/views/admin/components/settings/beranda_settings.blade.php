@@ -6,6 +6,10 @@
     $submenu = request('submenu');
 @endphp
 
+@if ($submenu !== 'Artikel')
+    @include('admin.components.settings.partials.flash_success')
+@endif
+
 @if ($submenu == 'Testimonial')
     @include('admin.components.settings.testimonial')
 @elseif ($submenu == 'Artikel')

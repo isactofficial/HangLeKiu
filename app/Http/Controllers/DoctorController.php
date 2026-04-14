@@ -71,6 +71,7 @@ class DoctorController extends Controller
                         'str' => $d->str_number,
                         'spec' => $d->specialization,
                         'exp' => $d->experience,
+                        'fee' => $d->default_fee_percentage,
                         'lulus' => $d->alma_mater,
                         'bio' => $d->bio,
                         'order' => $d->carousel_order ?? 99,

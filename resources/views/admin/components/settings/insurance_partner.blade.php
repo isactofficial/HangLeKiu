@@ -2,6 +2,8 @@
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/master_crud.css') }}">
 @endpush
 
+@include('admin.components.settings.partials.flash_success')
+
 <div class="mc-header-row">
     <div style="display: flex; align-items: center; gap: 16px;">
         <a href="?menu=beranda-settings" class="mc-btn-icon" title="Kembali ke Beranda Settings">
@@ -14,6 +16,8 @@
     </div>
     <button class="mc-btn-primary" onclick="openPartnerModal()">+ Tambah Partner</button>
 </div>
+
+@include('admin.components.settings.partials.inline_notice')
 
 <div class="mc-actions-row">
     <div class="mc-search-box">
@@ -74,7 +78,7 @@
                         <img id="logo-preview-img" class="photo-preview-img" style="display:none; object-fit: contain;">
                     </div>
                     <input type="file" id="partner-logo" name="logo" class="mc-input-file" accept="image/*" onchange="previewLogo(this)">
-                    <p style="font-size:11px;color:#9CA3AF;margin-top:4px;">Format: SVG, PNG, JPG (Max. 5MB). Rekomendasi background transparan.</p>
+                    <p style="font-size:11px;color:#B09A85;margin-top:4px;">Format: SVG, PNG, JPG (Max. 5MB). Rekomendasi background transparan.</p>
                 </div>
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -104,6 +108,42 @@
 const PARTNER_API = '/api/insurance-partners';
 let partnerCurrentPage = 1;
 const STORAGE_URL = '{{ asset('storage') }}/';
+
+function showPartnerToast(message, type = 'success') {
+    window.showSettingsInlineNotice?.(message, type);
+}
+
+function showPartnerConfirm(message) {
+    return new Promise((resolve) => {
+        const old = document.getElementById('partner-confirm-overlay');
+        if (old) old.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'partner-confirm-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,27,16,.46);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;box-sizing:border-box;';
+        overlay.innerHTML = `
+            <div style="width:min(100%,620px);max-height:calc(100vh - 32px);overflow:auto;background:#FFFDFB;border-radius:18px;box-shadow:0 26px 56px rgba(47,29,17,.28);border:1px solid #E9D8C8;padding:28px 24px;box-sizing:border-box;text-align:center;">
+                <div style="font-size:24px;font-weight:700;line-height:1.15;color:#2B1609;margin-bottom:14px;">Konfirmasi Hapus</div>
+                <div style="font-size:20px;color:#5E3A24;line-height:1.45;max-width:90%;margin:0 auto;">${message}</div>
+                <div style="display:flex;justify-content:center;gap:14px;margin-top:32px;">
+                    <button type="button" data-action="cancel" style="border:1px solid #D3BCA7;background:#FFF8F2;color:#4A2D1A;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Batal</button>
+                    <button type="button" data-action="ok" style="border:none;background:#4A2B1B;color:#fff;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Ya, Hapus</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const close = (val) => {
+            overlay.remove();
+            resolve(val);
+        };
+        overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => close(false));
+        overlay.querySelector('[data-action="ok"]').addEventListener('click', () => close(true));
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close(false);
+        });
+    });
+}
 
 function fetchPartnerData(page = 1) {
     partnerCurrentPage = page;
@@ -259,29 +299,36 @@ async function savePartnerData(e) {
         if (res.success) {
             closePartnerModal();
             fetchPartnerData(partnerCurrentPage);
+            showPartnerToast(id ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan');
         } else {
-            alert(res.message || 'Gagal menyimpan data');
+            showPartnerToast(res.message || 'Gagal menyimpan data', 'error');
         }
     } catch (err) {
         console.error(err);
-        alert('Terjadi kesalahan');
+        showPartnerToast('Terjadi kesalahan saat menyimpan data', 'error');
     }
 }
 
-function deletePartnerData(id) {
-    if (confirm('Yakin ingin menghapus partner ini?')) {
-        fetch(`${PARTNER_API}/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(r => r.json())
-        .then(res => {
-            if (res.success) fetchPartnerData(partnerCurrentPage);
-            else alert('Gagal menghapus');
-        });
-    }
+async function deletePartnerData(id) {
+    const confirmed = await showPartnerConfirm('Data partner yang dihapus tidak dapat dikembalikan. Lanjutkan?');
+    if (!confirmed) return;
+
+    fetch(`${PARTNER_API}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            fetchPartnerData(partnerCurrentPage);
+            showPartnerToast('Data berhasil dihapus');
+        } else {
+            showPartnerToast(res.message || 'Gagal menghapus data', 'error');
+        }
+    })
+    .catch(() => showPartnerToast('Terjadi kesalahan saat menghapus data', 'error'));
 }
 
 document.addEventListener('DOMContentLoaded', fetchPartnerData);

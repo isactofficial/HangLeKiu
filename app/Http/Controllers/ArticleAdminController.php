@@ -10,6 +10,23 @@ use Illuminate\Support\Facades\File;
 
 class ArticleAdminController extends Controller
 {
+    private function uniqueSlug(string $title, ?string $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($title) ?: 'artikel';
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (Article::withTrashed()
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->where('slug', $slug)
+            ->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -49,6 +66,8 @@ class ArticleAdminController extends Controller
         ]);
 
         $data = $request->all();
+        $data['id'] = (string) Str::uuid();
+        $data['slug'] = $this->uniqueSlug($request->title);
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
@@ -122,6 +141,7 @@ class ArticleAdminController extends Controller
         ]);
 
         $data = $request->all();
+        $data['slug'] = $this->uniqueSlug($request->title, $article->id);
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
