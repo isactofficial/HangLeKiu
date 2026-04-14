@@ -98,7 +98,7 @@
     <div id="navbarSpacer" class="h-24 md:h-28 w-full shrink-0"></div>
 
     <main class="grow pb-12">
-        <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 py-8 -mt-8 relative z-20">
+        <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 pt-10 pb-8 relative z-20">
             
             {{-- Toast Notifications --}}
             @if(session('success'))
@@ -138,12 +138,12 @@
                     {{-- Informasi Dokter (Profil) --}}
                     <div class="dash-card bg-white rounded-3xl overflow-hidden relative mb-10">
                         <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#F4E9DF] to-transparent opacity-40 rounded-bl-full pointer-events-none"></div>
-                        <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
-                            <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
+                        <div class="px-6 sm:px-8 lg:px-10 py-5 sm:py-6 border-b border-[#EFE3D7]/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+                            <h2 class="text-lg sm:text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
                                 <i class="fas fa-user-md text-[var(--color-primary)]"></i>
                                 <span class="truncate">Profil Profesional Dokter</span>
                             </h2>
-                            <button id="openEditProfileModal" type="button" class="shrink-0 px-4 py-2 rounded-lg bg-[var(--font-color-primary)] hover:bg-[var(--color-primary)] text-white font-medium transition text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                            <button id="openEditProfileModal" type="button" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[var(--font-color-primary)] hover:bg-[var(--color-primary)] text-white font-bold transition text-xs shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
                                 <i class="fas fa-edit"></i>
                                 Edit Profil
                             </button>
@@ -170,7 +170,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm md:pl-2">
+                            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm md:pl-2">
                                 <div class="profile-item">
                                     <p class="profile-item-label">Email Aktif</p>
                                     <p class="profile-item-value truncate">{{ $user->email }}</p>
@@ -180,29 +180,69 @@
                                     <p class="profile-item-value">{{ $doctor->phone_number ?? '-' }}</p>
                                 </div>
                                 <div class="profile-item">
-                                    <p class="profile-item-label">STR / License No</p>
-                                    <p class="profile-item-value">{{ $doctor->license_no ?? '-' }}</p>
+                                    <p class="profile-item-label">Spesialisasi</p>
+                                    <p class="profile-item-value">{{ $doctor->specialization ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Nomor SIP</p>
+                                    <p class="profile-item-value">{{ $doctor->sip_number ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Nomor STR</p>
+                                    <p class="profile-item-value">{{ $doctor->str_number ?? '-' }}</p>
                                 </div>
                                 <div class="profile-item">
                                     <p class="profile-item-label">Jabatan</p>
                                     <p class="profile-item-value">{{ $doctor->job_title ?? 'Dokter Spesialis' }}</p>
                                 </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Alma Mater</p>
+                                    <p class="profile-item-value">{{ $doctor->alma_mater ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Pengalaman Praktik</p>
+                                    <p class="profile-item-value">{{ $doctor->experience ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item flex items-center justify-between">
+                                    <div>
+                                        <p class="profile-item-label">Media Sosial</p>
+                                        <div class="flex gap-2 mt-1">
+                                            @if($doctor && $doctor->instagram_url)
+                                                <a href="{{ $doctor->instagram_url }}" target="_blank" class="text-pink-600 hover:scale-110 transition"><i class="fab fa-instagram text-lg"></i></a>
+                                            @endif
+                                            @if($doctor && $doctor->linkedin_url)
+                                                <a href="{{ $doctor->linkedin_url }}" target="_blank" class="text-blue-700 hover:scale-110 transition"><i class="fab fa-linkedin text-lg"></i></a>
+                                            @endif
+                                            @if(!$doctor || (!$doctor->instagram_url && !$doctor->linkedin_url))
+                                                <span class="text-slate-400 font-medium">-</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            @if($doctor && $doctor->bio)
+                            <div class="mt-6 md:pl-2">
+                                <p class="profile-item-label">Biografi Singkat</p>
+                                <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl italic text-[var(--font-color-secondary)] leading-relaxed">
+                                    "{{ $doctor->bio }}"
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
 
                     {{-- Registration Actions --}}
-                    <div class="dash-card bg-white p-8 rounded-3xl flex items-center justify-between gap-6 mb-10 border-l-8 border-l-[var(--color-primary)]">
-                        <div class="flex items-center gap-6">
-                            <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-[var(--color-primary)]">
+                    <div class="dash-card bg-white p-6 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6 mb-10 border-l-8 border-l-[var(--color-primary)]">
+                        <div class="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
+                            <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center text-[var(--color-primary)] shrink-0">
                                 <i class="fas fa-calendar-plus text-3xl"></i>
                             </div>
                             <div>
-                                <h3 class="text-2xl font-bold text-[var(--font-color-primary)]">Kunjungan Pasien</h3>
-                                <p class="text-[var(--font-color-secondary)] font-medium text-sm">Lakukan pendaftaran baru untuk kunjungan hari ini</p>
+                                <h3 class="text-xl sm:text-2xl font-bold text-[var(--font-color-primary)]">Kunjungan Pasien</h3>
+                                <p class="text-[var(--font-color-secondary)] font-medium text-xs sm:text-sm">Lakukan pendaftaran baru kunjungan hari ini</p>
                             </div>
                         </div>
-                        <button onclick="openRegModal('modalPendaftaranBaru')" class="px-10 py-4 bg-[var(--color-primary)] text-white rounded-2xl font-bold hover:brightness-110 transition-all shadow-xl active:scale-95 flex items-center gap-2">
+                        <button onclick="openRegModal('modalPendaftaranBaru')" class="w-full sm:w-auto px-10 py-4 bg-[var(--color-primary)] text-white rounded-2xl font-bold hover:brightness-110 transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2">
                             <i class="fas fa-user-plus"></i>
                             Pendaftaran Baru
                         </button>
@@ -210,15 +250,42 @@
 
                     {{-- Today's Schedule Table --}}
                     <div class="dash-card bg-white rounded-3xl overflow-hidden relative">
-                        <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
-                            <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
-                                <svg class="w-6 h-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <span class="truncate">Jadwal Praktik Hari Ini</span>
+                        <div class="px-6 sm:px-8 lg:px-10 py-5 sm:py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
+                            <h2 class="text-lg sm:text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
+                                <i class="fas fa-clipboard-list text-[var(--color-primary)]"></i>
+                                <span class="truncate">Antrean Pasien Hari Ini</span>
                             </h2>
-                            <span class="text-xs font-bold text-[var(--font-color-secondary)] uppercase bg-slate-50 px-3 py-1 rounded-full">{{ \Carbon\Carbon::today()->format('d M Y') }}</span>
+                            <span class="text-[10px] sm:text-xs font-bold text-[var(--font-color-secondary)] uppercase bg-slate-50 px-3 py-1 rounded-full whitespace-nowrap">{{ \Carbon\Carbon::today()->format('d M Y') }}</span>
                         </div>
-                        <div class="p-8 lg:p-10">
-                            <div class="overflow-x-auto rounded-2xl border border-[#EBDCCF] shadow-sm">
+                        <div class="p-6 sm:p-8 lg:p-10">
+                            {{-- Mobile Card List (Hidden on sm+) --}}
+                            <div class="block sm:hidden space-y-4">
+                                @forelse($todayAppointments as $apt)
+                                <div class="p-4 rounded-2xl border border-[#EBDCCF] bg-[#FEFCFA]/30 space-y-3">
+                                    <div class="flex justify-between items-start">
+                                        <div class="text-lg font-black text-[var(--font-color-primary)]">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</div>
+                                        <span class="inline-flex px-2 py-0.5 rounded-lg text-[10px] font-black uppercase {{ $statusClasses[$apt->status] ?? 'bg-slate-100' }}">
+                                            {{ $statusLabels[$apt->status] ?? $apt->status }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-[var(--font-color-primary)]">{{ $apt->patient->full_name }}</div>
+                                        <div class="text-[10px] text-[var(--font-color-secondary)] uppercase tracking-widest font-bold">{{ $apt->patient->medical_record_no ?? '-' }} • {{ $apt->patient->gender === 'Male' ? 'Laki-laki' : 'Perempuan' }}</div>
+                                    </div>
+                                    <div class="pt-2 border-t border-[#EFE3D7] flex items-center gap-2 text-xs font-medium text-[var(--font-color-secondary)]">
+                                        <i class="fas fa-tag"></i> {{ $apt->poli->name ?? 'Gigi Umum' }}
+                                    </div>
+                                </div>
+                                @empty
+                                <div class="py-10 text-center text-slate-400">
+                                    <i class="fas fa-calendar-day text-3xl opacity-20 mb-2"></i>
+                                    <p class="text-sm">Belum ada antrean hari ini.</p>
+                                </div>
+                                @endforelse
+                            </div>
+
+                            {{-- Desktop Table (Hidden on smaller screens) --}}
+                            <div class="hidden sm:block overflow-x-auto rounded-2xl border border-[#EBDCCF] shadow-sm">
                                 <table class="min-w-full text-sm text-left">
                                     <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold">
                                         <tr>
@@ -235,7 +302,7 @@
                                             <td class="px-6 py-4 font-bold">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</td>
                                             <td class="px-6 py-4">
                                                 <div class="font-bold">{{ $apt->patient->full_name }}</div>
-                                                <div class="text-[10px] text-[var(--font-color-secondary)] uppercase tracking-tight">{{ $apt->patient->gender === 'Male' ? 'Laki-laki' : 'Perempuan' }}</div>
+                                                <div class="text-[10px] text-[var(--font-color-secondary)] uppercase tracking-tight font-bold">{{ $apt->patient->gender === 'Male' ? 'Laki-laki' : 'Perempuan' }}</div>
                                             </td>
                                             <td class="px-6 py-4 text-center font-medium">{{ $apt->patient->medical_record_no ?? '-' }}</td>
                                             <td class="px-6 py-4">
@@ -254,8 +321,8 @@
                                                     $statusLabels = [
                                                         'pending'   => 'Menunggu',
                                                         'confirmed' => 'Dikonfirmasi',
-                                                        'waiting'   => 'Menunggu Antrean',
-                                                        'engaged'   => 'Sedang Dilayani',
+                                                        'waiting'   => 'Antrean',
+                                                        'engaged'   => 'Dilayani',
                                                         'succeed'   => 'Selesai',
                                                         'failed'    => 'Batal',
                                                     ];
@@ -268,8 +335,8 @@
                                         @empty
                                         <tr>
                                             <td colspan="5" class="px-6 py-12 text-center text-slate-400">
-                                                <svg class="w-12 h-12 mx-auto mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                                Belum ada jadwal pendaftaran untuk hari ini.
+                                                <i class="fas fa-calendar-day text-3xl opacity-20 mb-3"></i>
+                                                Belum ada jadwal pendaftaran hari ini.
                                             </td>
                                         </tr>
                                         @endforelse
@@ -356,11 +423,20 @@
                             </div>
                             <div class="group bg-white border border-[#EFE3D7] rounded-2xl p-5 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-[#D9C3AE] hover:-translate-y-1 transition-all duration-300 cursor-default">
                                 <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-calendar-alt text-2xl"></i>
+                                     <i class="fas fa-calendar-alt text-2xl"></i>
+                                 </div>
+                                 <div class="flex-1 min-w-0">
+                                     <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Jadwal Hari Ini</p>
+                                     <p class="text-xl font-black text-[var(--font-color-primary)]">{{ (isset($todayAppointments) ? $todayAppointments->count() : 0) }} <span class="text-xs font-semibold text-[var(--font-color-secondary)]">Antrean</span></p>
+                                 </div>
+                            </div>
+                            <div class="group bg-white border border-[#EFE3D7] rounded-2xl p-5 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-[#D9C3AE] hover:-translate-y-1 transition-all duration-300 cursor-default">
+                                <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-wallet text-2xl"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Jadwal Hari Ini</p>
-                                    <p class="text-xl font-black text-[var(--font-color-primary)]">{{ $todayAppointments->count() }} <span class="text-xs font-semibold text-[var(--font-color-secondary)]">Antrean</span></p>
+                                    <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Pendapatan Hari Ini</p>
+                                    <p class="text-xl font-black text-emerald-700">Rp {{ number_format($todayIncomeTotal ?? 0, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -373,26 +449,29 @@
                                 <i class="fas fa-chart-line text-[var(--color-primary)]"></i>
                                 Statistik Pendapatan Dokter
                             </h3>
-                            <form method="GET" action="{{ route('doctor.dashboard') }}" class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label for="month" class="field-label">Bulan</label>
-                                    <select id="month" name="month" class="field-input px-3 py-2.5">
-                                        @for($month = 1; $month <= 12; $month++)
-                                            <option value="{{ $month }}" {{ $selectedMonth === $month ? 'selected' : '' }}>
-                                                {{ \Carbon\Carbon::createFromDate($selectedYear, $month, 1)->translatedFormat('F') }}
-                                            </option>
-                                        @endfor
-                                    </select>
+                             <form method="GET" action="{{ route('doctor.dashboard') }}" class="flex flex-col gap-4 mt-2">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label for="month" class="field-label px-1">Bulan</label>
+                                        <select id="month" name="month" class="field-input px-3 py-3 border-[#EFE3D7]">
+                                            @for($month = 1; $month <= 12; $month++)
+                                                <option value="{{ $month }}" {{ $selectedMonth === $month ? 'selected' : '' }}>
+                                                    {{ \Carbon\Carbon::createFromDate($selectedYear, $month, 1)->translatedFormat('F') }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="year" class="field-label px-1">Tahun</label>
+                                        <select id="year" name="year" class="field-input px-3 py-3 border-[#EFE3D7]">
+                                            @for($year = now()->year - 3; $year <= now()->year + 1; $year++)
+                                                <option value="{{ $year }}" {{ $selectedYear === $year ? 'selected' : '' }}>{{ $year }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label for="year" class="field-label">Tahun</label>
-                                    <select id="year" name="year" class="field-input px-3 py-2.5">
-                                        @for($year = now()->year - 3; $year <= now()->year + 1; $year++)
-                                            <option value="{{ $year }}" {{ $selectedYear === $year ? 'selected' : '' }}>{{ $year }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <button type="submit" class="col-span-2 px-4 py-2.5 rounded-xl bg-[var(--color-primary)] text-white font-bold hover:brightness-110 transition text-sm">
+                                <button type="submit" class="w-full px-4 py-3 rounded-2xl bg-[var(--color-primary)] text-white font-bold hover:brightness-110 transition shadow-lg active:scale-95 text-sm flex items-center justify-center gap-2">
+                                    <i class="fas fa-filter text-xs"></i>
                                     Terapkan Filter
                                 </button>
                             </form>
@@ -445,7 +524,7 @@
     {{-- Modal Edit Profile --}}
     <div id="editProfileModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-2 sm:p-4 overflow-hidden">
         <div id="editProfileBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"></div>
-        <div id="editProfileDialog" class="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl border border-[#EFE3D7] overflow-hidden transform transition-all flex flex-col min-h-0 max-h-full" style="height: min(920px, calc(100vh - 1rem));">
+        <div id="editProfileDialog" class="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl border border-[#EFE3D7] transform transition-all flex flex-col min-h-0 max-h-[95vh]">
             
             <div class="px-6 sm:px-8 py-4 sm:py-5 border-b border-[#EFE3D7] flex items-center justify-between bg-gradient-to-r from-[#FEFCFA] to-white shrink-0 sticky top-0 z-20">
                 <div>
@@ -459,7 +538,7 @@
                 <form id="profileUpdateForm" method="POST" action="{{ route('doctor.profile.update') }}" enctype="multipart/form-data" autocomplete="off" class="p-6 sm:p-8 space-y-8">
                     @csrf
                     @method('PUT')
-                    <input type="hidden" name="photo_base64" id="photo_base64">
+                    <input type="hidden" id="photo_base64">
                     
                     <div class="flex flex-col items-center justify-center mb-4">
                         <div class="relative w-28 h-28 mb-3 group cursor-pointer" onclick="document.getElementById('photo_input').click()">
@@ -471,37 +550,126 @@
                             </div>
                         </div>
                         <p class="text-sm font-bold text-[#8B5E3C] cursor-pointer hover:text-[#582c0c] transition" onclick="document.getElementById('photo_input').click()">Ubah Foto Profil</p>
-                        <input type="file" id="photo_input" class="hidden" accept="image/*">
+                        <input type="file" id="photo_input" name="foto_profil" class="hidden" accept="image/*">
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Nama Lengkap & Gelar</label>
-                            <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" required>
-                        </div>
+                    <div class="space-y-10">
+                        {{-- Section: Identitas Dasar --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Email Aktif</label>
-                            <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" required>
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                                <div class="md:col-span-3">
+                                    <label for="title_prefix_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Prefix (Gelar)</label>
+                                    <input type="text" id="title_prefix_input" name="title_prefix" value="{{ old('title_prefix', $doctor->title_prefix ?? '') }}" placeholder="Contoh: drg." class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                                <div class="md:col-span-9">
+                                    <label for="name_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Nama Lengkap (Tanpa Gelar Depan)</label>
+                                    <input type="text" id="name_input" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-bold" required>
+                                </div>
+                                <div class="md:col-span-6">
+                                    <label for="email_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Email</label>
+                                    <input type="email" id="email_input" name="email" value="{{ old('email', $user->email) }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium" required>
+                                </div>
+                                <div class="md:col-span-6">
+                                    <label for="phone_number_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">WhatsApp</label>
+                                    <input type="tel" id="phone_number_input" name="phone_number" value="{{ old('phone_number', $doctor->phone_number ?? '') }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- Section: Spesialisasi & Jabatan --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">No. WhatsApp</label>
-                            <input type="tel" name="phone_number" value="{{ old('phone_number', $doctor->phone_number ?? '') }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="specialization_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Spesialisasi (Gelar Belakang)</label>
+                                    <input type="text" id="specialization_input" name="specialization" value="{{ old('specialization', $doctor->specialization ?? '') }}" placeholder="Contoh: Sp.Ortho" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                                <div>
+                                    <label for="subspecialization_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Sub-Spesialisasi</label>
+                                    <input type="text" id="subspecialization_input" name="subspecialization" value="{{ old('subspecialization', $doctor->subspecialization ?? '') }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="job_title_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Jabatan Kerja</label>
+                                    <input type="text" id="job_title_input" name="job_title" value="{{ old('job_title', $doctor->job_title ?? '') }}" placeholder="Contoh: Kepala Dokter Gigi" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- Section: Legalitas Profesi --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Nomor SIP</label>
-                            <input type="text" name="sip_number" value="{{ old('sip_number', $doctor->sip_number ?? '') }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 p-5 bg-[#FEFCFA] border border-[#EBDCCF] rounded-2xl">
+                                    <div class="md:col-span-12 font-black text-[10px] uppercase text-slate-400 tracking-tighter -mt-2 mb-1">Surat Tanda Registrasi (STR)</div>
+                                    <div class="md:col-span-6">
+                                        <label for="str_number_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Nomor STR</label>
+                                        <input type="text" id="str_number_input" name="str_number" value="{{ old('str_number', $doctor->str_number ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <label for="str_institution_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Institusi STR</label>
+                                        <input type="text" id="str_institution_input" name="str_institution" value="{{ old('str_institution', $doctor->str_institution ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <input type="text" id="str_expiry_date_input" name="str_expiry_date" value="{{ old('str_expiry_date', $doctor->str_expiry_date ? $doctor->str_expiry_date->format('Y-m-d') : '') }}" placeholder="YYYY-MM-DD" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <label for="license_no_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">STR / License Extra</label>
+                                        <input type="text" id="license_no_input" name="license_no" value="{{ old('license_no', $doctor->license_no ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 p-5 bg-[#FEFCFA] border border-[#EBDCCF] rounded-2xl">
+                                    <div class="md:col-span-12 font-black text-[10px] uppercase text-slate-400 tracking-tighter -mt-2 mb-1">Surat Izin Praktik (SIP)</div>
+                                    <div class="md:col-span-6">
+                                        <label for="sip_number_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Nomor SIP</label>
+                                        <input type="text" id="sip_number_input" name="sip_number" value="{{ old('sip_number', $doctor->sip_number ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <label for="sip_institution_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Institusi SIP</label>
+                                        <input type="text" id="sip_institution_input" name="sip_institution" value="{{ old('sip_institution', $doctor->sip_institution ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-12">
+                                        <input type="text" id="sip_expiry_date_input" name="sip_expiry_date" value="{{ old('sip_expiry_date', $doctor->sip_expiry_date ? $doctor->sip_expiry_date->format('Y-m-d') : '') }}" placeholder="YYYY-MM-DD" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- Section: Profil Publik & Resume --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">License / STR</label>
-                            <input type="text" name="license_no" value="{{ old('license_no', $doctor->license_no ?? '') }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                            <div class="grid grid-cols-1 gap-5">
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Alma Mater (Studi)</label>
+                                        <input type="text" name="alma_mater" value="{{ old('alma_mater', $doctor->alma_mater ?? '') }}" placeholder="Contoh: Universitas Indonesia" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Pengalaman Praktik</label>
+                                        <input type="text" name="experience" value="{{ old('experience', $doctor->experience ?? '') }}" placeholder="Contoh: 10+ Tahun" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Biografi Singkat (Publik)</label>
+                                    <textarea name="bio" rows="4" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm leading-relaxed" placeholder="Tuliskan biografi singkat Anda untuk ditampilkan kepada pasien...">{{ old('bio', $doctor->bio ?? '') }}</textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Instagram URL</label>
+                                        <div class="relative">
+                                            <i class="fab fa-instagram absolute left-4 top-1/2 -translate-y-1/2 text-pink-600"></i>
+                                            <input type="url" name="instagram_url" value="{{ old('instagram_url', $doctor->instagram_url ?? '') }}" placeholder="https://instagram.com/..." class="w-full pl-10 pr-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] shadow-sm text-xs">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">LinkedIn URL</label>
+                                        <div class="relative">
+                                            <i class="fab fa-linkedin absolute left-4 top-1/2 -translate-y-1/2 text-blue-700"></i>
+                                            <input type="url" name="linkedin_url" value="{{ old('linkedin_url', $doctor->linkedin_url ?? '') }}" placeholder="https://linkedin.com/..." class="w-full pl-10 pr-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] shadow-sm text-xs">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="pt-6 border-t border-[#EFE3D7]">
-                        <p class="text-xs text-[#8B5E3C] mb-4 uppercase tracking-wider font-extrabold flex items-center gap-2">
-                            <i class="fas fa-lock"></i>
-                            Keamanan (Ubah Password)
-                        </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <input type="password" name="password" autocomplete="new-password" placeholder="Password Baru" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm">
                             <input type="password" name="password_confirmation" autocomplete="new-password" placeholder="Ulangi Password" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm">
@@ -541,6 +709,11 @@
         closeBtn?.addEventListener('click', () => toggleModal(false));
         cancelBtn?.addEventListener('click', () => toggleModal(false));
         backdrop?.addEventListener('click', () => toggleModal(false));
+
+        // Auto-reopen modal if there are validation errors
+        @if($errors->any())
+            setTimeout(() => toggleModal(true), 100);
+        @endif
 
         // Photo Preview Logic
         const photoInput = document.getElementById('photo_input');

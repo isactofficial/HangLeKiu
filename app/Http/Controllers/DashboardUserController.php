@@ -26,6 +26,7 @@ class DashboardUserController extends Controller
         $medicalHistoryRows = $this->emptyPaginator('history_page');
         $doctorNotesRows = $this->emptyPaginator('notes_page');
         $odontogramRows = $this->emptyPaginator('odontogram_page');
+        $odontogramData = [];
 
         $doctors = Doctor::active()
             ->orderBy('full_name')
