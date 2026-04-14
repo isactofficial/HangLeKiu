@@ -33,11 +33,6 @@ class AuthController extends Controller
         return view('admin.pages.admin-login');
     }
 
-    public function showAdminRegister()
-    {
-        return view('admin.pages.admin-register');
-    }
-
     public function showDoctorLogin()
     {
         return view('doctor.pages.login');
@@ -246,44 +241,6 @@ class AuthController extends Controller
         } while (Patient::where('medical_record_no', $number)->exists());
 
         return $number;
-    }
-
-    // ── ADMIN REGISTER ────────────────────────────────────────
-
-    public function adminRegister(Request $request)
-    {
-        $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'max:255', 'unique:user,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        $adminRole = Role::where('code', 'ADM')->first();
-
-        if (! $adminRole) {
-            $adminRole = Role::create([
-                'id' => (string) Str::uuid(),
-                'code' => 'ADM',
-                'name' => 'Admin',
-                'permissions' => null,
-                'created_at' => now(),
-            ]);
-        }
-
-        $user = User::create([
-            'id' => (string) Str::uuid(),
-            'role_id' => $adminRole->id,
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'is_active' => true,
-            'is_verified' => true,
-        ]);
-
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect(route('admin.dashboard'));
     }
 
     // ── LOGOUT ────────────────────────────────────────────────
