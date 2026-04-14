@@ -405,26 +405,28 @@
     };
 
     // ─── HAPUS ────────────────────────────────────────────────
-    window.hapusBHP = async function (id, nama) {
-        if (!confirm(`Hapus barang "${nama}"? Tindakan ini tidak dapat dibatalkan.`)) return;
-
-        try {
-            const res = await fetch(`${BASE_URL}/${id}`, {
-                method:  'DELETE',
-                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
-            });
-
-            if (res.ok) {
-                loadBHP(currentSearch);
-            } else {
-                const json = await res.json().catch(() => ({}));
-                alert('Gagal menghapus: ' + (json.message || 'Terjadi kesalahan.'));
+    window.hapusBHP = function (id, nama) {
+        konfirmasiHapus(
+            `Hapus barang "${nama}"? Tindakan ini tidak dapat dibatalkan.`,
+            async () => {
+                try {
+                    const res = await fetch(`${BASE_URL}/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+                    });
+                    if (res.ok) {
+                        loadBHP(currentSearch);
+                    } else {
+                        const json = await res.json().catch(() => ({}));
+                        alert('Gagal menghapus: ' + (json.message || 'Terjadi kesalahan.'));
+                    }
+                } catch (err) {
+                    alert('Error jaringan: ' + err.message);
+                }
             }
-        } catch (err) {
-            alert('Error jaringan: ' + err.message);
-        }
+        );
     };
-
+    
     // ─── MODAL HELPERS ────────────────────────────────────────
     function tutupSemua() {
         document.getElementById('modalBHP')?.classList.remove('open');

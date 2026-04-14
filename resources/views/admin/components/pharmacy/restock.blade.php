@@ -136,7 +136,7 @@
 <!-- ==========================================
      MODAL DETAIL
      ========================================== -->
-<div id="modalDetail" class="modal-overlay">
+<div id="modalDetail" class="modal-overlay" style="z-index:1050;">
     <div class="modal-container" style="max-width:500px;">
         <div class="modal-header">
             <h3 class="modal-title">Detail Transaksi</h3>
@@ -382,39 +382,39 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ── HAPUS DARI DETAIL ────────────────────────────────────
-    document.getElementById('btnHapusDetail')?.addEventListener('click', async () => {
+    document.getElementById('btnHapusDetail')?.addEventListener('click', () => {
         const d = currentDetail;
-        if (!confirm(`Hapus transaksi ${d.kode}?\nStok akan dikembalikan secara otomatis.`)) return;
+         document.getElementById('modalDetail').classList.remove('open');
+        konfirmasiHapus(
+            `Hapus transaksi ${d.kode}? Stok akan dikembalikan secara otomatis.`,
+            async () => {
+                const btnHapus = document.getElementById('btnHapusDetail');
+                btnHapus.disabled    = true;
+                btnHapus.textContent = 'Menghapus...';
+                try {
+                    const url = d.source === 'obat'
+                    ? `/api/medicine/${d.itemId}/stock-mutation/${d.id}`
+                    : `/api/bhp/restock/${d.id}`;
 
-        const btnHapus = document.getElementById('btnHapusDetail');
-        btnHapus.disabled    = true;
-        btnHapus.textContent = 'Menghapus...';
-
-        try {
-            // ✅ FIX: d.itemId = medicine_id, d.id = mutation_id
-            const url = d.source === 'obat'
-                ? `/api/medicine/${d.itemId}/stock-mutation/${d.id}`
-                : `/api/bhp/restock/${d.id}`;
-
-            const res  = await fetch(url, {
-                method : 'DELETE',
-                headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-            });
-            const json = await res.json();
-
-            if (res.ok) {
-                document.getElementById('modalDetail').classList.remove('open');
-                alert('Transaksi berhasil dihapus!');
-                loadTabel();
-            } else {
-                alert('Gagal: ' + (json.message ?? 'Terjadi kesalahan.'));
+                    const res  = await fetch(url, {
+                        method : 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                    });
+                    const json = await res.json();
+                    if (res.ok) {
+                        document.getElementById('modalDetail').classList.remove('open');
+                        loadTabel();
+                    } else {
+                        alert('Gagal: ' + (json.message ?? 'Terjadi kesalahan.'));
+                    }
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                } finally {
+                    btnHapus.disabled    = false;
+                    btnHapus.textContent = 'Hapus';
+                }
             }
-        } catch (err) {
-            alert('Error: ' + err.message);
-        } finally {
-            btnHapus.disabled    = false;
-            btnHapus.textContent = 'Hapus';
-        }
+        );
     });
 
     // ── LOAD DROPDOWN ITEM ───────────────────────────────────

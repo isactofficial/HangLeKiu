@@ -129,6 +129,7 @@
             </div>
         </div>
 
+        
         <div class="apt-main">
             @php
                 $pharmacyView = 'admin.components.pharmacy.' . $active;
@@ -146,6 +147,44 @@
             @endif
         </div>
 
+    </div>
+</div>
+
+{{-- Modal Konfirmasi Hapus (shared) --}}
+<div id="modalKonfirmasiHapus" class="modal-overlay" style="z-index:9999;">
+    <div style="background:white;border-radius:20px;padding:36px 32px;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+        
+        {{-- Icon trash dengan dekorasi --}}
+        <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <div style="width:72px;height:72px;border-radius:50%;background:#FEE2E2;display:flex;align-items:center;justify-content:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.8">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14H6L5 6"/>
+                    <path d="M10 11v6M14 11v6"/>
+                    <path d="M9 6V4h6v2"/>
+                </svg>
+            </div>
+            {{-- Dekorasi titik-titik --}}
+            <span style="position:absolute;top:-4px;left:-4px;color:#FCA5A5;font-size:10px;">✕</span>
+            <span style="position:absolute;top:-4px;right:-4px;color:#FCA5A5;font-size:10px;">✕</span>
+            <span style="position:absolute;bottom:-4px;right:-8px;color:#FCA5A5;font-size:10px;">✕</span>
+        </div>
+
+        {{-- Teks --}}
+        <h3 style="font-size:16px;font-weight:700;color:#111827;margin:0 0 8px;font-family:'Instrument Sans',sans-serif;">
+            Yakin ingin menghapus?
+        </h3>
+        <p id="hapusModalPesan" style="font-size:13px;color:#6B7280;margin:0 0 28px;line-height:1.6;font-family:'Instrument Sans',sans-serif;"></p>
+
+        {{-- Tombol --}}
+        <button id="hapusModalKonfirm" class="modal-btn" 
+            style="width:100%;padding:12px;background:#DC2626;color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:'Instrument Sans',sans-serif;">
+            Ya, Hapus
+        </button>
+        <button id="hapusModalBatal" 
+            style="width:100%;padding:10px;background:none;border:none;color:#6B7280;font-size:13px;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-weight:500;">
+            Batal
+        </button>
     </div>
 </div>
 
@@ -192,6 +231,26 @@ document.addEventListener('click', function(e) {
     }
     document.querySelectorAll('.apt-dropdown-menu.open').forEach(m => m.classList.remove('open'));
 });
+
+// Modal Hapus 
+function konfirmasiHapus(pesan, onKonfirm) {
+    const modal      = document.getElementById('modalKonfirmasiHapus');
+    const pesanEl    = document.getElementById('hapusModalPesan');
+    const btnBatal   = document.getElementById('hapusModalBatal');
+    const btnKonfirm = document.getElementById('hapusModalKonfirm');
+
+    pesanEl.textContent = pesan;
+    modal.classList.add('open');
+
+    const newKonfirm = btnKonfirm.cloneNode(true);
+    btnKonfirm.parentNode.replaceChild(newKonfirm, btnKonfirm);
+
+    const tutup = () => modal.classList.remove('open');
+    btnBatal.onclick = tutup;
+    modal.onclick = (e) => { if (e.target === modal) tutup(); };
+    newKonfirm.onclick = () => { tutup(); onKonfirm(); };
+}
+
 </script>
 
 @endsection
