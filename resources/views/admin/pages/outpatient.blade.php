@@ -314,113 +314,167 @@
                 {{-- Mobile Cards --}}
                 <div class="rj-mobile-schedule">
                     @if ($viewMode === 'all')
+                        {{-- ── MODE SEMUA DOKTER ── --}}
                         @foreach ($timeSlots as $slot)
-                            <div class="mobile-time-group">
-                                <div class="m-time-label">{{ $slot }}</div>
-                                <div class="m-cards">
-                                    @foreach ($doctors as $doc)
-                                        @php 
-                                            $apt = $schedule[$doc->id][$slot] ?? null; 
-                                            $dayName = strtolower(\Carbon\Carbon::parse($date)->locale('en')->dayName);
-                                            
-                                            $isPracticing = \Illuminate\Support\Facades\DB::table('doctor_schedule')
-                                                ->where('doctor_id', $doc->id)
-                                                ->where('day', $dayName)
-                                                ->where('is_active', 1)
-                                                ->where('start_time', '<=', $slot . ':00')
-                                                ->where('end_time', '>', $slot . ':00')
-                                                ->exists();
-                                        @endphp
+                            @php
+                                $hasAnything = false;
+                                foreach ($doctors as $doc) {
+                                    $apt = $schedule[$doc->id][$slot] ?? null;
+                                    $dayName = strtolower(\Carbon\Carbon::parse($date)->locale('en')->dayName);
+                                    $isPrac = \Illuminate\Support\Facades\DB::table('doctor_schedule')
+                                        ->where('doctor_id', $doc->id)->where('day', $dayName)
+                                        ->where('is_active', 1)
+                                        ->where('start_time', '<=', $slot . ':00')
+                                        ->where('end_time', '>', $slot . ':00')
+                                        ->exists();
+                                    if ($apt || $isPrac) { $hasAnything = true; break; }
+                                }
+                            @endphp
 
-                                        @if ($apt)
-                                            <div class="apt-card m-card {{ $apt->status }}" style="border-left-color:{{ $apt->status_color }}" 
-                                                data-id="{{ $apt->id }}"
-                                                data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
-                                                data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
-                                                data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
-                                                data-gender="{{ $apt->patient->gender ?? '' }}"
-                                                data-time="{{ $apt->formatted_time }}"
-                                                data-doctor="{{ $doc->full_name ?? '-' }}"
-                                                data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
-                                                data-created-at="{{ $apt->formatted_created_at }}"
-                                                data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
-                                                data-duration="{{ $apt->duration_minutes ?? 10 }}"
-                                                data-status="{{ $apt->status }}"
-                                                data-action="open-detail">
-                                                <div class="m-card-header">
-                                                    <div class="apt-name">{{ $apt->patient->full_name ?? 'Pasien' }}</div>
-                                                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                            @if ($hasAnything)
+                                <div class="m-slot-group">
+                                    <div class="m-slot-time">{{ $slot }}</div>
+                                    <div class="m-slot-cards">
+                                        @foreach ($doctors as $doc)
+                                            @php
+                                                $apt = $schedule[$doc->id][$slot] ?? null;
+                                                $dayName = strtolower(\Carbon\Carbon::parse($date)->locale('en')->dayName);
+                                                $isPracticing = \Illuminate\Support\Facades\DB::table('doctor_schedule')
+                                                    ->where('doctor_id', $doc->id)->where('day', $dayName)
+                                                    ->where('is_active', 1)
+                                                    ->where('start_time', '<=', $slot . ':00')
+                                                    ->where('end_time', '>', $slot . ':00')
+                                                    ->exists();
+                                            @endphp
+
+                                            @if ($apt)
+                                                <div class="m-apt-card" style="border-left: 3px solid {{ $apt->status_color }};"
+                                                    data-id="{{ $apt->id }}"
+                                                    data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
+                                                    data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
+                                                    data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
+                                                    data-gender="{{ $apt->patient->gender ?? '' }}"
+                                                    data-time="{{ $apt->formatted_time }}"
+                                                    data-doctor="{{ $doc->full_name ?? '-' }}"
+                                                    data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
+                                                    data-created-at="{{ $apt->formatted_created_at }}"
+                                                    data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
+                                                    data-duration="{{ $apt->duration_minutes ?? 10 }}"
+                                                    data-status="{{ $apt->status }}"
+                                                    data-action="open-detail">
+                                                    <div class="m-apt-top">
+                                                        <span class="m-apt-name" style="{{ $apt->status === 'pending' ? 'color:#ef4444' : '' }}">
+                                                            {{ $apt->patient->full_name ?? 'Pasien' }}
+                                                        </span>
+                                                        <span class="m-apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                    </div>
+                                                    <div class="m-apt-meta">
+                                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                                        {{ $doc->full_name }}
+                                                        @if($apt->poli) · {{ $apt->poli->name }} @endif
+                                                    </div>
                                                 </div>
-                                                <div class="apt-treat">{{ $apt->poli->name ?? '-' }}</div>
-                                                <div class="m-doc-name">
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 
+                                            @elseif ($isPracticing)
+                                                <div class="m-add-btn"
+                                                    data-action="open-registration"
+                                                    data-doctor-id="{{ $doc->id }}"
+                                                    data-time="{{ $slot }}"
+                                                    data-poli-id="{{ $doc->poli_id ?? '' }}"
+                                                    data-date="{{ $date }}">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                                     {{ $doc->full_name }}
                                                 </div>
-                                            </div>
-                                        @elseif ($isPracticing)
-                                            <div class="m-empty-slot" 
-                                                data-action="open-registration"
-                                                data-doctor-id="{{ $doc->id }}"
-                                                data-time="{{ $slot }}"
-                                                data-poli-id="{{ $doc->poli_id ?? '' }}"
-                                                data-date="{{ $date }}"
-                                                style="cursor:pointer; border: 1px dashed #A67C52;">
-                                                <div class="m-empty-label text-[#A67C52]"><i class="fa fa-plus"></i> Tambah Pasien ({{ $doc->full_name }})</div>
-                                            </div>
-                                        @else
-                                            <div class="m-empty-slot" style="background:#f9fafb; cursor:not-allowed; border: 1px dashed #e5e7eb;">
-                                                <div class="m-empty-label" style="color:#d1d5db;">Tidak Ada Praktek ({{ $doc->full_name }})</div>
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-                    @else
-                        @foreach ($dateColumns as $dc)
-                            @php 
-                                $dcCarbon = \Carbon\Carbon::parse($dc); 
-                                
-                                $aptsForDate = \App\Models\Appointment::with('patient')
-                                    ->where('doctor_id', $selectedDoctorId)
-                                    ->whereDate('appointment_datetime', $dc)
-                                    ->orderBy('appointment_datetime')
-                                    ->get();
-                            @endphp
-                            <div class="mobile-time-group">
-                                <div class="m-time-label" style="background: var(--gold); color: white;">
-                                    {{ $dcCarbon->locale('id')->isoFormat('dddd, D MMM YYYY') }}
-                                </div>
-                                <div class="m-cards">
-                                    @if ($aptsForDate->count() > 0)
-                                        @foreach ($aptsForDate as $apt)
-                                            <div class="apt-card m-card {{ $apt->status }}" style="border-left-color:{{ $apt->status_color }}" 
-                                                data-id="{{ $apt->id }}"
-                                                data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
-                                                data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
-                                                data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
-                                                data-gender="{{ $apt->patient->gender ?? '' }}"
-                                                data-time="{{ $apt->formatted_time }}"
-                                                data-doctor="{{ $apt->doctor?->full_name ?? $selectedDoctor->full_name }}"
-                                                data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
-                                                data-created-at="{{ $apt->formatted_created_at }}"
-                                                data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
-                                                data-duration="{{ $apt->duration_minutes ?? 10 }}"
-                                                data-status="{{ $apt->status }}"
-                                                data-action="open-detail">
-                                                <div class="m-card-header">
-                                                    <div class="apt-name">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }} | {{ $apt->patient->full_name ?? 'Pasien' }}</div>
-                                                    <span class="apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
-                                                </div>
-                                                <div class="apt-treat">{{ $apt->poli->name ?? '-' }}</div>
-                                            </div>
+                                            @endif
+                                            {{-- "Tidak Ada Praktek" sengaja disembunyikan di mobile --}}
                                         @endforeach
-                                    @else
-                                        <div class="m-empty-slot" style="background:#f9fafb; border: 1px dashed #e5e7eb; cursor:not-allowed;">
-                                            <div class="m-empty-label" style="color:#d1d5db;">Tidak ada jadwal di hari ini</div>
-                                        </div>
-                                    @endif
+                                    </div>
                                 </div>
+                            @endif
+                        @endforeach
+
+                    @else
+                        {{-- ── MODE SINGLE DOCTOR ── --}}
+                        @foreach ($dateColumns as $dc)
+                            @php
+                                $dcCarbon = \Carbon\Carbon::parse($dc);
+                                $dayName  = strtolower($dcCarbon->locale('en')->dayName);
+                                $isColToday = $dc === $today;
+
+                                // Kumpulkan slot yang relevan saja
+                                $relevantSlots = [];
+                                foreach ($timeSlots as $slot) {
+                                    $apt = $schedule[$dc][$slot] ?? null;
+                                    $isPrac = \Illuminate\Support\Facades\DB::table('doctor_schedule')
+                                        ->where('doctor_id', $selectedDoctorId)->where('day', $dayName)
+                                        ->where('is_active', 1)
+                                        ->where('start_time', '<=', $slot . ':00')
+                                        ->where('end_time', '>', $slot . ':00')
+                                        ->exists();
+                                    if ($apt || $isPrac) {
+                                        $relevantSlots[] = ['slot' => $slot, 'apt' => $apt, 'isPrac' => $isPrac];
+                                    }
+                                }
+                            @endphp
+
+                            <div class="m-date-section {{ $isColToday ? 'm-date-today' : '' }}">
+                                {{-- Header Tanggal --}}
+                                <div class="m-date-header">
+                                    <div class="m-date-weekday">{{ $dcCarbon->locale('id')->isoFormat('dddd') }}</div>
+                                    <div class="m-date-full">
+                                        {{ $dcCarbon->locale('id')->isoFormat('D MMMM YYYY') }}
+                                        @if($isColToday) <span class="m-today-pill">Hari Ini</span> @endif
+                                    </div>
+                                </div>
+
+                                {{-- Isi Slot --}}
+                                @if (count($relevantSlots) === 0)
+                                    <div class="m-no-schedule">Tidak ada jadwal praktek hari ini</div>
+                                @else
+                                    <div class="m-slot-list">
+                                        @foreach ($relevantSlots as $item)
+                                            @if ($item['apt'])
+                                                @php $apt = $item['apt']; @endphp
+                                                <div class="m-apt-card" style="border-left: 3px solid {{ $apt->status_color }};"
+                                                    data-id="{{ $apt->id }}"
+                                                    data-patient="{{ $apt->patient->full_name ?? 'Pasien' }}"
+                                                    data-mr="{{ $apt->patient->medical_record_no ?? '-' }}"
+                                                    data-dob="{{ $apt->patient->date_of_birth ?? '' }}"
+                                                    data-gender="{{ $apt->patient->gender ?? '' }}"
+                                                    data-time="{{ $apt->formatted_time }}"
+                                                    data-doctor="{{ $selectedDoctor->full_name ?? '-' }}"
+                                                    data-creator="{{ $apt->admin->name ?? ($apt->admin_id == 1 ? 'System' : '-') }}"
+                                                    data-created-at="{{ $apt->formatted_created_at }}"
+                                                    data-payment="{{ $apt->paymentMethod->name ?? '-' }}"
+                                                    data-duration="{{ $apt->duration_minutes ?? 10 }}"
+                                                    data-status="{{ $apt->status }}"
+                                                    data-action="open-detail">
+                                                    <div class="m-apt-top">
+                                                        <div style="display:flex; align-items:center; gap:6px;">
+                                                            <span class="m-slot-tag">{{ $item['slot'] }}</span>
+                                                            <span class="m-apt-name" style="{{ $apt->status === 'pending' ? 'color:#ef4444' : '' }}">
+                                                                {{ $apt->patient->full_name ?? 'Pasien' }}
+                                                            </span>
+                                                        </div>
+                                                        <span class="m-apt-badge" style="background:{{ $apt->status_color }}">{{ ucfirst($apt->status) }}</span>
+                                                    </div>
+                                                    @if($apt->poli)
+                                                        <div class="m-apt-meta">{{ $apt->poli->name }}</div>
+                                                    @endif
+                                                </div>
+                                            @elseif ($item['isPrac'])
+                                                <div class="m-add-btn"
+                                                    data-action="open-registration"
+                                                    data-doctor-id="{{ $selectedDoctorId }}"
+                                                    data-time="{{ $item['slot'] }}"
+                                                    data-poli-id="{{ $selectedDoctor->poli_id ?? '' }}"
+                                                    data-date="{{ $dc }}">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                                    {{ $item['slot'] }} — Tambah Pasien
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     @endif
