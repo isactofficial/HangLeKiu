@@ -759,37 +759,62 @@
         {{-- KANAN: ACTIONS --}}
         <div class="emr-side-actions">
             <div class="diagnosa-container">
-                <button class="btn-primary-blue" onclick="toggleDiagnosaMenu(event)" {{ ($appointment->status ?? '') !== 'engaged' ? 'disabled' : '' }}>
+                <button class="btn-primary-blue" 
+                        onclick="toggleDiagnosaMenu(event)"
+                        data-diagnosa-btn="true"
+                        aria-label="Tambah Diagnosis (Prosedur, Odontogram, Catatan)"
+                        aria-expanded="false"
+                        aria-haspopup="menu"
+                        {{ ($appointment->status ?? '') !== 'engaged' ? 'disabled aria-disabled="true"' : '' }}>
                     <span>+ TAMBAH DIAGNOSA</span>
+                    <i class="fa fa-plus ml-2" style="font-size: 12px; opacity: 0.8;"></i>
                 </button>
-                <div class="diagnosa-dropdown hidden" id="diagnosa-menu">
-                    <input type="text" id="diagSearchInput" onkeyup="filterDiagnosaList()" placeholder="Cari fitur medis..." class="diag-search-input">
-                    <ul class="diag-list" id="diagList">
-                        <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleProsedureModal(true, {
-                                name: @js($patient->full_name ?? '-'),
-                                rm: @js($patient->medical_record_no ?? '-'),
-                                gender: @js($patientGenderLabel),
-                                age: @js($patientAgeNumber . ' Tahun'),
-                                payment: @js($paymentLabel),
-                                patient_id: @js($appointment->patient_id ?? ''),
-                                registration_id: @js($appointment->id ?? ''),
-                                doctor_id: @js($appointment->doctor_id ?? ''),
-                                doctor_name: @js($appointment->doctor->full_name ?? '')
-                            })">
-                                Tambah Prosedur
+                <div class="diagnosa-dropdown hidden" id="diagnosa-menu" role="menu">
+                    <input type="text" 
+                           id="diagSearchInput" 
+                           onkeyup="filterDiagnosaList()" 
+                           placeholder="Cari diagnosis/prosedur..." 
+                           class="diag-search-input"
+                           autocomplete="off">
+                    <ul class="diag-list" id="diagList" role="listbox">
+                        <li><a href="javascript:void(0)" 
+                               class="diagnosa-item" 
+                               role="menuitem"
+                               onclick="toggleProsedureModal(true, {
+                                   name: @js($patient->full_name ?? '-'),
+                                   rm: @js($patient->medical_record_no ?? '-'),
+                                   gender: @js($patientGenderLabel),
+                                   age: @js($patientAgeNumber . ' Tahun'),
+                                   payment: @js($paymentLabel),
+                                   patient_id: @js($appointment->patient_id ?? ''),
+                                   registration_id: @js($appointment->id ?? ''),
+                                   doctor_id: @js($appointment->doctor_id ?? ''),
+                                   doctor_name: @js($appointment->doctor->full_name ?? '')
+                               })">
+                               <i class="fas fa-stethoscope mr-3"></i>Tambah Prosedur
                             </a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleOdontogramModal(true, {
-                                    name: @js($patient->full_name ?? '-'),
-                                    rm: @js($patient->medical_record_no ?? '-'),
-                                    gender: @js($patientGenderLabel),
-                                    age: @js($patientAgeNumber . ' Tahun'),
-                                    payment: @js($paymentLabel),
-                                    patient_id: @js($appointment->patient_id ?? ''),
-                                    registration_id: @js($appointment->id ?? ''),
-                                    doctor_id: @js($appointment->doctor_id ?? ''),
-                                    doctor_name: @js($appointment->doctor->full_name ?? '')
-                                })">Tambah Odontogram</a></li>
-                        <li><a href="javascript:void(0)" class="diagnosa-item" onclick="openDoctorNoteModalFromDetail()">Tambah Catatan Dokter</a></li>
+                        <li><a href="javascript:void(0)" 
+                               class="diagnosa-item" 
+                               role="menuitem"
+                               onclick="toggleOdontogramModal(true, {
+                                   name: @js($patient->full_name ?? '-'),
+                                   rm: @js($patient->medical_record_no ?? '-'),
+                                   gender: @js($patientGenderLabel),
+                                   age: @js($patientAgeNumber . ' Tahun'),
+                                   payment: @js($paymentLabel),
+                                   patient_id: @js($appointment->patient_id ?? ''),
+                                   registration_id: @js($appointment->id ?? ''),
+                                   doctor_id: @js($appointment->doctor_id ?? ''),
+                                   doctor_name: @js($appointment->doctor->full_name ?? '')
+                               })">
+                               <i class="fas fa-tooth mr-3"></i>Tambah Odontogram
+                            </a></li>
+                        <li><a href="javascript:void(0)" 
+                               class="diagnosa-item" 
+                               role="menuitem"
+                               onclick="openDoctorNoteModalFromDetail()">
+                               <i class="fas fa-file-medical mr-3"></i>Tambah Catatan Dokter
+                            </a></li>
                     </ul>
                 </div>
             </div>
