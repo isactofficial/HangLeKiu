@@ -288,12 +288,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(74, 39, 16, 0.56);
-    z-index: 1050;
-    align-items: center;
+    background: rgba(46, 21, 5, 0.65); /* Sedikit lebih gelap agar fokus */
+    z-index: 9999; /* Pastikan di atas segalanya termasuk navbar */
+    align-items: flex-start; /* Ubah ke top agar kontrol scroll lebih baik */
     justify-content: center;
-    padding: 24px;
-    backdrop-filter: blur(4px);
+    padding: 80px 24px 40px; /* Padding top ditambah (80px) untuk menghindari navbar */
+    backdrop-filter: blur(6px);
+    overflow-y: auto; /* Memungkinkan overlay yang menampung scroll jika konten sangat panjang */
 }
 
 @media (max-width: 768px) {
@@ -306,15 +307,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .reg-modal-content {
     width: 100%;
-    max-width: 800px; /* Lebar lebih disesuaikan untuk popup (kurang dari 900px) */
-    max-height: 95vh;
-    overflow-y: auto;
+    max-width: 800px;
     background: var(--cream-50);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     position: relative;
-    padding: 40px 24px 60px; /* Ditambahkan agar isinya tidak menempel batas modal */
-    /* Hide scrollbar for aesthetics but keep functionality */
-    scrollbar-width: none;
+    padding: 48px 32px 60px;
+    margin-bottom: 40px; /* Jarak bawah agar tidak nempel */
+    box-shadow: 0 25px 50px -12px rgba(46, 21, 5, 0.3);
 }
 
 @media (max-width: 768px) {

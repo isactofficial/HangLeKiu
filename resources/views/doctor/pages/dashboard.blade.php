@@ -170,7 +170,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm md:pl-2">
+                            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm md:pl-2">
                                 <div class="profile-item">
                                     <p class="profile-item-label">Email Aktif</p>
                                     <p class="profile-item-value truncate">{{ $user->email }}</p>
@@ -180,14 +180,54 @@
                                     <p class="profile-item-value">{{ $doctor->phone_number ?? '-' }}</p>
                                 </div>
                                 <div class="profile-item">
-                                    <p class="profile-item-label">STR / License No</p>
-                                    <p class="profile-item-value">{{ $doctor->license_no ?? '-' }}</p>
+                                    <p class="profile-item-label">Spesialisasi</p>
+                                    <p class="profile-item-value">{{ $doctor->specialization ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Nomor SIP</p>
+                                    <p class="profile-item-value">{{ $doctor->sip_number ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Nomor STR</p>
+                                    <p class="profile-item-value">{{ $doctor->str_number ?? '-' }}</p>
                                 </div>
                                 <div class="profile-item">
                                     <p class="profile-item-label">Jabatan</p>
                                     <p class="profile-item-value">{{ $doctor->job_title ?? 'Dokter Spesialis' }}</p>
                                 </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Alma Mater</p>
+                                    <p class="profile-item-value">{{ $doctor->alma_mater ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item">
+                                    <p class="profile-item-label">Pengalaman Praktik</p>
+                                    <p class="profile-item-value">{{ $doctor->experience ?? '-' }}</p>
+                                </div>
+                                <div class="profile-item flex items-center justify-between">
+                                    <div>
+                                        <p class="profile-item-label">Media Sosial</p>
+                                        <div class="flex gap-2 mt-1">
+                                            @if($doctor && $doctor->instagram_url)
+                                                <a href="{{ $doctor->instagram_url }}" target="_blank" class="text-pink-600 hover:scale-110 transition"><i class="fab fa-instagram text-lg"></i></a>
+                                            @endif
+                                            @if($doctor && $doctor->linkedin_url)
+                                                <a href="{{ $doctor->linkedin_url }}" target="_blank" class="text-blue-700 hover:scale-110 transition"><i class="fab fa-linkedin text-lg"></i></a>
+                                            @endif
+                                            @if(!$doctor || (!$doctor->instagram_url && !$doctor->linkedin_url))
+                                                <span class="text-slate-400 font-medium">-</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            @if($doctor && $doctor->bio)
+                            <div class="mt-6 md:pl-2">
+                                <p class="profile-item-label">Biografi Singkat</p>
+                                <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl italic text-[var(--font-color-secondary)] leading-relaxed">
+                                    "{{ $doctor->bio }}"
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
 
@@ -445,7 +485,7 @@
     {{-- Modal Edit Profile --}}
     <div id="editProfileModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-2 sm:p-4 overflow-hidden">
         <div id="editProfileBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"></div>
-        <div id="editProfileDialog" class="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl border border-[#EFE3D7] overflow-hidden transform transition-all flex flex-col min-h-0 max-h-full" style="height: min(920px, calc(100vh - 1rem));">
+        <div id="editProfileDialog" class="relative bg-white rounded-3xl shadow-2xl w-full max-w-3xl border border-[#EFE3D7] transform transition-all flex flex-col min-h-0 max-h-[95vh]">
             
             <div class="px-6 sm:px-8 py-4 sm:py-5 border-b border-[#EFE3D7] flex items-center justify-between bg-gradient-to-r from-[#FEFCFA] to-white shrink-0 sticky top-0 z-20">
                 <div>
@@ -459,7 +499,7 @@
                 <form id="profileUpdateForm" method="POST" action="{{ route('doctor.profile.update') }}" enctype="multipart/form-data" autocomplete="off" class="p-6 sm:p-8 space-y-8">
                     @csrf
                     @method('PUT')
-                    <input type="hidden" name="photo_base64" id="photo_base64">
+                    <input type="hidden" id="photo_base64">
                     
                     <div class="flex flex-col items-center justify-center mb-4">
                         <div class="relative w-28 h-28 mb-3 group cursor-pointer" onclick="document.getElementById('photo_input').click()">
@@ -471,37 +511,126 @@
                             </div>
                         </div>
                         <p class="text-sm font-bold text-[#8B5E3C] cursor-pointer hover:text-[#582c0c] transition" onclick="document.getElementById('photo_input').click()">Ubah Foto Profil</p>
-                        <input type="file" id="photo_input" class="hidden" accept="image/*">
+                        <input type="file" id="photo_input" name="foto_profil" class="hidden" accept="image/*">
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Nama Lengkap & Gelar</label>
-                            <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" required>
-                        </div>
+                    <div class="space-y-10">
+                        {{-- Section: Identitas Dasar --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Email Aktif</label>
-                            <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" required>
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                                <div class="md:col-span-3">
+                                    <label for="title_prefix_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Prefix (Gelar)</label>
+                                    <input type="text" id="title_prefix_input" name="title_prefix" value="{{ old('title_prefix', $doctor->title_prefix ?? '') }}" placeholder="Contoh: drg." class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                                <div class="md:col-span-9">
+                                    <label for="name_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Nama Lengkap (Tanpa Gelar Depan)</label>
+                                    <input type="text" id="name_input" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-bold" required>
+                                </div>
+                                <div class="md:col-span-6">
+                                    <label for="email_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Email</label>
+                                    <input type="email" id="email_input" name="email" value="{{ old('email', $user->email) }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium" required>
+                                </div>
+                                <div class="md:col-span-6">
+                                    <label for="phone_number_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">WhatsApp</label>
+                                    <input type="tel" id="phone_number_input" name="phone_number" value="{{ old('phone_number', $doctor->phone_number ?? '') }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- Section: Spesialisasi & Jabatan --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">No. WhatsApp</label>
-                            <input type="tel" name="phone_number" value="{{ old('phone_number', $doctor->phone_number ?? '') }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="specialization_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Spesialisasi (Gelar Belakang)</label>
+                                    <input type="text" id="specialization_input" name="specialization" value="{{ old('specialization', $doctor->specialization ?? '') }}" placeholder="Contoh: Sp.Ortho" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                                <div>
+                                    <label for="subspecialization_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Sub-Spesialisasi</label>
+                                    <input type="text" id="subspecialization_input" name="subspecialization" value="{{ old('subspecialization', $doctor->subspecialization ?? '') }}" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="job_title_input" class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Jabatan Kerja</label>
+                                    <input type="text" id="job_title_input" name="job_title" value="{{ old('job_title', $doctor->job_title ?? '') }}" placeholder="Contoh: Kepala Dokter Gigi" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- Section: Legalitas Profesi --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">Nomor SIP</label>
-                            <input type="text" name="sip_number" value="{{ old('sip_number', $doctor->sip_number ?? '') }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 p-5 bg-[#FEFCFA] border border-[#EBDCCF] rounded-2xl">
+                                    <div class="md:col-span-12 font-black text-[10px] uppercase text-slate-400 tracking-tighter -mt-2 mb-1">Surat Tanda Registrasi (STR)</div>
+                                    <div class="md:col-span-6">
+                                        <label for="str_number_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Nomor STR</label>
+                                        <input type="text" id="str_number_input" name="str_number" value="{{ old('str_number', $doctor->str_number ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <label for="str_institution_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Institusi STR</label>
+                                        <input type="text" id="str_institution_input" name="str_institution" value="{{ old('str_institution', $doctor->str_institution ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <input type="text" id="str_expiry_date_input" name="str_expiry_date" value="{{ old('str_expiry_date', $doctor->str_expiry_date ? $doctor->str_expiry_date->format('Y-m-d') : '') }}" placeholder="YYYY-MM-DD" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <label for="license_no_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">STR / License Extra</label>
+                                        <input type="text" id="license_no_input" name="license_no" value="{{ old('license_no', $doctor->license_no ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 p-5 bg-[#FEFCFA] border border-[#EBDCCF] rounded-2xl">
+                                    <div class="md:col-span-12 font-black text-[10px] uppercase text-slate-400 tracking-tighter -mt-2 mb-1">Surat Izin Praktik (SIP)</div>
+                                    <div class="md:col-span-6">
+                                        <label for="sip_number_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Nomor SIP</label>
+                                        <input type="text" id="sip_number_input" name="sip_number" value="{{ old('sip_number', $doctor->sip_number ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-6">
+                                        <label for="sip_institution_input" class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Institusi SIP</label>
+                                        <input type="text" id="sip_institution_input" name="sip_institution" value="{{ old('sip_institution', $doctor->sip_institution ?? '') }}" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                    <div class="md:col-span-12">
+                                        <input type="text" id="sip_expiry_date_input" name="sip_expiry_date" value="{{ old('sip_expiry_date', $doctor->sip_expiry_date ? $doctor->sip_expiry_date->format('Y-m-d') : '') }}" placeholder="YYYY-MM-DD" class="w-full px-3 py-2 rounded-lg border-[#EBDCCF] focus:ring-[#8B5E3C] text-sm font-medium">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        {{-- Section: Profil Publik & Resume --}}
                         <div>
-                            <label class="block text-sm font-bold text-[#8B5E3C] mb-2 pl-1">License / STR</label>
-                            <input type="text" name="license_no" value="{{ old('license_no', $doctor->license_no ?? '') }}" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-[var(--font-color-primary)] font-medium">
+                            <div class="grid grid-cols-1 gap-5">
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Alma Mater (Studi)</label>
+                                        <input type="text" name="alma_mater" value="{{ old('alma_mater', $doctor->alma_mater ?? '') }}" placeholder="Contoh: Universitas Indonesia" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Pengalaman Praktik</label>
+                                        <input type="text" name="experience" value="{{ old('experience', $doctor->experience ?? '') }}" placeholder="Contoh: 10+ Tahun" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm font-medium">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Biografi Singkat (Publik)</label>
+                                    <textarea name="bio" rows="4" class="w-full px-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm leading-relaxed" placeholder="Tuliskan biografi singkat Anda untuk ditampilkan kepada pasien...">{{ old('bio', $doctor->bio ?? '') }}</textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">Instagram URL</label>
+                                        <div class="relative">
+                                            <i class="fab fa-instagram absolute left-4 top-1/2 -translate-y-1/2 text-pink-600"></i>
+                                            <input type="url" name="instagram_url" value="{{ old('instagram_url', $doctor->instagram_url ?? '') }}" placeholder="https://instagram.com/..." class="w-full pl-10 pr-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] shadow-sm text-xs">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-[#8B5E3C] mb-2 uppercase tracking-wider">LinkedIn URL</label>
+                                        <div class="relative">
+                                            <i class="fab fa-linkedin absolute left-4 top-1/2 -translate-y-1/2 text-blue-700"></i>
+                                            <input type="url" name="linkedin_url" value="{{ old('linkedin_url', $doctor->linkedin_url ?? '') }}" placeholder="https://linkedin.com/..." class="w-full pl-10 pr-4 py-3 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] shadow-sm text-xs">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="pt-6 border-t border-[#EFE3D7]">
-                        <p class="text-xs text-[#8B5E3C] mb-4 uppercase tracking-wider font-extrabold flex items-center gap-2">
-                            <i class="fas fa-lock"></i>
-                            Keamanan (Ubah Password)
-                        </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <input type="password" name="password" autocomplete="new-password" placeholder="Password Baru" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm">
                             <input type="password" name="password_confirmation" autocomplete="new-password" placeholder="Ulangi Password" class="w-full px-4 py-2.5 rounded-xl border-[#EBDCCF] bg-[#FEFCFA] focus:bg-white focus:border-[#8B5E3C] focus:ring-[#8B5E3C] shadow-sm text-sm">
@@ -541,6 +670,11 @@
         closeBtn?.addEventListener('click', () => toggleModal(false));
         cancelBtn?.addEventListener('click', () => toggleModal(false));
         backdrop?.addEventListener('click', () => toggleModal(false));
+
+        // Auto-reopen modal if there are validation errors
+        @if($errors->any())
+            setTimeout(() => toggleModal(true), 100);
+        @endif
 
         // Photo Preview Logic
         const photoInput = document.getElementById('photo_input');

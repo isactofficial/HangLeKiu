@@ -117,13 +117,27 @@ class DashboardDoctorController extends Controller
         $doctor = $user->doctor;
 
         $validated = $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|max:255|unique:user,email,' . $user->id,
-            'phone_number'   => 'nullable|string|max:20',
-            'sip_number'     => 'nullable|string|max:50',
-            'license_no'     => 'nullable|string|max:50',
-            'foto_profil'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'password'       => 'nullable|string|min:8|confirmed',
+            'name'                => 'required|string|max:255',
+            'email'               => 'required|email|max:255|unique:user,email,' . $user->id,
+            'phone_number'        => 'nullable|string|max:20',
+            'title_prefix'        => 'nullable|string|max:50',
+            'specialization'      => 'nullable|string|max:100',
+            'subspecialization'   => 'nullable|string|max:100',
+            'job_title'           => 'nullable|string|max:50',
+            'license_no'          => 'nullable|string|max:50',
+            'str_number'          => 'nullable|string|max:50',
+            'str_institution'     => 'nullable|string|max:50',
+            'str_expiry_date'     => 'nullable|date',
+            'sip_number'          => 'nullable|string|max:50',
+            'sip_institution'     => 'nullable|string|max:50',
+            'sip_expiry_date'     => 'nullable|date',
+            'alma_mater'          => 'nullable|string|max:255',
+            'experience'          => 'nullable|string|max:255',
+            'bio'                 => 'nullable|string',
+            'instagram_url'       => 'nullable|url|max:255',
+            'linkedin_url'        => 'nullable|url|max:255',
+            'foto_profil'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'password'            => 'nullable|string|min:8|confirmed',
         ]);
 
         $user->name = $validated['name'];
@@ -136,11 +150,25 @@ class DashboardDoctorController extends Controller
 
         if ($doctor) {
             $doctorData = [
-                'full_name'    => $validated['name'],
-                'email'        => $validated['email'],
-                'phone_number' => $validated['phone_number'],
-                'sip_number'   => $validated['sip_number'],
-                'license_no'   => $validated['license_no'],
+                'full_name'          => $validated['name'],
+                'email'              => $validated['email'],
+                'phone_number'       => $validated['phone_number'],
+                'title_prefix'       => $validated['title_prefix'],
+                'specialization'     => $validated['specialization'],
+                'subspecialization'  => $validated['subspecialization'],
+                'job_title'          => $validated['job_title'],
+                'license_no'         => $validated['license_no'],
+                'str_number'         => $validated['str_number'],
+                'str_institution'    => $validated['str_institution'],
+                'str_expiry_date'    => $validated['str_expiry_date'],
+                'sip_number'         => $validated['sip_number'],
+                'sip_institution'    => $validated['sip_institution'],
+                'sip_expiry_date'    => $validated['sip_expiry_date'],
+                'alma_mater'         => $validated['alma_mater'],
+                'experience'         => $validated['experience'],
+                'bio'                => $validated['bio'],
+                'instagram_url'      => $validated['instagram_url'],
+                'linkedin_url'       => $validated['linkedin_url'],
             ];
 
             if ($request->hasFile('foto_profil')) {
