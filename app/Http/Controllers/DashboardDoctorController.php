@@ -61,6 +61,20 @@ class DashboardDoctorController extends Controller
                 ? 'COALESCE(mp.doctor_fee_percentage_snapshot, d.default_fee_percentage, 0)'
                 : 'COALESCE(d.default_fee_percentage, 0)';
 
+            // Total Pendapatan Hari Ini
+            $todayIncomeTotal = DB::table('procedure_item as pi')
+                ->join('medical_procedure as mp', 'pi.procedure_id', '=', 'mp.id')
+                ->join('registration as ap', 'mp.registration_id', '=', 'ap.id')
+                ->leftJoin('doctor as d', 'mp.doctor_id', '=', 'd.id')
+                ->where('mp.doctor_id', $doctor->id)
+                ->where('ap.status', 'succeed')
+                ->whereNull('ap.deleted_at')
+                ->whereNull('mp.deleted_at')
+                ->whereNull('pi.deleted_at')
+                ->whereDate('mp.created_at', Carbon::today())
+                ->selectRaw("SUM(({$netSubtotalExpression}) * (({$doctorFeePercentageExpression}) / 100)) as income")
+                ->value('income') ?? 0;
+
             $doctorProcedureSummary = DB::table('procedure_item as pi')
                 ->join('medical_procedure as mp', 'pi.procedure_id', '=', 'mp.id')
                 ->join('registration as ap', 'mp.registration_id', '=', 'ap.id')
@@ -100,6 +114,7 @@ class DashboardDoctorController extends Controller
             'totalPatientsTreated',
             'doctorProcedureSummary',
             'doctorIncomeTotal',
+            'todayIncomeTotal',
             'totalProcedureActions',
             'selectedMonth',
             'selectedYear',

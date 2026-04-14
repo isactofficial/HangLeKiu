@@ -423,11 +423,20 @@
                             </div>
                             <div class="group bg-white border border-[#EFE3D7] rounded-2xl p-5 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-[#D9C3AE] hover:-translate-y-1 transition-all duration-300 cursor-default">
                                 <div class="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-calendar-alt text-2xl"></i>
+                                     <i class="fas fa-calendar-alt text-2xl"></i>
+                                 </div>
+                                 <div class="flex-1 min-w-0">
+                                     <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Jadwal Hari Ini</p>
+                                     <p class="text-xl font-black text-[var(--font-color-primary)]">{{ (isset($todayAppointments) ? $todayAppointments->count() : 0) }} <span class="text-xs font-semibold text-[var(--font-color-secondary)]">Antrean</span></p>
+                                 </div>
+                            </div>
+                            <div class="group bg-white border border-[#EFE3D7] rounded-2xl p-5 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-[#D9C3AE] hover:-translate-y-1 transition-all duration-300 cursor-default">
+                                <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-wallet text-2xl"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Jadwal Hari Ini</p>
-                                    <p class="text-xl font-black text-[var(--font-color-primary)]">{{ $todayAppointments->count() }} <span class="text-xs font-semibold text-[var(--font-color-secondary)]">Antrean</span></p>
+                                    <p class="text-[var(--font-color-secondary)] text-[10px] font-bold uppercase tracking-widest mb-1">Pendapatan Hari Ini</p>
+                                    <p class="text-xl font-black text-emerald-700">Rp {{ number_format($todayIncomeTotal ?? 0, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         </div>
