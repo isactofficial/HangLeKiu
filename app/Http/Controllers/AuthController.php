@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -252,6 +253,108 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    // ── GOOGLE OAUTH ──────────────────────────────────────────
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            Log::info('Memulai Socialite Google callback');
+            $googleUser = Socialite::driver('google')->user();
+            Log::info('Data Google User berhasil didapat', ['email' => $googleUser->getEmail()]);
+
+            // 1. Cari berdasarkan google_id
+            $user = User::where('google_id', $googleUser->getId())->first();
+
+            if ($user) {
+                Log::info('User ditemukan berdasarkan google_id', ['id' => $user->id]);
+                return $this->loginSocialUser($user);
+            }
+
+            // 2. Cari berdasarkan email (jika google_id tidak ada)
+            $user = User::where('email', $googleUser->getEmail())->first();
+
+            if ($user) {
+                Log::info('User ditemukan berdasarkan email, melakukan linking...', ['id' => $user->id]);
+                $user->update([
+                    'google_id'   => $googleUser->getId(),
+                    'avatar_url'  => $user->avatar_url ?? $googleUser->getAvatar(),
+                    'is_verified' => true,
+                ]);
+                return $this->loginSocialUser($user);
+            }
+
+            // 3. User baru -> Registrasi otomatis sebagai Pasien
+            Log::info('Mendaftarkan user baru via Google');
+            $userRole = Role::where('code', 'PAT')->first();
+            if (! $userRole) {
+                Log::info('Role PAT belum ada, membuat baru...');
+                $userRole = Role::create([
+                    'code' => 'PAT',
+                    'name' => 'Patient',
+                    'permissions' => null,
+                    'created_at' => now(),
+                ]);
+            }
+
+            $user = DB::transaction(function () use ($googleUser, $userRole) {
+                $newUser = User::create([
+                    'id'          => (string) \Illuminate\Support\Str::uuid(),
+                    'role_id'     => $userRole->id,
+                    'name'        => $googleUser->getName(),
+                    'email'       => $googleUser->getEmail(),
+                    'google_id'   => $googleUser->getId(),
+                    'social_type' => 'google',
+                    'avatar_url'  => $googleUser->getAvatar(),
+                    'is_active'   => true,
+                    'is_verified' => true,
+                ]);
+
+                Patient::create([
+                    'id'                => (string) \Illuminate\Support\Str::ulid(),
+                    'user_id'           => $newUser->id,
+                    'full_name'         => $googleUser->getName(),
+                    'email'             => $googleUser->getEmail(),
+                    'medical_record_no' => $this->generateMedicalRecordNumber(),
+                    'date_of_birth'     => '1900-01-01',
+                    'gender'            => 'Male', 
+                ]);
+
+                return $newUser;
+            });
+
+            Log::info('Registrasi user baru berhasil', ['id' => $user->id]);
+            return $this->loginSocialUser($user);
+
+        } catch (\Exception $e) {
+            Log::error('Gagal saat proses login/callback Google: ' . $e->getMessage(), [
+                'exception' => $e,
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $errorMsg = empty($e->getMessage()) ? get_class($e) : $e->getMessage();
+            return redirect('/login')->withErrors(['email' => 'Gagal login via Google. Error detail: ' . $errorMsg]);
+        }
+    }
+
+    private function loginSocialUser($user)
+    {
+        if (! $user->is_active) {
+            return redirect('/login')->withErrors(['email' => 'Akun Anda telah dinonaktifkan.']);
+        }
+
+        Auth::login($user);
+        request()->session()->regenerate();
+
+        return redirect()->intended('/user/dashboard');
     }
 
     /**

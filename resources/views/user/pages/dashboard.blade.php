@@ -214,7 +214,7 @@
 
     <main class="grow pb-12">
 
-        <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 py-8 -mt-8 relative z-20">
+        <section class="container mx-auto px-5 sm:px-10 lg:px-16 xl:px-24 py-8 relative z-20">
             @if(session('success'))
                 <div id="toast-success" class="fixed top-28 right-6 z-50 w-full max-w-sm rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-xl flex items-start gap-3 transition-all duration-500 transform translate-x-0 opacity-100">
                     <svg class="w-6 h-6 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -246,6 +246,20 @@
 
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-x-8 gap-y-12">
                 <div class="xl:col-span-2">
+                    @if($isIncompleteProfile ?? false)
+                        <div class="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-2xl mb-8 shadow-sm flex items-start gap-4">
+                            <div class="bg-amber-100 p-2 rounded-full">
+                                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-bold text-amber-800 uppercase tracking-wider mb-1">Lengkapi Profil Anda</h3>
+                                <p class="text-amber-700 text-sm leading-relaxed">Selamat datang! Untuk kenyamanan pendaftaran kunjungan, mohon lengkapi data No. WhatsApp, Tanggal Lahir, dan Jenis Kelamin Anda.</p>
+                                <button type="button" onclick="document.getElementById('openEditAccountModal').click()" class="mt-3 text-sm font-bold text-amber-800 hover:text-amber-900 flex items-center gap-1 transition">
+                                    Lengkapi Sekarang <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
 
                     {{-- PROFIL PASIEN --}}
                     <div id="profil-pasien" class="dash-card bg-white rounded-3xl overflow-hidden relative mb-10">
@@ -1052,6 +1066,15 @@
             modal.classList.remove('flex');
             document.body.classList.remove('overflow-hidden');
         }
+        @if($isIncompleteProfile ?? false)
+        window.addEventListener('DOMContentLoaded', () => {
+            // Give a small delay for smoother UX
+            setTimeout(() => {
+                const editBtn = document.getElementById('openEditAccountModal');
+                if (editBtn) editBtn.click();
+            }, 800);
+        });
+        @endif
     </script>
 </body>
 

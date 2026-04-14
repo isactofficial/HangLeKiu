@@ -276,6 +276,129 @@ class AuthController extends Controller
         ]);
     }
 
+    // ── Login with Google (Mobile) ────────────────────────────────────────────
+    /**
+     * POST /api/auth/google/login
+     */
+    public function loginWithGoogle(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'google_id' => 'required',
+            'email'     => 'required|email',
+            'name'      => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        // 1. Cari berdasarkan google_id
+        $user = User::where('google_id', $request->google_id)->first();
+
+        // 2. Jika tidak ada, cari berdasarkan email
+        if (! $user) {
+            $user = User::where('email', $request->email)->first();
+
+            if ($user) {
+                // Link akun yang sudah ada
+                $user->update([
+                    'google_id'   => $request->google_id,
+                    'is_verified' => true,
+                ]);
+            } else {
+                // 3. Registrasi baru (Role PAT)
+                $patientRole = Role::where('code', 'PAT')->first();
+                if (! $patientRole) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Role default tidak ditemukan.',
+                    ], 500);
+                }
+
+                $user = User::create([
+                    'id'          => (string) Str::uuid(),
+                    'role_id'     => $patientRole->id,
+                    'name'        => $request->name,
+                    'email'       => $request->email,
+                    'google_id'   => $request->google_id,
+                    'social_type' => 'google',
+                    'avatar_url'  => $request->avatar_url,
+                    'is_active'   => true,
+                    'is_verified' => true,
+                ]);
+
+                // Buat record Patient juga
+                \App\Models\Patient::create([
+                    'id'                => (string) Str::ulid(),
+                    'user_id'           => $user->id,
+                    'full_name'         => $user->name,
+                    'email'             => $user->email,
+                    'medical_record_no' => $this->generateMedicalRecordNumberApi(),
+                    'date_of_birth'     => '1900-01-01', // Default value
+                    'gender'            => 'Male',
+                ]);
+            }
+        }
+
+        if (! $user->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun dinonaktifkan.',
+            ], 403);
+        }
+
+        // Login sukes -> Return JWT
+        try {
+            if (! $token = JWTAuth::fromUser($user)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email atau password salah.',
+                ], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat token.',
+            ], 500);
+        }
+
+        $user->update(['last_login_at' => now()]);
+        $user->load('role');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login Google berhasil.',
+            'data'    => [
+                'token'      => $token,
+                'token_type' => 'bearer',
+                'expires_in' => config('jwt.ttl') * 60,
+                'user'       => [
+                    'id'            => $user->id,
+                    'name'          => $user->name,
+                    'email'         => $user->email,
+                    'role'          => $user->role->code,
+                    'role_name'     => $user->role->name,
+                    'avatar_url'    => $user->avatar_url,
+                    'is_verified'   => $user->is_verified,
+                    'last_login_at' => $user->last_login_at,
+                ],
+            ],
+        ]);
+    }
+
+    private function generateMedicalRecordNumberApi(): string
+    {
+        do {
+            $number = 'MR' . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT);
+        } while (\App\Models\Patient::where('medical_record_no', $number)->exists());
+
+        return $number;
+    }
+
     // ── Logout ────────────────────────────────────────────────────────────────
     /**
      * POST /api/auth/logout

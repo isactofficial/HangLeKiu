@@ -49,6 +49,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login',   [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register',[AuthController::class, 'register']);
+
+    // Google OAuth
+    Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
+    Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
 // ================= AUTH REQUIRED =================

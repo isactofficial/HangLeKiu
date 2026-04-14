@@ -132,6 +132,15 @@ class DashboardUserController extends Controller
                 ];
             })->toArray();
 
+            // Check if profile is incomplete
+            $isIncomplete = false;
+            if ($patient->date_of_birth && $patient->date_of_birth->format('Y-m-d') === '1900-01-01') {
+                $isIncomplete = true;
+            } elseif (empty($patient->phone_number) || empty($patient->gender)) {
+                $isIncomplete = true;
+            }
+            
+            view()->share('isIncompleteProfile', $isIncomplete);
         }
 
         return view('user.pages.dashboard', compact(

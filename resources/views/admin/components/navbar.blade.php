@@ -72,9 +72,11 @@
                         <path d="M9 17v1a3 3 0 0 0 6 0v-1"/>
                     </svg>
                     @if($pendingCount > 0)
-                        <span style="position:absolute; top:-4px; right:-4px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:16px; height:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; padding:0 4px; line-height:1;">
+                        <span class="notif-badge-count" style="position:absolute; top:-4px; right:-4px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:16px; height:16px; border-radius:20px; display:flex; align-items:center; justify-content:center; padding:0 4px; line-height:1;">
                              {{ $pendingCount > 99 ? '99+' : $pendingCount }}
                         </span>
+                    @else
+                        <span class="notif-badge-count" style="position:absolute; top:-4px; right:-4px; background:#EF4444; color:white; font-size:10px; font-weight:700; min-width:16px; height:16px; border-radius:20px; display:none; align-items:center; justify-content:center; padding:0 4px; line-height:1;"></span>
                     @endif
                 </button>
             </a>
@@ -110,8 +112,18 @@
 </header>
 <script>
     (function() {
-    // Cek setiap 30 detik
-    const INTERVAL = 30000;
+    // Polling lebih cepat (5 detik)
+    const INTERVAL = 5000;
+    let lastCount = {{ $pendingCount }};
+
+    // Request permission untuk notifikasi browser
+    if (window.Notification && Notification.permission === 'default') {
+        document.addEventListener('click', () => {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }, { once: true });
+    }
 
     async function checkNotifCount() {
         try {
@@ -120,6 +132,31 @@
             });
             const data = await res.json();
             const count = data.count || 0;
+
+            // Jika ada notifikasi baru masuk
+            if (count > lastCount) {
+                // 1. Alert Suara
+                try {
+                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                    audio.play();
+                } catch (e) {}
+
+                // 2. Browser Push Notification
+                if (window.Notification && Notification.permission === 'granted') {
+                    new Notification('Hanglekiu Dental', {
+                        body: 'Ada permintaan janji temu baru masuk.',
+                        icon: '/favicon.ico'
+                    });
+                }
+
+                // 3. Efek Pulse pada Badge
+                document.querySelectorAll('.notif-badge-count').forEach(el => {
+                    el.style.transform = 'scale(1.3)';
+                    setTimeout(() => el.style.transform = 'scale(1)', 300);
+                });
+            }
+
+            lastCount = count;
 
             // Update semua badge notif yang ada di halaman
             document.querySelectorAll('.notif-badge-count').forEach(el => {
@@ -135,10 +172,7 @@
         }
     }
 
-    // Cek pertama saat load
-    checkNotifCount();
-
-    // Cek terus tiap 30 detik
+    // Cek berkala
     setInterval(checkNotifCount, INTERVAL);
 })();
     function toggleDropdown(menuId) {

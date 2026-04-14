@@ -518,7 +518,8 @@ let rescheduleAptId = null;
 // POLLING — cek notif baru setiap 30 detik
 // ============================================================
 (function() {
-    const INTERVAL = 30000;
+    const INTERVAL = 5000;
+    let lastCount = {{ $totalPending }};
 
     async function checkNotifCount() {
         try {
@@ -527,6 +528,21 @@ let rescheduleAptId = null;
             });
             const data = await res.json();
             const count = data.count || 0;
+
+            if (count > lastCount) {
+                // Show 'New Data' banner on the page
+                const allTab = document.getElementById('tab-semua');
+                if (allTab && !document.getElementById('new-data-banner')) {
+                    const banner = document.createElement('div');
+                    banner.id = 'new-data-banner';
+                    banner.style = "background:#fdf0e4; border:1px solid #d6b08a; padding:12px; border-radius:8px; margin-bottom:12px; text-align:center; font-size:13px; color:#7a3b0a; cursor:pointer; font-weight:600;";
+                    banner.innerHTML = "✨ Ada janji temu baru! Klik di sini untuk memuat ulang daftar.";
+                    banner.onclick = () => location.reload();
+                    allTab.prepend(banner);
+                }
+            }
+
+            lastCount = count;
 
             // Update badge di tab
             ['badge-semua', 'badge-janji'].forEach(id => {
