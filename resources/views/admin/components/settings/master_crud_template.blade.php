@@ -2,6 +2,8 @@
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/master_crud.css') }}">
 @endpush
 
+@include('admin.components.settings.partials.flash_success')
+
 <div class="mc-header-row">
     <div style="display: flex; align-items: center; gap: 16px;">
         <a href="?menu=general-settings" class="mc-btn-icon" title="Kembali ke General Settings">
@@ -14,6 +16,8 @@
     </div>
     <button class="mc-btn-primary" onclick="openMasterModal()">+ Tambah {{ $itemLabel }}</button>
 </div>
+
+@include('admin.components.settings.partials.inline_notice')
 
 <div class="mc-actions-row">
     <div class="mc-search-box">
@@ -75,6 +79,63 @@
     (function() {
         let currentPage = 1;
         const apiUrl = '{{ $apiUrl }}';
+
+        function showMasterToast(message, type = 'success') {
+            window.showSettingsInlineNotice?.(message, type);
+        }
+
+        function showMasterConfirm(message) {
+            return new Promise((resolve) => {
+                const existing = document.getElementById('master-confirm-overlay');
+                if (existing) existing.remove();
+
+                const overlay = document.createElement('div');
+                overlay.id = 'master-confirm-overlay';
+                overlay.style.position = 'fixed';
+                overlay.style.inset = '0';
+                overlay.style.background = 'rgba(17,24,39,0.45)';
+                overlay.style.display = 'flex';
+                overlay.style.alignItems = 'center';
+                overlay.style.justifyContent = 'center';
+                overlay.style.zIndex = '10000';
+                overlay.style.padding = '16px';
+                overlay.style.boxSizing = 'border-box';
+
+                const box = document.createElement('div');
+                box.style.width = 'min(100%, 620px)';
+                box.style.maxHeight = 'calc(100vh - 32px)';
+                box.style.overflow = 'auto';
+                box.style.background = '#FFFDFB';
+                box.style.borderRadius = '18px';
+                box.style.boxShadow = '0 26px 56px rgba(47, 29, 17, 0.28)';
+                box.style.border = '1px solid #E9D8C8';
+                box.style.padding = '28px 24px';
+                box.style.boxSizing = 'border-box';
+                box.style.textAlign = 'center';
+                box.innerHTML = `
+                    <div style="font-size:24px;font-weight:700;line-height:1.15;color:#2B1609;margin-bottom:14px;">Konfirmasi Hapus</div>
+                    <div style="font-size:20px;color:#5E3A24;line-height:1.45;max-width:90%;margin:0 auto;">${message}</div>
+                    <div style="display:flex;justify-content:center;gap:14px;margin-top:32px;">
+                        <button type="button" data-action="cancel" style="border:1px solid #D3BCA7;background:#FFF8F2;color:#4A2D1A;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Batal</button>
+                        <button type="button" data-action="ok" style="border:none;background:#4A2B1B;color:#fff;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Ya, Hapus</button>
+                    </div>
+                `;
+
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+
+                const cleanup = (value) => {
+                    overlay.remove();
+                    resolve(value);
+                };
+
+                box.querySelector('[data-action="cancel"]').addEventListener('click', () => cleanup(false));
+                box.querySelector('[data-action="ok"]').addEventListener('click', () => cleanup(true));
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) cleanup(false);
+                });
+            });
+        }
 
         window.fetchMasterData = function(page = 1) {
             currentPage = page;
@@ -162,20 +223,34 @@
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success) { closeMasterModal(); fetchMasterData(currentPage); }
-                else alert('Gagal menyimpan data');
+                if (data.success) {
+                    closeMasterModal();
+                    fetchMasterData(currentPage);
+                    showMasterToast(id ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan');
+                } else {
+                    showMasterToast(data.message || 'Gagal menyimpan data', 'error');
+                }
             });
         };
 
-        window.deleteMasterData = function(id) {
-            if (confirm('Yakin ingin menghapus data ini?')) {
-                fetch(`${apiUrl}/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-                })
-                .then(r => r.json())
-                .then(data => { if (data.success) fetchMasterData(currentPage); else alert('Gagal menghapus'); });
-            }
+        window.deleteMasterData = async function(id) {
+            const confirmed = await showMasterConfirm('Data yang dihapus tidak dapat dikembalikan. Lanjutkan?');
+            if (!confirmed) return;
+
+            fetch(`${apiUrl}/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    fetchMasterData(currentPage);
+                    showMasterToast('Data berhasil dihapus');
+                } else {
+                    showMasterToast(data.message || 'Gagal menghapus data', 'error');
+                }
+            })
+            .catch(() => showMasterToast('Terjadi kesalahan saat menghapus data', 'error'));
         };
 
         function renderMasterPagination(data, callback) {

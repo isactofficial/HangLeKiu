@@ -2,6 +2,8 @@
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/master_crud.css') }}">
 @endpush
 
+@include('admin.components.settings.partials.flash_success')
+
 <div class="mc-header-row">
     <div style="display: flex; align-items: center; gap: 16px;">
         <a href="?menu=general-settings" class="mc-btn-icon" title="Kembali ke General Settings">
@@ -14,6 +16,8 @@
     </div>
     <button class="mc-btn-primary" onclick="openProcedureModal()">+ Tambah Prosedur</button>
 </div>
+
+@include('admin.components.settings.partials.inline_notice')
 
 <div class="mc-actions-row">
     <div class="mc-search-box">
@@ -94,6 +98,42 @@
     let procedureCurrentPage = 1;
     let careTypeMap = {};
 
+    function showProcedureToast(message, type = 'success') {
+        window.showSettingsInlineNotice?.(message, type);
+    }
+
+    function showProcedureConfirm(message) {
+        return new Promise((resolve) => {
+            const old = document.getElementById('procedure-confirm-overlay');
+            if (old) old.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'procedure-confirm-overlay';
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,27,16,.46);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;box-sizing:border-box;';
+            overlay.innerHTML = `
+                <div style="width:min(100%,620px);max-height:calc(100vh - 32px);overflow:auto;background:#FFFDFB;border-radius:18px;box-shadow:0 26px 56px rgba(47,29,17,.28);border:1px solid #E9D8C8;padding:28px 24px;box-sizing:border-box;text-align:center;">
+                    <div style="font-size:24px;font-weight:700;line-height:1.15;color:#2B1609;margin-bottom:14px;">Konfirmasi Hapus</div>
+                    <div style="font-size:20px;color:#5E3A24;line-height:1.45;max-width:90%;margin:0 auto;">${message}</div>
+                    <div style="display:flex;justify-content:center;gap:14px;margin-top:32px;">
+                        <button type="button" data-action="cancel" style="border:1px solid #D3BCA7;background:#FFF8F2;color:#4A2D1A;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Batal</button>
+                        <button type="button" data-action="ok" style="border:none;background:#4A2B1B;color:#fff;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Ya, Hapus</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            const close = (val) => {
+                overlay.remove();
+                resolve(val);
+            };
+            overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => close(false));
+            overlay.querySelector('[data-action="ok"]').addEventListener('click', () => close(true));
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) close(false);
+            });
+        });
+    }
+
     // Load care types for dropdown
     function loadCareTypes() {
         fetch(CARE_TYPE_API + '?per_page=999')
@@ -123,7 +163,7 @@
         fetch(url)
             .then(r => r.json())
             .then(data => renderProcedureTable(data.data))
-            .catch(() => alert('Gagal memuat data'));
+            .catch(() => showProcedureToast('Gagal memuat data', 'error'));
     };
 
     function formatCurrency(num) {
@@ -238,7 +278,7 @@
 
         const careTypeSelect = document.getElementById('procedure-care-type');
         if (!careTypeSelect.value) {
-            alert('Silakan pilih Jenis Perawatan terlebih dahulu');
+            showProcedureToast('Silakan pilih Jenis Perawatan terlebih dahulu', 'error');
             careTypeSelect.focus();
             return;
         }
@@ -281,26 +321,35 @@
             if (res.success) {
                 closeProcedureModal();
                 fetchProcedureData(procedureCurrentPage);
+                showProcedureToast(id ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan');
             } else {
-                alert(res.message || 'Gagal menyimpan data');
+                showProcedureToast(res.message || 'Gagal menyimpan data', 'error');
             }
         })
         .catch(err => {
             console.error('Save error:', err);
-            alert('Gagal menyimpan: ' + err.message);
+            showProcedureToast('Gagal menyimpan: ' + err.message, 'error');
         });
     };
 
-    window.deleteProcedureData = function(id) {
-        if (confirm('Yakin ingin menghapus data ini?')) {
-            fetch(`${PROCEDURE_API}/${id}`, {
-                method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            })
-            .then(r => r.json())
-            .then(res => { if (res.success) fetchProcedureData(procedureCurrentPage); else alert('Gagal menghapus'); })
-            .catch(() => alert('Terjadi kesalahan'));
-        }
+    window.deleteProcedureData = async function(id) {
+        const confirmed = await showProcedureConfirm('Data yang dihapus tidak dapat dikembalikan. Lanjutkan?');
+        if (!confirmed) return;
+
+        fetch(`${PROCEDURE_API}/${id}`, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                fetchProcedureData(procedureCurrentPage);
+                showProcedureToast('Data berhasil dihapus');
+            } else {
+                showProcedureToast(res.message || 'Gagal menghapus data', 'error');
+            }
+        })
+        .catch(() => showProcedureToast('Terjadi kesalahan saat menghapus data', 'error'));
     };
 
     // Initialize

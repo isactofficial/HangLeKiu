@@ -29,6 +29,7 @@
   col.c-no { width: 44px; }
   col.c-dokter { width: 220px; }
   col.c-spec { width: 150px; }
+  col.c-fee { width: 110px; }
   col.c-lulus { width: 170px; }
   col.c-exp { width: 100px; }
   col.c-urut { width: 80px; }
@@ -58,7 +59,7 @@
   .page-btn:hover { background: #FAF6F2; }
   .page-btn.active { background: #C58F59; color: #fff; border-color: #C58F59; }
   .page-btn:disabled { opacity: 0.4; cursor: default; }
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 12000; align-items: center; justify-content: center; padding: 16px; }
   .overlay.open { display: flex; }
   .modal { background: #fff; border-radius: 14px; border: 0.5px solid #e0dbd4; width: 100%; max-width: 900px; max-height: 92vh; display: flex; flex-direction: column; }
   .modal-sm { max-width: 400px; }
@@ -96,6 +97,18 @@
   .detail-bio { margin-top: 16px; padding: 14px; background: #FAF8F5; border-radius: 8px; font-size: 13px; color: #582C0C; line-height: 1.6; }
   .ms-modal-form { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .ms-modal-form input[type="file"] { display: none; }
+
+  @media (max-width: 768px) {
+    .overlay {
+      align-items: flex-start;
+      padding: calc(76px + env(safe-area-inset-top)) 10px 10px;
+    }
+
+    .modal {
+      max-height: calc(100vh - 86px - env(safe-area-inset-top));
+      border-radius: 12px;
+    }
+  }
 </style>
 
 <div class="doctor-management">
@@ -147,7 +160,7 @@
       <table>
         <colgroup>
           <col class="c-no"><col class="c-dokter"><col class="c-spec"><col class="c-lulus">
-          <col class="c-exp"><col class="c-urut"><col class="c-status"><col class="c-aksi">
+          <col class="c-fee"><col class="c-exp"><col class="c-urut"><col class="c-status"><col class="c-aksi">
         </colgroup>
         <thead>
           <tr>
@@ -155,6 +168,7 @@
             <th>Dokter</th>
             <th>Spesialisasi</th>
             <th>Instansi Lulusan</th>
+            <th>Fee Dokter</th>
             <th>Pengalaman</th>
             <th>ID / Order</th>
             <th>Status</th>
@@ -258,14 +272,14 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Estimasi Konsultasi (Menit)</label>
-                                <input class="form-input" name="estimasi_konsultasi" type="number" value="15">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Fee Pasien / Tindakan (%)</label>
-                                <input class="form-input" name="default_fee_percentage" type="number" step="0.01" value="0">
-                            </div>
+                          <div class="form-group">
+                            <label class="form-label">Estimasi Konsultasi (Menit)</label>
+                            <input class="form-input" name="estimasi_konsultasi" type="number" value="15">
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Fee % Doctor</label>
+                            <input class="form-input" name="default_fee_percentage" type="number" step="0.01" min="0" max="100" placeholder="Contoh: 35">
+                          </div>
                         </div>
                     </div>
 
@@ -470,6 +484,7 @@ function renderTable(data) {
       </td>
       <td><span class="badge ${d.spec ? 'badge-spec' : ''}">${d.spec ? d.spec.replace('Spesialis ', '') : '-'}</span></td>
       <td style="font-size:12px;color:#6B513E;">${d.lulus || '—'}</td>
+      <td style="font-size:12px;color:#6B513E;">${d.fee != null && d.fee !== '' ? `${Number(d.fee).toFixed(2)}%` : '0.00%'}</td>
       <td style="font-size:12px;color:#6B513E;">${d.exp || '—'}</td>
       <td style="font-size:12px;color:#6B513E;text-align:center;">#${d.order || d.id}</td>
       <td>
@@ -533,11 +548,12 @@ function openEdit(id) {
           f.experience.value = doc.experience || '';
           f.alma_mater.value = doc.alma_mater || '';
           f.bio.value = doc.bio || '';
-          f.carousel_order.value = (doc.order === 99) ? '' : doc.order;
+          const carouselOrder = doc.carousel_order ?? doc.order;
+          f.carousel_order.value = (carouselOrder === 99 || carouselOrder === null || carouselOrder === undefined) ? '' : carouselOrder;
           f.is_active.value = doc.is_active ? "1" : "0";
           f.show_in_carousel.value = doc.show_in_carousel ? "1" : "0";
           f.estimasi_konsultasi.value = doc.estimasi_konsultasi || '15';
-          f.default_fee_percentage.value = doc.default_fee_percentage || '0';
+          f.default_fee_percentage.value = doc.default_fee_percentage ?? '';
           f.str_number.value = doc.str_number || '';
           f.str_institution.value = doc.str_institution || '';
           if(doc.str_expiry_date) f.str_expiry_date.value = doc.str_expiry_date.split(' ')[0];
