@@ -1,5 +1,5 @@
 <style>
-    :root {
+:root {
         --brown-900: #3b331e;
         --brown-800: #57462c;
         --brown-700: #6f5635;
@@ -9,6 +9,78 @@
         --brown-200: #eadfd3;
         --brown-100: #f7f1ea;
         --brown-50: #fdfaf6;
+    }
+
+    /* Odontogram Notes Formatting */
+    .odontogram-notes {
+        line-height: 1.4;
+        max-height: 120px;
+        overflow-y: auto;
+        font-size: 11.5px;
+    }
+
+    /* Transparent Scrollbar for Odontogram Notes */
+    .odontogram-notes::-webkit-scrollbar {
+        width: 4px;
+    }
+    .odontogram-notes::-webkit-scrollbar-track {
+        background: rgba(234, 223, 211, 0.3);
+        border-radius: 2px;
+    }
+    .odontogram-notes::-webkit-scrollbar-thumb {
+        background: rgba(142, 106, 69, 0.5);
+        border-radius: 2px;
+    }
+    .odontogram-notes::-webkit-scrollbar-thumb:hover {
+        background: rgba(142, 106, 69, 0.7);
+    }
+    .odontogram-notes strong {
+        color: var(--brown-700);
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-right: 4px;
+    }
+    .odontogram-notes br {
+        margin-bottom: 1px;
+    }
+
+    /* MOBILE RESPONSIVE ODONTOGRAM */
+    @media (max-width: 768px) {
+        .odontogram-notes {
+            max-height: 60vh !important;
+            font-size: 11px !important;
+            line-height: 1.45 !important;
+            padding: 4px 0 !important;
+        }
+        .odontogram-notes strong {
+            font-size: 10px !important;
+            display: inline-block;
+            min-width: 65px;
+        }
+        
+        /* Record table responsive */
+        [data-record-tab-content="odontogram-history"] .record-table-shell {
+            overflow-x: auto;
+        }
+        [data-record-tab-content="odontogram-history"] .record-table-row {
+            min-width: 480px;
+            grid-template-columns: 120px 140px 1fr 90px !important;
+        }
+        [data-record-tab-content="odontogram-history"] .record-table-head {
+            min-width: 480px !important;
+            grid-template-columns: 120px 140px 1fr 90px !important;
+        }
+        [data-record-tab-content="odontogram-history"] .record-table-text {
+            padding: 8px 6px !important;
+            font-size: 11px !important;
+        }
+        
+        /* Button mobile */
+        [data-record-tab-content="odontogram-history"] button[onclick*="toggleOdontogramModal"] {
+            padding: 4px 8px !important;
+            font-size: 10px !important;
+        }
     }
 
     /* ================= 1. FORCING FULL WIDTH ================= */
@@ -527,6 +599,44 @@
 </style>
 
 @php
+    // Helper function to format odontogram notes
+    function formatOdontogramNotes($notes) {
+        if (empty($notes)) return '-';
+        
+        $lines = explode("\n", $notes);
+        $formatted = [];
+        
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line) || str_starts_with($line, 'Catatan Tambahan:')) continue;
+            
+            [$label, $value] = explode(':', $line, 2) + ['', ''];
+            $label = trim(ucwords(strtolower($label)));
+            $value = trim($value);
+            
+            if (!empty($value)) {
+                $formatted[] = "<strong>{$label}:</strong> {$value}";
+            }
+        }
+        
+        // Handle DMF compact line
+        if (preg_match('/D:\\s*([^,\\n]+),\\s*M:\\s*([^,\\n]+),\\s*F:\\s*([^\\n]+)/', $notes, $dmfMatch)) {
+            $formatted[] = "<strong>DMF:</strong> D={$dmfMatch[1]}, M={$dmfMatch[2]}, F={$dmfMatch[3]}";
+        }
+        
+        // Catatan Tambahan
+        if (preg_match('/Catatan Tambahan:\\s*(.+)$/s', $notes, $extraMatch)) {
+            $extra = trim($extraMatch[1]);
+            if (!empty($extra)) {
+                $formatted[] = "<strong>Catatan Tambahan:</strong><br><span style='font-size:0.9em;color:#666;line-height:1.3;'>{$extra}</span>";
+            }
+        }
+        
+        return implode('<br>', $formatted) ?: '-';
+    }
+    @endphp
+
+@php
     $patient = $appointment->patient;
     $paymentLabel = $appointment->paymentMethod->name ?? $appointment->guarantorType->name ?? 'Tunai';
     $appointmentTimeText = $appointment->appointment_datetime
@@ -1003,7 +1113,7 @@
                             {{ $rec->examined_at ? \Carbon\Carbon::parse($rec->examined_at)->translatedFormat('d F Y') : '-' }}
                         </div>
                         <div class="record-table-text" style="font-weight:700;">{{ $rec->examined_by ?? '-' }}</div>
-                        <div class="record-table-text">{{ $rec->notes ?? '-' }}</div>
+                        <div class="record-table-text odontogram-notes">{!! formatOdontogramNotes($rec->notes) !!}</div>
                         <div class="record-table-text">
                             <button type="button" 
                                     style="padding:6px 12px; background:var(--brown-700); color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700;"
