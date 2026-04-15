@@ -33,6 +33,8 @@ class User extends Authenticatable
         'is_active',
         'is_verified',
         'last_login_at',
+        'google_id',
+        'social_type',
     ];
 
     protected $hidden = [

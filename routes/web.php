@@ -39,8 +39,6 @@ Route::get('/pelayanan/dokter', [DoctorPageController::class, 'index'])->name('d
 // ================= ADMIN & DOCTOR AUTH =================
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
-Route::get('/admin/register', [AuthController::class, 'showAdminRegister'])->name('admin.register');
-Route::post('/admin/register',[AuthController::class, 'adminRegister'])->name('admin.register.post');
 // Dokter login
 Route::get('/doctor/login',   [AuthController::class, 'showDoctorLogin'])->name('doctor.login');
 Route::post('/doctor/login',  [AuthController::class, 'doctorLogin'])->name('doctor.login.post');
@@ -51,6 +49,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login',   [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register',[AuthController::class, 'register']);
+
+    // Google OAuth
+    Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
+    Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 });
 
 // ================= AUTH REQUIRED =================

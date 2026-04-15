@@ -85,9 +85,9 @@ class Doctor extends Model
      */
     public function getFullTitleAttribute(): string
     {
-        return $this->specialization
-            ? "{$this->full_name} {$this->specialization}"
-            : $this->full_name;
+        $prefix = $this->title_prefix ? "{$this->title_prefix} " : "";
+        $spec = $this->specialization ? ", {$this->specialization}" : "";
+        return "{$prefix}{$this->full_name}{$spec}";
     }
 
     // ================= SCOPE =================

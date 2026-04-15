@@ -2,6 +2,8 @@
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/general_settings.css') }}">
 @endpush
 
+@include('admin.components.settings.partials.flash_success')
+
 @php
     $submenu = request('submenu');
 @endphp

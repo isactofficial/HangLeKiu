@@ -7,9 +7,24 @@
     <title>Hanglekiu Dental — Profil Dokter</title>
     <meta name="description" content="Kenali tim dokter spesialis Hanglekiu Dental Clinic yang berpengalaman dan berdedikasi untuk kesehatan gigi Anda.">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-brown: #582C0C;
+            --secondary-brown: #C18B51;
+            --accent-brown: #4D2303;
+            --bg-cream: #FAF9F6;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-cream);
+        }
+    </style>
 </head>
 
-<body class="font-sans text-[var(--font-color-primary)] m-0 min-h-screen flex flex-col relative bg-white">
+<body class="text-[var(--font-color-primary)] m-0 min-h-screen flex flex-col relative bg-white">
 
     @include('user.components.navbarWelcome')
 
@@ -123,26 +138,24 @@
         </div>
     </section>
 
-    {{-- CTA --}}
-    <section class="w-full py-12 md:py-20">
-        <div class="max-w-7xl mx-auto px-6 md:px-10 lg:px-16">
-            <div class="bg-[#E5D6C5] rounded-3xl px-8 py-12 md:px-14 md:py-16 text-center">
-                <h2 class="text-[24px] md:text-[48px] font-bold text-[#582C0C] mb-4">
-                    Siap Berkonsultasi?
-                </h2>
-                <p class="text-[15px] md:text-[18.75px] font-normal text-[#582C0C] max-w-2xl mx-auto leading-relaxed mb-8">
-                    Jadwalkan pertemuan dengan salah satu dokter spesialis kami hari ini dan mulai perjalanan menuju senyum sehat yang Anda inginkan.
-                </p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="{{ route('appointments.create') }}"
-                       class="px-8 py-3 bg-[#C58F59] hover:bg-[#A0703E] text-white text-[15px] md:text-[18.75px] font-medium rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 inline-block">
-                        Buat Janji Temu
-                    </a>
-                    <a href="https://wa.me/6285211888621" target="_blank"
-                       class="px-8 py-3 bg-[#582C0C] hover:bg-[#3D1A02] text-white text-[15px] md:text-[18.75px] font-medium rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 inline-block">
-                        WhatsApp Kami
-                    </a>
-                </div>
+    {{-- Call to Action Section --}}
+    <section class="mb-24 px-6 md:px-10 lg:px-16 w-full max-w-7xl mx-auto">
+        <div class="bg-[var(--accent-brown)] rounded-[40px] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
+            {{-- Decorative circles --}}
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32"></div>
+            
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6 relative z-10">Siap Berkonsultasi?</h2>
+            <p class="text-white/80 text-lg mb-10 max-w-2xl mx-auto relative z-10">
+                Jadwalkan pertemuan dengan salah satu dokter spesialis kami hari ini dan mulai perjalanan menuju senyum sehat yang Anda inginkan.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+                <a href="{{ route('appointments.create') }}" class="px-8 py-4 bg-[var(--secondary-brown)] hover:bg-[var(--secondary-brown)]/90 text-white font-bold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl">
+                    Buat Janji Temu
+                </a>
+                <a href="https://wa.me/6285211888621" target="_blank" class="px-8 py-4 bg-white hover:bg-white/90 text-[var(--accent-brown)] font-bold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                    WhatsApp Kami
+                </a>
             </div>
         </div>
     </section>

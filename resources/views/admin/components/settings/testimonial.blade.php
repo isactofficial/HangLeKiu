@@ -2,6 +2,8 @@
     <link rel="stylesheet" href="{{ asset('css/admin/components/settings/master_crud.css') }}">
 @endpush
 
+@include('admin.components.settings.partials.flash_success')
+
 <div class="mc-header-row">
     <div style="display: flex; align-items: center; gap: 16px;">
         <a href="?menu=beranda-settings" class="mc-btn-icon" title="Kembali ke Beranda Settings">
@@ -14,6 +16,8 @@
     </div>
     <button class="mc-btn-primary" onclick="openTestimonialModal()">+ Tambah Testimonial</button>
 </div>
+
+@include('admin.components.settings.partials.inline_notice')
 
 <div class="mc-actions-row">
     <div class="mc-search-box">
@@ -46,8 +50,8 @@
 
 {{-- ===== MODAL FORM ===== --}}
 <div id="testimonial-modal" class="mc-modal-overlay">
-    <div class="mc-modal-content" style="display:flex;flex-direction:column;max-height:90vh;width:100%;max-width:540px;">
-        <div class="mc-modal-header" style="flex-shrink:0;">
+    <div class="mc-modal-content" style="display:flex;flex-direction:column;max-height:calc(100vh - 24px);width:min(100%,540px);overflow:hidden;">
+        <div class="mc-modal-header" style="flex-shrink:0;position:relative;padding-right:52px;">
             <h3 id="testimonial-modal-title">Tambah Testimonial</h3>
             <button class="mc-modal-close" onclick="closeTestimonialModal()">&times;</button>
         </div>
@@ -63,7 +67,7 @@
                 <div>
                     <label class="mc-label" style="display:block;margin-bottom:8px;">
                         Foto Profil <span style="color:red">*</span>
-                        <span style="font-weight:400;color:#9CA3AF;font-size:12px;">— drag untuk atur posisi, scroll untuk zoom</span>
+                        <span style="font-weight:400;color:#B09A85;font-size:12px;">— drag untuk atur posisi, scroll untuk zoom</span>
                     </label>
                     <div style="display:flex;gap:14px;align-items:flex-start;">
                         {{-- Canvas crop --}}
@@ -86,14 +90,14 @@
                         </div>
                         {{-- Preview + upload --}}
                         <div style="display:flex;flex-direction:column;gap:10px;flex:1;">
-                            <div style="font-size:12px;color:#6B7280;">Preview foto profil</div>
+                            <div style="font-size:12px;color:#B09A85;">Preview foto profil</div>
                             <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;
                                         border:2px solid #E5E7EB;flex-shrink:0;">
                                 <canvas id="crop-preview" width="80" height="80" style="display:block;width:80px;height:80px;"></canvas>
                             </div>
                             <label for="testimonial-photo" style="display:flex;align-items:center;gap:6px;
                                    padding:7px 12px;border-radius:8px;border:1px dashed #D1D5DB;
-                                   background:#F9FAFB;font-size:12px;color:#6B7280;cursor:pointer;
+                                   background:#F9FAFB;font-size:12px;color:#B09A85;cursor:pointer;
                                    justify-content:center;">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
@@ -102,7 +106,7 @@
                                 Upload foto
                             </label>
                             <input type="file" id="testimonial-photo" accept="image/*" style="display:none;">
-                            <div style="font-size:11px;color:#9CA3AF;line-height:1.6;">
+                            <div style="font-size:11px;color:#B09A85;line-height:1.6;">
                                 • Drag gambar untuk memilih area<br>
                                 • Scroll / pinch untuk zoom<br>
                                 • Foto akan dipotong bulat
@@ -122,7 +126,7 @@
                         <input type="text" id="testimonial-profession" name="profession" class="mc-input">
                     </div>
                     <div class="mc-form-group">
-                        <label class="mc-label">Urutan tampil <span style="font-weight:400;font-size:11px;color:#9CA3AF;">(0 = terakhir)</span></label>
+                        <label class="mc-label">Urutan tampil <span style="font-weight:400;font-size:11px;color:#B09A85;">(0 = terakhir)</span></label>
                         <input type="number" id="testimonial-order" name="order" class="mc-input" min="0" max="999" value="0">
                     </div>
                 </div>
@@ -155,6 +159,42 @@ const TESTIMONIAL_API = '/api/master-testimonial';
 let testimonialCurrentPage = 1;
 const STORAGE_URL = '{{ asset('storage') }}/';
 const FALLBACK_IMG = '/images/profile.svg';
+
+function showTestimonialToast(message, type = 'success') {
+    window.showSettingsInlineNotice?.(message, type);
+}
+
+function showTestimonialConfirm(message) {
+    return new Promise((resolve) => {
+        const old = document.getElementById('testimonial-confirm-overlay');
+        if (old) old.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'testimonial-confirm-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(44,27,16,.46);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;box-sizing:border-box;';
+        overlay.innerHTML = `
+            <div style="width:min(100%,620px);max-height:calc(100vh - 32px);overflow:auto;background:#FFFDFB;border-radius:18px;box-shadow:0 26px 56px rgba(47,29,17,.28);border:1px solid #E9D8C8;padding:28px 24px;box-sizing:border-box;text-align:center;">
+                <div style="font-size:24px;font-weight:700;line-height:1.15;color:#2B1609;margin-bottom:14px;">Konfirmasi Hapus</div>
+                <div style="font-size:20px;color:#5E3A24;line-height:1.45;max-width:90%;margin:0 auto;">${message}</div>
+                <div style="display:flex;justify-content:center;gap:14px;margin-top:32px;">
+                    <button type="button" data-action="cancel" style="border:1px solid #D3BCA7;background:#FFF8F2;color:#4A2D1A;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Batal</button>
+                    <button type="button" data-action="ok" style="border:none;background:#4A2B1B;color:#fff;padding:12px 20px;border-radius:12px;cursor:pointer;font-size:16px;font-weight:600;line-height:1.2;">Ya, Hapus</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        const close = (val) => {
+            overlay.remove();
+            resolve(val);
+        };
+        overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => close(false));
+        overlay.querySelector('[data-action="ok"]').addEventListener('click', () => close(true));
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close(false);
+        });
+    });
+}
 
 // ========== CROP ENGINE ==========
 let cropImg = null, cropScale = 1, cropOffsetX = 0, cropOffsetY = 0, cropDragging = false, cropLastX = 0, cropLastY = 0;
@@ -311,7 +351,7 @@ window.fetchTestimonialData = function(page = 1) {
     fetch(`${TESTIMONIAL_API}?page=${page}&search=${encodeURIComponent(search)}`)
         .then(r => r.json())
         .then(res => renderTestimonialTable(res.data))
-        .catch(() => alert('Gagal memuat data'));
+    .catch(() => showTestimonialToast('Gagal memuat data', 'error'));
 };
 
 function renderTestimonialTable(paginator) {
@@ -320,7 +360,7 @@ function renderTestimonialTable(paginator) {
     const items = paginator.data;
 
     if (!items || items.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:40px;">Belum ada testimonial</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#B09A85;padding:40px;">Belum ada testimonial</td></tr>';
         renderPaginationTestimonial(paginator);
         return;
     }
@@ -441,27 +481,35 @@ window.saveTestimonialData = async function(e) {
             headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
         });
         const res = await response.json();
-        if (res.success) { closeTestimonialModal(); fetchTestimonialData(testimonialCurrentPage); }
-        else alert(res.message || 'Gagal menyimpan');
+        if (res.success) {
+            closeTestimonialModal();
+            fetchTestimonialData(testimonialCurrentPage);
+            showTestimonialToast(id ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan');
+        }
+        else showTestimonialToast(res.message || 'Gagal menyimpan data', 'error');
     } catch (err) {
         console.error(err);
-        alert('Terjadi kesalahan saat menyimpan');
+        showTestimonialToast('Terjadi kesalahan saat menyimpan data', 'error');
     }
 };
 
-window.deleteTestimonialData = function(id) {
-    if (confirm('Yakin ingin menghapus testimonial ini?')) {
-        fetch(`${TESTIMONIAL_API}/${id}`, {
-            method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-        })
-        .then(r => r.json())
-        .then(res => {
-            if (res.success) fetchTestimonialData(testimonialCurrentPage);
-            else alert('Gagal menghapus');
-        })
-        .catch(() => alert('Terjadi kesalahan'));
-    }
+window.deleteTestimonialData = async function(id) {
+    const confirmed = await showTestimonialConfirm('Data testimonial yang dihapus tidak dapat dikembalikan. Lanjutkan?');
+    if (!confirmed) return;
+
+    fetch(`${TESTIMONIAL_API}/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            fetchTestimonialData(testimonialCurrentPage);
+            showTestimonialToast('Data berhasil dihapus');
+        }
+        else showTestimonialToast(res.message || 'Gagal menghapus data', 'error');
+    })
+    .catch(() => showTestimonialToast('Terjadi kesalahan saat menghapus data', 'error'));
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -493,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
         border-style: solid;
         border-color: #10B981;
     }
-    .photo-preview-placeholder svg { color: #9CA3AF; margin-bottom: 8px; }
+    .photo-preview-placeholder svg { color: #B09A85; margin-bottom: 8px; }
     .photo-preview-placeholder p { color: #6B7280; font-size: 14px; margin: 0; }
     .photo-preview-img {
         width: 100%;

@@ -1,0 +1,397 @@
+
+
+/* ── BREAKPOINT TABLET (≤ 1024px) ── */
+@media (max-width: 1024px) {
+    .cashier-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .cashier-toolbar > div {
+        flex: 1 1 100%;
+    }
+
+    .cashier-toolbar .cashier-btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+/* ── BREAKPOINT MOBILE (≤ 768px) ── */
+@media (max-width: 768px) {
+
+    /* Header */
+    .cashier-header {
+        margin-bottom: 14px;
+    }
+    .cashier-title {
+        font-size: 22px;
+    }
+    .cashier-subtitle {
+        font-size: 13px;
+    }
+
+    /* Layout */
+    .cashier-layout {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Toolbar: stack vertikal */
+    .cashier-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    /* Search row: bungkus filter tanggal */
+    .cashier-toolbar > div:first-child {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    /* Input search & date full width */
+    .cashier-search-input,
+    #filterFromDate,
+    #filterToDate {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Label dari/sampai */
+    .cashier-toolbar label {
+        white-space: nowrap;
+        min-width: 50px;
+    }
+
+    /* Tombol aksi full width */
+    .cashier-btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+        padding: 11px 16px;
+        font-size: 13px;
+    }
+
+    /* Tabel: horizontal scroll */
+    .cashier-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+    }
+
+    .cashier-table {
+        min-width: 640px;
+    }
+
+    .cashier-table th,
+    .cashier-table td {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+
+    /* Keterangan grid di dalam tabel */
+    .keterangan-grid {
+        grid-template-columns: 90px 1fr !important;
+        gap: 5px 8px !important;
+        min-width: unset !important;
+    }
+
+    .ket-label {
+        font-size: 10px !important;
+    }
+    .ket-value {
+        font-size: 12px !important;
+    }
+
+    /* Pagination */
+    #pagination-info {
+        font-size: 11px;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+
+    /* ── MODAL PAYMENT FULL BOTTOM SHEET ── */
+    #modalPayment {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    #modalPayment .modal-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        max-height: 92vh !important;
+        border-radius: 16px 16px 0 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Header modal */
+    #modalPayment .modal-container > div:first-child h2 {
+        font-size: 13px !important;
+    }
+
+    /* Padding konten */
+    #modalPayment .modal-container > div[style*="padding:20px 24px"] {
+        padding: 12px !important;
+    }
+
+    /* Detail pasien: 2 kolom */
+    #modalPayment [style*="grid-template-columns:repeat(5,1fr)"] {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* Tabel invoice: sembunyikan kolom tidak penting */
+    #modalPayment table th:nth-child(1),
+    #modalPayment table td:nth-child(1) {
+        display: none; /* sembunyikan kolom tanggal */
+    }
+
+    #modalPayment table {
+        min-width: unset !important;
+        font-size: 11px !important;
+    }
+
+    #modalPayment table th,
+    #modalPayment table td {
+        padding: 6px 8px !important;
+    }
+
+    /* Total & print: stack vertikal */
+    #modalPayment [style*="justify-content:flex-end"][style*="gap:16px"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    #modalPayment [style*="justify-content:flex-end"][style*="gap:16px"] button {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Checkbox row: stack */
+    #modalPayment [style*="display:flex"][style*="gap:20px"][style*="margin-bottom:12px"] {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    /* Grid 2 kolom utama metode → 1 kolom */
+    #modalPayment [style*="grid-template-columns:1fr 1fr"][style*="gap:16px 24px"] {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Grid kembalian/hutang → tetap 2 kolom */
+    #modalPayment [style*="grid-template-columns:1fr 1fr"][style*="align-content:start"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Tipe, Metode, Akun Kas → row 3 kolom kecil */
+    #modalPayment [style*="display:flex"][style*="flex-direction:column"][style*="gap:12px"] {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr !important;
+        gap: 8px !important;
+    }
+
+    /* Footer buttons */
+    #modalPayment [style*="padding:16px 24px"] {
+        padding: 12px !important;
+        gap: 8px !important;
+    }
+
+    #modalPayment [style*="padding:16px 24px"] button {
+        flex: 1 !important;
+        justify-content: center !important;
+        font-size: 12px !important;
+        padding: 10px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Tipe, Metode, Akun Kas → 1 kolom di layar kecil */
+    #modalPayment [style*="display:flex"][style*="flex-direction:column"][style*="gap:12px"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+    @media (max-width: 768px) {
+
+    /* ── MODAL PEMBAYARAN MANUAL ── */
+    #modalPembayaranManual {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    #modalPembayaranManual .modal-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        max-height: 92vh !important;
+        border-radius: 16px 16px 0 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Padding konten */
+    #modalPembayaranManual > .modal-container > div[style*="padding: 20px 28px"] {
+        padding: 12px !important;
+    }
+
+    /* Header "Pembayaran Manual" */
+    #modalPembayaranManual h2 {
+        font-size: 16px !important;
+    }
+
+    /* Invoice Summary header: kecilkan */
+    #modalPembayaranManual [style*="font-size: 18px"] {
+        font-size: 14px !important;
+    }
+
+    /* Depot + search item: stack vertikal */
+    #modalPembayaranManual [style*="justify-content: space-between"][style*="flex-wrap: wrap"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+    }
+
+    /* Search item full width */
+    #modalPembayaranManual #pm-search-item {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Dropdown item full width */
+    #pm-item-dropdown {
+        min-width: unset !important;
+        width: 100% !important;
+    }
+
+    /* Depot row: full width */
+    #modalPembayaranManual #pm-depot {
+        min-width: unset !important;
+        width: 100% !important;
+    }
+
+    /* Tabel invoice: scroll horizontal */
+    #modalPembayaranManual [style*="overflow-x: auto"] {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #modalPembayaranManual table {
+        min-width: 480px !important;
+        font-size: 11px !important;
+    }
+
+    #modalPembayaranManual table th,
+    #modalPembayaranManual table td {
+        padding: 6px 8px !important;
+    }
+
+    /* Total row: stack */
+    #modalPembayaranManual [style*="justify-content: flex-end"][style*="gap: 20px"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    #modalPembayaranManual [style*="justify-content: flex-end"][style*="gap: 20px"] button {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Detail pasien grid: 2 kolom */
+    #modalPembayaranManual [style*="grid-template-columns: repeat(4, 1fr)"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Metode pembayaran grid utama → 1 kolom */
+    #modalPembayaranManual [style*="grid-template-columns: 200px 1fr 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* Kolom bayar+kembalian & dibayar oleh: full */
+    #modalPembayaranManual [style*="grid-template-columns: 200px 1fr 1fr"] > div:first-child {
+        grid-column: 1 / -1 !important;
+    }
+
+    /* Metode + akun kas → 2 kolom */
+    #modalPembayaranManual [style*="grid-template-columns: 200px 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Footer padding */
+    #modalPembayaranManual [style*="padding: 16px 28px"] {
+        padding: 12px !important;
+    }
+
+    #modalPembayaranManual [style*="padding: 16px 28px"] button {
+        flex: 1 !important;
+        justify-content: center !important;
+    }
+}
+}
+/* ── BREAKPOINT KECIL (≤ 480px) ── */
+@media (max-width: 480px) {
+
+    .cashier-title {
+        font-size: 18px;
+    }
+    .cashier-subtitle {
+        font-size: 12px;
+    }
+
+    /* Tabel kolom actions: lebih compact */
+    .cashier-table td:last-child {
+        padding: 10px 6px;
+    }
+
+    /* Badge lunas */
+    .badge-lunas-hijau,
+    .badge-belum-lunas {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    /* Tombol bayar/nota */
+    .btn-bayar-tabel,
+    .cashier-table button {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+    }
+
+    /* Pagination buttons */
+    #pagination-prev-btn,
+    #pagination-next-btn {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+    }
+
+    /* Modal header font size */
+    #modalPayment h2 {
+        font-size: 13px !important;
+    }
+
+    /* Modal detail pasien: 1 kolom di layar sangat kecil */
+    #modalPayment [style*="grid-template-columns:repeat(5,1fr)"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Kembalian/hutang tetap 2 kolom */
+    #modalPayment [style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Total & print button stack */
+    #modalPayment [style*="justify-content:flex-end"][style*="gap:16px"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+
+    #modalPayment [style*="justify-content:flex-end"][style*="gap:16px"] button {
+        width: 100% !important;
+        justify-content: center;
+    }
+}

@@ -72,9 +72,9 @@
             gap: 10px;
         }
         .alert-success {
-            background: #ecfdf5;
-            color: #059669;
-            border: 1px solid #10b98120;
+            background: #FFF7F1;
+            color: #582C0C;
+            border: 1px solid #D9B69A;
         }
         .alert-error {
             background: #fef2f2;

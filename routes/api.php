@@ -40,6 +40,7 @@ use App\Http\Controllers\InsurancePartnerController;
 // ================= AUTH =================
 Route::prefix('auth')->group(function () {
     Route::post('/login',    [AuthController::class, 'login']);
+    Route::post('/google/login', [AuthController::class, 'loginWithGoogle']);
     Route::post('/register', [AuthController::class, 'register']);
 
     Route::middleware('auth:api')->group(function () {

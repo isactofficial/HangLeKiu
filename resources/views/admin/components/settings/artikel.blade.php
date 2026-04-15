@@ -19,11 +19,7 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="gs-alert gs-alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+    @include('admin.components.settings.partials.flash_success')
 
     <div class="article-grid">
         @forelse($articles as $article)
@@ -44,7 +40,7 @@
                                     <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"/>
                                 </svg>
                             </a>
-                            <form action="{{ route('admin.articles.destroy', $article->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus artikel ini?')">
+                            <form action="{{ route('admin.articles.destroy', $article->id) }}" method="POST" class="js-article-delete-form" data-article-title="{{ $article->title }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="art-btn art-btn-delete" title="Hapus">
@@ -68,6 +64,53 @@
         {{ $articles->links() }}
     </div>
 </div>
+
+<div id="article-delete-overlay" class="article-confirm-overlay" style="display:none;">
+    <div class="article-confirm-box">
+        <div class="article-confirm-title">Konfirmasi Hapus</div>
+        <div class="article-confirm-message" id="article-delete-message">Data yang dihapus tidak dapat dikembalikan. Lanjutkan?</div>
+        <div class="article-confirm-actions">
+            <button type="button" class="article-confirm-btn article-confirm-cancel" id="article-delete-cancel">Batal</button>
+            <button type="button" class="article-confirm-btn article-confirm-danger" id="article-delete-ok">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const overlay = document.getElementById('article-delete-overlay');
+        const msg = document.getElementById('article-delete-message');
+        const btnCancel = document.getElementById('article-delete-cancel');
+        const btnOk = document.getElementById('article-delete-ok');
+        let pendingForm = null;
+
+        function closeDeletePopup() {
+            overlay.style.display = 'none';
+            pendingForm = null;
+        }
+
+        document.querySelectorAll('.js-article-delete-form').forEach((form) => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                pendingForm = form;
+                const articleTitle = (form.dataset.articleTitle || '').trim();
+                msg.textContent = articleTitle
+                    ? `Hapus artikel "${articleTitle}"`
+                    : 'Data yang dihapus tidak dapat dikembalikan. Lanjutkan?';
+                overlay.style.display = 'flex';
+            });
+        });
+
+        btnCancel.addEventListener('click', closeDeletePopup);
+        btnOk.addEventListener('click', function () {
+            if (pendingForm) pendingForm.submit();
+            closeDeletePopup();
+        });
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) closeDeletePopup();
+        });
+    })();
+</script>
 
 <style>
     .article-settings-wrap {
@@ -102,7 +145,7 @@
     }
     .gs-subtitle {
         font-size: 13px;
-        color: #666;
+        color: #B09A85;
     }
     .gs-add-btn {
         background: var(--color-primary);
@@ -180,7 +223,7 @@
     }
     .article-p {
         font-size: 12px;
-        color: #666;
+        color: #B09A85;
         line-height: 1.5;
         margin-bottom: 12px;
     }
@@ -223,5 +266,99 @@
         background: #fdfdfd;
         border-radius: 16px;
         border: 2px dashed #eee;
+    }
+    .article-confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(44, 27, 16, 0.46);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 16px;
+        box-sizing: border-box;
+    }
+    .article-confirm-box {
+        width: min(100%, 620px);
+        max-height: calc(100vh - 32px);
+        overflow: auto;
+        background: #FFFDFB;
+        border-radius: 18px;
+        box-shadow: 0 26px 56px rgba(47, 29, 17, 0.28);
+        border: 1px solid #E9D8C8;
+        padding: 28px 24px;
+        box-sizing: border-box;
+        text-align: center;
+    }
+    .article-confirm-title {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.15;
+        color: #2B1609;
+        margin-bottom: 14px;
+    }
+    .article-confirm-message {
+        font-size: 20px;
+        color: #5E3A24;
+        line-height: 1.45;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    .article-confirm-actions {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 32px;
+    }
+    .article-confirm-btn {
+        border-radius: 12px;
+        padding: 13px 22px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.2;
+        transition: all 0.2s ease;
+    }
+    .article-confirm-cancel {
+        border: 1px solid #D9B69A;
+        background: #FFF7F1;
+        color: #582C0C;
+    }
+    .article-confirm-cancel:hover {
+        background: #F8E6D8;
+        border-color: #C99E7F;
+    }
+    .article-confirm-danger {
+        border: none;
+        background: #582C0C;
+        color: #fff;
+    }
+    .article-confirm-danger:hover {
+        background: #442108;
+    }
+
+    @media (max-width: 768px) {
+        .article-confirm-overlay {
+            padding: 12px;
+        }
+        .article-confirm-box {
+            width: 100%;
+            max-height: calc(100vh - 24px);
+            padding: 22px 18px;
+        }
+        .article-confirm-title {
+            font-size: 22px;
+        }
+        .article-confirm-message {
+            font-size: 18px;
+        }
+        .article-confirm-btn {
+            font-size: 16px;
+            padding: 11px 18px;
+        }
+        .article-confirm-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
     }
 </style>

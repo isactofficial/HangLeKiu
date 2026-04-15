@@ -411,19 +411,21 @@
     };
 
     // ─── HAPUS ────────────────────────────────────────────────
-    window.hapusObat = async function (id, nama) {
-        if (!confirm(`Hapus obat "${nama}"?`)) return;
-
-        const res = await fetch(`/admin/pharmacy/medicine/${id}`, {
-            method: 'DELETE',
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
-        });
-
-        if (res.ok) {
-            loadObat();
-        } else {
-            alert('Gagal menghapus data.');
-        }
+    window.hapusObat = function (id, nama) {
+        konfirmasiHapus(
+            `Hapus obat "${nama}"? Tindakan ini tidak dapat dibatalkan.`,
+            async () => {
+                const res = await fetch(`/admin/pharmacy/medicine/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF }
+                });
+                if (res.ok) {
+                    loadObat();
+                } else {
+                    alert('Gagal menghapus data.');
+                }
+            }
+        );
     };
 
     // ─── MODAL HELPERS ────────────────────────────────────────

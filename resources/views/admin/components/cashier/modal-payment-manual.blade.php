@@ -1,6 +1,8 @@
 {{-- =============================================
      MODAL: PEMBAYARAN MANUAL
      ============================================= --}}
+<link rel="stylesheet" href="{{ asset('css/admin/pages/cashier-mobile.css') }}">
+
 <div id="modalPembayaranManual" class="modal-overlay">
     <div class="modal-container" style="
         background: #fff;

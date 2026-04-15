@@ -27,7 +27,7 @@
     .apt-table { width: 100%; border-collapse: collapse; text-align: left; }
     .apt-table th { background: #fdf8f4; color: #582C0C; font-size: 13px; font-weight: 600; padding: 11px 16px; border-top: 1px solid #E5D6C5; border-bottom: 2px solid #E5D6C5; white-space: nowrap; cursor: pointer; }
     .apt-table th:hover { color: #C58F59; }
-    .apt-table td { padding: 11px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #F3EDE6; white-space: nowrap; }
+    .apt-table td { padding: 11px 16px; font-size: 13px; color: #57462c; border-bottom: 1px solid #F3EDE6; white-space: nowrap; }
     .apt-table tr:last-child td { border-bottom: none; }
     .apt-table tr:hover td { background: rgba(253,248,244,.7); }
     .apt-pagination { display: flex; justify-content: flex-end; align-items: center; padding: 12px 18px; gap: 20px; border-top: 1px solid #E5D6C5; }
