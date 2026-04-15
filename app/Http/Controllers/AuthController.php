@@ -259,14 +259,15 @@ class AuthController extends Controller
 
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        session()->save();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     public function handleGoogleCallback()
     {
         try {
             Log::info('Memulai Socialite Google callback');
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')->stateless()->user();
             Log::info('Data Google User berhasil didapat', ['email' => $googleUser->getEmail()]);
 
             // 1. Cari berdasarkan google_id
