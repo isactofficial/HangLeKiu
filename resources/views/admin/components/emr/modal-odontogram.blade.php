@@ -141,6 +141,14 @@
         justify-content: flex-end;
       }
 
+      #modalOdontogramOverlay .odonto-footer.view-only {
+        display: none !important;
+      }
+
+      #modalOdontogramOverlay .odonto-footer.view-only {
+        display: none !important;
+      }
+
       #modalOdontogramOverlay .odonto-save-btn {
         background: #3b331e;
         border: 0;
@@ -647,8 +655,9 @@
  
 
         <!-- Footer Modal -->
-        <div class="odonto-footer flex-shrink-0">
+        <div class="odonto-footer flex-shrink-0" id="odonto-footer">
           <button
+            id="odontogram-save-btn"
             onclick="submitOdontogram()"
             class="odonto-save-btn"
             type="button"
@@ -904,6 +913,20 @@
           const titleEl = document.querySelector('.odonto-title');
           if (titleEl) {
             titleEl.textContent = recordIdToLoad ? "Riwayat Odontogram" : "Tambah Odontogram";
+          }
+
+          // Set view mode based on record_id (LIHAT mode)
+          window.isOdontogramViewMode = !!recordIdToLoad;
+
+          // Hide save button in VIEW mode
+          const footerEl = document.getElementById('odonto-footer');
+          const saveBtn = document.getElementById('odontogram-save-btn');
+          if (window.isOdontogramViewMode && footerEl) {
+            footerEl.classList.add('view-only');
+            if (saveBtn) saveBtn.disabled = true;
+          } else if (footerEl) {
+            footerEl.classList.remove('view-only');
+            if (saveBtn) saveBtn.disabled = false;
           }
 
           clearOdontogramState();
@@ -1796,6 +1819,12 @@
       // FUNGSI SUBMIT KE BACKEND
       // ==========================================
       async function submitOdontogram() {
+          // Check view mode - no save in LIHAT mode
+          if (window.isOdontogramViewMode) {
+            alert('Mode Lihat Saja - Tombol simpan dinonaktifkan untuk riwayat odontogram.');
+            return;
+          }
+
           const patientId = document.getElementById('odontogramPatientId').value;
           
           if (!patientId || patientId === 'dummy-patient-id') {

@@ -1,0 +1,743 @@
+/* ===== RESET GLOBAL MOBILE ===== */
+@media (max-width: 768px) {
+ 
+    /* ---- CONTAINER ---- */
+    .emr-container {
+        padding: 0 0 120px 0; /* 🆕 +20px safe-area untuk sticky button */
+    }
+ 
+    /* ---- HEADER ---- */
+    .emr-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+ 
+    .emr-title {
+        font-size: 20px !important;
+    }
+ 
+    .emr-subtitle {
+        font-size: 12px;
+    }
+ 
+    /* Status legend: horizontal scroll, no wrap */
+    .emr-status-legend {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        gap: 8px;
+        width: 100%;
+        padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    }
+    .emr-status-legend::-webkit-scrollbar { display: none; }
+ 
+    .emr-status-item {
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 10px;
+        gap: 4px;
+        font-weight: 600;
+    }
+ 
+    .emr-dot { width: 6px; height: 6px; }
+ 
+    .emr-header-actions {
+        width: 100%;
+    }
+    .emr-icon-btn { flex: 1; height: 32px; }
+ 
+    /* ================================================================
+       LAYOUT: hapus flex row, jadikan satu kolom penuh
+       ================================================================ */
+    .emr-layout {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+ 
+    /* ================================================================
+       SIDEBAR → sticky panel di atas, tidak ada height kosong
+       ================================================================ */
+    .emr-sidebar {
+        width: 100% !important;
+        flex-shrink: 0;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        background: #fff;
+        border: 1px solid #e5d6c5;
+        border-radius: 12px;
+        overflow: hidden;
+        /* tidak pakai min-height / max-height agar menyesuaikan konten */
+    }
+ 
+    /* Toggle header */
+    .emr-sidebar-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 11px 14px;
+        background: linear-gradient(135deg, #582c0c 0%, #8e6a45 100%);
+        cursor: pointer;
+        border: none;
+        width: 100%;
+        font-family: "Instrument Sans", sans-serif;
+    }
+ 
+    .emr-sidebar-toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: white;
+        font-size: 12px;
+        font-weight: 700;
+    }
+ 
+    .emr-sidebar-toggle-count {
+        background: rgba(255,255,255,0.22);
+        color: white;
+        padding: 1px 7px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+ 
+    .emr-sidebar-toggle-arrow {
+        width: 14px;
+        height: 14px;
+        color: rgba(255,255,255,0.7);
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+ 
+    .emr-sidebar.expanded .emr-sidebar-toggle-arrow {
+        transform: rotate(180deg);
+    }
+ 
+    /* Collapsible body */
+    .emr-sidebar-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease !important;
+        opacity: 0;
+    }
+ 
+.emr-sidebar.expanded .emr-sidebar-body {
+        max-height: 500px !important; /* Increased for dropdown + patient list */
+        overflow-y: auto !important; /* Enable body scroll */
+        -webkit-overflow-scrolling: touch !important;
+        opacity: 1;
+    }
+ 
+    /* Filter row */
+    .emr-sidebar-header {
+        padding: 8px 10px 0;
+    }
+ 
+    .emr-select-trigger {
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+    .emr-select-text { font-size: 11px; }
+ 
+    /* Patient list: FIXED HORIZONTAL CAROUSEL - BLACKBOXAI */
+    .emr-patient-list {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        max-height: none !important;
+        gap: 8px !important;
+        padding: 8px 10px 12px !important;
+        -webkit-overflow-scrolling: touch !important;
+        scroll-snap-type: x mandatory !important;
+        scrollbar-width: none !important;
+        scroll-behavior: smooth !important;
+    }
+    .emr-patient-list::-webkit-scrollbar { 
+        display: none !important; 
+    }
+    
+    /* Snap points for smooth card snapping */
+    .js-emr-patient-link {
+        scroll-snap-align: start !important;
+        scroll-margin: 8px !important;
+    }
+ 
+    /* section wrappers jadi inline */
+    .js-patient-list-section {
+        display: contents !important;
+    }
+ 
+    .js-emr-patient-link {
+        flex-shrink: 0 !important;
+        text-decoration: none;
+        display: block !important;
+    }
+ 
+    .patient-card {
+        width: 140px !important;
+        min-width: 140px !important;
+        padding: 8px 9px !important;
+        border-radius: 10px;
+        gap: 5px;
+    }
+ 
+    .patient-card.active {
+        border-left: 3px solid #C58F59 !important;
+    }
+ 
+    .p-name { font-size: 11px !important; line-height: 1.3; }
+    .p-date, .p-mr { font-size: 9px !important; }
+    .status-badge { font-size: 8px !important; padding: 2px 5px !important; }
+ 
+    /* ================================================================
+       MAIN AREA - DETAIL PASIEN
+       ================================================================ */
+    .emr-main {
+        border-radius: 12px !important;
+        padding: 14px 14px !important;
+        min-height: unset !important;
+        border: 1px solid #eef2f7 !important;
+        background: #fff !important;
+    }
+
+    /* ══════════ MOBILE TIMELINE FIX (Stack Vertically) ══════════ */
+    .emr-content-body[data-tab-content="timeline"] {
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+
+    .emr-timeline-section {
+        order: 1 !important;
+        width: 100% !important;
+    }
+
+    .timeline-row {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 12px !important;
+        text-align: center !important;
+    }
+
+    .timeline-date {
+        width: auto !important;
+        padding: 0 !important;
+        order: 1 !important;
+    }
+
+    .timeline-line {
+        width: 100% !important;
+        height: 24px !important;
+        order: 2 !important;
+        justify-content: center !important;
+    }
+
+    .line-vertical {
+        width: 2px !important;
+        height: 20px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        left: 50% !important;
+        margin-left: -1px !important;
+    }
+
+    .line-dot {
+        width: 14px !important;
+        height: 14px !important;
+        margin-top: 0 !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 2 !important;
+    }
+
+    .timeline-content-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 16px 14px !important; /* Reduced padding */
+        margin-bottom: 0 !important;
+        order: 3 !important;
+        box-sizing: border-box !important;
+    }
+
+    .card-title {
+        font-size: 14px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .tl-split-row {
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: stretch !important;
+    }
+
+    .payment-box-static {
+        width: 100% !important;
+        text-align: center !important;
+        padding: 10px 14px !important;
+    }
+
+    .card-actions-row {
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    .card-time-info {
+        font-size: 12px !important;
+        text-align: center !important;
+        padding: 8px 0 !important;
+    }
+
+    /* ══════════ BUTTON: Full-Width Sticky Footer 🆕 FIXED ══════════ */
+    .emr-side-actions {
+        order: 2 !important;
+        flex: none !important;
+        width: 100% !important;
+        position: -webkit-sticky !important; /* iOS Safari */
+        position: sticky !important;
+        bottom: env(safe-area-inset-bottom, 0px) !important; /* Safe area */
+        background: #fff !important;
+        padding: 20px 16px 16px !important; /* 🆕 Extra padding */
+        margin-top: 12px !important;
+        border-top: 1px solid #e5d6c5 !important;
+        box-shadow: 0 -8px 32px rgba(0,0,0,0.08) !important;
+        z-index: 100 !important; /* 🆕 Higher z-index */
+    }
+
+    .btn-primary-blue {
+        width: 100% !important;
+        padding: 18px 24px !important; /* 🆕 Bigger touch target */
+        font-size: 16px !important; /* 🆕 Larger text */
+        border-radius: 14px !important;
+        box-shadow: 0 6px 20px rgba(37,99,235,0.35) !important;
+        min-height: 60px !important;
+        position: relative !important;
+        z-index: 101 !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .btn-primary-blue:not(:disabled):active {
+        transform: scale(0.98) !important;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.4) !important;
+    }
+
+    .btn-primary-blue:disabled {
+        background: #cbd5e1 !important;
+        box-shadow: none !important;
+        opacity: 0.7 !important;
+    }
+
+    /* ══════════ DROPDOWN: FIXED Viewport Overlay 🆕 FIXED ══════════ */
+    .diagnosa-dropdown {
+        position: fixed !important;
+        top: auto !important;
+        left: 12px !important;
+        right: 12px !important;
+        bottom: env(safe-area-inset-bottom, 20px) !important;
+        max-height: 60vh !important;
+        width: auto !important;
+        background: #fff !important;
+        border: 1px solid var(--brown-200) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25) !important;
+        z-index: 1000 !important;
+        padding: 20px !important;
+        backdrop-filter: blur(20px) !important;
+        transform: translateY(10px) !important;
+        opacity: 0 !important;
+        transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+        overflow: hidden !important;
+    }
+    
+    .diagnosa-dropdown:not(.hidden) {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+    }
+    
+    .diagnosa-dropdown.hidden {
+        transform: translateY(10px) !important;
+        opacity: 0 !important;
+    }
+
+    .diag-search-input {
+        padding: 14px 18px !important;
+        font-size: 15px !important;
+        border-radius: 12px !important;
+        border: 2px solid var(--brown-200) !important;
+    }
+
+    .diag-list {
+        max-height: 300px !important;
+        padding-right: 8px !important;
+    }
+
+    .diagnosa-item {
+        padding: 16px 20px !important;
+        font-size: 15px !important;
+        border-radius: 12px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .diagnosa-item:hover,
+    .diagnosa-item:active {
+        background: var(--brown-100) !important;
+        transform: translateX(4px) !important;
+    }
+ 
+    /* ══════════ Prevent Overflow & Polish ══════════ */
+    [data-tab-content="timeline"] {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        padding-bottom: 140px !important; /* 🆕 Space for sticky */
+    }
+
+    .timeline-content-card,
+    .emr-timeline-section,
+    .emr-content-body {
+        overflow-x: hidden !important;
+    }
+
+    /* Smaller fonts/gaps for density */
+    .card-title { line-height: 1.3 !important; }
+    .status-current-text { font-size: 12px !important; }
+    .btn-status-toggle { padding: 10px 16px !important; font-size: 12px !important; }
+
+    /* 🆕 Backdrop overlay when dropdown open */
+    body.dropdown-open {
+        overflow: hidden !important;
+    }
+
+    /* Empty state */
+    .emr-empty-state {
+        padding: 40px 16px !important;
+    }
+ 
+    /* Profile section: row compact */
+    .p-detail-container [class*="profile"],
+    .p-detail-container > div:first-child {
+        /* handled via inline override below */
+    }
+ 
+    /* ================================================================
+       PATIENT DETAIL INTERNAL LAYOUT
+       ================================================================ */
+ 
+    /* Profile row: avatar + nama inline */
+    .p-profile-row,
+    [class*="p-info-header"] {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 12px !important;
+        margin-bottom: 12px !important;
+    }
+ 
+    .p-avatar-circle {
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 50% !important;
+        flex-shrink: 0 !important;
+    }
+ 
+    /* Nama pasien */
+    [class*="patient-name"],
+    .p-detail-container h2 {
+        font-size: 16px !important;
+        line-height: 1.25 !important;
+    }
+ 
+    /* Info grid: 2 kolom, bukan 4 */
+    [class*="info-grid"],
+    [class*="p-detail-grid"],
+    [class*="p-info-grid"] {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+    }
+ 
+    /* Setiap info cell */
+    [class*="info-cell"],
+    [class*="p-info-cell"] {
+        padding: 7px 9px !important;
+    }
+ 
+    [class*="info-label"] {
+        font-size: 9px !important;
+    }
+ 
+    [class*="info-val"],
+    [class*="info-value"] {
+        font-size: 11px !important;
+    }
+ 
+    /* Tabs: horizontal scroll */
+    [class*="tab-nav"],
+    [class*="tab-list"],
+    .emr-main .tabs {
+        display: flex !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        scrollbar-width: none;
+        border-bottom: 2px solid #f0e8df;
+        gap: 0;
+        margin-bottom: 12px;
+    }
+ 
+    .tab-item {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        padding: 8px 14px !important;
+        font-size: 12px !important;
+    }
+ 
+    /* Timeline item */
+    [class*="timeline-item"],
+    [class*="timeline-card"] {
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+        border-radius: 10px !important;
+    }
+ 
+    /* Actions row di timeline: wrap rapi */
+    .card-actions-row,
+    [class*="actions-row"],
+    [class*="action-row"] {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        align-items: center !important;
+    }
+ 
+    .card-actions-row > *,
+    [class*="actions-row"] > * {
+        font-size: 10px !important;
+        padding: 5px 8px !important;
+        white-space: nowrap;
+    }
+ 
+    /* Tambah Diagnosa button: full-width sticky bottom */
+    .tambah-diagnosa-wrapper,
+    [style*="TAMBAH DIAGNOSA"],
+    [class*="tambah-diagnosa"] {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 20 !important;
+        background: white !important;
+        padding: 8px 0 0 !important;
+        border-top: 1px solid #f0e8df !important;
+        margin-top: 8px;
+    }
+ 
+    /* Record tabs: scroll */
+    [class*="record-tabs"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        scrollbar-width: none;
+    }
+    [class*="record-tabs"]::-webkit-scrollbar { display: none; }
+ 
+    .record-tab-btn {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        font-size: 11px !important;
+        padding: 7px 10px !important;
+    }
+ 
+    /* FINAL MOBILE DETAIL: Horizontal scroll OK, no overflow - BLACKBOXAI */
+    /* Tables keep natural width but scrollable horizontally */
+    .record-table-shell {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        -webkit-overflow-scrolling: touch !important;
+        max-width: 100% !important;
+    }
+    
+    .record-table-head,
+    .record-table-row {
+        min-width: 420px !important;
+    }
+    
+    /* Prevent parent overflow */
+    #emr-detail-view,
+    .emr-main,
+    .p-detail-container,
+    .record-table-shell > div {
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Force body scrollable */
+    body.emr-detail-open {
+        overflow-x: auto !important;
+    }
+ 
+    /* ================================================================
+       FAB
+       ================================================================ */
+    .emr-fab-container {
+        bottom: 1.2rem !important;
+        right: 1.2rem !important;
+    }
+ 
+    .emr-fab-btn {
+        width: 3rem !important;
+        height: 3rem !important;
+        border-radius: 12px !important;
+    }
+ 
+    .emr-fab-icon {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+    }
+ 
+    .emr-fab-menu {
+        width: 210px !important;
+        bottom: 3.5rem !important;
+    }
+}
+ 
+/* ================================================================
+   TOGGLE BUTTON: HIDDEN on desktop
+   ================================================================ */
+.emr-sidebar-toggle {
+    display: none;
+}
+ 
+.emr-sidebar-body {
+    /* desktop: always visible */
+    display: block;
+}
+ 
+@media (max-width: 768px) {
+    .emr-sidebar-toggle {
+        display: flex;
+    }
+}
+ 
+/* ================================================================
+   TABLET 769-992px
+   ================================================================ */
+@media (min-width: 769px) and (max-width: 992px) {
+    .emr-layout {
+        flex-direction: column;
+    }
+ 
+    .emr-sidebar {
+        width: 100%;
+    }
+ 
+    .emr-patient-list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        max-height: none;
+        gap: 8px;
+        padding: 8px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .emr-patient-list::-webkit-scrollbar { display: none; }
+ 
+    .js-patient-list-section { display: contents; }
+    .js-emr-patient-link { flex-shrink: 0; }
+    .patient-card { width: 155px; min-width: 155px; }
+}
+ 
+/* ================================================================
+   TOPBAR SEARCH PANEL - MOBILE FIX
+   ================================================================ */
+@media (max-width: 768px) {
+    #emrTopbarSearchDropdown {
+        position: fixed !important;
+        top: 56px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: auto !important;
+        max-height: 60vh !important;
+        border-radius: 12px !important;
+    }
+ 
+    #emrAdvanceSearchPanel {
+        position: fixed !important;
+        top: 56px !important;
+        left: 8px !important;
+        right: 8px !important;
+        min-width: unset !important;
+        border-radius: 12px !important;
+        z-index: 9999 !important;
+    }
+}
+ 
+/* ================================================================
+   TOAST - MOBILE
+   ================================================================ */
+@media (max-width: 768px) {
+    .emr-toast-mobile {
+        position: fixed !important;
+        bottom: 80px !important;
+        left: 12px !important;
+        right: 12px !important;
+        top: auto !important;
+        transform: none !important;
+        font-size: 12px;
+        border-radius: 10px;
+        text-align: center;
+    }
+}
+
+/* ══════════ MOBILE FILTER DROPDOWN SCROLLABLE 🆕 BLACKBOXAI ══════════ */
+@media (max-width: 768px) {
+.emr-filter-box.open .emr-options {
+    max-height: 200px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #cbd5e1 transparent !important;
+    z-index: 20 !important;
+    padding: 8px !important;
+}
+}
+
+.emr-filter-box .emr-options::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+.emr-filter-box .emr-options::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.emr-filter-box .emr-options::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 2px !important;
+}
+
+@media (max-width: 768px) {
+    .emr-option {
+        min-height: 44px !important; /* Touch-friendly */
+        display: flex !important;
+        align-items: center !important;
+        padding: 14px 16px !important;
+        font-size: 14px !important;
+    }
+    
+    .emr-filter-box.open .emr-options {
+        position: absolute !important;
+        top: calc(100% + 6px) !important;
+        left: 12px !important;
+        right: 12px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2) !important;
+        background: white !important;
+    }
+}
+
