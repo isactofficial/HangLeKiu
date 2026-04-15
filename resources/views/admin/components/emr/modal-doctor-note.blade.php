@@ -1,3 +1,24 @@
+<style>
+#modalDoctorNoteOverlay > div { width: min(100%, 760px); }
+
+@media (max-width: 768px) {
+    #modalDoctorNoteOverlay > div > div:first-child h3 {
+        font-size: 20px !important;
+    }
+    #modalDoctorNoteOverlay > div > div:first-child,
+    #modalDoctorNoteOverlay > div > div:nth-child(2) {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+    #modalDoctorNoteOverlay > div > div:last-child {
+        padding: 10px 14px 16px !important;
+    }
+    /* Collapse 2-col patient info to 1-col */
+    #modalDoctorNoteOverlay .grid[style*="grid-template-columns:repeat(2"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
 <div id="modalDoctorNoteOverlay" class="hidden" style="position:fixed; inset:0; background:rgba(15, 23, 42, 0.55); z-index:9999; align-items:center; justify-content:center; padding:20px;">
     <div style="background:#fff; width:100%; max-width:760px; border-radius:16px; box-shadow:0 24px 55px rgba(0,0,0,0.22); overflow:hidden; border:1px solid #f0e7dc;">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 22px; border-bottom:1px solid #eadfd3; background:linear-gradient(180deg, #fdf7f1 0%, #fff 100%);">

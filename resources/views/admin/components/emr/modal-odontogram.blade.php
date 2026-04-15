@@ -302,6 +302,43 @@
         #modalOdontogramOverlay .odonto-dmf-row .odonto-field {
           width: 100%;
         }
+
+        #modalOdontogramOverlay .odonto-title {
+          font-size: 20px;
+          margin-bottom: 10px;
+        }
+
+        #modalOdontogramOverlay .odonto-header {
+          padding: 14px 16px;
+        }
+
+        #modalOdontogramOverlay .odonto-body {
+          padding: 14px 16px;
+        }
+
+        #modalOdontogramOverlay .odonto-patient-info {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        #modalOdontogramOverlay .odonto-patient-left {
+          min-width: unset;
+          width: 100%;
+        }
+
+        #modalOdontogramOverlay .odonto-clear-btn {
+          width: 100%;
+          text-align: center;
+        }
+
+        #modalOdontogramOverlay .odonto-footer {
+          padding: 12px 16px;
+        }
+
+        #modalOdontogramOverlay .odonto-save-btn {
+          width: 100%;
+        }
       }
     </style>
 @endpush

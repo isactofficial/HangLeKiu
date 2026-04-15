@@ -259,15 +259,15 @@
                     </div>
 
                     <div class="dash-card bg-white rounded-3xl overflow-hidden mb-10 relative">
-                        <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
-                        <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
+                        <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+                        <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2 self-start sm:self-auto">
                             <svg class="w-6 h-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
                             <span class="truncate">Daftar Kunjungan</span>
                         </h2>
                         
-                        <button id="openVisitModal" type="button" class="shrink-0 px-4 py-2 rounded-lg bg-[var(--font-color-primary)] hover:brightness-110 text-white font-medium transition text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                        <button id="openVisitModal" type="button" class="shrink-0 w-full sm:w-auto justify-center px-4 py-2 rounded-lg bg-[var(--font-color-primary)] hover:brightness-110 text-white font-medium transition text-sm sm:text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                             Tambah Kunjungan
                         </button>
@@ -366,9 +366,9 @@
 
     <div class="p-8 lg:p-10 relative z-10">
         
-        <div class="flex flex-wrap gap-2 mb-6 bg-[#FEFCFA] p-1.5 rounded-xl border border-[#EFE3D7] inline-flex shadow-sm">
-            <button type="button" data-tab="registrasi" class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold bg-[var(--font-color-primary)] text-white shadow-sm transition">Kunjungan</button>
-            <button type="button" data-tab="odontogram" class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold text-[var(--font-color-secondary)] hover:text-[var(--font-color-primary)] transition">Odontogram Gigi</button>
+        <div class="flex flex-col sm:flex-row w-full sm:w-auto gap-2 mb-6 bg-[#FEFCFA] p-1.5 rounded-xl border border-[#EFE3D7] shadow-sm">
+            <button type="button" data-tab="registrasi" class="history-tab-btn w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold bg-[var(--font-color-primary)] text-white shadow-sm transition">Kunjungan</button>
+            <button type="button" data-tab="odontogram" class="history-tab-btn w-full sm:w-auto px-6 py-2.5 rounded-lg text-sm font-bold text-[var(--font-color-secondary)] bg-transparent transition">Odontogram Gigi</button>
         </div>
 
         <div id="tab-registrasi" class="history-tab-panel">
@@ -442,8 +442,8 @@
                             <tr>
                                 <th class="px-6 py-5 whitespace-nowrap w-48">Tanggal Periksa</th>
                                 <th class="px-6 py-5 whitespace-nowrap w-56">Dokter</th>
-                                <th class="px-6 py-5 text-center whitespace-nowrap w-32">No Gigi</th>
-                                <th class="px-6 py-5 min-w-[300px]">Catatan Odontogram</th>
+                                <th class="px-6 py-5 text-center whitespace-nowrap w-32">Jumlah Gigi Diperiksa</th>
+                                <th class="px-6 py-5">Catatan Odontogram</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#EFE3D7] bg-white">
@@ -457,10 +457,10 @@
                                         {{ $record->doctor->full_name ?? '-' }}
                                     </td>
                                     <td class="px-6 py-5 text-center font-bold text-[var(--color-primary)] whitespace-nowrap">
-                                        {{ $record->tooth_number ?? '-' }}
+                                        {{ $record->teeth_count ?? '0' }} Gigi
                                     </td>
-                                    <td class="px-6 py-5 text-[var(--font-color-secondary)] leading-relaxed max-w-[300px] truncate" title="{{ $record->notes ?: '-' }}">
-                                        {{ $record->notes ?: 'Tidak ada catatan khusus.' }}
+                                    <td class="px-6 py-5 text-[var(--font-color-secondary)] leading-relaxed" title="{{ $record->notes ?: '-' }}">
+                                        {!! $record->notes ? implode('<br>', array_map('trim', explode(',', $record->notes))) : 'Tidak ada catatan khusus.' !!}
                                     </td>
                                 </tr>
                             @empty

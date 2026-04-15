@@ -40,6 +40,7 @@
     display: flex;
     gap: 16px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .emr-status-item {
@@ -55,6 +56,7 @@
     height: 8px;
     border-radius: 50%;
     display: inline-block;
+    flex-shrink: 0;
 }
 
 /* ===== TOMBOL AKSI KANAN ATAS ===== */
@@ -91,6 +93,7 @@
 .emr-layout {
     display: flex;
     gap: 24px;
+    position: relative;
 }
 
 .emr-sidebar {
@@ -216,6 +219,7 @@
     justify-content: center;
     min-height: 400px;
     border: 1px dashed #c58f59;
+    min-width: 0;
 }
 
 .emr-empty-state {
@@ -244,39 +248,114 @@
     margin: 0;
 }
 
+/* ===== MOBILE SIDEBAR TOGGLE BUTTON ===== */
+.emr-sidebar-toggle-btn {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #e5d6c5;
+    border-radius: 10px;
+    padding: 10px 16px;
+    color: #582c0c;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 12px;
+    width: 100%;
+    transition: all 0.2s;
+}
+
+.emr-sidebar-toggle-btn:hover {
+    border-color: #c58f59;
+    background: #fdf8f4;
+}
+
+/* ===== MOBILE DRAWER BACKDROP ===== */
+.emr-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 18, 6, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1099;
+}
+
+.emr-sidebar-backdrop.active {
+    display: block;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 992px) {
     .emr-layout {
         flex-direction: column;
+        gap: 0;
     }
 
+    /* Sidebar becomes a fixed drawer from the left on mobile */
     .emr-sidebar {
-        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 300px;
+        max-width: 90vw;
+        background: #fff;
+        z-index: 1100;
+        padding: 20px 16px;
+        box-shadow: 4px 0 24px rgba(88, 44, 12, 0.16);
+        transform: translateX(-110%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-y: auto;
+    }
+
+    .emr-sidebar.drawer-open {
+        transform: translateX(0);
+    }
+
+    .emr-sidebar-toggle-btn {
+        display: flex;
+    }
+
+    .emr-main {
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .emr-empty-state {
+        margin: auto;
     }
 
     .emr-status-legend {
         flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .emr-patient-list {
+        max-height: calc(100vh - 160px);
     }
 }
 
 @media (max-width: 768px) {
     .emr-title {
-        font-size: 24px !important;
+        font-size: 22px !important;
     }
 
     .emr-subtitle {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .emr-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 10px;
+        margin-bottom: 14px;
     }
 
     .emr-status-legend {
-        gap: 12px;
+        gap: 8px;
     }
+
     .emr-status-item {
         font-size: 11px;
     }
@@ -291,11 +370,17 @@
 
     .emr-empty-img {
         width: 100%;
-        max-width: 300px;
+        max-width: 240px;
     }
 
     .emr-empty-title {
         font-size: 16px;
+    }
+
+    .emr-main {
+        min-height: 300px;
+        border-radius: 10px;
+        padding: 16px;
     }
 }
 
@@ -304,7 +389,7 @@
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    z-index: 50; /* Pastikan di atas konten EMR, tapi di bawah Modal Overlay */
+    z-index: 50;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -312,21 +397,21 @@
 
 /* Tombol Biru */
 .emr-fab-btn {
-    width: 4rem; /* Ubah ukuran wadah tombol jika ingin lebih besar (misal: 4rem) */
-    height: 4rem; /* Pastikan width dan height sama agar proporsional */
+    width: 4rem;
+    height: 4rem;
     background: linear-gradient(135deg, #6b513e, #6b513e);
     color: white;
     border: none;
     border-radius: 14px;
     display: flex;
-    align-items: center; /* Ini yang membuat icon ke tengah vertikal */
-    justify-content: center; /* Ini yang membuat icon ke tengah horizontal */
+    align-items: center;
+    justify-content: center;
     box-shadow:
         0 8px 16px rgba(235, 143, 37, 0.25),
         inset 0 1px 1px rgba(255, 255, 255, 0.2);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    font-size: 2.25rem; /* Ukuran font untuk icon, bisa disesuaikan */
+    font-size: 2.25rem;
 }
 
 .emr-fab-btn:hover {
@@ -342,7 +427,7 @@
 /* Menu Popup / List Fitur */
 .emr-fab-menu {
     position: absolute;
-    bottom: 4.5rem; /* Jarak dari atas tombol FAB */
+    bottom: 4.5rem;
     right: 0;
     width: 250px;
     background-color: white;
@@ -351,8 +436,6 @@
     box-shadow:
         0 10px 15px -3px rgba(0, 0, 0, 0.1),
         0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
-    /* Disembunyikan secara default */
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
@@ -393,7 +476,7 @@
     padding: 0;
     margin: 0;
     max-height: 300px;
-    overflow-y: auto; /* Agar bisa di-scroll jika kepanjangan */
+    overflow-y: auto;
 }
 
 /* Custom Scrollbar untuk list fitur */

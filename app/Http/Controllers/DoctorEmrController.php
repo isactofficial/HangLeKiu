@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\OdontogramRecord;
 
 class DoctorEmrController extends Controller
 {
@@ -154,11 +155,16 @@ class DoctorEmrController extends Controller
             ->sortByDesc('created_at')
             ->values();
             
-                if ($request->ajax() || $request->hasHeader('X-Requested-With')) {
-                    return view('doctor.components.emr.patient-detail-partial',        
-                    compact('appointment', 'doctorNotes', 'patientRegistrations')
-                )->render();
-            }
+        $odontogramRecords = OdontogramRecord::with('teeth')
+            ->where('patient_id', $appointment->patient_id)
+            ->orderByDesc('examined_at')
+            ->get();
+            
+        if ($request->ajax() || $request->hasHeader('X-Requested-With')) {
+            return view('doctor.components.emr.patient-detail-partial',        
+                compact('appointment', 'doctorNotes', 'patientRegistrations', 'odontogramRecords')
+            )->render();
+        }
 
         return redirect()->route('doctor.emr');
     }

@@ -438,8 +438,13 @@
   }
 
   #modalTambahProsedur .modal-shell {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #modalTambahProsedur .modal-title {
+    font-size: 22px;
+    margin-top: 14px;
   }
 
   #modalTambahProsedur .patient-meta-card,
@@ -456,8 +461,23 @@
     grid-template-columns: 1fr;
   }
 
-  #modalTambahProsedur .obat-row {
+  #modalTambahProsedur .obat-row,
+  #modalTambahProsedur .bhp-row {
     grid-template-columns: 1fr;
+  }
+
+  #modalTambahProsedur .footer-layout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  #modalTambahProsedur .footer-layout .total-box {
+    text-align: left;
+  }
+
+  #totalHargaDisplay {
+    font-size: 18px;
   }
 }
 </style>

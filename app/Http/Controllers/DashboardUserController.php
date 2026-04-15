@@ -24,8 +24,9 @@ class DashboardUserController extends Controller
         $upcomingAppointment = null;
         $activeRegistrations = collect();
         $recentAppointments  = collect();
-        $medicalHistoryRows  = collect();
-        $odontogramRows      = collect();
+        $medicalHistoryRows  = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+        $odontogramRows      = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+        $odontogramData      = [];
 
         $doctors = Doctor::active()
             ->orderBy('full_name')
@@ -62,8 +63,7 @@ class DashboardUserController extends Controller
             $medicalHistoryRows = Appointment::where('patient_id', $patient->id)
                 ->with('doctor')
                 ->latest('appointment_datetime')
-                ->take(10)
-                ->get();
+                ->paginate(10, ['*'], 'medical_history_page');
 
             $odontogramRows = OdontogramRecord::where('patient_id', $patient->id)
                 ->withCount('teeth')
@@ -107,6 +107,7 @@ class DashboardUserController extends Controller
             'recentAppointments',
             'medicalHistoryRows',
             'odontogramRows',
+            'odontogramData',
             'doctors',
             'treatments'
         ));

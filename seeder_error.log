@@ -1,0 +1,25 @@
+
+   INFO  Seeding database.  
+
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`hanglekiu_dental`.`registration`, CONSTRAINT `registration_poli_id_foreign` FOREIGN KEY (`poli_id`) REFERENCES `master_poli` (`id`)) (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: hanglekiu_dental, SQL: update `master_poli` set `id` = a0ee9ee0-3aa4-4e41-888c-92632ca44933, `is_active` = 1, `created_at` = 2026-04-13 11:13:35 where (`name` = Poli Gigi Umum) limit 1)
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+    834Γûò             $exceptionType = $this->isUniqueConstraintError($e)
+    835Γûò                 ? UniqueConstraintViolationException::class
+    836Γûò                 : QueryException::class;
+    837Γûò 
+  Γ₧£ 838Γûò             throw new $exceptionType(
+    839Γûò                 $this->getNameWithReadWriteType(),
+    840Γûò                 $query,
+    841Γûò                 $this->prepareBindings($bindings),
+    842Γûò                 $e,
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:609
+      PDOException::("SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`hanglekiu_dental`.`registration`, CONSTRAINT `registration_poli_id_foreign` FOREIGN KEY (`poli_id`) REFERENCES `master_poli` (`id`))")
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:609
+      PDOStatement::execute()
+

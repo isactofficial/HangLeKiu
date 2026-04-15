@@ -524,6 +524,104 @@
     .riwayat-accordion { margin-top: 15px; padding: 15px 0; border-top: 1px solid var(--brown-200); display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 14px; font-weight: 800; color: var(--brown-900); }
     
     .hidden { display: none !important; }
+
+    /* ================= 6. MOBILE RESPONSIVE ================= */
+    @media (max-width: 992px) {
+        /* Info grid: 3-col → 2-col */
+        .p-info-grid {
+            grid-template-columns: minmax(180px, 1.5fr) minmax(140px, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        /* Profile header stacks */
+        .p-profile-flex { gap: 14px; }
+
+        /* Info grid: single column */
+        .p-info-grid {
+            grid-template-columns: 1fr;
+            gap: 12px 0;
+        }
+
+        .name-highlight { font-size: 20px; }
+
+        /* Tabs: horizontally scrollable */
+        .emr-tabs-nav {
+            gap: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 1px;
+        }
+        .emr-tabs-nav::-webkit-scrollbar { display: none; }
+        .tab-item { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+
+        /* Content body: stack side-actions below timeline */
+        .emr-content-body {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Side actions: full width */
+        .emr-side-actions {
+            flex: none;
+            width: 100%;
+        }
+
+        /* Timeline card: reduce padding */
+        .timeline-content-card { padding: 14px; }
+
+        /* Timeline row: reduce gap */
+        .timeline-row { gap: 10px; }
+        .timeline-date { width: 50px; }
+        .timeline-date .day { font-size: 18px; }
+
+        /* tl-split-row: stack on mobile */
+        .tl-split-row { flex-direction: column; gap: 10px; }
+        .tl-split-bottom { flex-wrap: wrap; gap: 8px; }
+
+        /* Status menu: open above, full width */
+        .status-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+            z-index: 9999;
+            min-width: unset;
+        }
+
+        /* Record tables: card view */
+        .record-table-head { display: none !important; }
+
+        .record-table-row {
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--brown-200);
+            border-radius: 10px;
+            margin: 6px;
+            box-shadow: 0 1px 4px rgba(59,51,30,0.06);
+        }
+
+        .record-table-row div {
+            padding: 4px 2px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Show data-label as micro-label above each cell value on mobile */
+        .record-table-row div[data-label]::before {
+            content: attr(data-label);
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--brown-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+    }
 </style>
 
 @php
@@ -548,7 +646,7 @@
     $patientFirstChatDateValue = $patient?->first_chat_date
         ? \Carbon\Carbon::parse($patient->first_chat_date)->format('Y-m-d')
         : '';
-    $patientGenderLabel = ($patient->gender ?? '') === 'Male' ? 'Laki-laki' : 'Perempuan';
+    $patientGenderLabel = ($patient?->gender ?? '') === 'Male' ? 'Laki-laki' : 'Perempuan';
     $patientPhoto = $patient?->photo ?? '';
     $normalizedPhoto = trim((string) $patientPhoto);
     $looksLikeRawBase64 = $normalizedPhoto !== ''
@@ -571,9 +669,9 @@
 
 <div class="p-detail-container"
      data-appointment-id="{{ $appointment->id }}"
-     data-patient-name="{{ $patient->full_name ?? '-' }}"
-     data-patient-rm="{{ $patient->medical_record_no ?? '-' }}"
-     data-doctor-name="{{ $appointment->doctor->full_name ?? '-' }}"
+     data-patient-name="{{ $patient?->full_name ?? '-' }}"
+     data-patient-rm="{{ $patient?->medical_record_no ?? '-' }}"
+     data-doctor-name="{{ $appointment->doctor?->full_name ?? '-' }}"
      data-patient-demography="{{ $patientDobText }} ({{ $patientAgeText }})">
     
     {{-- 1. HEADER PROFIL --}}
@@ -586,7 +684,7 @@
             <div class="p-info-grid">
                 <div class="info-group">
                     <label>NAMA PASIEN</label>
-                    <div class="info-value name-highlight">{{ $patient->full_name ?? '-' }}</div>
+                    <div class="info-value name-highlight">{{ $patient?->full_name ?? '-' }}</div>
                 </div>
                 <div class="info-group">
                     <label>TANGGAL LAHIR / UMUR</label>
@@ -606,8 +704,8 @@
                     </label>
                     <div class="info-value"
                          id="patientAddressValue"
-                         data-sensitive-original="{{ e($patient->address ?? '-') }}"
-                         data-sensitive-visible="1">{{ e($patient->address ?? '-') }}</div>
+                         data-sensitive-original="{{ e($patient?->address ?? '-') }}"
+                         data-sensitive-visible="1">{{ e($patient?->address ?? '-') }}</div>
                     <div class="info-link" style="text-align: left; margin-top: 8px;">
                         <a href="javascript:void(0)" onclick="document.getElementById('patientDetailModal').style.display='flex'">Lihat data lainnya &gt;</a>
                     </div>
@@ -621,8 +719,8 @@
                     </label>
                     <div class="info-value"
                          id="patientIdCardValue"
-                         data-sensitive-original="{{ e($patient->id_card_number ?? '-') }}"
-                         data-sensitive-visible="1">{{ e($patient->id_card_number ?? '-') }}</div>
+                         data-sensitive-original="{{ e($patient?->id_card_number ?? '-') }}"
+                         data-sensitive-visible="1">{{ e($patient?->id_card_number ?? '-') }}</div>
                 </div>
                 <div class="info-group">
                     <label>
@@ -633,8 +731,8 @@
                     </label>
                     <div class="info-value"
                          id="patientPhoneValue"
-                         data-sensitive-original="{{ e($patient->phone_number ?? '-') }}"
-                         data-sensitive-visible="1">{{ e($patient->phone_number ?? '-') }}</div>
+                         data-sensitive-original="{{ e($patient?->phone_number ?? '-') }}"
+                         data-sensitive-visible="1">{{ e($patient?->phone_number ?? '-') }}</div>
                 </div>
             </div>
         </div>
@@ -660,7 +758,7 @@
                 
                 <div class="timeline-content-card">
                     <div class="card-title">
-                        Poli <strong>{{ $appointment->doctor->specialization ?? 'Bedah Mulut' }}</strong> dengan <span class="doc-link">drg. {{ $appointment->doctor->full_name }}</span>
+                        Poli <strong>{{ $appointment->doctor?->specialization ?? 'Bedah Mulut' }}</strong> dengan <span class="doc-link">drg. {{ $appointment->doctor?->full_name ?? '-' }}</span>
                     </div>
                     
                     {{-- ROW 1: Pembayaran (Kiri) & Icons+Status (Kanan) --}}
@@ -766,28 +864,28 @@
                     <input type="text" id="diagSearchInput" onkeyup="filterDiagnosaList()" placeholder="Cari fitur medis..." class="diag-search-input">
                     <ul class="diag-list" id="diagList">
                         <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleProsedureModal(true, {
-                                name: @js($patient->full_name ?? '-'),
-                                rm: @js($patient->medical_record_no ?? '-'),
+                                name: @js($patient?->full_name ?? '-'),
+                                rm: @js($patient?->medical_record_no ?? '-'),
                                 gender: @js($patientGenderLabel),
                                 age: @js($patientAgeNumber . ' Tahun'),
                                 payment: @js($paymentLabel),
                                 patient_id: @js($appointment->patient_id ?? ''),
                                 registration_id: @js($appointment->id ?? ''),
                                 doctor_id: @js($appointment->doctor_id ?? ''),
-                                doctor_name: @js($appointment->doctor->full_name ?? '')
+                                doctor_name: @js($appointment->doctor?->full_name ?? '')
                             })">
                                 Tambah Prosedur
                             </a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item" onclick="toggleOdontogramModal(true, {
-                                    name: @js($patient->full_name ?? '-'),
-                                    rm: @js($patient->medical_record_no ?? '-'),
+                                    name: @js($patient?->full_name ?? '-'),
+                                    rm: @js($patient?->medical_record_no ?? '-'),
                                     gender: @js($patientGenderLabel),
                                     age: @js($patientAgeNumber . ' Tahun'),
                                     payment: @js($paymentLabel),
                                     patient_id: @js($appointment->patient_id ?? ''),
                                     registration_id: @js($appointment->id ?? ''),
                                     doctor_id: @js($appointment->doctor_id ?? ''),
-                                    doctor_name: @js($appointment->doctor->full_name ?? '')
+                                    doctor_name: @js($appointment->doctor?->full_name ?? '')
                                 })">Tambah Odontogram</a></li>
                         <li><a href="javascript:void(0)" class="diagnosa-item" onclick="openDoctorNoteModalFromDetail()">Tambah Catatan Dokter</a></li>
                     </ul>
@@ -983,8 +1081,8 @@
                             <button type="button" 
                                     style="padding:6px 12px; background:var(--brown-700); color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700;"
                                     onclick="toggleOdontogramModal(true, {
-                                        name: @js($patient->full_name ?? '-'),
-                                        rm: @js($patient->medical_record_no ?? '-'),
+                                        name: @js($patient?->full_name ?? '-'),
+                                        rm: @js($patient?->medical_record_no ?? '-'),
                                         gender: @js($patientGenderLabel),
                                         age: @js($patientAgeNumber . ' Tahun'),
                                         payment: @js($paymentLabel),
@@ -1012,14 +1110,14 @@
             <a href="javascript:void(0)" class="patient-detail-modal-close" onclick="document.getElementById('patientDetailModal').style.display='none'">✕</a>
         </div>
         <div class="patient-detail-modal-body">
-            <input type="hidden" id="patientDetailPatientId" value="{{ $patient->id ?? '' }}">
+            <input type="hidden" id="patientDetailPatientId" value="{{ $patient?->id ?? '' }}">
             <input type="hidden" id="patientDetailPhotoBase64" value="">
 
             <div class="patient-detail-photo-wrap">
                 <img src="{{ $patientPhotoSrc }}" alt="Foto pasien" class="patient-detail-photo" id="patientDetailPhotoPreview">
                 <div class="patient-detail-photo-meta">
-                    <div class="patient-detail-photo-name">{{ $patient->full_name ?? '-' }}</div>
-                    <div class="patient-detail-photo-rm">RM: {{ $patient->medical_record_no ?? '-' }}</div>
+                    <div class="patient-detail-photo-name">{{ $patient?->full_name ?? '-' }}</div>
+                    <div class="patient-detail-photo-rm">RM: {{ $patient?->medical_record_no ?? '-' }}</div>
                     <div class="patient-detail-photo-actions">
                         <label for="patientDetailPhotoInput" id="patientDetailPhotoUploadLabel" class="patient-detail-photo-upload-label disabled">
                             <i class="fa fa-image"></i> Ganti Foto
@@ -1033,23 +1131,23 @@
             <div class="patient-detail-grid">
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">ID Pasien</div>
-                    <input class="patient-detail-input" value="{{ $patient->id ?? '-' }}" disabled data-readonly-permanent="1">
+                    <input class="patient-detail-input" value="{{ $patient?->id ?? '-' }}" disabled data-readonly-permanent="1">
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">User ID</div>
-                    <input class="patient-detail-input" value="{{ $patient->user_id ?? '-' }}" disabled data-readonly-permanent="1">
+                    <input class="patient-detail-input" value="{{ $patient?->user_id ?? '-' }}" disabled data-readonly-permanent="1">
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Nama Lengkap</div>
-                    <input id="patientDetailFullName" data-patient-field="full_name" class="patient-detail-input" value="{{ $patient->full_name ?? '' }}" disabled>
+                    <input id="patientDetailFullName" data-patient-field="full_name" class="patient-detail-input" value="{{ $patient?->full_name ?? '' }}" disabled>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Email</div>
-                    <input id="patientDetailEmail" data-patient-field="email" class="patient-detail-input" value="{{ $patient->email ?? '' }}" disabled>
+                    <input id="patientDetailEmail" data-patient-field="email" class="patient-detail-input" value="{{ $patient?->email ?? '' }}" disabled>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">No. Rekam Medis</div>
-                    <input class="patient-detail-input" value="{{ $patient->medical_record_no ?? '-' }}" disabled data-readonly-permanent="1">
+                    <input class="patient-detail-input" value="{{ $patient?->medical_record_no ?? '-' }}" disabled data-readonly-permanent="1">
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Tanggal Lahir</div>
@@ -1059,89 +1157,89 @@
                     <div class="patient-detail-label">Jenis Kelamin</div>
                     <select id="patientDetailGender" data-patient-field="gender" class="patient-detail-select" disabled>
                         <option value="">-</option>
-                        <option value="Male" {{ ($patient->gender ?? '') === 'Male' ? 'selected' : '' }}>Laki-laki</option>
-                        <option value="Female" {{ ($patient->gender ?? '') === 'Female' ? 'selected' : '' }}>Perempuan</option>
+                        <option value="Male" {{ ($patient?->gender ?? '') === 'Male' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Female" {{ ($patient?->gender ?? '') === 'Female' ? 'selected' : '' }}>Perempuan</option>
                     </select>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Golongan Darah</div>
                     <select id="patientDetailBloodType" data-patient-field="blood_type" class="patient-detail-select" disabled>
                         <option value="">-</option>
-                        <option value="A" {{ ($patient->blood_type ?? '') === 'A' ? 'selected' : '' }}>A</option>
-                        <option value="B" {{ ($patient->blood_type ?? '') === 'B' ? 'selected' : '' }}>B</option>
-                        <option value="AB" {{ ($patient->blood_type ?? '') === 'AB' ? 'selected' : '' }}>AB</option>
-                        <option value="O" {{ ($patient->blood_type ?? '') === 'O' ? 'selected' : '' }}>O</option>
-                        <option value="unknown" {{ ($patient->blood_type ?? '') === 'unknown' ? 'selected' : '' }}>Tidak diketahui</option>
+                        <option value="A" {{ ($patient?->blood_type ?? '') === 'A' ? 'selected' : '' }}>A</option>
+                        <option value="B" {{ ($patient?->blood_type ?? '') === 'B' ? 'selected' : '' }}>B</option>
+                        <option value="AB" {{ ($patient?->blood_type ?? '') === 'AB' ? 'selected' : '' }}>AB</option>
+                        <option value="O" {{ ($patient?->blood_type ?? '') === 'O' ? 'selected' : '' }}>O</option>
+                        <option value="unknown" {{ ($patient?->blood_type ?? '') === 'unknown' ? 'selected' : '' }}>Tidak diketahui</option>
                     </select>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Rhesus</div>
                     <select id="patientDetailRhesus" data-patient-field="rhesus" class="patient-detail-select" disabled>
                         <option value="">-</option>
-                        <option value="+" {{ ($patient->rhesus ?? '') === '+' ? 'selected' : '' }}>+</option>
-                        <option value="-" {{ ($patient->rhesus ?? '') === '-' ? 'selected' : '' }}>-</option>
-                        <option value="unknown" {{ ($patient->rhesus ?? '') === 'unknown' ? 'selected' : '' }}>Tidak diketahui</option>
+                        <option value="+" {{ ($patient?->rhesus ?? '') === '+' ? 'selected' : '' }}>+</option>
+                        <option value="-" {{ ($patient?->rhesus ?? '') === '-' ? 'selected' : '' }}>-</option>
+                        <option value="unknown" {{ ($patient?->rhesus ?? '') === 'unknown' ? 'selected' : '' }}>Tidak diketahui</option>
                     </select>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Nomor HP</div>
-                    <input id="patientDetailPhone" data-patient-field="phone_number" class="patient-detail-input" value="{{ $patient->phone_number ?? '' }}" disabled>
+                    <input id="patientDetailPhone" data-patient-field="phone_number" class="patient-detail-input" value="{{ $patient?->phone_number ?? '' }}" disabled>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Nomor KTP</div>
-                    <input id="patientDetailIdCard" data-patient-field="id_card_number" class="patient-detail-input" value="{{ $patient->id_card_number ?? '' }}" disabled>
+                    <input id="patientDetailIdCard" data-patient-field="id_card_number" class="patient-detail-input" value="{{ $patient?->id_card_number ?? '' }}" disabled>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Kota</div>
-                    <input id="patientDetailCity" data-patient-field="city" class="patient-detail-input" value="{{ $patient->city ?? '' }}" disabled>
+                    <input id="patientDetailCity" data-patient-field="city" class="patient-detail-input" value="{{ $patient?->city ?? '' }}" disabled>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Agama</div>
                     <select id="patientDetailReligion" data-patient-field="religion" class="patient-detail-select" disabled>
                         <option value="">-</option>
-                        <option value="Islam" {{ ($patient->religion ?? '') === 'Islam' ? 'selected' : '' }}>Islam</option>
-                        <option value="Kristen" {{ ($patient->religion ?? '') === 'Kristen' ? 'selected' : '' }}>Kristen</option>
-                        <option value="Katolik" {{ ($patient->religion ?? '') === 'Katolik' ? 'selected' : '' }}>Katolik</option>
-                        <option value="Hindu" {{ ($patient->religion ?? '') === 'Hindu' ? 'selected' : '' }}>Hindu</option>
-                        <option value="Buddha" {{ ($patient->religion ?? '') === 'Buddha' ? 'selected' : '' }}>Buddha</option>
-                        <option value="Konghucu" {{ ($patient->religion ?? '') === 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
+                        <option value="Islam" {{ ($patient?->religion ?? '') === 'Islam' ? 'selected' : '' }}>Islam</option>
+                        <option value="Kristen" {{ ($patient?->religion ?? '') === 'Kristen' ? 'selected' : '' }}>Kristen</option>
+                        <option value="Katolik" {{ ($patient?->religion ?? '') === 'Katolik' ? 'selected' : '' }}>Katolik</option>
+                        <option value="Hindu" {{ ($patient?->religion ?? '') === 'Hindu' ? 'selected' : '' }}>Hindu</option>
+                        <option value="Buddha" {{ ($patient?->religion ?? '') === 'Buddha' ? 'selected' : '' }}>Buddha</option>
+                        <option value="Konghucu" {{ ($patient?->religion ?? '') === 'Konghucu' ? 'selected' : '' }}>Konghucu</option>
                     </select>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Pendidikan</div>
                     <select id="patientDetailEducation" data-patient-field="education" class="patient-detail-select" disabled>
                         <option value="">-</option>
-                        <option value="SD/Sederajat" {{ in_array(($patient->education ?? ''), ['SD/Sederajat', 'SD'], true) ? 'selected' : '' }}>SD/Sederajat</option>
-                        <option value="SMP/Sederajat" {{ in_array(($patient->education ?? ''), ['SMP/Sederajat', 'SMP'], true) ? 'selected' : '' }}>SMP/Sederajat</option>
-                        <option value="SMA/Sederajat" {{ in_array(($patient->education ?? ''), ['SMA/Sederajat', 'SMA'], true) ? 'selected' : '' }}>SMA/Sederajat</option>
-                        <option value="D3" {{ ($patient->education ?? '') === 'D3' ? 'selected' : '' }}>D3</option>
-                        <option value="S1/D4" {{ in_array(($patient->education ?? ''), ['S1/D4', 'S1'], true) ? 'selected' : '' }}>S1/D4</option>
-                        <option value="S2" {{ ($patient->education ?? '') === 'S2' ? 'selected' : '' }}>S2</option>
-                        <option value="S3" {{ ($patient->education ?? '') === 'S3' ? 'selected' : '' }}>S3</option>
-                        <option value="Lainnya" {{ ($patient->education ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                        <option value="SD/Sederajat" {{ in_array(($patient?->education ?? ''), ['SD/Sederajat', 'SD'], true) ? 'selected' : '' }}>SD/Sederajat</option>
+                        <option value="SMP/Sederajat" {{ in_array(($patient?->education ?? ''), ['SMP/Sederajat', 'SMP'], true) ? 'selected' : '' }}>SMP/Sederajat</option>
+                        <option value="SMA/Sederajat" {{ in_array(($patient?->education ?? ''), ['SMA/Sederajat', 'SMA'], true) ? 'selected' : '' }}>SMA/Sederajat</option>
+                        <option value="D3" {{ ($patient?->education ?? '') === 'D3' ? 'selected' : '' }}>D3</option>
+                        <option value="S1/D4" {{ in_array(($patient?->education ?? ''), ['S1/D4', 'S1'], true) ? 'selected' : '' }}>S1/D4</option>
+                        <option value="S2" {{ ($patient?->education ?? '') === 'S2' ? 'selected' : '' }}>S2</option>
+                        <option value="S3" {{ ($patient?->education ?? '') === 'S3' ? 'selected' : '' }}>S3</option>
+                        <option value="Lainnya" {{ ($patient?->education ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                     </select>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Pekerjaan</div>
                     <select id="patientDetailOccupation" data-patient-field="occupation" class="patient-detail-select" disabled>
                         <option value="">-</option>
-                        <option value="Pelajar/Mahasiswa" {{ ($patient->occupation ?? '') === 'Pelajar/Mahasiswa' ? 'selected' : '' }}>Pelajar/Mahasiswa</option>
-                        <option value="PNS" {{ ($patient->occupation ?? '') === 'PNS' ? 'selected' : '' }}>PNS</option>
-                        <option value="Karyawan Swasta" {{ ($patient->occupation ?? '') === 'Karyawan Swasta' ? 'selected' : '' }}>Karyawan Swasta</option>
-                        <option value="Wiraswasta" {{ ($patient->occupation ?? '') === 'Wiraswasta' ? 'selected' : '' }}>Wiraswasta</option>
-                        <option value="Ibu Rumah Tangga" {{ ($patient->occupation ?? '') === 'Ibu Rumah Tangga' ? 'selected' : '' }}>Ibu Rumah Tangga</option>
-                        <option value="Lainnya" {{ ($patient->occupation ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                        <option value="Pelajar/Mahasiswa" {{ ($patient?->occupation ?? '') === 'Pelajar/Mahasiswa' ? 'selected' : '' }}>Pelajar/Mahasiswa</option>
+                        <option value="PNS" {{ ($patient?->occupation ?? '') === 'PNS' ? 'selected' : '' }}>PNS</option>
+                        <option value="Karyawan Swasta" {{ ($patient?->occupation ?? '') === 'Karyawan Swasta' ? 'selected' : '' }}>Karyawan Swasta</option>
+                        <option value="Wiraswasta" {{ ($patient?->occupation ?? '') === 'Wiraswasta' ? 'selected' : '' }}>Wiraswasta</option>
+                        <option value="Ibu Rumah Tangga" {{ ($patient?->occupation ?? '') === 'Ibu Rumah Tangga' ? 'selected' : '' }}>Ibu Rumah Tangga</option>
+                        <option value="Lainnya" {{ ($patient?->occupation ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                     </select>
                 </div>
                 <div class="patient-detail-item">
                     <div class="patient-detail-label">Status Perkawinan</div>
                     <select id="patientDetailMaritalStatus" data-patient-field="marital_status" class="patient-detail-select" disabled>
                         <option value="">-</option>
-                        <option value="Belum Kawin" {{ in_array(($patient->marital_status ?? ''), ['Belum Kawin', 'Belum Menikah'], true) ? 'selected' : '' }}>Belum Kawin</option>
-                        <option value="Kawin" {{ in_array(($patient->marital_status ?? ''), ['Kawin', 'Menikah'], true) ? 'selected' : '' }}>Kawin</option>
-                        <option value="Cerai Hidup" {{ in_array(($patient->marital_status ?? ''), ['Cerai Hidup', 'Cerai'], true) ? 'selected' : '' }}>Cerai Hidup</option>
-                        <option value="Cerai Mati" {{ ($patient->marital_status ?? '') === 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
-                        <option value="Lainnya" {{ ($patient->marital_status ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                        <option value="Belum Kawin" {{ in_array(($patient?->marital_status ?? ''), ['Belum Kawin', 'Belum Menikah'], true) ? 'selected' : '' }}>Belum Kawin</option>
+                        <option value="Kawin" {{ in_array(($patient?->marital_status ?? ''), ['Kawin', 'Menikah'], true) ? 'selected' : '' }}>Kawin</option>
+                        <option value="Cerai Hidup" {{ in_array(($patient?->marital_status ?? ''), ['Cerai Hidup', 'Cerai'], true) ? 'selected' : '' }}>Cerai Hidup</option>
+                        <option value="Cerai Mati" {{ ($patient?->marital_status ?? '') === 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
+                        <option value="Lainnya" {{ ($patient?->marital_status ?? '') === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                     </select>
                 </div>
                 <div class="patient-detail-item">
@@ -1150,11 +1248,11 @@
                 </div>
                 <div class="patient-detail-item full">
                     <div class="patient-detail-label">Alamat Rumah</div>
-                    <textarea id="patientDetailAddress" data-patient-field="address" class="patient-detail-textarea" disabled>{{ $patient->address ?? '' }}</textarea>
+                    <textarea id="patientDetailAddress" data-patient-field="address" class="patient-detail-textarea" disabled>{{ $patient?->address ?? '' }}</textarea>
                 </div>
                 <div class="patient-detail-item full">
                     <div class="patient-detail-label">Riwayat Alergi</div>
-                    <textarea id="patientDetailAllergy" data-patient-field="allergy_history" class="patient-detail-textarea" disabled>{{ $patient->allergy_history ?? '' }}</textarea>
+                    <textarea id="patientDetailAllergy" data-patient-field="allergy_history" class="patient-detail-textarea" disabled>{{ $patient?->allergy_history ?? '' }}</textarea>
                 </div>
             </div>
 

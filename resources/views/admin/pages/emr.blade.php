@@ -1,4 +1,4 @@
-﻿@extends('admin.layout.admin')
+@extends('admin.layout.admin')
 @section('title', 'Electronic Medical Record')
 
 @section('navbar')
@@ -8,21 +8,7 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/pages/emr.css') }}">
     <style>
-        /* ================= 1. LAYOUT SIDEBAR & MAIN (FULL WIDTH) ================= */
-        .emr-layout { 
-            display: flex; 
-            gap: 20px; /* Jarak antara sidebar dan konten utama sedikit dirapatkan */
-            align-items: flex-start; 
-            width: 100%; 
-            margin-top: 20px;
-        }
-
-        /* LEBAR SIDEBAR DIPERKECIL (Kanan-Kiri) */
-        .emr-sidebar { 
-            width: 260px; /* Awalnya 320px, sekarang jauh lebih ramping */
-            flex-shrink: 0; 
-        }
-
+        /* ================= SIDEBAR & PATIENT CARDS ================= */
         .emr-main { 
             flex: 1; 
             background-color: #fff; 
@@ -33,24 +19,11 @@
             min-height: 80vh; 
         }
 
-        /* ================= 2. SKALA FOTO PROFIL ================= */
         .p-avatar-circle { 
-            width: 30px; 
-            height: 30px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            flex-shrink: 0;
-            border: 1px solid #eee;
+            width: 30px; height: 30px; border-radius: 50%; 
+            object-fit: cover; flex-shrink: 0; border: 1px solid #eee;
         }
 
-        @media (max-width: 1200px) {
-            .p-avatar-circle { width: 18.75px; height: 18.75px; }
-        }
-        @media (max-width: 768px) {
-            .p-avatar-circle { width: 12px; height: 12px; }
-        }
-
-        /* ================= 3. SIDEBAR CARDS & SEARCH ================= */
         .emr-sidebar-search-input { 
             width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; 
             border-radius: 8px; font-size: 12px; outline: none; transition: 0.2s; 
@@ -62,10 +35,9 @@
             max-height: calc(100vh - 280px); padding: 5px; 
         }
         
-        /* PADDING KANAN-KIRI KOTAK PASIEN DIPERKECIL */
         .patient-card {
             background: #fff; border: 1px solid #eee; border-radius: 8px; 
-            padding: 8px 8px; /* Kanan-kirinya jadi 8px (awalnya 12px atau 14px) */
+            padding: 8px 8px;
             display: flex; flex-direction: column; gap: 4px; transition: 0.2s; cursor: pointer;
             text-decoration: none;
         }
@@ -73,17 +45,39 @@
         .patient-card.active { border-color: #C58F59; background-color: rgba(197, 143, 89, 0.05); border-left: 4px solid #C58F59; }
         
         .p-card-top, .p-card-bottom { display: flex; justify-content: space-between; align-items: center; }
-        
         .p-name { font-weight: 700; color: #8e6a45; font-size: 12px; }
         .p-date, .p-mr { font-size: 10px; color: #888; font-weight: 600; }
-        
         .status-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; color: white; font-weight: 800; text-transform: uppercase; }
 
-        /* ================= 4. SPINNER & UTILITIES ================= */
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #C58F59; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .hidden { display: none !important; }
+
+        /* ===== MOBILE SIDEBAR CLOSE BUTTON (inside drawer) ===== */
+        .emr-drawer-close {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 0 16px;
+            border-bottom: 1px solid #f0e5d8;
+            margin-bottom: 14px;
+        }
+        .emr-drawer-close-btn {
+            background: none; border: none; color: #8e6a45;
+            font-size: 20px; cursor: pointer; padding: 4px 8px;
+            border-radius: 8px; line-height: 1;
+        }
+        .emr-drawer-close-btn:hover { background: #fdf0e5; }
+        .emr-drawer-title { font-weight: 800; font-size: 14px; color: #582c0c; }
+
+        @media (max-width: 992px) {
+            .emr-drawer-close { display: flex; }
+            .emr-main { min-height: 60vh; }
+        }
+        @media (max-width: 768px) {
+            .emr-main { padding: 14px; min-height: 50vh; }
+        }
     </style>
 @endpush
 
@@ -103,9 +97,17 @@
             </div>
         </div>
 
+        {{-- MOBILE BACKDROP --}}
+        <div class="emr-sidebar-backdrop" id="emrSidebarBackdrop"></div>
+
         <div class="emr-layout">
             {{-- SIDEBAR --}}
-            <div class="emr-sidebar">
+            <div class="emr-sidebar" id="emrSidebar">
+                {{-- DRAWER CLOSE (mobile only) --}}
+                <div class="emr-drawer-close">
+                    <span class="emr-drawer-title"><i class="fa fa-list-ul" style="color:#C58F59; margin-right:6px;"></i>Daftar Pasien</span>
+                    <button class="emr-drawer-close-btn" id="emrDrawerCloseBtn" aria-label="Tutup">&#x2715;</button>
+                </div>
                 <div class="emr-sidebar-header">
                     <div class="emr-filter-box" id="customFilterDropdown">
                         <div class="emr-select-trigger">
@@ -179,8 +181,13 @@
 
             {{-- MAIN CONTENT (RIWAYAT MEDIS) --}}
             <div class="emr-main" id="emrMainContent">
+                {{-- Mobile Toggle Button --}}
+                <button class="emr-sidebar-toggle-btn" id="emrSidebarToggleBtn" aria-label="Daftar Pasien">
+                    <i class="fa fa-bars"></i> Daftar Pasien
+                </button>
+
                 {{-- View Kosong --}}
-                <div class="emr-empty-state" id="emr-empty-view" style="text-align:center; padding-top:100px;">
+                <div class="emr-empty-state" id="emr-empty-view" style="text-align:center; padding-top:60px;">
                     <img src="{{ asset('images/empty-queue.png') }}" style="width:200px; opacity:0.5;">
                     <h2 style="color:#CBD5E0; margin-top:20px;">Pilih pasien di sebelah kiri</h2>
                 </div>
@@ -199,6 +206,38 @@
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {
+            // ================= 0. MOBILE SIDEBAR DRAWER =================
+            const emrSidebar      = document.getElementById('emrSidebar');
+            const emrBackdrop     = document.getElementById('emrSidebarBackdrop');
+            const emrToggleBtn    = document.getElementById('emrSidebarToggleBtn');
+            const emrDrawerClose  = document.getElementById('emrDrawerCloseBtn');
+
+            function openSidebar() {
+                if (!emrSidebar) return;
+                emrSidebar.classList.add('drawer-open');
+                if (emrBackdrop) emrBackdrop.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                if (!emrSidebar) return;
+                emrSidebar.classList.remove('drawer-open');
+                if (emrBackdrop) emrBackdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            if (emrToggleBtn)   emrToggleBtn.addEventListener('click', openSidebar);
+            if (emrDrawerClose) emrDrawerClose.addEventListener('click', closeSidebar);
+            if (emrBackdrop)    emrBackdrop.addEventListener('click', closeSidebar);
+
+            // Auto-close drawer when a patient is selected on mobile
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('.js-emr-patient-link');
+                if (link && window.innerWidth <= 992) {
+                    closeSidebar();
+                }
+            });
+
             // ================= 1. FILTER & SEARCH SIDEBAR =================
             const dropdown = document.getElementById('customFilterDropdown');
             const listHariIni = document.getElementById('list-hari-ini');
