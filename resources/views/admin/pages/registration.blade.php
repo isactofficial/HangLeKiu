@@ -361,21 +361,23 @@
     });
 
     // Modal Functions
-    function openRegModal(modalId) {
-        let modal = document.getElementById(modalId);
-        if(modal) {
-            modal.classList.add('open');
-            document.body.style.overflow = 'hidden'; 
-        }
-    }
-    
-    function closeRegModal(modalId) {
-        let modal = document.getElementById(modalId);
-        if(modal) {
-            modal.classList.remove('open');
-            document.body.style.overflow = '';
-        }
-    }
+    window.openRegModal = function (modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.style.display = 'flex';
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeRegModal = function (modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    };
 
     // Client-side table filtering for search (no page reload)
     function clientFilterTable() {

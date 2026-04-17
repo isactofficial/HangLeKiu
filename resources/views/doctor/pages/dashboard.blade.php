@@ -746,8 +746,16 @@
 
         // Core Window Functions for Admin Components
         window.openRegModal = function(modalId) {
+            // Always reset New Patient modal state before opening target modal.
+            const pasienModal = document.getElementById('modalPasienBaru');
+            if (pasienModal) {
+                pasienModal.classList.remove('open');
+                pasienModal.style.display = 'none';
+            }
+
             let m = document.getElementById(modalId);
             if(m) {
+                m.style.display = 'flex';
                 m.classList.add('open');
                 document.body.style.overflow = 'hidden'; 
             }
@@ -758,7 +766,10 @@
             if(m) {
                 m.classList.remove('open');
                 m.style.display = '';
-                document.body.style.overflow = '';
+
+                const pasienModal = document.getElementById('modalPasienBaru');
+                const pasienOpen = pasienModal && (pasienModal.style.display === 'flex' || pasienModal.classList.contains('open'));
+                document.body.style.overflow = pasienOpen ? 'hidden' : '';
             }
         };
 
@@ -766,7 +777,9 @@
         window.openNewPatientModal = function() {
             const m = document.getElementById('modalPasienBaru');
             if (m) {
+                m.classList.add('open');
                 m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
                 const f = document.getElementById('pasienBaruForm');
                 if (f) f.reset();
             }
@@ -774,7 +787,11 @@
 
         window.closePasienBaruModal = function() {
             const m = document.getElementById('modalPasienBaru');
-            if (m) m.style.display = 'none';
+            if (m) {
+                m.classList.remove('open');
+                m.style.display = 'none';
+                document.body.style.overflow = '';
+            }
         };
 
         window.addEventListener('patientCreatedInModal', function (e) {

@@ -5,11 +5,56 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/pages/emr.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/pages/emr-mobile.css') }}">
 <style>
+    :root {
+        --doctor-navbar-offset: 88px;
+    }
+
     /* ===== LAYOUT ===== */
+    .emr-container { padding: 18px 24px 26px; }
     .emr-layout { display:flex; gap:20px; align-items:flex-start; width:100%; margin-top:20px; }
     .emr-sidebar { width:260px; flex-shrink:0; }
     .emr-main { flex:1; background:#fff; border:1px solid #eef2f7; border-radius:15px; padding:20px; position:relative; min-height:80vh; }
+    .emr-title-area { min-width: 0; }
+
+    .emr-sidebar-header { margin-bottom: 8px; }
+    .emr-sidebar-search {
+        width:100%;
+        padding:9px 12px;
+        border:1px solid #e2e8f0;
+        border-radius:8px;
+        font-size:12px;
+        outline:none;
+        margin-bottom:10px;
+        box-sizing:border-box;
+        color:#582C0C;
+        transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    .emr-sidebar-search:focus {
+        border-color:#C58F59;
+        box-shadow:0 0 0 3px rgba(197,143,89,.14);
+    }
+
+    .emr-empty-view { text-align:center; padding-top:100px; }
+    .emr-empty-view img { width:180px; opacity:0.45; }
+    .emr-empty-view h2 { color:#CBD5E0; margin-top:20px; font-size:18px; }
+
+    .emr-loading-view {
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%,-50%);
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+    }
+
+    /* ===== MOBILE SIDEBAR TOGGLE ===== */
+    .emr-sidebar-toggle-btn { display:none; align-items:center; gap:8px; background:#fff; border:1.5px solid #e5d6c5; border-radius:8px; padding:10px 12px; color:#582c0c; font-weight:700; font-size:13px; cursor:pointer; margin-bottom:12px; width:100%; transition:all 0.2s; }
+    .emr-sidebar-toggle-btn:hover { border-color:#C58F59; background:#fdf8f4; }
+    .emr-sidebar-backdrop { display:none; position:fixed; inset:0; background:rgba(28,18,6,0.45); backdrop-filter:blur(2px); z-index:1099; }
+    .emr-sidebar-backdrop.active { display:block; }
 
     /* ===== SIDEBAR CARDS ===== */
     .patient-card { background:#fff; border:1px solid #eee; border-radius:8px; padding:8px; display:flex; flex-direction:column; gap:4px; transition:.2s; cursor:pointer; text-decoration:none; }
@@ -53,18 +98,68 @@
     color: #C58F59;
     opacity: 1;
     }
+
+    /* ===== MOBILE RESPONSIVE (max-width: 768px) ===== */
+    @media (max-width: 768px) {
+        .emr-container {
+            padding: calc(var(--doctor-navbar-offset, 88px) + 8px) 12px 120px !important;
+        }
+
+        .emr-layout { flex-direction:column; gap:0; margin-top:8px; }
+        .emr-header { margin-bottom: 10px; }
+        
+        .emr-sidebar { 
+            position:fixed; top:var(--doctor-navbar-offset, 88px); left:0; bottom:0; width:280px; max-width:90vw; 
+            height: calc(100dvh - var(--doctor-navbar-offset, 88px));
+            background:#fff; z-index:1100; padding:16px 12px; box-shadow:4px 0 24px rgba(88,44,12,0.16);
+            transform:translateX(-110%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            overflow-y:auto; flex-shrink:0;
+        }
+
+        .emr-sidebar-backdrop {
+            top: var(--doctor-navbar-offset, 88px);
+        }
+        
+        .emr-sidebar.drawer-open { transform:translateX(0); }
+        
+        .emr-sidebar-toggle-btn { display:flex; }
+        
+        .emr-main { 
+            flex:1; min-height:calc(100vh - 140px); border:none; border-radius:0; 
+            padding:16px 12px; background:#fcfaf8;
+        }
+
+        .emr-patient-list { max-height:calc(100vh - 280px); }
+        
+        .patient-card { padding:6px; font-size:11px; }
+        .p-name { font-size:11px; }
+        .p-date, .p-mr { font-size:9px; }
+        
+        .status-badge { font-size:8px; padding:1px 4px; }
+        
+        h1 { font-size:20px !important; }
+        
+        .emr-status-legend { flex-wrap:wrap; gap:6px; }
+        .emr-status-item { font-size:10px; }
+
+        .emr-empty-view { padding-top:48px; }
+        .emr-empty-view img { width:150px; }
+        .emr-empty-view h2 { margin-top:14px; font-size:15px; }
+        .emr-loading-view span { font-size:12px; }
+    }
+
 </style>
 @endpush
 
 @section('content')
 
 
-<div style="padding:20px 24px;">
+<div class="emr-container">
     {{-- HEADER --}}
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-        <div>
-            <h1 style="font-size:26px; font-weight:800; color:#3b331e; margin:0;">Electronic Medical Record</h1>
-            <p style="font-size:13px; color:#C58F59; margin:4px 0 0; font-weight:600;">Pasien saya — {{ optional($doctor)->full_name }}</p>
+    <div class="emr-header">
+        <div class="emr-title-area">
+            <h1 class="emr-title">Electronic Medical Record</h1>
+            <p class="emr-subtitle">Pasien saya — {{ optional($doctor)->full_name }}</p>
         </div>
         <div class="emr-status-legend">
             @php $legendColors = ['6B7280'=>'Pending','F59E0B'=>'Confirmed','8B5CF6'=>'Waiting','3B82F6'=>'Engaged','84CC16'=>'Succeed','EF4444'=>'Failed']; @endphp
@@ -76,82 +171,107 @@
         </div>
     </div>
 
+    {{-- MOBILE SIDEBAR BACKDROP --}}
+    <div class="emr-sidebar-backdrop" id="emrSidebarBackdrop"></div>
+
     <div class="emr-layout">
         {{-- ===== SIDEBAR ===== --}}
-        <div class="emr-sidebar">
-            {{-- Filter dropdown --}}
-            <div class="emr-filter-box" id="customFilterDropdown">
-                <div class="emr-select-trigger">
-                    <span class="emr-select-text">Hari Ini</span>
-                    <i class="fa fa-chevron-down" style="color:#C58F59;"></i>
-                </div>
-                <div class="emr-options">
-                    <div class="emr-option is-selected" data-value="hari_ini">Hari Ini</div>
-                    <div class="emr-option" data-value="semua">Semua</div>
-                </div>
-            </div>
+        <div class="emr-sidebar" id="emrSidebar">
+            <button class="emr-sidebar-toggle" id="emrSidebarToggle" type="button">
+                <span class="emr-sidebar-toggle-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Daftar Pasien
+                    <span class="emr-sidebar-toggle-count" id="sidebarPatientCount">{{ count($todayPatients ?? []) }}</span>
+                </span>
+                <svg class="emr-sidebar-toggle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </button>
 
-            {{-- Search --}}
-            <input type="text" id="js-sidebar-search" placeholder="Cari nama pasien..."
-            style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; outline:none; margin-bottom:10px; box-sizing:border-box; color: #582C0C;">
-            <div class="emr-patient-list" id="emrPatientList">
-                @php $statusColors = ['pending'=>'#6B7280','confirmed'=>'#F59E0B','waiting'=>'#8B5CF6','engaged'=>'#3B82F6','succeed'=>'#84CC16','failed'=>'#EF4444']; @endphp
-
-                {{-- TODAY --}}
-                <div id="list-hari-ini" class="js-patient-list-section">
-                    @forelse($todayPatients as $apt)
-                        <a href="{{ route('doctor.emr.show', $apt->id) }}"
-                           class="js-emr-patient-link"
-                           data-patient-name="{{ strtolower($apt->patient->full_name ?? '') }}"
-                           data-patient-rm="{{ strtolower($apt->patient->medical_record_no ?? '') }}">
-                            <div class="patient-card">
-                                <div class="p-card-top">
-                                    <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
-                                    <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</span>
-                                </div>
-                                <div class="p-card-bottom">
-                                    <span class="p-mr">{{ $apt->patient->medical_record_no ?? '-' }}</span>
-                                    <span class="status-badge" style="background:{{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
-                                </div>
-                            </div>
-                        </a>
-                    @empty
-                        <div style="text-align:center; padding:20px; color:#888; font-size:12px;">Tidak ada pasien hari ini</div>
-                    @endforelse
+            <div class="emr-sidebar-body" id="emrSidebarBody">
+                <div class="emr-sidebar-header">
+                    {{-- Filter dropdown --}}
+                    <div class="emr-filter-box" id="customFilterDropdown">
+                        <div class="emr-select-trigger">
+                            <span class="emr-select-text">Hari Ini</span>
+                            <i class="fa fa-chevron-down" style="color:#C58F59;"></i>
+                        </div>
+                        <div class="emr-options">
+                            <div class="emr-option is-selected" data-value="hari_ini">Hari Ini</div>
+                            <div class="emr-option" data-value="semua">Semua</div>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- SEMUA --}}
-                <div id="list-semua" class="hidden js-patient-list-section">
-                    @forelse($allPatients as $apt)
-                        <a href="{{ route('doctor.emr.show', $apt->id) }}"
-                           class="js-emr-patient-link"
-                           data-patient-name="{{ strtolower($apt->patient->full_name ?? '') }}"
-                           data-patient-rm="{{ strtolower($apt->patient->medical_record_no ?? '') }}">
-                            <div class="patient-card">
-                                <div class="p-card-top">
-                                    <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
-                                    <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('d/m/y H:i') }}</span>
+                {{-- Search --}}
+                <input type="text" id="js-sidebar-search" class="emr-sidebar-search" placeholder="Cari nama pasien...">
+                <div class="emr-patient-list" id="emrPatientList">
+                    @php $statusColors = ['pending'=>'#6B7280','confirmed'=>'#F59E0B','waiting'=>'#8B5CF6','engaged'=>'#3B82F6','succeed'=>'#84CC16','failed'=>'#EF4444']; @endphp
+
+                    {{-- TODAY --}}
+                    <div id="list-hari-ini" class="js-patient-list-section">
+                        @forelse($todayPatients as $apt)
+                            <a href="{{ route('doctor.emr.show', $apt->id) }}"
+                               class="js-emr-patient-link"
+                               data-patient-name="{{ strtolower($apt->patient->full_name ?? '') }}"
+                               data-patient-rm="{{ strtolower($apt->patient->medical_record_no ?? '') }}">
+                                <div class="patient-card">
+                                    <div class="p-card-top">
+                                        <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
+                                        <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('H:i') }}</span>
+                                    </div>
+                                    <div class="p-card-bottom">
+                                        <span class="p-mr">{{ $apt->patient->medical_record_no ?? '-' }}</span>
+                                        <span class="status-badge" style="background:{{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
+                                    </div>
                                 </div>
-                                <div class="p-card-bottom">
-                                    <span class="p-mr">{{ $apt->patient->medical_record_no ?? '-' }}</span>
-                                    <span class="status-badge" style="background:{{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
+                            </a>
+                        @empty
+                            <div style="text-align:center; padding:20px; color:#888; font-size:12px;">Tidak ada pasien hari ini</div>
+                        @endforelse
+                    </div>
+
+                    {{-- SEMUA --}}
+                    <div id="list-semua" class="hidden js-patient-list-section">
+                        @forelse($allPatients as $apt)
+                            <a href="{{ route('doctor.emr.show', $apt->id) }}"
+                               class="js-emr-patient-link"
+                               data-patient-name="{{ strtolower($apt->patient->full_name ?? '') }}"
+                               data-patient-rm="{{ strtolower($apt->patient->medical_record_no ?? '') }}">
+                                <div class="patient-card">
+                                    <div class="p-card-top">
+                                        <span class="p-name">{{ $apt->patient->full_name ?? 'Pasien' }}</span>
+                                        <span class="p-date">{{ \Carbon\Carbon::parse($apt->appointment_datetime)->format('d/m/y H:i') }}</span>
+                                    </div>
+                                    <div class="p-card-bottom">
+                                        <span class="p-mr">{{ $apt->patient->medical_record_no ?? '-' }}</span>
+                                        <span class="status-badge" style="background:{{ $statusColors[strtolower($apt->status)] ?? '#888' }}">{{ $apt->status }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
-                    @empty
-                        <div style="text-align:center; padding:20px; color:#888; font-size:12px;">Belum ada pasien</div>
-                    @endforelse
+                            </a>
+                        @empty
+                            <div style="text-align:center; padding:20px; color:#888; font-size:12px;">Belum ada pasien</div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
 
         {{-- ===== MAIN CONTENT ===== --}}
         <div class="emr-main" id="emrMainContent">
-            <div id="emr-empty-view" style="text-align:center; padding-top:100px;">
-                <img src="{{ asset('images/empty-queue.png') }}" style="width:180px; opacity:0.45;">
-                <h2 style="color:#CBD5E0; margin-top:20px; font-size:18px;">Pilih pasien di sebelah kiri</h2>
+            <button class="emr-sidebar-toggle-btn" id="emrSidebarToggleBtn" aria-label="Daftar Pasien">
+                <i class="fa fa-bars"></i> Daftar Pasien
+            </button>
+            <div id="emr-empty-view" class="emr-empty-view">
+                <img src="{{ asset('images/empty-queue.png') }}" alt="Empty queue">
+                <h2>Pilih pasien di sebelah kiri</h2>
             </div>
-            <div id="emr-loading" class="hidden" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center;">
+            <div id="emr-loading" class="hidden emr-loading-view">
                 <div class="spinner"></div>
                 <span style="color:#C58F59; font-weight:600;">Memuat data...</span>
             </div>
@@ -162,6 +282,73 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Sidebar Drawer Toggle (tablet/mobile)
+    const emrSidebar   = document.getElementById('emrSidebar');
+    const emrBackdrop  = document.getElementById('emrSidebarBackdrop');
+    const emrToggleBtn = document.getElementById('emrSidebarToggleBtn');
+
+    function openSidebarDrawer() {
+        if (!emrSidebar) return;
+        emrSidebar.classList.add('drawer-open');
+        emrBackdrop?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebarDrawer() {
+        if (!emrSidebar) return;
+        emrSidebar.classList.remove('drawer-open');
+        emrBackdrop?.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    emrToggleBtn?.addEventListener('click', openSidebarDrawer);
+    emrBackdrop?.addEventListener('click', closeSidebarDrawer);
+
+    // ── Sidebar Collapse Toggle (mobile carousel mode)
+    (function initMobileSidebarToggle() {
+        const sidebar = document.getElementById('emrSidebar');
+        const toggle  = document.getElementById('emrSidebarToggle');
+        const patientList = document.getElementById('emrPatientList');
+        if (!sidebar || !toggle || !patientList) return;
+
+        const STORAGE_KEY = 'doctor_emr_sidebar_mobile_state';
+        const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+        function setExpanded(expanded) {
+            sidebar.classList.toggle('expanded', expanded);
+            localStorage.setItem(STORAGE_KEY, expanded ? 'expanded' : 'collapsed');
+        }
+
+        toggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!isMobile()) return;
+            const expanded = !sidebar.classList.contains('expanded');
+            setExpanded(expanded);
+            if (expanded) patientList.scrollLeft = 0;
+        });
+
+        document.addEventListener('click', function (e) {
+            const patientLink = e.target.closest('.js-emr-patient-link');
+            if (!patientLink) return;
+
+            if (window.innerWidth <= 992) {
+                closeSidebarDrawer();
+            }
+
+            if (isMobile() && sidebar.classList.contains('expanded')) {
+                setTimeout(() => setExpanded(false), 500);
+            }
+        });
+
+        if (isMobile() && localStorage.getItem(STORAGE_KEY) === 'expanded') {
+            setExpanded(true);
+        }
+
+        window.addEventListener('resize', () => {
+            if (!isMobile()) sidebar.classList.remove('expanded');
+        });
+    })();
 
     // ── Filter dropdown
     const dropdown = document.getElementById('customFilterDropdown');
@@ -178,6 +365,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 listHariIni.classList.remove('hidden'); listSemua.classList.add('hidden');
             } else {
                 listHariIni.classList.add('hidden'); listSemua.classList.remove('hidden');
+            }
+
+            const countBadge = document.getElementById('sidebarPatientCount');
+            const listId = this.dataset.value === 'hari_ini' ? 'list-hari-ini' : 'list-semua';
+            const listEl = document.getElementById(listId);
+            if (countBadge && listEl) {
+                countBadge.textContent = listEl.querySelectorAll('.js-emr-patient-link').length;
             }
         });
     });

@@ -540,11 +540,12 @@
     });
 
     /** --- GLOBAL MODAL CONTROLLER (RESTORED) --- **/
-    function openRegModal(modalId, doctorId = null, time = null, poliId = null, date = null) {
+    window.openRegModal = function (modalId, doctorId = null, time = null, poliId = null, date = null) {
         console.log('Opening modal:', modalId);
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
+        modal.style.display = 'flex';
         modal.classList.add('open');
         document.body.style.overflow = 'hidden'; 
 
@@ -572,14 +573,17 @@
                 if (dateInput) dateInput.value = date;
             }
         }
-    }
+    };
 
-    function closeRegModal(modalId) {
+    window.closeRegModal = function (modalId) {
         console.log('Closing modal:', modalId);
         const modal = document.getElementById(modalId);
-        if (modal) modal.classList.remove('open');
+        if (modal) {
+            modal.classList.remove('open');
+            modal.style.display = 'none';
+        }
         document.body.style.overflow = '';
-    }
+    };
 
     // Close registration modals when clicking overlay
     window.addEventListener('click', function(e) {

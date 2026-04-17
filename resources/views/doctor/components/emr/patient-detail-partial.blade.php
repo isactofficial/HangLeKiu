@@ -240,14 +240,6 @@
                         <div class="payment-box-static">Metode Pembayaran: {{ $paymentLabel }}</div>
 
                         <div class="card-actions-row">
-                            {{-- Tombol ke kasir kalau sudah succeed --}}
-                            @if($appointment->status === 'succeed')
-                                <a href="{{ route('admin.cashier') }}"
-                                   style="background:#10b981;color:#fff;padding:6px 12px;border-radius:8px;font-weight:800;font-size:11px;text-decoration:none;display:flex;align-items:center;gap:5px;">
-                                    <i class="fa fa-wallet"></i> KE KASIR
-                                </a>
-                            @endif
-
                             <div class="status-container">
                                 <button class="btn-status-toggle"
                                         style="background-color:{{ $appointment->status_color ?? '#3B82F6' }}"

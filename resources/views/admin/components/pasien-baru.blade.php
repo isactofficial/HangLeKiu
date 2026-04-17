@@ -1,4 +1,4 @@
-<div class="reg-modal-overlay" id="modalPasienBaru" style="z-index: 1100;">
+<div class="reg-modal-overlay" id="modalPasienBaru" style="z-index: 10050;">
     <div class="reg-modal-content">
         <button type="button" class="modal-close-btn" onclick="closePasienModalAndBackToReg()">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -656,12 +656,14 @@ window.closePasienModalAndBackToReg = function() {
     const regModal = document.getElementById('modalPendaftaranBaru');
     
     if (pasienModal) {
+        pasienModal.classList.remove('open');
         pasienModal.style.display = 'none';
     }
     if (regModal) {
         regModal.classList.add('open');
-        regModal.style.display = ''; 
+        regModal.style.display = 'flex';
     }
+    document.body.style.overflow = 'hidden';
 };
 
 // Only allow numbers in KTP input

@@ -688,13 +688,23 @@
        + PASIEN BUTTON FUNCTION - NEW
     ============================================================ */
     window.openPasienBaruModal = function() {
-        // Close current Daftar Kunjungan modal
-        closeRegModal('modalPendaftaranBaru');
-        
-        // Open Tambah Pasien Baru modal
+        // Preferred path: use global modal opener so all state stays in sync.
+        if (typeof window.openRegModal === 'function') {
+            window.openRegModal('modalPasienBaru');
+            return;
+        }
+
+        // Fallback for contexts where openRegModal is unavailable.
+        const regModal = document.getElementById('modalPendaftaranBaru');
         const pasienModal = document.getElementById('modalPasienBaru');
+        if (regModal) {
+            regModal.classList.remove('open');
+            regModal.style.display = 'none';
+        }
         if (pasienModal) {
+            pasienModal.classList.add('open');
             pasienModal.style.display = 'flex';
+            pasienModal.style.zIndex = '10050';
             document.body.style.overflow = 'hidden';
         }
         
