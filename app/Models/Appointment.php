@@ -38,11 +38,15 @@ class Appointment extends Model
         'complaint',
         'patient_condition',
         'procedure_plan',
+        'waiting_at',
+        'engaged_at',
     ];
 
     protected $casts = [
         'registration_date'    => 'date',
         'appointment_datetime' => 'datetime',
+        'waiting_at'           => 'datetime',
+        'engaged_at'           => 'datetime',
     ];
 
     // ─── Status Colors ────────────────────────────

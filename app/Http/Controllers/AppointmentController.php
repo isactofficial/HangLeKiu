@@ -322,7 +322,14 @@ class AppointmentController extends Controller
             ], 422);
         }
 
-        $appointment->update(['status' => $targetStatus]);
+        $updateData = ['status' => $targetStatus];
+        if ($targetStatus === 'waiting' && !$appointment->waiting_at) {
+            $updateData['waiting_at'] = now();
+        } elseif ($targetStatus === 'engaged' && !$appointment->engaged_at) {
+            $updateData['engaged_at'] = now();
+        }
+
+        $appointment->update($updateData);
 
         return response()->json([
             'success' => true,
