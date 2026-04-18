@@ -100,7 +100,7 @@ class DashboardController extends Controller
             ->whereColumn('current_stock', '<=', 'min_stock')
             ->count();
 
-        // Waktu tunggu: selisih created_at → appointment_datetime (detik)
+        // Waktu tunggu Dokter (Lama pendaftaran -> Jadwal)
         $avgWait = DB::table('registration')
             ->whereMonth('registration_date', $month)
             ->whereYear('registration_date', $year)
@@ -109,7 +109,7 @@ class DashboardController extends Controller
             ->where('appointment_datetime', '>', DB::raw('created_at'))
             ->avg(DB::raw('TIMESTAMPDIFF(SECOND, created_at, appointment_datetime)'));
 
-        // Rata-rata durasi konsultasi dari duration_minutes → konversi ke detik
+        // Rata-rata durasi konsultasi
         $avgConsult = DB::table('registration')
             ->whereMonth('registration_date', $month)
             ->whereYear('registration_date', $year)
@@ -118,12 +118,23 @@ class DashboardController extends Controller
             ->where('duration_minutes', '>', 0)
             ->avg('duration_minutes');
 
+        // Rata-rata waktu tunggu apotek (Sesuai instruksi: selisih waiting -> engaged)
+        $avgWaitPharmacy = DB::table('registration')
+            ->whereMonth('registration_date', $month)
+            ->whereYear('registration_date', $year)
+            ->whereNull('deleted_at')
+            ->whereNotNull('waiting_at')
+            ->whereNotNull('engaged_at')
+            ->whereRaw('engaged_at > waiting_at')
+            ->avg(DB::raw('TIMESTAMPDIFF(SECOND, waiting_at, engaged_at)'));
+
         return [
-            'new_patients'        => ['value' => $newThis,   'trend' => $this->trend($newThis, $newPrev)],
-            'total_patients'      => ['value' => $totalNow,  'trend' => $this->trend($totalNow, $totalPrev)],
-            'low_stock'           => $lowStock,
-            'avg_wait_seconds'    => round($avgWait ?? 0),
-            'avg_consult_seconds' => round(($avgConsult ?? 0) * 60),
+            'new_patients'             => ['value' => $newThis,   'trend' => $this->trend($newThis, $newPrev)],
+            'total_patients'           => ['value' => $totalNow,  'trend' => $this->trend($totalNow, $totalPrev)],
+            'low_stock'                => $lowStock,
+            'avg_wait_seconds'         => round($avgWait ?? 0),
+            'avg_consult_seconds'      => round(($avgConsult ?? 0) * 60),
+            'avg_wait_pharmacy_seconds' => round($avgWaitPharmacy ?? 0),
         ];
     }
 
