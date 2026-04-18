@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardUserController;
 use App\Http\Controllers\DashboardDoctorController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ClinicProfileController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ArticleController;
@@ -24,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 
 // ================= PUBLIC =================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/klinik', fn() => view('user.pages.klinik'))->name('klinik');
+Route::get('/klinik', [HomeController::class, 'klinik'])->name('klinik');
 Route::get('/artikel', [ArticleController::class, 'index'])->name('artikel');
 Route::get('/artikel/{slug}', [ArticleController::class, 'show'])->name('artikel.show');
 
@@ -95,7 +96,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/registration/pasien-baru', fn() => view('admin.pages.pasien-baru'))->name('registration.pasien-baru');
             
             Route::get('/pharmacy',     fn() => view('admin.layout.pharmacy'))->name('pharmacy');
-            Route::get('/profile',      fn() => view('admin.pages.profile'))->name('profile');
+            Route::get('/profile',      [ClinicProfileController::class, 'edit'])->name('profile');
+            Route::put('/profile',      [ClinicProfileController::class, 'update'])->name('profile.update');
             Route::get('/messages',     fn() => view('admin.pages.messages'))->name('messages');
             Route::get('/office',       [OfficeController::class, 'index'])->name('office');
             

@@ -85,7 +85,7 @@
 <aside class="sidebar" id="appSidebar">
     {{-- Logo Container --}}
     <div class="sidebar-logo">
-        <img src="/images/logo-hds.png" alt="HDS">
+        <img src="{{ ($clinicProfile->logo ?? null) ? asset('storage/' . $clinicProfile->logo) : asset('images/logo-hds.png') }}" alt="{{ $clinicProfile->name ?? 'HDS' }}">
     </div>
 
     {{-- Navigation --}}

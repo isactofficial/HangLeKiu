@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Doctor;
+use App\Models\ClinicProfile;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -18,5 +19,11 @@ class HomeController extends Controller
             ]);
             
         return view('welcome', compact('doctors'));
+    }
+
+    public function klinik()
+    {
+        $profile = ClinicProfile::first();
+        return view('user.pages.klinik', compact('profile'));
     }
 }
