@@ -1085,20 +1085,21 @@
           .join(', ');
       }
 
-      function applySavedToothNumbersToProcedureRow(row, registrationId) {
-        if (!row) return;
-
+      function applySavedToothNumbersToAllEmptyRows(registrationId) {
         const toothText = getSavedToothNumbersText(registrationId);
         if (!toothText) return;
 
-        const toothInput = row.querySelector('.input-no-gigi');
-        if (!toothInput) return;
+        const rows = prosedurContainer.querySelectorAll('.prosedur-row');
+        rows.forEach(row => {
+          const toothInput = row.querySelector('.input-no-gigi');
+          if (!toothInput) return;
 
-        const currentValue = String(toothInput.value || '').trim();
-        if (currentValue) return;
-
-        toothInput.value = toothText;
-        toothInput.dispatchEvent(new Event('input', { bubbles: true }));
+          const currentValue = String(toothInput.value || '').trim();
+          if (!currentValue || currentValue === '') {
+            toothInput.value = toothText;
+            toothInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        });
       }
 
       async function loadExistingProcedureForRegistration(registrationId) {
@@ -1107,12 +1108,23 @@
           return false;
         }
 
+        const currentLoadedRegId = document.getElementById('prosedur-registration-id')?.dataset?.lastLoadedRegId;
+        if (currentLoadedRegId === registrationId) {
+            // Sudah dimuat sebelumnya untuk registrasi yang sama, jangan reset/reload paksa
+            // agar data sementara (WIP) tidak hilang.
+            return true; 
+        }
+
         const res = await fetch(`/api/medical-procedures/check-registration/${registrationId}`, {
           headers: { 'Accept': 'application/json' }
         });
         const payload = await res.json();
 
         resetProsedurForm();
+        
+        // Simpan marker bahwa data untuk registrasi ini sudah dimuat.
+        const regIdInput = document.getElementById('prosedur-registration-id');
+        if (regIdInput) regIdInput.dataset.lastLoadedRegId = registrationId;
 
         if (!res.ok || !payload.success || !payload.data) {
           return false;
@@ -1145,7 +1157,7 @@
         });
 
         if (items.length === 0) {
-          applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'), registrationId);
+          applySavedToothNumbersToAllEmptyRows(registrationId);
         }
 
         const medicines = Array.isArray(record.medicines) ? record.medicines : [];
@@ -1218,7 +1230,7 @@
         loadExistingProcedureForRegistration(registrationId)
           .then((hasExisting) => {
             if (!hasExisting) {
-              applySavedToothNumbersToProcedureRow(prosedurContainer.querySelector('.prosedur-row'), registrationId);
+              applySavedToothNumbersToAllEmptyRows(registrationId);
             }
           })
           .catch(() => {
@@ -2100,4 +2112,27 @@
 
     window.addAssistantRow = addAssistantRow;
     window.removeAssistantRow = removeAssistantRow;
+
+    // LISTENER UNTUK DATA ODONTOGRAM YANG BARU DISIMPAN
+    window.addEventListener('odontogram-saved', function(e) {
+        const { registration_id, tooth_numbers } = e.detail;
+        const currentRegId = document.getElementById('prosedur-registration-id')?.value;
+        
+        // Hanya sinkron jika ini registrasi yang sama
+        if (registration_id && currentRegId && registration_id === currentRegId) {
+            console.log("EMR: Menangkap update odontogram, sinkronisasi ke tabel prosedur...");
+            applySavedToothNumbersToAllEmptyRows(registration_id);
+            
+            // Beri visual feedback singkat jika modal sedang terbuka
+            const modal = document.getElementById('modalTambahProsedur');
+            if (modal && !modal.classList.contains('hidden')) {
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg z-[99999] text-xs font-bold animate-bounce';
+                toast.innerText = 'No. Gigi disinkronkan dari Odontogram';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+        }
+    });
+
     </script>
