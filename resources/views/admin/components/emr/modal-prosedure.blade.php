@@ -1283,16 +1283,6 @@
                 }
             });
 
-                const allBhpRows = document.querySelectorAll('.bhp-row');
-                allBhpRows.forEach(function(row) {
-                  const inputBhp = row.querySelector('.search-bhp');
-                  if (inputBhp && inputBhp.dataset.bhpId) {
-                    const price = parseFloat(inputBhp.dataset.price || 0);
-                    const qtyBhp = row.querySelector('input[type="number"]');
-                    const qty = parseInt(qtyBhp ? qtyBhp.value : 0) || 0;
-                    totalAmount += (price * qty);
-                  }
-                });
 
             const itemsPayload = [];
             for (let row of prosedurRows) {
@@ -1579,16 +1569,6 @@
               }
           });
 
-            const semuaBhpRows = document.querySelectorAll('.bhp-row');
-            semuaBhpRows.forEach(function(row) {
-              const inputBhp = row.querySelector('.search-bhp');
-              if (inputBhp && inputBhp.dataset.bhpId) {
-                const price = parseFloat(inputBhp.dataset.price || 0);
-                const qtyInput = row.querySelector('input[type="number"]');
-                const qty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
-                total += (price * qty);
-              }
-            });
           
           const totalEle = document.getElementById('totalHargaDisplay');
           if (totalEle) {
