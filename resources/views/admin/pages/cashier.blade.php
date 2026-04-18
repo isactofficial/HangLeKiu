@@ -189,24 +189,7 @@
                                         $arrGigi[] = '-'; 
                                     }
 
-                                    // Gabungkan BHP (Consumable)
-                                    $bhpUsages = \Illuminate\Support\Facades\DB::table('consumable_usage')
-                                        ->join('consumable_items', 'consumable_usage.bhp_id', '=', 'consumable_items.id')
-                                        ->where('consumable_usage.treatment_id', $medicalProcedure->id)
-                                        ->select('consumable_items.item_name', 'consumable_usage.unit_price', 'consumable_usage.quantity_used')
-                                        ->get();
 
-                                    foreach ($bhpUsages as $bhp) {
-                                        $arrTindakan[] = $bhp->item_name;
-                                        $bhpPrice = (float) $bhp->unit_price;
-                                        $bhpQty = (int) $bhp->quantity_used;
-
-                                        $arrHarga[] = $bhpPrice;
-                                        $arrQty[] = $bhpQty;
-                                        $arrDiskon[] = 0;
-                                        $arrSubtotal[] = $bhpPrice * $bhpQty;
-                                        $arrGigi[] = '-';
-                                    }
                                 }
                                 
                                 // 4. CEK DATA DI TABEL INVOICE (Data Permanen setelah Refresh)
