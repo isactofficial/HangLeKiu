@@ -15,8 +15,7 @@
 $menuItems = [
 'general-settings' => 'General Settings',
             'beranda-settings' => 'Beranda Settings',
-            'manajemen-staff' => 'Manajemen Staff',
-            'hak-akses' => 'Hak Akses',
+            'manajemen-staff' => 'Staff & Hak Akses',
             'info-tenaga-medis' => 'Info Tenaga Medis',
         ];
         $active = request('menu', 'general-settings');

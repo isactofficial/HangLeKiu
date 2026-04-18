@@ -102,21 +102,6 @@ class CashierController extends Controller
             $results = $results->merge($medicines);
         }
 
-        // ── BHP (Consumable Items) — muncul di semua depot ────
-        $bhpItems = ConsumableItem::select('id', 'item_name', 'general_price')
-            ->where('item_name', 'like', "%{$q}%")
-            ->where('current_stock', '>', 0)
-            ->limit(4)
-            ->get()
-            ->map(fn($b) => [
-                'id'    => $b->id,
-                'name'  => $b->item_name,
-                'type'  => 'BHP',
-                'price' => (float) $b->general_price,
-            ]);
-
-        $results = $results->merge($bhpItems);
-
         return response()->json($results->take(12)->values());
     }
 

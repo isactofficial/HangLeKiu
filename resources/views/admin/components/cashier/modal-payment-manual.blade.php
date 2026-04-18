@@ -263,7 +263,7 @@
                         <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                             <thead>
                                 <tr style="border-bottom: 2px solid #E5D6C5;">
-                                    <th style="padding: 9px 10px; text-align: left; font-size: 11px; font-weight: 700; color: #A67C52; white-space: nowrap;">Tindakan / Obat / Bahan Habis Pakai</th>
+                                <th style="padding: 9px 10px; text-align: left; font-size: 11px; font-weight: 700; color: #A67C52; white-space: nowrap;">Tindakan / Obat</th>
                                     <th style="padding: 9px 10px; text-align: center; font-size: 11px; font-weight: 700; color: #A67C52; white-space: nowrap;">Depot</th>
                                     <th style="padding: 9px 10px; text-align: center; font-size: 11px; font-weight: 700; color: #A67C52; white-space: nowrap;">Jumlah</th>
                                     <th style="padding: 9px 10px; text-align: right; font-size: 11px; font-weight: 700; color: #A67C52; white-space: nowrap;">Harga</th>
@@ -739,7 +739,7 @@ function searchItemManual(query) {
                     " onmouseover="this.style.background='#fdf8f5'" onmouseout="this.style.background='#fff'">
                         <div style="font-weight: 600; font-size: 13px; color: #582C0C;">${item.name}</div>
                         <div style="font-size: 11px; color: #A67C52; margin-top: 2px;">
-                            ${item.type ?? ''} &bull; Rp${Number(item.price).toLocaleString('id-ID')}
+                            Rp${Number(item.price).toLocaleString('id-ID')}
                         </div>
                     </div>
                 `).join('');
@@ -778,7 +778,7 @@ function pmRenderItems() {
             <tr id="pm-empty-row">
                 <td colspan="7" style="text-align: center; padding: 28px 20px; color: #C58F59; font-size: 13px; font-style: italic;">
                     <i class="fa fa-plus-circle" style="margin-right: 6px; opacity: 0.5;"></i>
-                    Cari dan tambahkan tindakan / obat / bahan di atas
+                    Cari dan tambahkan tindakan / obat di atas
                 </td>
             </tr>`;
         return;
@@ -786,9 +786,7 @@ function pmRenderItems() {
 
     tbody.innerHTML = pmItems.map((item, i) => `
         <tr style="border-bottom: 1px solid #f0ebe4;">
-            <td style="padding: 9px 10px; font-size: 12px; color: #374151; font-weight: 600;">${item.name}
-                ${item.type ? `<div style="font-size: 10px; color: #A67C52; margin-top: 2px;">${item.type}</div>` : ''}
-            </td>
+            <td style="padding: 9px 10px; font-size: 12px; color: #374151; font-weight: 600;">${item.name}</td>
             <td style="padding: 9px 10px; text-align: center; font-size: 12px; color: #6B513E;">${item.depot}</td>
             <td style="padding: 9px 10px; text-align: center;">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">

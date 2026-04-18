@@ -39,6 +39,11 @@ class AuthController extends Controller
         return view('doctor.pages.login');
     }
 
+    public function showDokterLogin()
+    {
+        return view('dokter.pages.login');
+    }
+
     // ── USER LOGIN ────────────────────────────────────────────
 
     public function login(Request $request)
