@@ -14,9 +14,32 @@
             <p class="mc-subtitle">Kelola master prosedur treatment di sistem hanglekiu</p>
         </div>
     </div>
-    <button class="mc-btn-primary" onclick="openProcedureModal()">+ Tambah Prosedur</button>
-</div>
 
+    {{-- Tombol semua dikumpulkan jadi satu grup di kanan --}}
+    <div style="display: flex; gap:8px; align-items:center;">
+        <a href="/api/master-procedure/export/template"
+            style="text-decoration: none; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px solid #582C0C; background:transparent; color:#582C0C; font-size:13px; font-weight:600; cursor:pointer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Template
+        </a>
+        <button onclick="document.getElementById('import-procedure-file').click()"
+                style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:none; background:#582C0C; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import Excel
+        </button>
+        <input type="file" id="import-procedure-file" accept=".xlsx,.xls" style="display:none" onchange="importProcedureExcel(this)">
+        <a href="/api/master-procedure/export/excel"
+           style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:none; background:#582C0C; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Excel
+        </a>
+
+        {{-- Divider tipis --}}
+        <div style="width:1px; height:28px; background:#D6C4B0;"></div>
+
+        <button class="mc-btn-primary" onclick="openProcedureModal()">+ Tambah Prosedur</button>
+    </div>
+</div>
 @include('admin.components.settings.partials.inline_notice')
 
 <div class="mc-actions-row">
@@ -350,6 +373,36 @@
             }
         })
         .catch(() => showProcedureToast('Terjadi kesalahan saat menghapus data', 'error'));
+    };
+
+    window.importProcedureExcel = function(input) {
+        const file = input.files[0];
+        if (!file) return;
+        input.value = '';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        showProcedureToast('Sedang mengimpor data...', 'info');
+
+        fetch('/api/master-procedure/import/excel', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: formData
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                fetchProcedureData(1);
+                let msg = `Berhasil import ${res.imported} data`;
+                if (res.skipped > 0) msg += `, ${res.skipped} baris dilewati`;
+                if (res.errors?.length > 0) msg += `. Error: ${res.errors.slice(0,3).join('; ')}`;
+                showProcedureToast(msg);
+            } else {
+                showProcedureToast(res.message || 'Gagal import data', 'error');
+            }
+        })
+        .catch(() => showProcedureToast('Terjadi kesalahan saat import', 'error'));
     };
 
     // Initialize

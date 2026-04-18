@@ -169,6 +169,11 @@ Route::prefix('procedure-medicine')->group(function () {
 Route::prefix('master-procedure')->group(function () {
     Route::get('/', [MasterProcedureController::class, 'index']);
     Route::post('/', [MasterProcedureController::class, 'store']);
+
+    Route::get('/export/excel',    [MasterProcedureController::class, 'exportExcel']);
+    Route::get('/export/template', [MasterProcedureController::class, 'exportTemplate']);
+    Route::post('/import/excel',   [MasterProcedureController::class, 'importExcel']);
+    
     Route::get('/{id}', [MasterProcedureController::class, 'show']);
     Route::put('/{id}', [MasterProcedureController::class, 'update']);
     Route::delete('/{id}', [MasterProcedureController::class, 'destroy']);
