@@ -4,7 +4,7 @@
         
         {{-- Left: Logo --}}
         <a href="/" class="flex items-center">
-            <img src="{{ asset('images/logo-hds.png') }}" alt="HDS" class="h-10 md:h-12 object-contain">
+            <img src="{{ ($clinicProfile->logo ?? null) ? asset('storage/' . $clinicProfile->logo) : asset('images/logo-hds.png') }}" alt="HDS" class="h-10 md:h-12 object-contain">
         </a>
 
         {{-- Hamburger Button (Mobile Only) --}}

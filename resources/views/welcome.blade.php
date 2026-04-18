@@ -26,7 +26,7 @@
 
         <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-10 lg:px-9 pb-16 md:pb-20">
             <h1 class="text-[38px] md:text-[42px] font-bold text-white leading-tight mb-4">
-                Hanglekiu Dental Specialist
+                {{ $clinicProfile->name ?? 'Hanglekiu Dental Specialist' }}
             </h1>
 
             <p class="text-[15px] md:text-xl font-medium text-white/90 max-w-4xl leading-relaxed mb-8">
@@ -40,7 +40,7 @@
                     Buat Janji Temu
                 </a>
 
-                <a href="https://wa.me/6281234567890" target="_blank" rel="noopener"
+                <a href="https://wa.me/{{ ($clinicProfile->phone ?? null) ? preg_replace('/[^0-9]/', '', $clinicProfile->phone) : '6281234567890' }}" target="_blank" rel="noopener"
                     class="px-[18px] py-[12px] bg-primary hover:bg-primary/90 text-white text-[15px] md:text-lg font-medium rounded-full transition-all duration-200 hover:shadow-lg flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

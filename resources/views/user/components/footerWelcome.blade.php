@@ -5,10 +5,10 @@
             {{-- Column 1: Logo & Social Media --}}
             <div class="flex flex-col items-center md:items-start">
                 <div class="mb-4">
-                    <img src="{{ asset('images/logo-hds.png') }}" alt="Hanglekiu Dental Specialist"
+                    <img src="{{ ($clinicProfile->logo ?? null) ? asset('storage/' . $clinicProfile->logo) : asset('images/logo-hds.png') }}" alt="{{ $clinicProfile->name ?? 'Hanglekiu Dental Specialist' }}"
                         class="h-25 object-contain">
                 </div>
-                <p class="text-[16px] font-medium text-[#582C0C] mb-6">Hanglekiu dental specialist</p>
+                <p class="text-[16px] font-medium text-[#582C0C] mb-6">{{ $clinicProfile->name ?? 'Hanglekiu dental specialist' }}</p>
 
                 {{-- Social Media Icons --}}
                 <div class="flex items-center justify-center md:justify-start gap-3">
@@ -70,7 +70,7 @@
                 <h3 class="text-[24px] font-bold text-[#582C0C] mb-6">Contact Us</h3>
 
                 {{-- Konsultasi Langsung Button --}}
-                <a href="https://wa.me/6281234567890" target="_blank" rel="noopener"
+                <a href="https://wa.me/{{ ($clinicProfile->phone ?? null) ? preg_replace('/[^0-9]/', '', $clinicProfile->phone) : '6281234567890' }}" target="_blank" rel="noopener"
                     class="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#25D366] text-white text-[16px] font-medium rounded-full hover:bg-[#582C0C]/90 transition-all duration-200 mb-6">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -81,7 +81,7 @@
 
                 {{-- Address --}}
                 <p class="text-[16px] font-normal text-[#582C0C] leading-relaxed max-w-[280px] md:max-w-none text-center md:text-left">
-                    Jl. Hang Lekiu V No.8, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, 12120
+                    {{ $clinicProfile->address ?? 'Jl. Hang Lekiu V No.8, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, 12120' }}
                 </p>
             </div>
 
@@ -92,7 +92,7 @@
     <div class="w-full border-t border-[#582C0C]/20 bg-[#C58F59]">
         <div class="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-5">
             <p class="text-center text-[9x] md:text-[16px] font-normal italic text-[#582C0C]">
-                Copyright &copy; 2026 Hanglekiu Dental Specialist. All Rights Reserved.
+                Copyright &copy; 2026 {{ $clinicProfile->name ?? 'Hanglekiu Dental Specialist' }}. All Rights Reserved.
             </p>
         </div>
     </div>

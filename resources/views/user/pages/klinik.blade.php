@@ -31,7 +31,7 @@
                     Tentang Kami
                 </div>
                 <h1 class="text-3xl md:text-[42px] font-bold text-white leading-tight mb-4">
-                    Hanglekiu Dental Specialist
+                    {{ $profile->name }}
                 </h1>
 
                 <p class="text-base md:text-xl font-medium text-white/90 max-w-4xl leading-relaxed mb-8">
@@ -95,22 +95,20 @@
                     <div class="lg:col-span-5 flex flex-col gap-4">
                         {{-- Info Card --}}
                         <div class="bg-[#C18B51] rounded-[20px] p-6 lg:p-7 text-[#582C0C] shadow-sm">
-                            <h3 class="text-[20px] lg:text-[22px] font-bold mb-2">Hanglekiu Dental Specialist</h3>
+                            <h3 class="text-[20px] lg:text-[22px] font-bold mb-2">{{ $profile->name }}</h3>
                             <p class="text-[14px] lg:text-[15px] font-medium opacity-90 mb-4 leading-normal pr-4">
-                                8, Jl. Hang Lekiu V No.8, RT.6/RW.4, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12120
+                                {{ $profile->address }}
                             </p>
                             
                             <div class="mb-4">
                                 <p class="text-[14px] lg:text-[15px] opacity-90 mb-1">Operasional</p>
                                 <ul class="space-y-1 text-[14px] lg:text-[15px] font-medium opacity-90">
-                                    <li class="flex items-center gap-2">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-[#582C0C] opacity-70"></span> 
-                                        Senin - Jumat: 10.00 - 19.00
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-[#582C0C] opacity-70"></span> 
-                                        Sabtu - Minggu: 10.00 - 13.00
-                                    </li>
+                                    @foreach(explode("\n", $profile->operational_summary) as $summaryLine)
+                                        <li class="flex items-center gap-2">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-[#582C0C] opacity-70"></span> 
+                                            {{ $summaryLine }}
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </div>
                             
@@ -125,53 +123,42 @@
                             <div id="full-schedule" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
                                 <div class="mt-4 pt-4 border-t border-[#582C0C]/10">
                                     <ul class="space-y-2 text-[13px] lg:text-[14px] font-medium opacity-90">
-                                        <li class="flex justify-between items-center">
-                                            <span>Senin</span>
-                                            <span>10.00 - 19.00</span>
-                                        </li>
-                                        <li class="flex justify-between items-center">
-                                            <span>Selasa</span>
-                                            <span>10.00 - 19.00</span>
-                                        </li>
-                                        <li class="flex justify-between items-center">
-                                            <span>Rabu</span>
-                                            <span>10.00 - 19.00</span>
-                                        </li>
-                                        <li class="flex justify-between items-center">
-                                            <span>Kamis</span>
-                                            <span>10.00 - 19.00</span>
-                                        </li>
-                                        <li class="flex justify-between items-center">
-                                            <span>Jumat</span>
-                                            <span>10.00 - 19.00</span>
-                                        </li>
-                                        <li class="flex justify-between items-center">
-                                            <span>Sabtu</span>
-                                            <span>10.00 - 13.00</span>
-                                        </li>
-                                        <li class="flex justify-between items-center">
-                                            <span>Minggu</span>
-                                            <span>10.00 - 13.00</span>
-                                        </li>
+                                        @php
+                                            $days = [
+                                                'monday' => 'Senin',
+                                                'tuesday' => 'Selasa',
+                                                'wednesday' => 'Rabu',
+                                                'thursday' => 'Kamis',
+                                                'friday' => 'Jumat',
+                                                'saturday' => 'Sabtu',
+                                                'sunday' => 'Minggu'
+                                            ];
+                                        @endphp
+                                        @foreach($days as $key => $label)
+                                            <li class="flex justify-between items-center">
+                                                <span>{{ $label }}</span>
+                                                <span>{{ $profile->operational_hours[$key] ?? '-' }}</span>
+                                            </li>
+                                        @endforeach
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
                         {{-- Contact Button --}}
-                        <a href="https://wa.me/6285211888621" target="_blank" 
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $profile->phone) }}" target="_blank" 
                            class="bg-[#4D2303] hover:bg-[#321402] text-white py-3.5 lg:py-4 rounded-[20px] font-medium text-[14px] lg:text-[15px] shadow-sm transition-colors flex items-center justify-center gap-2 w-full shrink-0">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                             </svg>
-                            085211888621 (Jakarta Selatan)
+                            {{ $profile->phone }} (Jakarta Selatan)
                         </a>
                     </div>
 
                     {{-- Right Side: Map (Spans 7/12 cols) --}}
                     <div class="lg:col-span-7 h-[350px] lg:h-[450px] rounded-[20px] overflow-hidden border border-[#C18B51]/30 shadow-sm relative">
                         <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.2179207224335!2d106.79431819999999!3d-6.234979900000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f13f7aa4320b%3A0xc0ab44fddef1bdfc!2sHANGLEKIU%20DENTAL%20SPECIALIST!5e0!3m2!1sid!2sid!4v1772801197619!5m2!1sid!2sid" 
+                            src="https://www.google.com/maps?q={{ urlencode($clinicProfile->address ?? 'Hanglekiu Dental Specialist') }}&output=embed" 
                             class="absolute inset-0 w-full h-full"
                             style="border:0;" 
                             allowfullscreen="" 

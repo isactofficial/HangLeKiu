@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Share clinic profile globally
+        if (!app()->runningInConsole()) {
+            try {
+                \Illuminate\Support\Facades\View::share('clinicProfile', \App\Models\ClinicProfile::first());
+            } catch (\Exception $e) {
+                // Ignore if table doesn't exist yet
+            }
+        }
     }
 }

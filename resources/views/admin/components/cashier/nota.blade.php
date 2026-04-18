@@ -6,15 +6,14 @@
         <table style="width: 100%; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px;">
             <tr>
                 <td style="width: 70px;">
-                    <img src="{{ asset('images/logo-hds.png') }}" alt="Logo HDS" style="width: 65px; height: auto;">
+                    <img src="{{ ($clinicProfile->logo ?? null) ? asset('storage/' . $clinicProfile->logo) : asset('images/logo-hds.png') }}" alt="Logo" style="width: 65px; height: auto;">
                 </td>
                 <td style="padding-left: 15px;">
-                    <h1 style="margin: 0; font-size: 15px; font-weight: bold; text-transform: uppercase; color: #3498db;">HANGLEKIU DENTAL SPECIALIST</h1>
+                    <h1 style="margin: 0; font-size: 15px; font-weight: bold; text-transform: uppercase; color: #3498db;">{{ $clinicProfile->name ?? 'HANGLEKIU DENTAL SPECIALIST' }}</h1>
                     <p style="margin: 2px 0; font-size: 9px; line-height: 1.4;">
-                        8, Jl. Hang Lekiu V No.8, RT.6/RW.4, Gunung, Kec. Kby. Baru,<br>
-                        Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12120
+                        {{ $clinicProfile->address ?? '8, Jl. Hang Lekiu V No.8, RT.6/RW.4, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12120' }}
                     </p>
-                    <p style="margin: 2px 0; font-size: 9px; font-weight: bold;">Telepon: 0852-1188-8621</p>
+                    <p style="margin: 2px 0; font-size: 9px; font-weight: bold;">Telepon: {{ $clinicProfile->phone ?? '0852-1188-8621' }}</p>
                 </td>
             </tr>
         </table>
@@ -117,7 +116,7 @@
         <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: flex-end;">
             <div style="font-size: 8px; font-style: italic; color: #666; max-width: 60%;">
                 * Terima kasih atas kunjungan Anda.<br>
-                * Dokumen ini adalah bukti pembayaran sah Hanglekiu Dental Specialist.
+                * Dokumen ini adalah bukti pembayaran sah {{ $clinicProfile->name ?? 'Hanglekiu Dental Specialist' }}.
             </div>
             <div style="text-align: center; width: 130px;">
                 <p style="font-size: 10px; margin-bottom: 35px;">Petugas Kasir,</p>
