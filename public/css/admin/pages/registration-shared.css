@@ -47,6 +47,13 @@
     margin-bottom: 24px;
 }
 
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+}
+
 /* ── Card Container ── */
 .form-card {
     background: var(--white);
@@ -290,7 +297,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     inset: 0;
     background: rgba(46, 21, 5, 0.65); /* Sedikit lebih gelap agar fokus */
     z-index: 9999; /* Pastikan di atas segalanya termasuk navbar */
-    align-items: flex-start; /* Ubah ke top agar kontrol scroll lebih baik */
+    align-items: center; /* Center vertikal */
     justify-content: center;
     padding: 80px 24px 40px; /* Padding top ditambah (80px) untuk menghindari navbar */
     backdrop-filter: blur(6px);
@@ -298,7 +305,11 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 768px) {
-    .reg-modal-overlay { padding: 12px; }
+    .reg-modal-overlay { 
+        padding: max(100px, 16px) 12px 20px; /* Min 100px top untuk navbar, lebih fleksibel */
+        align-items: flex-start; /* Kembalikan ke top agar bisa scroll jika perlu */
+        padding-top: max(100px, 16px); /* Pastikan ada space dari navbar */
+    }
 }
 
 .reg-modal-overlay.open {
@@ -314,12 +325,18 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     padding: 48px 32px 60px;
     margin-bottom: 40px; /* Jarak bawah agar tidak nempel */
     box-shadow: 0 25px 50px -12px rgba(46, 21, 5, 0.3);
+    max-height: calc(100vh - 140px); /* Batasi tinggi agar scrollable */
+    overflow-y: auto; /* Content scrollable jika terlalu panjang */
 }
 
 @media (max-width: 768px) {
     .reg-modal-content { 
-        padding: 32px 16px 40px;
-        border-radius: var(--radius-sm);
+        padding: 28px 16px 32px;
+        border-radius: 12px;
+        width: calc(100% - 24px); /* Account for padding */
+        max-width: 500px; /* Lebih compact untuk mobile */
+        max-height: calc(100vh - 140px); /* Scrollable jika perlu */
+        margin: 0 auto; /* Center horisontal */
     }
 }
 
@@ -348,7 +365,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 768px) {
-    .modal-close-btn { top: 12px; right: 12px; width: 32px; height: 32px; }
+    .modal-close-btn { 
+        top: 16px; 
+        right: 16px; 
+        width: 32px; 
+        height: 32px;
+        font-size: 14px;
+    }
 }
 
 .modal-close-btn:hover {

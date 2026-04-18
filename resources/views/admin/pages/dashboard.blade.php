@@ -1,4 +1,4 @@
-﻿@extends('admin.layout.admin')
+@extends('admin.layout.admin')
 @section('title', 'Dashboard')
 
 @section('navbar')
@@ -170,7 +170,7 @@
                     </div>
                 </div>
 
-                <div class="dash-card dash-mini-card">
+                <div class="dash-card dash-mini-card" data-stat="avg-wait-pharmacy">
                     <div class="stat-header"><i class="fas fa-hourglass-half stat-icon"></i></div>
                     <p class="stat-title">Rata-Rata Waktu Tunggu Apotek</p>
                     <div class="stat-value-row">
@@ -323,11 +323,12 @@ function renderDonut(donut) {
 
 // ── Stats Cards ───────────────────────────────────────────────────────────
 function renderStats(stats) {
-    setCard('new-patients',   stats.new_patients.value,   stats.new_patients.trend);
-    setCard('total-patients', stats.total_patients.value, stats.total_patients.trend);
-    setCard('low-stock',      stats.low_stock);
-    setCard('avg-wait',       formatSeconds(stats.avg_wait_seconds));
-    setCard('avg-consult',    formatSeconds(stats.avg_consult_seconds));
+    setCard('new-patients',      stats.new_patients.value,   stats.new_patients.trend);
+    setCard('total-patients',    stats.total_patients.value, stats.total_patients.trend);
+    setCard('low-stock',         stats.low_stock);
+    setCard('avg-wait',          formatSeconds(stats.avg_wait_seconds));
+    setCard('avg-consult',       formatSeconds(stats.avg_consult_seconds));
+    setCard('avg-wait-pharmacy', formatSeconds(stats.avg_wait_pharmacy_seconds));
 }
 
 // ── Financial ─────────────────────────────────────────────────────────────

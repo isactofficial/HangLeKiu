@@ -612,9 +612,9 @@
 
                 container.innerHTML = partners.map(partner => `
                     <div class="flex items-center justify-center px-3 py-2 bg-white rounded-lg shadow-sm">
-                        <img src="${partner.logo ? '/storage/' + partner.logo : '/images/gigi.svg'}" 
-                             alt="${partner.name}" 
-                             class="w-18 h-18 md:w-24 md:h-24 object-contain">
+                            <img src="${partner.logo ? '/storage/' + partner.logo : '/images/gigi.svg'}" 
+                                alt="${partner.name}" 
+                                class="w-24 h-24 md:w-32 md:h-32 object-contain">
                     </div>
                 `).join('');
             } catch (error) {

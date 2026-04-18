@@ -13,11 +13,13 @@
 
         body {
             font-family: 'Instrument Sans', sans-serif;
-            background-color: #C58F59;
+            background: url('{{ asset('images/bg-clinic.png') }}') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         .card {

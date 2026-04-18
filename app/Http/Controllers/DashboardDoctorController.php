@@ -151,7 +151,7 @@ class DashboardDoctorController extends Controller
             'bio'                 => 'nullable|string',
             'instagram_url'       => 'nullable|url|max:255',
             'linkedin_url'        => 'nullable|url|max:255',
-            'foto_profil'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'foto_profil'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
             'password'            => 'nullable|string|min:8|confirmed',
         ]);
 

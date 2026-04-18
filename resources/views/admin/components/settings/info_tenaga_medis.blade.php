@@ -350,7 +350,7 @@
                                 <div class="upload-box" onclick="triggerUpload('upFoto')">
                                     <svg width="22" height="22" fill="none" stroke="#C58F59" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                                     <span class="upload-label" id="upFotoLabel">Klik untuk upload</span>
-                                    <span class="upload-hint">PNG, maks 2 MB</span>
+                                    <span class="upload-hint">PNG, maks 3 MB</span>
                                     <input type="file" id="upFoto" name="foto_profil" accept="image/png, image/webp, image/jpeg" style="display:none;" onchange="setUploadLabel('upFoto','upFotoLabel')">
                                 </div>
                             </div>
@@ -359,7 +359,7 @@
                                 <div class="upload-box" onclick="triggerUpload('upShadow')">
                                     <svg width="22" height="22" fill="none" stroke="#C58F59" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                                     <span class="upload-label" id="upShadowLabel">Klik untuk upload</span>
-                                    <span class="upload-hint">PNG, maks 2 MB</span>
+                                    <span class="upload-hint">PNG, maks 3 MB</span>
                                     <input type="file" id="upShadow" name="shadow_image" accept="image/png, image/webp" style="display:none;" onchange="setUploadLabel('upShadow','upShadowLabel')">
                                 </div>
                             </div>
@@ -390,7 +390,7 @@
                                 <div class="upload-box" onclick="triggerUpload('upTtd')">
                                     <svg width="22" height="22" fill="none" stroke="#C58F59" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                                     <span class="upload-label" id="upTtdLabel">Klik upload tanda tangan</span>
-                                    <span class="upload-hint">PNG statis, maks 2 MB</span>
+                                    <span class="upload-hint">PNG statis, maks 3 MB</span>
                                     <input type="file" id="upTtd" name="ttd" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="setUploadLabel('upTtd','upTtdLabel')">
                                 </div>
                             </div>

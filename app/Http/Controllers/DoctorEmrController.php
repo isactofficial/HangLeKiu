@@ -267,7 +267,14 @@ class DoctorEmrController extends Controller
             abort(403, 'Anda tidak memiliki akses ke data ini.');
         }
 
-        $appointment->update(['status' => $request->status]);
+        $updateData = ['status' => $request->status];
+        if ($request->status === 'engaged' && !$appointment->engaged_at) {
+            $updateData['engaged_at'] = now();
+        } elseif ($request->status === 'waiting' && !$appointment->waiting_at) {
+            $updateData['waiting_at'] = now();
+        }
+
+        $appointment->update($updateData);
 
         return response()->json(['success' => true, 'message' => 'Status berhasil diubah.']);
     }
