@@ -125,12 +125,22 @@ class MasterProcedureController extends BaseMasterController
     public function destroy($id)
     {
         $item = MasterProcedure::findOrFail($id);
-        $item->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => "{$this->resourceName} berhasil dihapus"
-        ]);
+        try {
+            $item->delete();
+            return response()->json([
+                'success' => true,
+                'message' => "{$this->resourceName} berhasil dihapus"
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "{$this->resourceName} tidak bisa dihapus karena sudah digunakan di data lain"
+                ], 422);
+            }
+            throw $e;
+        }
     }
 
     // ─── Export & Import ───────────────────────────────────────────────

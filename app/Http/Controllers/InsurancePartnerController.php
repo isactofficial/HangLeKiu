@@ -113,6 +113,11 @@ class InsurancePartnerController extends Controller
             $this->deleteLogo($item->logo);
             $item->delete();
             return response()->json(['success' => true, 'message' => 'Partner asuransi berhasil dihapus']);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return response()->json(['success' => false, 'message' => 'Partner asuransi tidak bisa dihapus karena sudah berhubungan dengan data lain'], 422);
+            }
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

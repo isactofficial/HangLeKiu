@@ -34,7 +34,15 @@
 
             {{-- Auth Section --}}
             @auth
-                <a href="{{ route('user.dashboard') }}" class="ml-2 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[#D9C3AE] bg-[#F4E9DF] text-[var(--font-color-primary)] hover:brightness-95 transition-all duration-200" title="Dashboard Pasien">
+                @php
+                    $dashboardRoute = route('user.dashboard');
+                    if(Auth::user()->role && Auth::user()->role->code === 'ADM') {
+                        $dashboardRoute = route('admin.dashboard');
+                    } elseif(Auth::user()->role && Auth::user()->role->code === 'DCT') {
+                        $dashboardRoute = route('doctor.dashboard');
+                    }
+                @endphp
+                <a href="{{ $dashboardRoute }}" class="ml-2 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border border-[#D9C3AE] bg-[#F4E9DF] text-[var(--font-color-primary)] hover:brightness-95 transition-all duration-200" title="Dashboard">
                         @if(Auth::user()->avatar_url)
                             <img src="{{ Auth::user()->avatar_url }}" alt="Foto Profil" class="w-full h-full object-cover">
                         @else
@@ -67,7 +75,15 @@
         <a href="{{ route('klinik') }}" class="px-6 py-4 text-[24px] font-medium border-b border-gray-50 text-[var(--font-color-secondary)]">Klinik</a>
         <a href="{{ route('artikel') }}" class="px-6 py-4 text-[24px] font-medium border-b border-gray-50 text-[var(--font-color-secondary)]">Artikel</a>
         @auth
-            <a href="{{ route('user.dashboard') }}" class="px-6 py-4 text-[24px] font-medium text-[var(--font-color-primary)] bg-gray-50">Dashboard Akun</a>
+            @php
+                $dashboardRoute = route('user.dashboard');
+                if(Auth::user()->role && Auth::user()->role->code === 'ADM') {
+                    $dashboardRoute = route('admin.dashboard');
+                } elseif(Auth::user()->role && Auth::user()->role->code === 'DCT') {
+                    $dashboardRoute = route('doctor.dashboard');
+                }
+            @endphp
+            <a href="{{ $dashboardRoute }}" class="px-6 py-4 text-[24px] font-medium text-[var(--font-color-primary)] bg-gray-50">Dashboard</a>
         @else
             <a href="{{ route('login') }}" class="px-6 py-4 text-[24px] font-medium text-white bg-primary text-center">Masuk</a>
         @endauth

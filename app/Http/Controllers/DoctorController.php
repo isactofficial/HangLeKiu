@@ -394,6 +394,11 @@ class DoctorController extends Controller
             $doctor->delete();
 
             return response()->json(['success' => true, 'message' => 'Data berhasil dihapus']);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return response()->json(['success' => false, 'message' => 'Data dokter tidak bisa dihapus karena sudah terhubung dengan data lain'], 422);
+            }
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
