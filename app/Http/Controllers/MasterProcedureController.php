@@ -170,7 +170,7 @@ class MasterProcedureController extends BaseMasterController
 
         // ── Baris 3: Header kolom ──
         $headers = $isTemplate
-            ? ['procedure_name *', 'jenis_perawatan *', 'base_price', 'description', 'status']
+            ? ['procedure_name', 'jenis_perawatan', 'base_price', 'description', 'status']
             : ['Nama Prosedur', 'Jenis Perawatan', 'Harga (IDR)', 'Deskripsi', 'Status'];
 
         foreach ($headers as $i => $h) {
@@ -232,7 +232,7 @@ class MasterProcedureController extends BaseMasterController
                 'borders'   => ['allBorders' => ['borderStyle' => 'thin', 'color' => ['rgb' => 'D6C4B0']]],
                 'alignment' => ['horizontal' => 'right', 'vertical' => 'center'],
             ]);
-            $sheet->getStyle("C{$r}")->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle("C{$r}")->getNumberFormat()->setFormatCode('0');
 
             // Deskripsi
             $sheet->setCellValue("D{$r}", $row['description']);
