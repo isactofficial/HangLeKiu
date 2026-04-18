@@ -327,7 +327,12 @@
                 <!-- KANAN -->
                 <div style="flex: 1; min-width: 300px;">
                     <div class="form-section" style="background:#fcfcfc; padding:15px; border:1px solid #f0f0f0; border-radius:8px;">
-                        <div class="form-section-title">Jadwal Praktek</div>
+                        <div class="form-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>Jadwal Praktek *</span>
+                            <label style="font-size:12px; text-transform:none; letter-spacing:0; color:#C58F59; cursor:pointer;">
+                                <input type="checkbox" name="is_flexible" value="1" id="isFlexibleCheck" onchange="toggleFlexible(this.checked)"> Jadwal Fleksibel
+                            </label>
+                        </div>
                         @php
                             $days = ['monday' => 'Senin', 'tuesday' => 'Selasa', 'wednesday' => 'Rabu', 'thursday' => 'Kamis', 'friday' => 'Jumat', 'saturday' => 'Sabtu', 'sunday' => 'Minggu'];
                         @endphp
@@ -445,6 +450,18 @@ function updateStats() {
   document.getElementById('statCarousel').textContent = doctors.filter(d => d.show_in_carousel).length;
 }
 
+function toggleFlexible(isFlexible) {
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  days.forEach(day => {
+    const cb = document.getElementById('sch_active_' + day);
+    const start = document.getElementById('sch_start_' + day);
+    const end = document.getElementById('sch_end_' + day);
+    if (cb) cb.disabled = isFlexible;
+    if (start) start.disabled = isFlexible;
+    if (end) end.disabled = isFlexible;
+  });
+}
+
 function filterTable() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   const status = document.getElementById('filterStatus').value;
@@ -482,7 +499,10 @@ function renderTable(data) {
           </div>
         </div>
       </td>
-      <td><span class="badge ${d.spec ? 'badge-spec' : ''}">${d.spec ? d.spec.replace('Spesialis ', '') : '-'}</span></td>
+      <td>
+        <span class="badge ${d.spec ? 'badge-spec' : ''}">${d.spec ? d.spec.replace('Spesialis ', '') : '-'}</span>
+        ${d.is_flexible ? '<span class="badge badge-active" style="display:block;margin-top:4px;font-size:9px;">Fleksibel</span>' : ''}
+      </td>
       <td style="font-size:12px;color:#6B513E;">${d.lulus || '—'}</td>
       <td style="font-size:12px;color:#6B513E;">${d.fee != null && d.fee !== '' ? `${Number(d.fee).toFixed(2)}%` : '0.00%'}</td>
       <td style="font-size:12px;color:#6B513E;">${d.exp || '—'}</td>
@@ -552,6 +572,8 @@ function openEdit(id) {
           f.carousel_order.value = (carouselOrder === 99 || carouselOrder === null || carouselOrder === undefined) ? '' : carouselOrder;
           f.is_active.value = doc.is_active ? "1" : "0";
           f.show_in_carousel.value = doc.show_in_carousel ? "1" : "0";
+          f.is_flexible.checked = !!doc.is_flexible;
+          toggleFlexible(doc.is_flexible);
           f.estimasi_konsultasi.value = doc.estimasi_konsultasi || '15';
           f.default_fee_percentage.value = doc.default_fee_percentage ?? '';
           f.str_number.value = doc.str_number || '';
@@ -581,12 +603,21 @@ function openEdit(id) {
 function saveDoctor(e) {
   e.preventDefault();
   const form = document.getElementById('docForm');
+
+  // Validasi Jadwal: Wajib pilih (Jam Tetap ATAU Fleksibel)
+  const isFlexible = form.is_flexible.checked;
+  const activeSchedules = form.querySelectorAll('input[name^="schedules"][name$="[is_active]"]:checked');
+  if (!isFlexible && activeSchedules.length === 0) {
+    alert('Harap tentukan jadwal: Pilih minimal satu jadwal praktek aktif atau centang Jadwal Fleksibel.');
+    return;
+  }
+
   const formData = new FormData(form);
 
   if (editingId) formData.append('_method', 'PUT');
 
   const url = editingId ? `/admin/settings/doctor/${editingId}` : '/admin/settings/manajemen-staff/doctor';
-  const method = 'POST'; // Since we are using FormData, we send POST with _method=PUT to handle multipart files
+  const method = 'POST';
   
   fetch(url, {
     method,

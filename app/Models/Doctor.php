@@ -24,6 +24,7 @@ class Doctor extends Model
         'specialization',
         'subspecialization',
         'is_active',
+        'is_flexible',
         'default_fee_percentage',
         'user_id',
         'email',
@@ -54,6 +55,7 @@ class Doctor extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_flexible' => 'boolean',
         'default_fee_percentage' => 'decimal:2',
         'estimasi_konsultasi' => 'integer',
         'str_expiry_date' => 'date',

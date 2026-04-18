@@ -77,6 +77,7 @@ class DoctorController extends Controller
                         'order' => $d->carousel_order ?? 99,
                         'status' => $d->is_active ? 'active' : 'inactive',
                         'show_in_carousel' => (bool)$d->show_in_carousel,
+                        'is_flexible' => (bool)$d->is_flexible,
                         'ig' => $d->instagram_url,
                         'li' => $d->linkedin_url,
                         'foto' => $d->foto_profil,
@@ -265,10 +266,25 @@ class DoctorController extends Controller
     {
         $validated = $this->validateRequest($request);
 
+        // Validasi Jadwal: Wajib (Fleksibel ATAU Jam Tetap)
+        $isFlexible = $request->boolean('is_flexible');
+        $hasActiveSchedule = collect($request->schedules ?? [])->contains(function ($val) {
+            return isset($val['is_active']) && ($val['is_active'] == '1' || $val['is_active'] == 'true');
+        });
+
+        if (! $isFlexible && ! $hasActiveSchedule) {
+            $msg = 'Harap tentukan jadwal: Pilih minimal satu jadwal praktek aktif atau aktifkan Jadwal Fleksibel.';
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->withErrors(['schedules' => $msg])->withInput();
+        }
+
         try {
             DB::transaction(function () use ($validated, $request) {
                 $dataToSave = array_merge($validated, [
                     'id' => (string) Str::uuid(),
+                    'default_fee_percentage' => $validated['default_fee_percentage'] ?? 0,
                     'is_active' => $request->boolean('is_active'),
                     'show_in_carousel' => $request->boolean('show_in_carousel'),
                     'foto_profil' => $request->hasFile('foto_profil') ? $this->uploadFile($request->file('foto_profil'), 'doctor_profiles') : null,
@@ -304,6 +320,16 @@ class DoctorController extends Controller
     {
         $doctor = Doctor::findOrFail($id);
         $validated = $this->validateRequest($request, $id);
+
+        // Validasi Jadwal: Wajib (Fleksibel ATAU Jam Tetap)
+        $isFlexible = $request->boolean('is_flexible');
+        $hasActiveSchedule = collect($request->schedules ?? [])->contains(function ($val) {
+            return isset($val['is_active']) && ($val['is_active'] == '1' || $val['is_active'] == 'true');
+        });
+
+        if (! $isFlexible && ! $hasActiveSchedule) {
+            return response()->json(['success' => false, 'message' => 'Harap tentukan jadwal: Pilih minimal satu jadwal praktek aktif atau aktifkan Jadwal Fleksibel.'], 422);
+        }
         
         $validated['is_active'] = $request->boolean('is_active');
         $validated['show_in_carousel'] = $request->boolean('show_in_carousel');
@@ -337,6 +363,7 @@ class DoctorController extends Controller
                     $validated['ttd'] = $this->uploadFile($request->file('ttd'), 'doctor_signatures');
                 }
 
+                $validated['default_fee_percentage'] = $validated['default_fee_percentage'] ?? 0;
                 $doctor->update($validated);
                 
                 // Update Jadwal
@@ -417,6 +444,7 @@ class DoctorController extends Controller
             'linkedin_url'        => 'nullable|url|max:150',
             'carousel_order'      => 'nullable|integer',
             'is_active'           => 'nullable|boolean',
+            'is_flexible'         => 'nullable|boolean',
             'show_in_carousel'    => 'nullable|boolean',
         ]);
     }
