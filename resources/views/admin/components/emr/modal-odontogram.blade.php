@@ -1897,6 +1897,15 @@
                   }
                   window.lastSavedToothNumbers = savedTeethNumbers;
                   const currentRegistrationId = String(visitIdEl ? (visitIdEl.value || '') : '').trim();
+                  
+                  // DISPATCH EVENT UNTUK NOTIFIKASI MODAL PROSEDUR
+                  window.dispatchEvent(new CustomEvent('odontogram-saved', { 
+                      detail: { 
+                          registration_id: currentRegistrationId,
+                          tooth_numbers: savedTeethNumbers 
+                      } 
+                  }));
+
                   window.lastSavedToothNumbersByRegistration = window.lastSavedToothNumbersByRegistration || {};
                   if (currentRegistrationId) {
                     window.lastSavedToothNumbersByRegistration[currentRegistrationId] = savedTeethNumbers;
