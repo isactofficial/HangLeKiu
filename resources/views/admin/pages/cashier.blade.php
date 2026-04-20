@@ -634,6 +634,7 @@ function hitungKembalian() {
     const isMultiPayment = document.getElementById('is_multi_payment')?.checked || false;
     let amountPaid2 = 0;
     let secondPaymentMethodName = null;
+    let secondPaymentMethodId = null;
 
     if (isMultiPayment) {
         const inputBayar2Raw = document.getElementById('m-input-bayar-2').value.replace(/[^0-9]/g, '');
@@ -645,8 +646,11 @@ function hitungKembalian() {
             return;
         }
 
-        const secondMethodSelect = document.getElementById('m-metode-2');
-        secondPaymentMethodName = secondMethodSelect ? secondMethodSelect.options[secondMethodSelect.selectedIndex].text : '';
+        const secondMethodSelect = document.getElementById('second_payment_method');
+        if (secondMethodSelect) {
+            secondPaymentMethodId = secondMethodSelect.value;
+            secondPaymentMethodName = secondMethodSelect.options[secondMethodSelect.selectedIndex].text;
+        }
     }
 
     // --- AMBIL CASH ACCOUNT (AKUN KAS) ---
@@ -696,6 +700,7 @@ function hitungKembalian() {
                 // Tambahan Field Multi Payment
                 is_multi_payment: isMultiPayment,
                 second_payment_method: secondPaymentMethodName,
+                second_payment_method_id: secondPaymentMethodId,
                 second_payment_amount: amountPaid2,
 
                 // Tambahan cash_account

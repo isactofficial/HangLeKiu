@@ -80,6 +80,7 @@ class DoctorController extends Controller
                         'is_flexible' => (bool)$d->is_flexible,
                         'ig' => $d->instagram_url,
                         'li' => $d->linkedin_url,
+                        'fb' => $d->facebook_url,
                         'foto' => $d->foto_profil,
                         'shadow' => $d->shadow_image,
                         'badge1' => $d->badge_1,

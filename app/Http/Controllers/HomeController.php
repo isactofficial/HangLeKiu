@@ -15,7 +15,8 @@ class HomeController extends Controller
             ->orderBy('full_name') // secondary sort
             ->get([
                 'id', 'full_name', 'specialization', 'str_number', 'foto_profil', 
-                'shadow_image', 'badge_1', 'badge_2', 'bio'
+                'shadow_image', 'badge_1', 'badge_2', 'bio',
+                'instagram_url', 'linkedin_url'
             ]);
             
         return view('welcome', compact('doctors'));

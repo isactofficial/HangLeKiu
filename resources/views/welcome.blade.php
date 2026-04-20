@@ -188,10 +188,8 @@
 
                         <div class="flex flex-row justify-between items-center md:flex-col md:items-start w-full">
 
-                            {{-- Social Media - akan diisi dinamis jika diperlukan --}}
-                            <div class="flex items-center gap-3 mb-0 md:mb-16">
-                                <!-- Social media links will be loaded here if available -->
-                            </div>
+                            {{-- Social Media Dinamis --}}
+                            <div id="doctor-social-media" class="flex items-center gap-3 mb-0 md:mb-16"></div>
 
                             {{-- Navigation Arrows --}}
                             <div class="flex items-center gap-3">
@@ -842,6 +840,19 @@
                     bioText = (doc.specialization || 'Dokter spesialis') + ' dengan pengalaman dalam memberikan perawatan dental terbaik.';
                 }
                 bioEl.textContent = bioText;
+
+                // Social Media
+                const socialDiv = document.getElementById('doctor-social-media');
+                if (socialDiv) {
+                    let html = '';
+                    if (doc.instagram_url) {
+                        html += `<a href="${doc.instagram_url}" target="_blank" rel="noopener" title="Instagram" class="hover:opacity-80 transition"><svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="6" stroke="#C58F59" stroke-width="2"/><path d="M16.5 12A4.5 4.5 0 1 1 7.5 12a4.5 4.5 0 0 1 9 0Z" stroke="#C58F59" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="#C58F59"/></svg></a>`;
+                    }
+                    if (doc.linkedin_url) {
+                        html += `<a href="${doc.linkedin_url}" target="_blank" rel="noopener" title="LinkedIn" class="hover:opacity-80 transition"><svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" stroke="#C58F59" stroke-width="2"/><path d="M7.75 9.5v5m0 0v-5m0 5h0m0 0h0m4.25-5v5m0 0v-2.5c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5V14.5m0-5v5" stroke="#C58F59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7.75" cy="7.75" r="1" fill="#C58F59"/></svg></a>`;
+                    }
+                    socialDiv.innerHTML = html;
+                }
 
                 // Update Badges with fade transition
                 if (badge1El) badge1El.style.opacity = '0';
