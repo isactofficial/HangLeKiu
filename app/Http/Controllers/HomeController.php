@@ -24,7 +24,25 @@ class HomeController extends Controller
 
     public function klinik()
     {
-        $profile = ClinicProfile::first();
+        $profile = ClinicProfile::firstOrCreate(
+            ['name' => 'Hanglekiu Dental Specialist'],
+            [
+                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'logo' => null,
+                'address' => 'Jl. Hang Lekiu V No.8, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, 12120',
+                'phone' => '085211888621',
+                'operational_hours' => [
+                    'monday' => '10.00 - 19.00',
+                    'tuesday' => '10.00 - 19.00',
+                    'wednesday' => '10.00 - 19.00',
+                    'thursday' => '10.00 - 19.00',
+                    'friday' => '10.00 - 19.00',
+                    'saturday' => '10.00 - 13.00',
+                    'sunday' => '10.00 - 13.00',
+                ],
+                'operational_summary' => "Senin - Jumat: 10.00 - 19.00\\nSabtu - Minggu: 10.00 - 13.00",
+            ]
+        );
         return view('user.pages.klinik', compact('profile'));
     }
 }

@@ -31,7 +31,7 @@
                     Tentang Kami
                 </div>
                 <h1 class="text-3xl md:text-[42px] font-bold text-white leading-tight mb-4">
-                    {{ $profile->name }}
+                    {{ $profile->name ?? 'Hanglekiu Dental Specialist' }}
                 </h1>
 
                 <p class="text-base md:text-xl font-medium text-white/90 max-w-4xl leading-relaxed mb-8">
@@ -95,9 +95,9 @@
                     <div class="lg:col-span-5 flex flex-col gap-4">
                         {{-- Info Card --}}
                         <div class="bg-[#C18B51] rounded-[20px] p-6 lg:p-7 text-[#582C0C] shadow-sm">
-                            <h3 class="text-[20px] lg:text-[22px] font-bold mb-2">{{ $profile->name }}</h3>
+                            <h3 class="text-[20px] lg:text-[22px] font-bold mb-2">{{ $profile->name ?? 'Hanglekiu Dental Specialist' }}</h3>
                             <p class="text-[14px] lg:text-[15px] font-medium opacity-90 mb-4 leading-normal pr-4">
-                                {{ $profile->address }}
+                                {{ $profile->address ?? 'Jl. Hang Lekiu V No.8, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, 12120' }}
                             </p>
                             
                             <div class="mb-4">
@@ -151,14 +151,14 @@
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                             </svg>
-                            {{ $profile->phone }} (Jakarta Selatan)
+                            {{ $profile->phone ?? '085211888621' }} (Jakarta Selatan)
                         </a>
                     </div>
 
                     {{-- Right Side: Map (Spans 7/12 cols) --}}
                     <div class="lg:col-span-7 h-[350px] lg:h-[450px] rounded-[20px] overflow-hidden border border-[#C18B51]/30 shadow-sm relative">
                         <iframe 
-                            src="https://www.google.com/maps?q={{ urlencode($clinicProfile->address ?? 'Hanglekiu Dental Specialist') }}&output=embed" 
+                            src="https://www.google.com/maps?q={{ urlencode($profile->address ?? 'Hanglekiu Dental Specialist') }}&output=embed" 
                             class="absolute inset-0 w-full h-full"
                             style="border:0;" 
                             allowfullscreen="" 

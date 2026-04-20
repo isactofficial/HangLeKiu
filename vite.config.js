@@ -3,6 +3,8 @@ import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+    base: '/build/', // ⬅️ WAJIB
+
     plugins: [
         tailwindcss(),
         laravel({
@@ -11,8 +13,8 @@ export default defineConfig({
                 'resources/css/topbar.css',
                 'resources/css/sidebar-mobile.css',
                 'resources/css/pharmacy-mobile.css',
-                'public/css/pharmacy/obat.css',
-                'public/css/pharmacy/antrian.css',
+                'resources/css/obat.css',
+                'resources/css/antrian.css',
                 'resources/js/app.js'
             ],
             refresh: true,
