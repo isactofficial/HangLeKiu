@@ -28,8 +28,16 @@ class Invoice extends Model
         'debt_amount',
         'rounding',
         'notes',
+        'is_multi_payment',
+        'second_payment_method_id',
+        'second_payment_amount',
         'created_at'
     ];
+
+    public function secondPaymentMethod()
+    {
+        return $this->belongsTo(MasterPaymentMethod::class, 'second_payment_method_id');
+    }
 
     protected static function booted(): void
     {

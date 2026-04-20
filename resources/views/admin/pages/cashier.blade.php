@@ -1,4 +1,4 @@
-@extends('admin.layout.admin')
+﻿@extends('admin.layout.admin')
 @section('title', 'Kasir - HangLeKiu')
 
 @section('navbar')
@@ -204,7 +204,13 @@
                                 $amtPaid = $invoice ? (float) $invoice->amount_paid : 0;
                                 $amtChange = $invoice ? (float) $invoice->change_amount : 0;
                                 $amtDebt = $invoice ? (float) $invoice->debt_amount : 0;
-                                
+
+                                // Pembayaran kedua (split bill)
+                                $isMultiPayment = $invoice && property_exists($invoice, 'is_multi_payment') ? ($invoice->is_multi_payment ? true : false) : false;
+                                $secondPaymentMethod = $invoice && property_exists($invoice, 'second_payment_method') ? $invoice->second_payment_method : null;
+                                $secondPaymentAmount = $invoice && property_exists($invoice, 'second_payment_amount') ? (float) $invoice->second_payment_amount : 0;
+                                $secondCashAccount = $invoice && property_exists($invoice, 'second_cash_account') ? $invoice->second_cash_account : null;
+
                                 // 5. Variabel Display & Data JS
                                 $invoiceNo = $invoice ? $invoice->invoice_number : 'INV' . \Carbon\Carbon::parse($apt->appointment_datetime)->format('Ymd') . str_pad($apt->id, 3, '0', STR_PAD_LEFT);
                                 $metodeBayar = $invoice ? $invoice->payment_method : ($apt->paymentMethod->name ?? 'Belum Ditentukan');
@@ -216,7 +222,9 @@
                                     'id' => $apt->patient->medical_record_no ?? '-',
                                     'usia' => $apt->patient->date_of_birth ? \Carbon\Carbon::parse($apt->patient->date_of_birth)->age . ' Thn' : '-',
                                     'hp' => $apt->patient->phone_number ?? '-',
-                                    'dokter' => $apt->doctor->full_name ?? '-'
+                                    'dokter' => $apt->doctor->full_name ?? '-',
+                                    'payment_method_id' => $apt->payment_method_id ?? '',
+                                    'payment_method_name' => $apt->paymentMethod->name ?? '', // ← tambah name sebagai fallback
                                 ];
                             @endphp
                                 
@@ -278,27 +286,31 @@
 
                                                                                     {{-- Tombol Nota tetap muncul untuk print ulang --}}
                                             <button class="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-white transition-colors bg-[#8e6a45] border-2 border-[#8e6a45] rounded shadow-sm hover:bg-[#7a5938] hover:border-[#7a5938]" 
-                                            onclick='prepareAndPrint(
-                                                @json($invoiceNo), 
-                                                @json($apt->patient->full_name ?? "Pasien"), 
-                                                @json($apt->doctor->full_name ?? "-"), 
-                                                @json($arrTindakan), 
-                                                @json($arrHarga), 
-                                                @json($arrQty), 
-                                                @json($arrDiskon), 
-                                                @json($arrSubtotal), 
-                                                @json($arrGigi), 
-                                                @json($metodeBayar), 
-                                                @json($tglInputStr), 
-                                                @json($catatanInvoice), 
-                                                @json($invoiceStatus), 
-                                                {{ $amtPaid }}, 
-                                                {{ $amtChange }}, 
-                                                {{ $amtDebt }}
-                                            )'
-                                        >
-                                            <i class="fa fa-print"></i> Nota
-                                        </button>
+                                                onclick='prepareAndPrint(
+                                                    @json($invoiceNo), 
+                                                    @json($apt->patient->full_name ?? "Pasien"), 
+                                                    @json($apt->doctor->full_name ?? "-"), 
+                                                    @json($arrTindakan), 
+                                                    @json($arrHarga), 
+                                                    @json($arrQty), 
+                                                    @json($arrDiskon), 
+                                                    @json($arrSubtotal), 
+                                                    @json($arrGigi), 
+                                                    @json($metodeBayar), 
+                                                    @json($tglInputStr), 
+                                                    @json($catatanInvoice), 
+                                                    @json($invoiceStatus), 
+                                                    {{ $amtPaid }}, 
+                                                    {{ $amtChange }}, 
+                                                    {{ $amtDebt }},
+                                                    @json($isMultiPayment),
+                                                    @json($secondPaymentMethod),
+                                                    {{ $secondPaymentAmount }},
+                                                    @json($secondCashAccount)
+                                                )'
+                                            >
+                                                <i class="fa fa-print"></i> Nota
+                                            </button>
                                         </div>
                                     @elseif($apt->status === 'succeed')
                                         {{-- JIKA BELUM ADA DI TABEL INVOICE SAMA SEKALI --}}
@@ -392,7 +404,10 @@
         document.getElementById('m-pasien-hp').innerText = dataPasien.hp || '-';
         document.getElementById('m-pasien-dokter').innerText = dataPasien.dokter || '-';
         document.getElementById('m-input-pembayar').value = (dataPasien.nama || '') + ' (Pribadi)';
-
+        autoSelectMetodeBayar(
+            dataPasien.payment_method_id,
+            dataPasien.payment_method_name
+        );
         let htmlItems = '';
         currentGrandTotal = 0;
 
@@ -437,31 +452,92 @@
         const modal = document.getElementById('modalPayment');
         modal.classList.add('open');
     }
+      function toggleMultiPayment() {
+    const checkbox = document.getElementById('is_multi_payment');
+    const section = document.getElementById('multi_payment_section');
+    const inputBayar2 = document.getElementById('m-input-bayar-2');
+    const method2 = document.getElementById('m-metode-2');
 
-    function hitungKembalian() {
-        let inputBayar = document.getElementById('m-input-bayar').value;
-        inputBayar = inputBayar.replace(/\./g, '');
-        let bayar = parseFloat(inputBayar) || 0;
+    if (checkbox && checkbox.checked) {
+        if(section) section.style.display = 'block';
+        if(method2) method2.setAttribute('required', 'required');
+    } else {
+        if(section) section.style.display = 'none';
+        if(method2) method2.removeAttribute('required');
+        if(inputBayar2) inputBayar2.value = ''; // Reset nilai form kedua
         
-        let kembalian = bayar - currentGrandTotal;
-        let hutang = currentGrandTotal - bayar;
-
-        if (kembalian > 0) {
-            document.getElementById('m-kembalian').innerText = 'Rp' + Number(kembalian).toLocaleString('id-ID');
-            document.getElementById('m-hutang').innerText = 'Rp0';
-        } else if (hutang > 0) {
-            document.getElementById('m-kembalian').innerText = 'Rp0';
-            document.getElementById('m-hutang').innerText = 'Rp' + Number(hutang).toLocaleString('id-ID');
-        } else {
-            document.getElementById('m-kembalian').innerText = 'Rp0';
-            document.getElementById('m-hutang').innerText = 'Rp0';
+        // Langsung hitung ulang kembalian setelah direset
+        if (typeof hitungKembalian === "function") {
+            hitungKembalian(); 
         }
     }
+}
+
+function hitungKembalian() {
+    // 1. Ambil nilai dari form Pembayaran 1
+    let inputBayar1 = document.getElementById('m-input-bayar').value;
+    inputBayar1 = inputBayar1.replace(/\./g, ''); // Hilangkan titik format ribuan
+    let bayar1 = parseFloat(inputBayar1) || 0;
+
+    // 2. Ambil nilai dari form Pembayaran 2 (Hanya dijumlahkan jika Multi Payment aktif)
+    let bayar2 = 0;
+    const checkbox = document.getElementById('is_multi_payment');
+    if (checkbox && checkbox.checked) {
+        let inputBayar2 = document.getElementById('m-input-bayar-2').value;
+        inputBayar2 = inputBayar2.replace(/\./g, ''); // Hilangkan titik format ribuan
+        bayar2 = parseFloat(inputBayar2) || 0;
+    }
+
+    // 3. Jumlahkan total uang yang dibayarkan pasien
+    let totalBayar = bayar1 + bayar2;
+    
+    // 4. Hitung selisihnya terhadap Total Tagihan
+    let kembalian = totalBayar - currentGrandTotal;
+    let hutang = currentGrandTotal - totalBayar;
+
+    // 5. Tampilkan ke UI Struk/Nota Kasir
+    if (kembalian > 0) {
+        document.getElementById('m-kembalian').innerText = 'Rp' + Number(kembalian).toLocaleString('id-ID');
+        document.getElementById('m-hutang').innerText = 'Rp0';
+    } else if (hutang > 0) {
+        document.getElementById('m-kembalian').innerText = 'Rp0';
+        document.getElementById('m-hutang').innerText = 'Rp' + Number(hutang).toLocaleString('id-ID');
+    } else {
+        document.getElementById('m-kembalian').innerText = 'Rp0';
+        document.getElementById('m-hutang').innerText = 'Rp0';
+    }
+}
     
     function closePayment() { 
         document.getElementById('modalPayment').classList.remove('open');
     }
+    function autoSelectMetodeBayar(paymentMethodId, paymentMethodName) {
+    const select = document.getElementById('m-metode');
+    if (!select) return;
 
+    // Coba cocokkan by UUID/ID dulu
+    for (let opt of select.options) {
+        if (opt.dataset.id && opt.dataset.id === String(paymentMethodId)) {
+            select.value = opt.value;
+            return;
+        }
+    }
+
+    // Fallback: cocokkan by nama (case-insensitive)
+    if (paymentMethodName) {
+        const nameLower = paymentMethodName.trim().toLowerCase();
+        for (let opt of select.options) {
+            if ((opt.dataset.name && opt.dataset.name === nameLower) || 
+                opt.text.trim().toLowerCase() === nameLower) {
+                select.value = opt.value;
+                return;
+            }
+        }
+    }
+
+    // Default: pilih opsi pertama
+    select.selectedIndex = 0;
+}
     // ─── HAPUS ITEM DARI TABEL MODAL ────────────────────────────────
     function hapusItemModal(index) {
         activeData.tindakanArray.splice(index, 1);
@@ -540,107 +616,154 @@
         }, 350);
     }
 
-    async function prosesDone() {
-        const appointmentId = activeData.appointmentId;
-        const btnSimpan = document.querySelector('button[onclick="prosesDone()"]');
-        
-        const inputBayarRaw = document.getElementById('m-input-bayar').value.replace(/[^0-9]/g, '');
-        const amountPaid = parseFloat(inputBayarRaw) || 0;
-        
-        if (amountPaid <= 0) {
-            showWarningPopup('Silakan masukkan nominal uang yang diterima terlebih dahulu.');
-            document.getElementById('m-input-bayar').focus();
+   async function prosesDone() {
+    const appointmentId = activeData.appointmentId;
+    const btnSimpan = document.querySelector('button[onclick="prosesDone()"]');
+
+    // --- AMBIL NOMINAL BAYAR 1 ---
+    const inputBayarRaw = document.getElementById('m-input-bayar').value.replace(/[^0-9]/g, '');
+    const amountPaid1 = parseFloat(inputBayarRaw) || 0;
+
+    if (amountPaid1 <= 0) {
+        showWarningPopup('Silakan masukkan nominal uang yang diterima terlebih dahulu.');
+        document.getElementById('m-input-bayar').focus();
+        return;
+    }
+
+    // --- CEK MULTI PAYMENT & AMBIL NOMINAL BAYAR 2 ---
+    const isMultiPayment = document.getElementById('is_multi_payment')?.checked || false;
+    let amountPaid2 = 0;
+    let secondPaymentMethodName = null;
+    let secondPaymentMethodId = null;
+
+    if (isMultiPayment) {
+        const inputBayar2Raw = document.getElementById('m-input-bayar-2').value.replace(/[^0-9]/g, '');
+        amountPaid2 = parseFloat(inputBayar2Raw) || 0;
+
+        if (amountPaid2 <= 0) {
+            showWarningPopup('Silakan masukkan nominal uang untuk metode pembayaran kedua.');
+            document.getElementById('m-input-bayar-2').focus();
             return;
         }
 
-        const paymentMethodSelect = document.getElementById('m-metode');
-        const paymentMethodName = paymentMethodSelect ? paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text : 'Tunai';
-        const notes = document.getElementById('m-notes')?.value || '-';
-
-        let changeAmount = 0;
-        let debtAmount = 0;
-
-        if (amountPaid > currentGrandTotal) {
-            changeAmount = amountPaid - currentGrandTotal;
-        } else if (amountPaid < currentGrandTotal) {
-            debtAmount = currentGrandTotal - amountPaid;
+        const secondMethodSelect = document.getElementById('second_payment_method');
+        if (secondMethodSelect) {
+            secondPaymentMethodId = secondMethodSelect.value;
+            secondPaymentMethodName = secondMethodSelect.options[secondMethodSelect.selectedIndex].text;
         }
+    }
 
-        // PENENTUAN STATUS (LUNAS / BELUM LUNAS)
-        const statusKasir = debtAmount > 0 ? 'partial' : 'paid';
+    // --- AMBIL CASH ACCOUNT (AKUN KAS) ---
+    let cashAccount = null;
+    const cashAccountSelect = document.getElementById('m-akun-kas');
+    if (cashAccountSelect) {
+        cashAccount = cashAccountSelect.value;
+    }
 
-        const originalText = btnSimpan.innerHTML;
-        btnSimpan.innerHTML = '<i class="fa fa-spinner fa-spin text-lg"></i> Memproses...';
-        btnSimpan.disabled = true;
+    // --- KALKULASI TOTAL BAYAR ---
+    const totalAmountPaid = amountPaid1 + amountPaid2;
 
-        try {
-            const response = await fetch('/admin/cashier/store-payment', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    registration_id: appointmentId, 
-                    payment_method:  paymentMethodName,
-                    payment_type:    document.getElementById('m-tipe')?.value || 'Langsung',
-                    cash_account:    document.getElementById('m-akun-kas')?.value || 'Kas Utama Klinik',
-                    amount_paid:     amountPaid,
-                    change_amount:   changeAmount,
-                    debt_amount:     debtAmount,
-                    status:          statusKasir, 
-                    notes:           notes
-                }) 
+    const paymentMethodSelect = document.getElementById('m-metode');
+    const paymentMethodName = paymentMethodSelect ? paymentMethodSelect.options[paymentMethodSelect.selectedIndex].text : 'Tunai';
+    const notes = document.getElementById('m-notes')?.value || '-';
+
+    let changeAmount = 0;
+    let debtAmount = 0;
+
+    // Perhitungan Kembalian & Hutang berdasarkan TOTAL BAYAR
+    if (totalAmountPaid > currentGrandTotal) {
+        changeAmount = totalAmountPaid - currentGrandTotal;
+    } else if (totalAmountPaid < currentGrandTotal) {
+        debtAmount = currentGrandTotal - totalAmountPaid;
+    }
+
+    // PENENTUAN STATUS (LUNAS / BELUM LUNAS)
+    const statusKasir = debtAmount > 0 ? 'partial' : 'paid';
+
+    const originalText = btnSimpan.innerHTML;
+    btnSimpan.innerHTML = '<i class="fa fa-spinner fa-spin text-lg"></i> Memproses...';
+    btnSimpan.disabled = true;
+
+    try {
+        const response = await fetch('/admin/cashier/store-payment', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                registration_id: appointmentId, 
+                payment_method:  paymentMethodName,
+                payment_type:    document.getElementById('m-tipe')?.value || 'Langsung',
+
+                // Tambahan Field Multi Payment
+                is_multi_payment: isMultiPayment,
+                second_payment_method: secondPaymentMethodName,
+                second_payment_method_id: secondPaymentMethodId,
+                second_payment_amount: amountPaid2,
+
+                // Tambahan cash_account
+                cash_account: cashAccount,
+
+                // Total yang dikirim (amount_paid) bisa di set sebagai total uang fisik yang masuk
+                amount_paid:     totalAmountPaid,
+                change_amount:   changeAmount,
+                debt_amount:     debtAmount,
+                status:          statusKasir, 
+                notes:           notes
+            }) 
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            closePayment();
+
+            showSuccessPopup("Pembayaran Berhasil Disimpan!<br>Nomor Invoice: <b>" + result.invoice_number + "</b>", function() {
+                const showDetail = document.getElementById('m-cb-detail')?.checked !== false;
+                
+                window.onafterprint = function() {
+                    window.location.reload();
+                };
+
+                // Catatan: Jika struk juga butuh menampilkan info Split Bill, 
+                // kamu harus mengupdate fungsi prepareAndPrint untuk menerima parameter tambahan.
+                prepareAndPrint(
+                    result.invoice_number,
+                    activeData.nama,
+                    activeData.dokter,
+                    showDetail ? activeData.tindakanArray : [],
+                    showDetail ? activeData.pricesArray   : [],
+                    showDetail ? activeData.qtyArray       : [],
+                    showDetail ? activeData.diskonArray    : [],
+                    showDetail ? activeData.subtotalArray  : [],
+                    showDetail ? activeData.gigiArray      : [],
+                    paymentMethodName,
+                    activeData.tglInput,
+                    notes,
+                    statusKasir,
+                    totalAmountPaid, // Kirim Total Bayar ke Struk
+                    changeAmount,
+                    debtAmount,
+                    isMultiPayment,          // Kirim status multi payment ke struk (opsional jika struk sudah dukung)
+                    secondPaymentMethodName, // Kirim nama metode ke-2 (opsional)
+                    amountPaid2              // Kirim nominal metode ke-2 (opsional)
+                );
             });
 
-            const result = await response.json();
-
-            if (result.success) {
-                closePayment();
-
-                showSuccessPopup("Pembayaran Berhasil Disimpan!<br>Nomor Invoice: <b>" + result.invoice_number + "</b>", function() {
-                    const showDetail = document.getElementById('m-cb-detail')?.checked !== false;
-                    
-                    // Auto-reload halaman SETELAH print dialog ditutup oleh user
-                    // Aman karena modal sudah ditutup (closePayment) dan CSS print 
-                    // sudah menambahkan .modal-overlay { display: none !important }
-                    window.onafterprint = function() {
-                        window.location.reload();
-                    };
-
-                    prepareAndPrint(
-                        result.invoice_number,
-                        activeData.nama,
-                        activeData.dokter,
-                        showDetail ? activeData.tindakanArray : [],
-                        showDetail ? activeData.pricesArray   : [],
-                        showDetail ? activeData.qtyArray       : [],
-                        showDetail ? activeData.diskonArray    : [],
-                        showDetail ? activeData.subtotalArray  : [],
-                        showDetail ? activeData.gigiArray      : [],
-                        paymentMethodName,
-                        activeData.tglInput,
-                        notes,
-                        statusKasir,
-                        amountPaid,
-                        changeAmount,
-                        debtAmount
-                    );
-                });
-
-            } else {
-                alert("Gagal: " + result.message);
-                btnSimpan.innerHTML = originalText;
-                btnSimpan.disabled = false;
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Terjadi kesalahan koneksi saat memproses pembayaran.");
+        } else {
+            alert("Gagal: " + result.message);
             btnSimpan.innerHTML = originalText;
             btnSimpan.disabled = false;
         }
+    } catch (error) {
+        console.error(error);
+        alert("Terjadi kesalahan koneksi saat memproses pembayaran.");
+        btnSimpan.innerHTML = originalText;
+        btnSimpan.disabled = false;
     }
+}
 
     function showSuccessPopup(message, callback) {
         const overlay = document.createElement('div');
@@ -752,7 +875,7 @@
     }
 
     // PARAMETER DITAMBAH: statusInv, amtPaid, amtChange, amtDebt
-    function prepareAndPrint(inv, nama, dokter, tindakanArray, pricesArray, qtyArray, diskonArray, subtotalArray, gigiArray, metode, tglApt, catatan, statusInv, amtPaid, amtChange, amtDebt) {
+    function prepareAndPrint(inv, nama, dokter, tindakanArray, pricesArray, qtyArray, diskonArray, subtotalArray, gigiArray, metode, tglApt, catatan, statusInv, amtPaid, amtChange, amtDebt, isMultiPayment, secondPaymentMethod, secondPaymentAmount, secondCashAccount) {
         const setHtml = (id, html) => {
             const el = document.getElementById(id);
             if (el) el.innerHTML = html;
@@ -818,8 +941,8 @@
         setHtml('print-harga-awal', formatRp(totalSeluruhSubtotal + totalSeluruhDiskon));
         setHtml('print-diskon', formatRp(totalSeluruhDiskon));
         setHtml('print-total', formatRp(totalSeluruhSubtotal));
+
         setHtml('print-label-transfer', `Dibayar (${metode})`);
-        
         // Gunakan parameter amount yang di-passing, jika kosong / undefined (kasus nota lama), gunakan totalSeluruhSubtotal
         let finalPaid = amtPaid !== undefined ? amtPaid : totalSeluruhSubtotal;
         let finalChange = amtChange !== undefined ? amtChange : 0;
@@ -827,6 +950,22 @@
 
         setHtml('print-dibayar', formatRp(finalPaid));
         setHtml('print-kembali', formatRp(finalChange));
+
+        // SPLIT BILL (MULTI PAYMENT)
+        const rowMulti = document.getElementById('row-print-multi-payment');
+        if (isMultiPayment && secondPaymentAmount && Number(secondPaymentAmount) > 0) {
+            // Label: gunakan nama metode kedua jika ada, default "Metode 2"
+            let label2 = 'Dibayar (Metode 2)';
+            if (secondPaymentMethod && typeof secondPaymentMethod === 'string' && secondPaymentMethod.trim() !== '') {
+                label2 = `Dibayar (${secondPaymentMethod})`;
+            }
+            setHtml('print-label-transfer-2', label2);
+            setHtml('print-dibayar-2', formatRp(secondPaymentAmount));
+            rowMulti.style.display = 'table-row';
+        } else {
+            // Sembunyikan baris jika tidak multi payment
+            rowMulti.style.display = 'none';
+        }
 
         const rowHutang = document.getElementById('row-print-hutang');
         if(statusInv === 'partial' || finalDebt > 0) {

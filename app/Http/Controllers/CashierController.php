@@ -126,6 +126,8 @@ class CashierController extends Controller
             'payment_type'   => 'nullable|string|max:100',
             'cash_account'   => 'nullable|string|max:100',
             'paid_by'        => 'nullable|string|max:255',
+            'second_payment_method_id' => 'nullable|string',
+            'second_payment_amount'    => 'nullable|numeric|min:0',
         ]);
 
         DB::beginTransaction();
@@ -163,6 +165,18 @@ class CashierController extends Controller
                 'rounding'        => 0,
                 'notes'           => $notes,
             ];
+
+            // Simpan is_multi_payment jika ada kolomnya di tabel
+            if (Schema::hasColumn('invoices', 'is_multi_payment')) {
+                $invoicePayload['is_multi_payment'] = $request->is_multi_payment ? 1 : 0;
+            }
+            // Simpan second payment jika ada kolomnya di tabel
+            if (Schema::hasColumn('invoices', 'second_payment_method_id')) {
+                $invoicePayload['second_payment_method_id'] = $request->second_payment_method_id;
+            }
+            if (Schema::hasColumn('invoices', 'second_payment_amount')) {
+                $invoicePayload['second_payment_amount'] = $request->second_payment_amount;
+            }
 
             if (Schema::hasColumn('invoices', 'cash_account')) {
                 $invoicePayload['cash_account'] = $request->cash_account;

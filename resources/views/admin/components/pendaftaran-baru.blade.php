@@ -258,8 +258,8 @@
     };
 
     // null  = dokter belum dipilih / fetch belum selesai
-    // {}    = dokter dipilih tapi tidak punya jadwal aktif
-    // { monday: {start, end}, ... } = jadwal terisi
+    // { isFlexible: true } = dokter fleksibel
+    // { isFlexible: false, monday: {start, end}, ... } = jadwal terisi
     let pbDoctorSchedules = null;
 
     // Flag: apakah saat ini ada pelanggaran jadwal yang hard-block?
@@ -401,6 +401,11 @@
         // Kalau tanggal / jam belum diisi, juga tidak diblokir dulu
         if (!dateVal) return { blocked: false, reason: null };
 
+        // KASUS 0: Dokter Fleksibel
+        if (pbDoctorSchedules.isFlexible) {
+            return { blocked: false, reason: null };
+        }
+
         const dayKey   = getDayKeyFromDate(dateVal);
         const dayLabel = DAY_LABEL[dayKey] || dayKey;
         const sch      = pbDoctorSchedules[dayKey];
@@ -445,6 +450,24 @@
         if (!doctorId || pbDoctorSchedules === null || !dateVal) {
             submitBtn.disabled = false;
             submitBtn.style.opacity = '1';
+            return;
+        }
+
+        // ── KASUS KHUSUS: DOKTER FLEKSIBEL ─────────────────────────────
+        if (pbDoctorSchedules.isFlexible) {
+            dateWarn.style.cssText = 'display:block; margin-top:5px; padding:8px 10px; border-radius:5px; font-size:11px; background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;';
+            dateWarn.innerHTML     = `<i class="fas fa-check-circle"></i> Dokter memiliki <strong>Jadwal Fleksibel</strong>. Bebas memilih waktu.`;
+            
+            if (timeVal) {
+                timeWarn.style.cssText = 'display:block; margin-top:5px; padding:8px 10px; border-radius:5px; font-size:11px; background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;';
+                timeWarn.innerHTML     = `<i class="fas fa-check-circle"></i> Jam <strong>${timeVal}</strong> diterima (Jadwal Fleksibel).`;
+            } else {
+                timeWarn.style.display = 'none';
+            }
+            
+            submitBtn.disabled     = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.cursor  = '';
             return;
         }
 
@@ -540,26 +563,31 @@
             });
             const data = await res.json();
 
-            if (data.success && data.doctor?.schedules) {
-                pbDoctorSchedules = {};
-                data.doctor.schedules.forEach(s => {
-                    if (s.is_active) {
-                        pbDoctorSchedules[s.day] = {
-                            start: s.start_time.substring(0, 5),
-                            end:   s.end_time.substring(0, 5),
-                        };
-                    }
-                });
+            if (data.success && data.doctor) {
+                const doc = data.doctor;
+                pbDoctorSchedules = { isFlexible: !!doc.is_flexible };
 
-                const activeDays = Object.keys(pbDoctorSchedules);
-                if (activeDays.length > 0) {
-                    const lines = activeDays
-                        .map(d => `<span style="display:inline-block; margin-right:8px;"><strong>${DAY_LABEL[d]}:</strong> ${pbDoctorSchedules[d].start}–${pbDoctorSchedules[d].end}</span>`)
-                        .join('');
-                    infoEl.innerHTML = `<i class="fas fa-calendar-check" style="color:#C58F59; margin-right:4px;"></i> <strong>Jadwal praktek:</strong><br>${lines}`;
-                } else {
-                    pbDoctorSchedules = {};
-                    infoEl.innerHTML  = `<i class="fas fa-calendar-times" style="color:#e05252; margin-right:4px;"></i> Dokter belum memiliki jadwal praktek aktif.`;
+                if (doc.is_flexible) {
+                    infoEl.innerHTML = `<i class="fas fa-calendar-check" style="color:#10B981; margin-right:4px;"></i> <strong>Jadwal Fleksibel:</strong> Dokter bisa kerja kapan saja.`;
+                } else if (doc.schedules) {
+                    doc.schedules.forEach(s => {
+                        if (s.is_active) {
+                            pbDoctorSchedules[s.day] = {
+                                start: s.start_time.substring(0, 5),
+                                end:   s.end_time.substring(0, 5),
+                            };
+                        }
+                    });
+
+                    const activeDays = Object.keys(pbDoctorSchedules).filter(k => k !== 'isFlexible');
+                    if (activeDays.length > 0) {
+                        const lines = activeDays
+                            .map(d => `<span style="display:inline-block; margin-right:8px;"><strong>${DAY_LABEL[d]}:</strong> ${pbDoctorSchedules[d].start}–${pbDoctorSchedules[d].end}</span>`)
+                            .join('');
+                        infoEl.innerHTML = `<i class="fas fa-calendar-check" style="color:#C58F59; margin-right:4px;"></i> <strong>Jadwal praktek:</strong><br>${lines}`;
+                    } else {
+                        infoEl.innerHTML  = `<i class="fas fa-calendar-times" style="color:#e05252; margin-right:4px;"></i> Dokter belum memiliki jadwal praktek aktif.`;
+                    }
                 }
             } else {
                 pbDoctorSchedules    = null;

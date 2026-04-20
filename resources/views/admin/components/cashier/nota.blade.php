@@ -98,6 +98,10 @@
                     <td colspan="5" style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;" id="print-label-transfer">Dibayar (Transfer)</td>
                     <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;" id="print-dibayar">Rp0</td>
                 </tr>
+                <tr id="row-print-multi-payment" style="display: none;">
+                    <td colspan="5" style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;" id="print-label-transfer-2">Dibayar (Metode 2)</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: right; font-weight: bold;" id="print-dibayar-2">Rp0</td>
+                </tr>
                 <tr>
                     <td colspan="5" style="border: 1px solid #000; padding: 6px; text-align: right;">Kembali</td>
                     <td style="border: 1px solid #000; padding: 6px; text-align: right;" id="print-kembali">Rp0</td>

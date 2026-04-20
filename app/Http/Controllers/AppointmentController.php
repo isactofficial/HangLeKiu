@@ -136,25 +136,30 @@ class AppointmentController extends Controller
                 ];
                 $dayKey = $dayMap[(int) $appointmentDateTime->dayOfWeek];
 
-                $doctorSchedule = DoctorSchedule::where('doctor_id', $validated['doctor_id'])
-                    ->where('day', $dayKey)
-                    ->where('is_active', true)
-                    ->first();
+                $doctor = Doctor::find($validated['doctor_id']);
+                $isFlexible = (bool)($doctor->is_flexible ?? false);
 
-                if (!$doctorSchedule) {
-                    return back()->withInput()->withErrors([
-                        'appointment_date' => 'Dokter tidak memiliki jadwal praktek pada tanggal yang dipilih.',
-                    ]);
-                }
+                if (!$isFlexible) {
+                    $doctorSchedule = DoctorSchedule::where('doctor_id', $validated['doctor_id'])
+                        ->where('day', $dayKey)
+                        ->where('is_active', true)
+                        ->first();
 
-                $selectedTime = $appointmentDateTime->format('H:i');
-                $startTime = Carbon::parse($doctorSchedule->start_time)->format('H:i');
-                $endTime = Carbon::parse($doctorSchedule->end_time)->format('H:i');
+                    if (!$doctorSchedule) {
+                        return back()->withInput()->withErrors([
+                            'appointment_date' => 'Dokter tidak memiliki jadwal praktek pada tanggal yang dipilih.',
+                        ]);
+                    }
 
-                if ($selectedTime < $startTime || $selectedTime > $endTime) {
-                    return back()->withInput()->withErrors([
-                        'appointment_time' => "Jam kunjungan di luar jadwal praktek dokter ({$startTime} - {$endTime}).",
-                    ]);
+                    $selectedTime = $appointmentDateTime->format('H:i');
+                    $startTime = Carbon::parse($doctorSchedule->start_time)->format('H:i');
+                    $endTime = Carbon::parse($doctorSchedule->end_time)->format('H:i');
+
+                    if ($selectedTime < $startTime || $selectedTime > $endTime) {
+                        return back()->withInput()->withErrors([
+                            'appointment_time' => "Jam kunjungan di luar jadwal praktek dokter ({$startTime} - {$endTime}).",
+                        ]);
+                    }
                 }
 
                 Appointment::create([

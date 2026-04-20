@@ -14,10 +14,7 @@
     @php
         $menuItems = [
             'dashboard-harian' => 'Dashboard Harian',
-            'keuangan' => 'Keuangan',
-            'laporan' => 'Laporan',
-            'pasien' => 'Pasien',
-            'akun' => 'Akun',
+            'laporan'          => 'Laporan',
         ];
         $active = request('menu', 'dashboard-harian');
     @endphp
