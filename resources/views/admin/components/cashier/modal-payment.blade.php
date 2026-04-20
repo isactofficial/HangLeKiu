@@ -95,7 +95,7 @@
                 </div>
             </div>
 
-            {{-- ===== METODE PEMBAYARAN ===== --}}
+           {{-- ===== METODE PEMBAYARAN ===== --}}
             <div>
                 <div style="background:#8B5E3C; color:#fff; padding:7px 14px; border-radius:5px 5px 0 0; font-size:11px; font-weight:700; letter-spacing:0.8px;">METODE PEMBAYARAN</div>
                 <div style="border:1px solid #e5d6c5; border-top:none; border-radius:0 0 5px 5px; padding:16px;">
@@ -103,40 +103,42 @@
                     {{-- Checkbox row --}}
                     <div style="display:flex; gap:20px; margin-bottom:12px; align-items:center;">
                         <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B513E; cursor:pointer;">
-                            <input type="checkbox" id="m-cb-detail" checked style="cursor:pointer; accent-color:#8B5E3C;">
+                            <input type="checkbox" id="m-cb-detail" name="show_detail" checked style="cursor:pointer; accent-color:#8B5E3C;">
                             Tampilkan detail harga per-item pada struk
                         </label>
-                        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:#8B5E3C; cursor:default;" title="Fitur ini belum tersedia">
-                            <input type="checkbox" disabled style="cursor:not-allowed;">
-                            Multi type payment (Split Bill) — <em>Coming soon</em>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:#6B513E; cursor:pointer;">
+                            <input type="checkbox" id="is_multi_payment" name="is_multi_payment" value="1" onchange="toggleMultiPayment()" style="cursor:pointer; accent-color:#8B5E3C;">
+                            Gunakan Multi Payment (Split Bill)
                         </label>
                     </div>
 
-                    {{-- Grid 2 kolom utama --}}
+                    {{-- Grid 2 kolom utama (Pembayaran Pertama) --}}
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 24px;">
 
                         {{-- Kolom kiri: Tipe, Metode, Akun Kas --}}
                         <div style="display:flex; flex-direction:column; gap:12px;">
                             <div>
                                 <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Tipe Pembayaran</label>
-                                <select id="m-tipe" style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; cursor:pointer; outline:none;">
+                                <select id="m-tipe" name="payment_type" style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; cursor:pointer; outline:none;">
                                     <option value="Langsung">Langsung (Full Payment)</option>
                                     <option value="Cicilan">Cicilan</option>
                                 </select>
                             </div>
                             <div>
                                 <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Metode</label>
-                                <select id="m-metode" style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; cursor:pointer; outline:none;">
-                                    <option>Tunai</option>
-                                    <option>Kartu Debit</option>
-                                    <option>Kartu Kredit</option>
-                                    <option>Transfer Bank</option>
-                                    <option>QRIS</option>
-                                </select>
+                                <select id="m-metode" name="payment_method" style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; cursor:pointer; outline:none;>
+                                @foreach(\App\Models\MasterPaymentMethod::where('is_active', true)->get() as $method)
+                                    <option 
+                                        value="{{ $method->id }}"
+                                        data-id="{{ $method->id }}"
+                                        data-name="{{ strtolower($method->name) }}"
+                                    >{{ $method->name }}</option>
+                                @endforeach
+                            </select>
                             </div>
                             <div>
                                 <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Akun Kas</label>
-                                <select id="m-akun-kas" style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; cursor:pointer; outline:none;">
+                                <select id="m-akun-kas" name="cash_account" style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; cursor:pointer; outline:none;">
                                     <option value="Kas Utama Klinik">Kas Utama Klinik</option>
                                     <option value="Kas Kecil">Kas Kecil</option>
                                     <option value="Rekening BCA">Rekening BCA</option>
@@ -148,16 +150,16 @@
                         {{-- Kolom kanan: Diterima, Dibayar Oleh, Kembalian, Hutang --}}
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; align-content:start;">
                             <div>
-                                <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Diterima (Bayar) <span style="color:#ef4444;">*</span></label>
+                                <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Diterima (Bayar 1) <span style="color:#ef4444;">*</span></label>
                                 <div style="display:flex; align-items:center; border:1px solid #e5d6c5; border-radius:5px; overflow:hidden; background:#fff;">
                                     <span style="padding:8px 10px; background:#fdf8f3; border-right:1px solid #e5d6c5; font-size:13px; font-weight:600; color:#6B513E;">Rp</span>
-                                    <input type="text" id="m-input-bayar" oninput="hitungKembalian()"
+                                    <input type="text" id="m-input-bayar" name="payment_amount" oninput="hitungKembalian()"
                                         style="flex:1; padding:8px 10px; border:none; outline:none; font-size:14px; font-weight:700; color:#582C0C; font-family:inherit; background:transparent;">
                                 </div>
                             </div>
                             <div>
                                 <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Dibayar Oleh <span style="color:#ef4444;">*</span></label>
-                                <input type="text" id="m-input-pembayar"
+                                <input type="text" id="m-input-pembayar" name="payer_name"
                                     style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; outline:none; box-sizing:border-box;">
                             </div>
                             <div>
@@ -174,6 +176,43 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- ===== SECTION MULTI PAYMENT (Hidden by default) ===== --}}
+                    <div id="multi_payment_section" style="display:none; margin-top:20px; padding-top:16px; border-top:1px dashed #cba88a;">
+                        <div style="font-size:11px; font-weight:700; color:#8B5E3C; margin-bottom:12px; letter-spacing:0.5px;">RINCIAN PEMBAYARAN KEDUA</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px 24px;">
+                            {{-- Kiri: Metode 2 & Akun Kas 2 --}}
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Metode Ke-2</label>
+                                    <select id="second_payment_method" name="second_payment_method" style="width:100%; padding:8px 10px; border:1px solid #e5d6c5; border-radius:5px; font-size:13px; color:#582C0C; font-family:inherit; background:#fff; cursor:pointer; outline:none;">
+                                        <option value="">-- Pilih Metode Ke-2 --</option>
+                                        {{-- Memanggil variabel payment methods yang sudah diparsing dari controller utama --}}
+                                        @foreach(\App\Models\MasterPaymentMethod::where('is_active', true)->get() as $method)
+                                            <option value="{{ $method->id }}">{{ $method->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            {{-- Kanan: Diterima (Bayar 2) --}}
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <label style="font-size:11px; font-weight:700; color:#6B513E; text-transform:uppercase; display:block; margin-bottom:5px;">Diterima (Bayar 2) <span style="color:#ef4444;">*</span></label>
+                                    <div style="display:flex; align-items:center; border:1px solid #e5d6c5; border-radius:5px; overflow:hidden; background:#fff;">
+                                        <span style="padding:8px 10px; background:#fdf8f3; border-right:1px solid #e5d6c5; font-size:13px; font-weight:600; color:#6B513E;">Rp</span>
+                                        <input type="text" id="m-input-bayar-2" name="second_payment_amount" oninput="hitungKembalian()" placeholder="0"
+                                            style="flex:1; padding:8px 10px; border:none; outline:none; font-size:14px; font-weight:700; color:#582C0C; font-family:inherit; background:transparent;">
+                                    </div>
+                                    <div style="font-size:10px; color:#888; margin-top:5px; line-height:1.4;">
+                                        *Masukkan nominal pembayaran kedua di sini. Total tagihan akan dikurangi nominal ini otomatis.
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -194,3 +233,4 @@
 
     </div>
 </div>
+{{-- Script untuk memunculkan form Multi Payment --}}
