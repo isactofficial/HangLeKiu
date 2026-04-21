@@ -27,6 +27,9 @@ class DashboardUserController extends Controller
         $doctorNotesRows = $this->emptyPaginator('notes_page');
         $odontogramRows = $this->emptyPaginator('odontogram_page');
 
+        // Fix: always define $odontogramData to avoid undefined variable error
+        $odontogramData = [];
+
         $doctors = Doctor::active()
             ->orderBy('full_name')
             ->get(['id', 'full_name']);

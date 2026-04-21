@@ -17,14 +17,14 @@ class OfficeController extends Controller
     public function index(Request $request)
     {
         $activeMenu = $request->query('menu', 'dashboard-harian');
-
+ 
         if ($activeMenu === 'laporan') {
             return $this->handleLaporanMenu($request);
         }
-
+ 
         return $this->handleDashboardHarian($request);
     }
-
+ 
     // ═══════════════════════════════════════════════════════════
     // DASHBOARD HARIAN
     // ═══════════════════════════════════════════════════════════
@@ -33,15 +33,15 @@ class OfficeController extends Controller
         $activeTab = $request->query('tab', 'kunjungan');
         $today     = Carbon::today();
         $yesterday = Carbon::yesterday();
-
+ 
         $countTodayAppts     = Appointment::whereDate('appointment_datetime', $today)->count();
         $countYesterdayAppts = Appointment::whereDate('appointment_datetime', $yesterday)->count();
         $apptDiff            = $countTodayAppts - $countYesterdayAppts;
         $apptTrendClass      = $apptDiff >= 0 ? 'up' : 'down';
-
+ 
         $sumTodayOmzet     = MedicalProcedure::whereDate('created_at', $today)->sum('total_amount');
         $sumYesterdayOmzet = MedicalProcedure::whereDate('created_at', $yesterday)->sum('total_amount');
-
+ 
         $omzetDiffPercent = 0;
         if ($sumYesterdayOmzet > 0) {
             $omzetDiffPercent = (($sumTodayOmzet - $sumYesterdayOmzet) / $sumYesterdayOmzet) * 100;
@@ -49,13 +49,12 @@ class OfficeController extends Controller
             $omzetDiffPercent = 100;
         }
         $omzetTrendClass = $omzetDiffPercent >= 0 ? 'up' : 'down';
-
+ 
         $subFilter = $request->query('sub_filter', 'status');
         $chartData = [];
-
+ 
         if ($activeTab === 'kunjungan') {
             $query = Appointment::whereDate('appointment_datetime', $today);
-
             if ($subFilter === 'status') {
                 $chartData = $query->select('status as label', DB::raw('count(*) as total'))
                     ->groupBy('status')->pluck('total', 'label')->all();
@@ -76,7 +75,7 @@ class OfficeController extends Controller
                     ->groupBy('master_guarantor_type.name')->pluck('total', 'label')->all();
             }
         }
-
+ 
         $tabData = [];
         if ($activeTab === 'prosedur') {
             $tabData = MedicalProcedure::whereDate('created_at', $today)->with(['patient', 'doctor'])->latest()->get();
@@ -84,12 +83,12 @@ class OfficeController extends Controller
             $count   = ProcedureMedicine::whereHas('medicalProcedure', fn($q) => $q->whereDate('created_at', $today))->count();
             $tabData = ['total' => $count];
         }
-
+ 
         $totalMasuk   = $sumTodayOmzet;
         $totalKeluar  = 0;
         $saldoAkhir   = $totalMasuk - $totalKeluar;
         $profitMargin = $totalMasuk > 0 ? ($saldoAkhir / $totalMasuk) * 100 : 0;
-
+ 
         return view('admin.layout.office', [
             'activeMenu'          => 'dashboard-harian',
             'activeTab'           => $activeTab,
@@ -110,22 +109,26 @@ class OfficeController extends Controller
             'profitMargin'        => round($profitMargin, 1),
         ]);
     }
-
+ 
     // ═══════════════════════════════════════════════════════════
-    // LAPORAN (gabungan: Keuangan + Pasien + Akun + dst.)
+    // LAPORAN — menu utama yang menggabungkan semua tab
     // ═══════════════════════════════════════════════════════════
     private function handleLaporanMenu(Request $request)
     {
         $tab     = $request->query('tab', 'keuangan');
         $payload = ['activeMenu' => 'laporan'];
-
+ 
         // ── TAB KEUANGAN ─────────────────────────────────────────
         if ($tab === 'keuangan') {
+ 
+            // Sub-tab keuangan: ikhtisar / pemasukan / pengeluaran / klaim
+            // Pakai parameter 'sub' agar tidak bentrok dengan 'tab' utama
             $subTab    = $request->query('sub', 'ikhtisar');
-            $startDate = $request->query('start_date', now()->startOfMonth()->toDateString());
-            $endDate   = $request->query('end_date',   now()->endOfMonth()->toDateString());
+            $startDate = $request->query('start_date') ?: now()->startOfMonth()->toDateString();
+            $endDate   = $request->query('end_date')   ?: now()->endOfMonth()->toDateString();
             $range     = [$startDate . ' 00:00:00', $endDate . ' 23:59:59'];
-
+ 
+            // Statistik periode
             $directIncome = Invoice::where('payment_type', '!=', 'BPJS')
                 ->whereBetween('created_at', $range)->sum('amount_paid');
             $bpjsIncome   = Invoice::where('payment_type', 'BPJS')
@@ -134,29 +137,43 @@ class OfficeController extends Controller
             $expenses     = ConsumableRestock::where('restock_type', 'restock')
                 ->whereBetween('created_at', $range)
                 ->sum(DB::raw('purchase_price * quantity_added'));
-
+            $margin       = $income - $expenses;
+ 
+            // Statistik lifetime (untuk kartu Total)
             $totalClaims = Invoice::where('payment_type', 'BPJS')->sum('amount_paid');
-            $kas         = Invoice::sum('amount_paid') - ConsumableRestock::where('restock_type', 'restock')
-                ->sum(DB::raw('purchase_price * quantity_added'));
-
+            $kas         = Invoice::sum('amount_paid')
+                - ConsumableRestock::where('restock_type', 'restock')
+                    ->sum(DB::raw('purchase_price * quantity_added'));
+ 
+            // Data tabel sesuai sub-tab
             $tabData = collect();
             if ($subTab === 'pemasukan') {
                 $tabData = Invoice::with(['registration.patient', 'registration.doctor'])
-                    ->whereBetween('created_at', $range)->orderByDesc('created_at')->paginate(10)->withQueryString();
+                    ->whereBetween('created_at', $range)
+                    ->orderByDesc('created_at')
+                    ->paginate(15)
+                    ->withQueryString();
             } elseif ($subTab === 'pengeluaran') {
-                $tabData = ConsumableRestock::with(['item'])->where('restock_type', 'restock')
-                    ->whereBetween('created_at', $range)->orderByDesc('created_at')->paginate(10)->withQueryString();
+                $tabData = ConsumableRestock::with(['item'])
+                    ->where('restock_type', 'restock')
+                    ->whereBetween('created_at', $range)
+                    ->orderByDesc('created_at')
+                    ->paginate(15)
+                    ->withQueryString();
             } elseif ($subTab === 'klaim') {
-                $tabData = Invoice::with(['registration.patient'])->where('payment_type', 'BPJS')
-                    ->whereBetween('created_at', $range)->orderByDesc('created_at')->paginate(10)->withQueryString();
+                $tabData = Invoice::with(['registration.patient'])
+                    ->where('payment_type', 'BPJS')
+                    ->whereBetween('created_at', $range)
+                    ->orderByDesc('created_at')
+                    ->paginate(15)
+                    ->withQueryString();
             }
-
+ 
             $payload = array_merge($payload, compact(
                 'subTab', 'startDate', 'endDate',
-                'directIncome', 'income', 'expenses',
+                'directIncome', 'income', 'expenses', 'margin',
                 'totalClaims', 'kas', 'tabData'
             ));
-            $payload['margin'] = $income - $expenses;
         }
 
         // ── TAB PASIEN ───────────────────────────────────────────
@@ -267,73 +284,114 @@ class OfficeController extends Controller
                 'patients'
             ));
         }
+        // ═══════════════════════════════════════════════════════════
+        // TAB: AKUN — bagian dari handleLaporanMenu()
+        // Ganti blok elseif ($tab === 'akun') yang lama dengan ini
+        // ═══════════════════════════════════════════════════════════
+        
         elseif ($tab === 'akun') {
-    $subTab    = $request->query('sub', 'ikhtisar');
-    $startDate = $request->query('start_date', now()->startOfMonth()->toDateString());
-    $endDate   = $request->query('end_date',   now()->endOfMonth()->toDateString());
-    $range     = [$startDate . ' 00:00:00', $endDate . ' 23:59:59'];
-
-    // 1. KATEGORI KAS TUNAI (Laci Kasir)
-    $kasTunaiIncome = \App\Models\Invoice::whereIn('cash_account', ['Kas Utama Klinik', 'Kas Kecil'])
-                        ->where('payment_type', '!=', 'BPJS')
-                        ->sum('amount_paid');
-    
-    // Pengeluaran restock biasanya diambil dari Kas Utama
-    $totalExpense = \Illuminate\Support\Facades\DB::table('consumable_restock')
-                        ->where('restock_type', 'restock')
-                        ->sum(\Illuminate\Support\Facades\DB::raw('purchase_price * quantity_added'));
-    
-    $saldoKasTunai = $kasTunaiIncome - $totalExpense;
-
-    // 2. KATEGORI REKENING BANK / QRIS
-    $saldoBank = \App\Models\Invoice::where('cash_account', 'like', 'Rekening%')
-                        ->sum('amount_paid');
-
-    // 3. KATEGORI PIUTANG (BPJS / Asuransi)
-    // Piutang adalah tagihan yang statusnya 'BPJS' tapi uangnya belum cair ke Bank
-    $totalPiutangBPJS = \App\Models\Invoice::where('payment_type', 'BPJS')
-                        ->sum('amount_paid');
-
-    // 4. DATA MUTASI (Berdasarkan Filter Tanggal)
-    $mutasiKas = \App\Models\Invoice::whereIn('cash_account', ['Kas Utama Klinik', 'Kas Kecil'])
-                    ->whereBetween('created_at', $range)->sum('amount_paid');
-    
-    $mutasiBank = \App\Models\Invoice::where('cash_account', 'like', 'Rekening%')
-                    ->whereBetween('created_at', $range)->sum('amount_paid');
-
-    $mutasiBPJS = \App\Models\Invoice::where('payment_type', 'BPJS')
-                    ->whereBetween('created_at', $range)->sum('amount_paid');
-
-    // 5. DATA GRAFIK (6 Bulan Terakhir)
-    $chartLabels = []; $chartDataKas = []; $chartDataBank = []; $chartDataBPJS = [];
-
-    for ($i = 5; $i >= 0; $i--) {
-        $month = now()->subMonths($i);
-        $chartLabels[] = $month->translatedFormat('M Y');
-        $mStart = $month->copy()->startOfMonth();
-        $mEnd = $month->copy()->endOfMonth();
-
-        $chartDataKas[] = \App\Models\Invoice::whereIn('cash_account', ['Kas Utama Klinik', 'Kas Kecil'])->whereBetween('created_at', [$mStart, $mEnd])->sum('amount_paid');
-        $chartDataBank[] = \App\Models\Invoice::where('cash_account', 'like', 'Rekening%')->whereBetween('created_at', [$mStart, $mEnd])->sum('amount_paid');
-        $chartDataBPJS[] = \App\Models\Invoice::where('payment_type', 'BPJS')->whereBetween('created_at', [$mStart, $mEnd])->sum('amount_paid');
-    }
-
-    return view('admin.layout.office', array_merge($payload, [
-        'tab' => $tab,
-        'startDate' => $startDate,
-        'endDate' => $endDate,
-        'saldoKasTunai' => $saldoKasTunai,
-        'saldoBank' => $saldoBank,
-        'totalPiutangBPJS' => $totalPiutangBPJS,
-        'mutasiKas' => $mutasiKas,
-        'mutasiBank' => $mutasiBank,
-        'mutasiBPJS' => $mutasiBPJS,
-        'chartLabels' => $chartLabels,
-        'chartDataKas' => $chartDataKas,
-        'chartDataBank' => $chartDataBank,
-        'chartDataBPJS' => $chartDataBPJS,
-    ]));
-}
+        
+            // ── Periode filter ────────────────────────────────────
+            // Kalau tidak ada input tanggal dari user, default ke bulan ini
+            $startDate = $request->query('start_date')
+                ?: now()->startOfMonth()->toDateString();
+            $endDate   = $request->query('end_date')
+                ?: now()->endOfMonth()->toDateString();
+        
+            $range = [
+                $startDate . ' 00:00:00',
+                $endDate   . ' 23:59:59',
+            ];
+        
+            // ── 1. SALDO KARTU — semua pakai $range ──────────────
+            // (supaya angka di kartu berubah sesuai filter)
+        
+            // Kas Tunai: invoice yang dibayar lewat Kas Utama / Kas Kecil
+            $saldoKasTunai = Invoice::whereIn('cash_account', ['Kas Utama Klinik', 'Kas Kecil'])
+                ->where('payment_type', '!=', 'BPJS')
+                ->whereBetween('created_at', $range)
+                ->sum('amount_paid');
+        
+            // Pengeluaran restock dalam periode (dikurangi dari kas tunai)
+            $pengeluaranPeriode = ConsumableRestock::where('restock_type', 'restock')
+                ->whereBetween('created_at', $range)
+                ->sum(DB::raw('purchase_price * quantity_added'));
+        
+            // Saldo kas tunai bersih periode ini
+            $saldoKasTunai = max(0, $saldoKasTunai - $pengeluaranPeriode);
+        
+            // Bank & QRIS: invoice yang dibayar lewat rekening
+            $saldoBank = Invoice::where('cash_account', 'like', 'Rekening%')
+                ->whereBetween('created_at', $range)
+                ->sum('amount_paid');
+        
+            // Piutang BPJS: invoice BPJS yang belum lunas dalam periode
+            $totalPiutangBPJS = Invoice::where('payment_type', 'BPJS')
+                ->whereIn('status', ['unpaid', 'partial'])
+                ->whereBetween('created_at', $range)
+                ->sum('amount_paid');
+        
+            // ── 2. MUTASI PERIODE (teks kecil di bawah kartu) ────
+            // Mutasi = total transaksi masuk dalam $range per kategori
+        
+            $mutasiKas = Invoice::whereIn('cash_account', ['Kas Utama Klinik', 'Kas Kecil'])
+                ->where('payment_type', '!=', 'BPJS')
+                ->whereBetween('created_at', $range)
+                ->sum('amount_paid');
+        
+            $mutasiBank = Invoice::where('cash_account', 'like', 'Rekening%')
+                ->whereBetween('created_at', $range)
+                ->sum('amount_paid');
+        
+            $mutasiBPJS = Invoice::where('payment_type', 'BPJS')
+                ->whereBetween('created_at', $range)
+                ->sum('amount_paid');
+        
+            // ── 3. DATA GRAFIK — 6 bulan terakhir ────────────────
+            // Grafik selalu menampilkan 6 bulan terakhir (tidak ikut filter),
+            // supaya trend tetap terlihat meski user filter ke 1 minggu saja.
+            $chartLabels   = [];
+            $chartDataKas  = [];
+            $chartDataBank = [];
+            $chartDataBPJS = [];
+        
+            for ($i = 5; $i >= 0; $i--) {
+                $month  = now()->subMonths($i);
+                $mStart = $month->copy()->startOfMonth();
+                $mEnd   = $month->copy()->endOfMonth();
+        
+                $chartLabels[] = $month->translatedFormat('M Y');
+        
+                $chartDataKas[] = Invoice::whereIn('cash_account', ['Kas Utama Klinik', 'Kas Kecil'])
+                    ->where('payment_type', '!=', 'BPJS')
+                    ->whereBetween('created_at', [$mStart, $mEnd])
+                    ->sum('amount_paid');
+        
+                $chartDataBank[] = Invoice::where('cash_account', 'like', 'Rekening%')
+                    ->whereBetween('created_at', [$mStart, $mEnd])
+                    ->sum('amount_paid');
+        
+                $chartDataBPJS[] = Invoice::where('payment_type', 'BPJS')
+                    ->whereBetween('created_at', [$mStart, $mEnd])
+                    ->sum('amount_paid');
+            }
+        
+            // ── Merge ke payload ──────────────────────────────────
+            $payload = array_merge($payload, [
+                'startDate'        => $startDate,
+                'endDate'          => $endDate,
+                'saldoKasTunai'    => $saldoKasTunai,
+                'saldoBank'        => $saldoBank,
+                'totalPiutangBPJS' => $totalPiutangBPJS,
+                'mutasiKas'        => $mutasiKas,
+                'mutasiBank'       => $mutasiBank,
+                'mutasiBPJS'       => $mutasiBPJS,
+                'chartLabels'      => $chartLabels,
+                'chartDataKas'     => $chartDataKas,
+                'chartDataBank'    => $chartDataBank,
+                'chartDataBPJS'    => $chartDataBPJS,
+            ]);
+        }
         // ── TAB AKUN / OPERASIONAL / BPJS / GRAFIK ──────────────
         // Tab statis, tidak butuh data tambahan
         else {

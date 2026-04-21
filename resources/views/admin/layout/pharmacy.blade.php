@@ -32,27 +32,20 @@
         </div>
         <div class="apt-header-actions">
             <div class="apt-date-nav">
-                <a href="#" class="apt-icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                </a>
                 <div class="apt-date-text">
                     <span class="apt-date-day">
                         {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('l') }}
                     </span>
-
                     <span class="apt-date-full">
-                    {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('j F Y') }}
-                </span>
+                        {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('j F Y') }}
+                    </span>
                 </div>
-                <a href="#" class="apt-icon-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                </a>
             </div>
-            <a href="#" class="apt-icon-btn apt-refresh-btn" title="Refresh">
+            <a href="#" class="apt-icon-btn apt-refresh-btn ml-2" title="Refresh" style="margin-left:12px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M21.015 4.353v4.992"/>
                 </svg>
-            </a>
+            </a>        
         </div>
     </div>
 
@@ -250,7 +243,15 @@ function konfirmasiHapus(pesan, onKonfirm) {
     modal.onclick = (e) => { if (e.target === modal) tutup(); };
     newKonfirm.onclick = () => { tutup(); onKonfirm(); };
 }
-
+ document.addEventListener('DOMContentLoaded', function() {
+    var refreshBtn = document.querySelector('.apt-refresh-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.reload();
+        });
+    }
+});
 </script>
 
 @endsection

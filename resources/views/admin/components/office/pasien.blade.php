@@ -236,23 +236,22 @@
 
                     <div class="pas-search-box">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B513E" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
                         </svg>
-                        <input type="text" name="search" value="{{ request('search') }}"
-                               placeholder="Nama, No MR, No KTP, HP..."
-                               onchange="document.getElementById('filterForm').submit()">
+
+                        <input 
+                            type="text"
+                            id="searchInput"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Nama, No MR, No KTP, HP..."
+                        >
                     </div>
 
                 </form>
 
-                <button class="pas-btn-export" onclick="exportPatientCsv()">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Export CSV
-                </button>
+                
             </div>
         </div>
 
@@ -423,13 +422,34 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script>
+
+let searchTimeout;
+
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── Change per-page ──────────────────────────────────────────
+    const form = document.getElementById('filterForm');
+    const searchInput = document.getElementById('searchInput');
+    const refreshBtn = document.getElementById('keuRefreshBtn');
+
+    // 🔍 SEARCH (DEBOUNCE)
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(() => {
+                if (this.value.length >= 2 || this.value.length === 0) {
+                    form.submit();
+                }
+            }, 500);
+        });
+    }
+
+    // 📄 PER PAGE
     window.changePerPage = function(val) {
         document.getElementById('perPageHidden').value = val;
-        document.getElementById('filterForm').submit();
+        form.submit();
     };
+
 
     // ── Export CSV ───────────────────────────────────────────────
     window.exportPatientCsv = function() {

@@ -210,7 +210,7 @@
 <body class="bg-[var(--color-background-primary)] text-[var(--font-color-primary)] flex flex-col min-h-screen font-sans">
     @include('user.components.navbarWelcome')
 
-    <div id="navbarSpacer" class="h-24 md:h-28 w-full shrink-0"></div>
+    <div id="navbarSpacer" class="h-24 md:h-28 w-full shrink-0 mb-6 md:mb-10"></div>
 
     <main class="grow pb-12">
 
@@ -307,69 +307,167 @@
 
                     {{-- DAFTAR KUNJUNGAN --}}
                     <div class="dash-card bg-white rounded-3xl overflow-hidden mb-10 relative">
-                        <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 flex items-center justify-between gap-4 relative z-10">
-                            <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
-                                <svg class="w-6 h-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                                <span class="truncate">Daftar Kunjungan</span>
-                            </h2>
-                            <a href="{{ route('registration.form') }}" class="shrink-0 px-4 py-2 rounded-lg bg-[var(--font-color-primary)] hover:brightness-110 text-white font-medium transition text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                Tambah Kunjungan
-                            </a>
-                        </div>
-                        <div class="p-8 lg:p-10 relative z-10">
-                            @php
-                                $statusFormat = ['pending' => ['bg-amber-100', 'text-amber-800', 'Menunggu'], 'confirmed' => ['bg-blue-100', 'text-blue-800', 'Terkonfirmasi'], 'waiting' => ['bg-indigo-100', 'text-indigo-800', 'Dalam Antrean'], 'engaged' => ['bg-cyan-100', 'text-cyan-800', 'Sedang Dilayani'], 'done' => ['bg-emerald-100', 'text-emerald-800', 'Selesai'], 'cancelled' => ['bg-red-100', 'text-red-800', 'Batal']];
-                            @endphp
-                            <div class="overflow-x-auto visit-scroll rounded-2xl border border-[#EBDCCF] shadow-sm">
-                                <table class="min-w-full text-sm text-left w-full">
-                                    <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold">
-                                        <tr>
-                                            <th class="px-4 py-4 text-center w-12">No</th>
-                                            <th class="px-4 py-4 whitespace-nowrap">Status</th>
-                                            <th class="px-4 py-4 whitespace-nowrap">Tgl Kunjungan</th>
-                                            <th class="px-4 py-4 whitespace-nowrap">Tgl Dibuat</th>
-                                            <th class="px-4 py-4 whitespace-nowrap">Poli</th>
-                                            <th class="px-4 py-4 min-w-[200px]">Rencana Tindakan</th>
-                                            <th class="px-4 py-4 min-w-[150px]">Dokter Pemeriksa</th>
-                                            <th class="px-4 py-4 whitespace-nowrap">Metode Bayar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-[#EFE3D7] bg-white">
-                                        @forelse($activeRegistrations as $row)
-                                            @php $activeStat = $statusFormat[strtolower($row->status)] ?? ['bg-slate-100', 'text-slate-800', ucfirst($row->status)]; @endphp
-                                            <tr class="hover:bg-slate-50 transition align-middle">
-                                                <td class="px-4 py-3 text-center font-medium text-[var(--font-color-secondary)]">{{ $loop->iteration }}</td>
-                                                <td class="px-4 py-3 whitespace-nowrap"><span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-bold {{ $activeStat[0] }} {{ $activeStat[1] }}">{{ $activeStat[2] }}</span></td>
-                                                <td class="px-4 py-3 font-bold text-[var(--font-color-primary)] whitespace-nowrap">{{ optional($row->appointment_datetime)->format('d M Y - H:i') ?? '-' }}</td>
-                                                <td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap">{{ optional($row->created_at)->format('d M Y') ?? '-' }}</td>
-                                                <td class="px-4 py-3 font-medium text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->poli->name ?? '-' }}</td>
-                                                <td class="px-4 py-3 text-[var(--font-color-secondary)] max-w-[200px] truncate" title="{{ $row->procedure_plan ?? '-' }}">{{ $row->procedure_plan ?? '-' }}</td>
-                                                <td class="px-4 py-3 text-[var(--font-color-primary)] whitespace-nowrap">{{ $row->doctor->full_name ?? '-' }}</td>
-                                                <td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap"><span class="uppercase text-xs font-bold tracking-wide">{{ $row->paymentMethod->name ?? $row->payment_method ?? 'UMUM' }}</span></td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="8" class="px-4 py-12 text-center text-[var(--font-color-secondary)]">
-                                                    <div class="flex flex-col items-center justify-center">
-                                                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
-                                                        <p class="font-bold text-[var(--font-color-primary)] mb-1">Belum ada data kunjungan</p>
-                                                        <p class="text-sm">Klik tombol "Tambah Kunjungan" untuk mendaftar antrean.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                            @if($activeRegistrations->hasPages())
-                                <div class="mt-5 px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl">
-                                    <span class="text-sm text-[var(--font-color-secondary)] font-medium">Menampilkan {{ $activeRegistrations->firstItem() ?? 0 }} - {{ $activeRegistrations->lastItem() ?? 0 }} dari {{ $activeRegistrations->total() }} data</span>
-                                    <div class="flex items-center gap-1 visit-pagination">{{ $activeRegistrations->links('pagination::tailwind') }}</div>
-                                </div>
-                            @endif
-                        </div>
+
+                    <!-- HEADER -->
+                    <div class="px-8 lg:px-10 py-6 border-b border-[#EFE3D7]/60 
+                                flex flex-col sm:flex-row sm:items-center sm:justify-between 
+                                gap-4 relative z-10">
+
+                        <!-- Judul -->
+                        <h2 class="text-xl font-bold text-[var(--font-color-primary)] flex items-center gap-2">
+                            <svg class="w-6 h-6 text-[var(--color-primary)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
+                            </svg>
+                            <span class="truncate">Daftar Kunjungan</span>
+                        </h2>
+
+                        <!-- Tombol -->
+                        <a href="{{ route('registration.form') }}"
+                        class="w-full sm:w-auto sm:ml-auto 
+                                px-4 py-2 rounded-lg 
+                                bg-[var(--font-color-primary)] hover:brightness-110 
+                                text-white font-medium transition text-xs shadow-sm 
+                                flex items-center justify-center gap-1.5 whitespace-nowrap">
+
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4">
+                                </path>
+                            </svg>
+
+                            Tambah Kunjungan
+                        </a>
+
                     </div>
+
+                    <!-- CONTENT -->
+                    <div class="p-8 lg:p-10 relative z-10">
+
+                        @php
+                            $statusFormat = [
+                                'pending' => ['bg-amber-100', 'text-amber-800', 'Menunggu'],
+                                'confirmed' => ['bg-blue-100', 'text-blue-800', 'Terkonfirmasi'],
+                                'waiting' => ['bg-indigo-100', 'text-indigo-800', 'Dalam Antrean'],
+                                'engaged' => ['bg-cyan-100', 'text-cyan-800', 'Sedang Dilayani'],
+                                'done' => ['bg-emerald-100', 'text-emerald-800', 'Selesai'],
+                                'cancelled' => ['bg-red-100', 'text-red-800', 'Batal']
+                            ];
+                        @endphp
+
+                        <div class="overflow-x-auto visit-scroll rounded-2xl border border-[#EBDCCF] shadow-sm">
+                            <table class="min-w-full text-sm text-left w-full">
+
+                                <thead class="bg-[#FEFCFA] border-b border-[#EBDCCF] text-[var(--font-color-secondary)] uppercase text-xs tracking-wider font-bold">
+                                    <tr>
+                                        <th class="px-4 py-4 text-center w-12">No</th>
+                                        <th class="px-4 py-4 whitespace-nowrap">Status</th>
+                                        <th class="px-4 py-4 whitespace-nowrap">Tgl Kunjungan</th>
+                                        <th class="px-4 py-4 whitespace-nowrap">Tgl Dibuat</th>
+                                        <th class="px-4 py-4 whitespace-nowrap">Poli</th>
+                                        <th class="px-4 py-4 min-w-[200px]">Rencana Tindakan</th>
+                                        <th class="px-4 py-4 min-w-[150px]">Dokter Pemeriksa</th>
+                                        <th class="px-4 py-4 whitespace-nowrap">Metode Bayar</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody class="divide-y divide-[#EFE3D7] bg-white">
+                                    @forelse($activeRegistrations as $row)
+
+                                        @php
+                                            $activeStat = $statusFormat[strtolower($row->status)] 
+                                                ?? ['bg-slate-100', 'text-slate-800', ucfirst($row->status)];
+                                        @endphp
+
+                                        <tr class="hover:bg-slate-50 transition align-middle">
+                                            <td class="px-4 py-3 text-center font-medium text-[var(--font-color-secondary)]">
+                                                {{ $loop->iteration }}
+                                            </td>
+
+                                            <td class="px-4 py-3 whitespace-nowrap">
+                                                <span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-bold {{ $activeStat[0] }} {{ $activeStat[1] }}">
+                                                    {{ $activeStat[2] }}
+                                                </span>
+                                            </td>
+
+                                            <td class="px-4 py-3 font-bold text-[var(--font-color-primary)] whitespace-nowrap">
+                                                {{ optional($row->appointment_datetime)->format('d M Y - H:i') ?? '-' }}
+                                            </td>
+
+                                            <td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap">
+                                                {{ optional($row->created_at)->format('d M Y') ?? '-' }}
+                                            </td>
+
+                                            <td class="px-4 py-3 font-medium text-[var(--font-color-primary)] whitespace-nowrap">
+                                                {{ $row->poli->name ?? '-' }}
+                                            </td>
+
+                                            <td class="px-4 py-3 text-[var(--font-color-secondary)] max-w-[200px] truncate"
+                                                title="{{ $row->procedure_plan ?? '-' }}">
+                                                {{ $row->procedure_plan ?? '-' }}
+                                            </td>
+
+                                            <td class="px-4 py-3 text-[var(--font-color-primary)] whitespace-nowrap">
+                                                {{ $row->doctor->full_name ?? '-' }}
+                                            </td>
+
+                                            <td class="px-4 py-3 text-[var(--font-color-secondary)] whitespace-nowrap">
+                                                <span class="uppercase text-xs font-bold tracking-wide">
+                                                    {{ $row->paymentMethod->name ?? $row->payment_method ?? 'UMUM' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="px-4 py-12 text-center text-[var(--font-color-secondary)]">
+                                                <div class="flex flex-col items-center justify-center">
+
+                                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                                                        <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+
+                                                    <p class="font-bold text-[var(--font-color-primary)] mb-1">
+                                                        Belum ada data kunjungan
+                                                    </p>
+
+                                                    <p class="text-sm">
+                                                        Klik tombol "Tambah Kunjungan" untuk mendaftar antrean.
+                                                    </p>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if($activeRegistrations->hasPages())
+                            <div class="mt-5 px-6 py-4 border-t border-[#EBDCCF] bg-[#FEFCFA] 
+                                        flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl">
+
+                                <span class="text-sm text-[var(--font-color-secondary)] font-medium">
+                                    Menampilkan {{ $activeRegistrations->firstItem() ?? 0 }} 
+                                    - {{ $activeRegistrations->lastItem() ?? 0 }} 
+                                    dari {{ $activeRegistrations->total() }} data
+                                </span>
+
+                                <div class="flex items-center gap-1 visit-pagination">
+                                    {{ $activeRegistrations->links('pagination::tailwind') }}
+                                </div>
+                            </div>
+                        @endif
+
+                    </div>
+                </div>
 
                     {{-- RIWAYAT MEDIS --}}
                     <div class="dash-card bg-white rounded-3xl overflow-hidden mb-10 relative">
@@ -380,10 +478,28 @@
                             </h2>
                         </div>
                         <div class="p-8 lg:p-10 relative z-10">
-                            <div class="flex flex-wrap gap-2 mb-6 bg-[#FEFCFA] p-1.5 rounded-xl border border-[#EFE3D7] inline-flex shadow-sm">
-                                <button type="button" data-tab="registrasi" class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold bg-[var(--font-color-primary)] text-white shadow-sm transition">Kunjungan</button>
-                                <button type="button" data-tab="catatan-dokter" class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold text-[var(--font-color-secondary)] hover:text-[var(--font-color-primary)] transition">Catatan Dokter</button>
-                                <button type="button" data-tab="odontogram" class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold text-[var(--font-color-secondary)] hover:text-[var(--font-color-primary)] transition">Odontogram Gigi</button>
+                            <div class="flex flex-wrap justify-center gap-2 mb-6 
+                                        bg-[#FEFCFA] p-1.5 rounded-xl border border-[#EFE3D7] 
+                                        w-full shadow-sm">
+
+                                <button type="button" data-tab="registrasi"
+                                    class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold 
+                                        bg-[var(--font-color-primary)] text-white shadow-sm transition">
+                                    Kunjungan
+                                </button>
+
+                                <button type="button" data-tab="catatan-dokter"
+                                    class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold 
+                                        text-[var(--font-color-secondary)] hover:text-[var(--font-color-primary)] transition">
+                                    Catatan Dokter
+                                </button>
+
+                                <button type="button" data-tab="odontogram"
+                                    class="history-tab-btn px-6 py-2.5 rounded-lg text-sm font-bold 
+                                        text-[var(--font-color-secondary)] hover:text-[var(--font-color-primary)] transition">
+                                    Odontogram Gigi
+                                </button>
+
                             </div>
 
                             {{-- TAB: KUNJUNGAN --}}

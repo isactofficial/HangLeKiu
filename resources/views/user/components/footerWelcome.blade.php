@@ -49,7 +49,7 @@
                     <li><a href="{{ url('/') }}"
                             class="text-[16px] font-regular text-[#582C0C] hover:text-[#A0703E] transition-colors">Beranda</a>
                     </li>
-                    <li><a href="{{ url('/#pelayanan') }}"
+                    <li><a href="{{ url('/pelayanan/dokter') }}"
                             class="text-[16px] font-normal text-[#582C0C] hover:text-[#A0703E] transition-colors">Pelayanan</a>
                     </li>
                     <li><a href="{{ route('klinik') }}"

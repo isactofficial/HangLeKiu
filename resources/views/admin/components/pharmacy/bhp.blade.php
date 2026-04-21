@@ -19,15 +19,6 @@
                 Tambah Data BHP
             </button>
 
-            <div class="apt-dropdown">
-                <button class="apt-btn-secondary" data-dropdown-trigger>
-                    Export Excel
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-                </button>
-                <div class="apt-dropdown-menu">
-                    <div class="apt-dropdown-item active">Semua</div>
-                </div>
-            </div>
         </div>
     </div>
 
