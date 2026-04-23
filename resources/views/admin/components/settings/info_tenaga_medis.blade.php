@@ -103,7 +103,6 @@
       align-items: flex-start;
       padding: calc(76px + env(safe-area-inset-top)) 10px 10px;
     }
-
     .modal {
       max-height: calc(100vh - 86px - env(safe-area-inset-top));
       border-radius: 12px;
@@ -251,6 +250,25 @@
                             <label class="form-label">Bio Singkat</label>
                             <textarea class="form-input" name="bio"></textarea>
                         </div>
+
+                        {{-- ✅ SOSIAL MEDIA --}}
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <svg style="display:inline;vertical-align:-2px;margin-right:4px;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C58F59" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#C58F59" stroke="none"/></svg>
+                                    Instagram
+                                </label>
+                                <input class="form-input" name="instagram_url" placeholder="@username atau URL lengkap">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <svg style="display:inline;vertical-align:-2px;margin-right:4px;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#582C0C" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><path d="M7 10v7M12 10v7M12 7a2 2 0 1 1 4 0v10"/></svg>
+                                    LinkedIn
+                                </label>
+                                <input class="form-input" name="linkedin_url" placeholder="URL atau username">
+                            </div>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">Urutan Tampil (Carousel)</label>
@@ -529,7 +547,6 @@ function openAdd() {
   document.getElementById('formTitle').textContent = 'Tambah Tenaga Medis';
   document.getElementById('docForm').reset();
   
-  // Reset labels
   document.getElementById('upFotoLabel').textContent = 'Klik untuk upload';
   document.getElementById('upShadowLabel').textContent = 'Klik untuk upload';
   document.getElementById('upBadge1Label').textContent = 'Logo universitas 1';
@@ -552,7 +569,6 @@ function openEdit(id) {
 
   openOverlay('formOverlay');
   
-  // Ambil detail lengkap dari server
   fetch('/admin/settings/doctor/' + id, { headers: { 'Accept': 'application/json' } })
     .then(res => res.json())
     .then(data => {
@@ -584,6 +600,10 @@ function openEdit(id) {
           if(doc.sip_expiry_date) f.sip_expiry_date.value = doc.sip_expiry_date.split(' ')[0];
           f.license_no.value = doc.license_no || '';
 
+          // ✅ Sosial Media
+          f.instagram_url.value = doc.instagram_url || '';
+          f.linkedin_url.value = doc.linkedin_url || '';
+
           if(doc.schedules && Array.isArray(doc.schedules)) {
              doc.schedules.forEach(s => {
                  const ds = s.day;
@@ -604,7 +624,6 @@ function saveDoctor(e) {
   e.preventDefault();
   const form = document.getElementById('docForm');
 
-  // Validasi Jadwal: Wajib pilih (Jam Tetap ATAU Fleksibel)
   const isFlexible = form.is_flexible.checked;
   const activeSchedules = form.querySelectorAll('input[name^="schedules"][name$="[is_active]"]:checked');
   if (!isFlexible && activeSchedules.length === 0) {
@@ -613,14 +632,12 @@ function saveDoctor(e) {
   }
 
   const formData = new FormData(form);
-
   if (editingId) formData.append('_method', 'PUT');
 
   const url = editingId ? `/admin/settings/doctor/${editingId}` : '/admin/settings/manajemen-staff/doctor';
-  const method = 'POST';
   
   fetch(url, {
-    method,
+    method: 'POST',
     body: formData,
     headers: { 
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -632,7 +649,7 @@ function saveDoctor(e) {
     if (data.success) {
       alert('Dokter berhasil disimpan!');
       closeOverlay('formOverlay');
-      loadDoctors(); // Reload list
+      loadDoctors();
     } else {
       let errorMsg = data.message || 'Gagal simpan';
       if (data.errors) {
@@ -685,7 +702,7 @@ function setUploadLabel(inputId, labelId) {
 }
 
 function loadDoctors() {
-  fetch('/admin/settings', { // The route is /admin/settings for DoctorController@index
+  fetch('/admin/settings', {
     headers: { 'Accept': 'application/json' }
   })
   .then(res => res.json())
@@ -696,10 +713,8 @@ function loadDoctors() {
   .catch(console.error);
 }
 
-// Init
 loadDoctors();
 
-// Close modals on overlay click / escape
 document.querySelectorAll('.overlay').forEach(el => {
   el.addEventListener('click', function(e) { if (e.target === this) closeOverlay(this.id); });
 });

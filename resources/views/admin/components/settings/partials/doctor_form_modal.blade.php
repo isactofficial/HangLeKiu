@@ -86,6 +86,22 @@
                             </div>
                         </div>
 
+                        {{-- SOSIAL MEDIA --}}
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="ms-field">
+                                <label for="instagram_url" style="color: #8A6B52; font-weight: 700; font-size: 11px; text-transform: uppercase;">
+                                    <i class="fa-brands fa-instagram" style="margin-right: 4px;"></i> Instagram
+                                </label>
+                                <input id="instagram_url" name="instagram_url" type="text" value="{{ old('instagram_url') }}" placeholder="@username atau URL" style="border-bottom: 1px solid #C58F59;">
+                            </div>
+                            <div class="ms-field">
+                                <label for="linkedin_url" style="color: #8A6B52; font-weight: 700; font-size: 11px; text-transform: uppercase;">
+                                    <i class="fa-brands fa-linkedin" style="margin-right: 4px;"></i> LinkedIn
+                                </label>
+                                <input id="linkedin_url" name="linkedin_url" type="text" value="{{ old('linkedin_url') }}" placeholder="URL atau username" style="border-bottom: 1px solid #C58F59;">
+                            </div>
+                        </div>
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             {{-- Placeholder TTD Digital --}}
                             <div class="ms-field">
@@ -113,7 +129,6 @@
                         @foreach($days as $dayKey => $dayLabel)
                             <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #eee;">
                                 <label style="font-weight: bold; font-size: 13px; min-width: 100px; display: flex; align-items: center; cursor: pointer; color: #4b5563;">
-                                    {{-- Input Checkbox dengan Accent Color Cokelat dan Margin Kanan --}}
                                     <input type="checkbox" 
                                         name="schedules[{{ $dayKey }}][is_active]" 
                                         value="1" 
@@ -206,7 +221,6 @@
         const cancelBtn = document.getElementById('ms-cancel-doctor-modal');
         const doctorForm = document.getElementById('ms-doctor-form');
 
-        // Preview Image
         const setupPreview = (inputId, previewId) => {
             const input = document.getElementById(inputId);
             const preview = document.getElementById(previewId);
@@ -230,7 +244,6 @@
         openBtn?.addEventListener('click', () => toggleModal(true));
         [closeBtn, cancelBtn].forEach(btn => btn?.addEventListener('click', () => toggleModal(false)));
 
-        // Validasi Submit
         doctorForm?.addEventListener('submit', (e) => {
             let valid = true;
             doctorForm.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
@@ -254,31 +267,25 @@
     })();
 
     function previewImage(input, imgId, iconId, boxId) {
-    const preview = document.getElementById(imgId);
-    const icon = document.getElementById(iconId);
-    const box = document.getElementById(boxId);
+        const preview = document.getElementById(imgId);
+        const icon = document.getElementById(iconId);
+        const box = document.getElementById(boxId);
 
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-            // Sembunyikan ikon, munculkan gambar
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-            icon.style.display = 'none';
-            
-            // Beri border cokelat biar cakep kalau ada isinya
-            box.style.borderColor = '#C58F59';
-            box.style.background = '#fff';
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                icon.style.display = 'none';
+                box.style.borderColor = '#C58F59';
+                box.style.background = '#fff';
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.style.display = 'none';
+            icon.style.display = 'block';
+            box.style.borderColor = '#ddd';
+            box.style.background = '#f9f9f9';
         }
-
-        reader.readAsDataURL(input.files[0]);
-    } else {
-        // Jika batal pilih file, balikin ke ikon
-        preview.style.display = 'none';
-        icon.style.display = 'block';
-        box.style.borderColor = '#ddd';
-        box.style.background = '#f9f9f9';
     }
-}
 </script>

@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
             --primary-brown: #582C0C;
@@ -20,6 +21,33 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-cream);
+        }
+        .sosmed-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.25s ease;
+        }
+        .sosmed-icon.ig {
+            border: 2px solid #C18B51;
+            color: #C18B51;
+        }
+        .sosmed-icon.ig:hover {
+            background: #C18B51;
+            color: white;
+        }
+        .sosmed-icon.li {
+            border: 2px solid #582C0C;
+            color: #582C0C;
+        }
+        .sosmed-icon.li:hover {
+            background: #582C0C;
+            color: white;
         }
     </style>
 </head>
@@ -88,11 +116,42 @@
                                 @endif
 
                                 @if($doctor->subspecialization)
-                                    <p class="text-[13px] text-[#6B513E] italic mb-4">
+                                    <p class="text-[13px] text-[#6B513E] italic mb-3">
                                         {{ $doctor->subspecialization }}
                                     </p>
                                 @else
-                                    <div class="mb-4"></div>
+                                    <div class="mb-3"></div>
+                                @endif
+
+                                {{-- Sosial Media --}}
+                                @if($doctor->instagram_url || $doctor->linkedin_url)
+                                    <div class="flex items-center gap-2 mb-4">
+                                        @if($doctor->instagram_url)
+                                            @php
+                                                $igUrl = str_starts_with($doctor->instagram_url, 'http')
+                                                    ? $doctor->instagram_url
+                                                    : 'https://instagram.com/' . ltrim($doctor->instagram_url, '@');
+                                            @endphp
+                                            <a href="{{ $igUrl }}" target="_blank" rel="noopener noreferrer"
+                                               class="sosmed-icon ig"
+                                               title="Instagram {{ $doctor->full_name }}">
+                                                <i class="fa-brands fa-instagram"></i>
+                                            </a>
+                                        @endif
+
+                                        @if($doctor->linkedin_url)
+                                            @php
+                                                $liUrl = str_starts_with($doctor->linkedin_url, 'http')
+                                                    ? $doctor->linkedin_url
+                                                    : 'https://linkedin.com/in/' . ltrim($doctor->linkedin_url, '/');
+                                            @endphp
+                                            <a href="{{ $liUrl }}" target="_blank" rel="noopener noreferrer"
+                                               class="sosmed-icon li"
+                                               title="LinkedIn {{ $doctor->full_name }}">
+                                                <i class="fa-brands fa-linkedin-in"></i>
+                                            </a>
+                                        @endif
+                                    </div>
                                 @endif
 
                                 {{-- Jadwal --}}
@@ -141,7 +200,6 @@
     {{-- Call to Action Section --}}
     <section class="mb-24 px-6 md:px-10 lg:px-16 w-full max-w-7xl mx-auto">
         <div class="bg-[var(--accent-brown)] rounded-[40px] p-10 md:p-16 text-center shadow-2xl relative overflow-hidden">
-            {{-- Decorative circles --}}
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32"></div>
             
@@ -162,10 +220,5 @@
 
     @include('user.components.footerWelcome')
 
-    <script>
-        (function () {
-            // no-op: hero section removed
-        })();
-    </script>
 </body>
 </html>

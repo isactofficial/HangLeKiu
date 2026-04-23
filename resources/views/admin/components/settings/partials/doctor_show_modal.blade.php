@@ -3,7 +3,6 @@
 <div id="ms-doctor-show-modal" class="ms-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
     <div class="ms-modal-card" style="background: white; width: 90%; max-width: 1000px; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
         
-        {{-- Header --}}
         <div class="ms-modal-header" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;">
             <h3 style="color: #8A6B52; font-weight: 800; margin: 0; text-transform: uppercase; font-size: 18px;">
                 <i class="fa fa-info-circle" style="margin-right: 8px; color: #C58F59;"></i> Detail Tenaga Medis
@@ -12,7 +11,6 @@
         </div>
 
         <div id="show-modal-content" style="max-height: 85vh; overflow-y: auto;">
-            {{-- Konten Utama (Akan diisi via AJAX) --}}
             <div style="padding: 40px; text-align: center;">
                 <i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #C58F59;"></i>
                 <p style="color: #8A6B52;">Memuat data tenaga medis...</p>
@@ -50,39 +48,56 @@
 
     function renderDoctorDetail(doctor) {
         const content = document.getElementById('show-modal-content');
+
         const formatDisplayDate = (value) => {
             if (!value) return '-';
             const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
                 ? new Date(`${value}T00:00:00`)
                 : new Date(value);
-
-            if (Number.isNaN(date.getTime())) {
-                return value;
-            }
-
-            return new Intl.DateTimeFormat('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            }).format(date);
+            if (Number.isNaN(date.getTime())) return value;
+            return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
         };
+
+        // Sosial Media HTML
+        let socialHtml = '';
+        if (doctor.instagram_url || doctor.linkedin_url) {
+            socialHtml = `<div style="display: flex; align-items: center; gap: 10px; margin-top: 12px;">`;
+            if (doctor.instagram_url) {
+                const igUrl = doctor.instagram_url.startsWith('http')
+                    ? doctor.instagram_url
+                    : 'https://instagram.com/' + doctor.instagram_url.replace(/^@/, '');
+                socialHtml += `
+                    <a href="${igUrl}" target="_blank" rel="noopener noreferrer"
+                       style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:2px solid #C58F59; color:#C58F59; text-decoration:none; transition:all 0.2s;"
+                       onmouseover="this.style.background='#C58F59';this.style.color='white';"
+                       onmouseout="this.style.background='transparent';this.style.color='#C58F59';"
+                       title="Instagram">
+                        <i class="fa-brands fa-instagram" style="font-size:14px;"></i>
+                    </a>`;
+            }
+            if (doctor.linkedin_url) {
+                const liUrl = doctor.linkedin_url.startsWith('http')
+                    ? doctor.linkedin_url
+                    : 'https://linkedin.com/in/' + doctor.linkedin_url.replace(/^\//, '');
+                socialHtml += `
+                    <a href="${liUrl}" target="_blank" rel="noopener noreferrer"
+                       style="display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:2px solid #582C0C; color:#582C0C; text-decoration:none; transition:all 0.2s;"
+                       onmouseover="this.style.background='#582C0C';this.style.color='white';"
+                       onmouseout="this.style.background='transparent';this.style.color='#582C0C';"
+                       title="LinkedIn">
+                        <i class="fa-brands fa-linkedin-in" style="font-size:14px;"></i>
+                    </a>`;
+            }
+            socialHtml += `</div>`;
+        }
         
-        // Render List Jadwal
+        // Jadwal
         let scheduleHtml = '';
         const dayNames = { monday: 'Senin', tuesday: 'Selasa', wednesday: 'Rabu', thursday: 'Kamis', friday: 'Jumat', saturday: 'Sabtu', sunday: 'Minggu' };
-        
-        // Buat urutan indeks untuk sorting dari Senin (1) ke Minggu (7)
         const dayOrder = { monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6, sunday: 7 };
         
         if(doctor.schedules && doctor.schedules.length > 0) {
-            
-            // LAKUKAN SORTING DI SINI SEBELUM DI-LOOPING
-            doctor.schedules.sort((a, b) => {
-                let orderA = dayOrder[a.day.toLowerCase()] || 99; // 99 jika nama hari tidak valid
-                let orderB = dayOrder[b.day.toLowerCase()] || 99;
-                return orderA - orderB;
-            });
-
+            doctor.schedules.sort((a, b) => (dayOrder[a.day.toLowerCase()] || 99) - (dayOrder[b.day.toLowerCase()] || 99));
             doctor.schedules.forEach(s => {
                 scheduleHtml += `
                     <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #eee; margin-bottom: 8px;">
@@ -97,7 +112,6 @@
         }
 
         content.innerHTML = `
-            {{-- CONTAINER ATAS: PROFIL & JADWAL --}}
             <div style="display: flex; gap: 30px; padding: 20px; border-bottom: 1px solid #eee;">
                 
                 {{-- KOLOM KIRI: PROFIL --}}
@@ -109,7 +123,7 @@
                     <div style="display: flex; flex-direction: column; gap: 15px;">
                         <div style="display: flex; gap: 20px; align-items: flex-start;">
                             <div style="width: 100px; height: 130px; border: 2px solid #C58F59; border-radius: 8px; overflow: hidden; background: #fdfaf8;">
-                                <img src="${doctor.foto_profil ? '/storage/'+doctor.foto_profil : 'https://ui-avatars.com/api/?name='+doctor.full_name+'&background=fdfaf8&color=8A6B52'}" 
+                                <img src="${doctor.foto_profil ? '/storage/'+doctor.foto_profil : 'https://ui-avatars.com/api/?name='+encodeURIComponent(doctor.full_name)+'&background=fdfaf8&color=8A6B52'}" 
                                      style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
@@ -123,6 +137,7 @@
                                     <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block;">Email Kontak</label>
                                     <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${doctor.email || '-'}</div>
                                 </div>
+                                ${socialHtml}
                             </div>
                         </div>
 
@@ -176,14 +191,12 @@
                 </div>
             </div>
 
-            {{-- SECTION BAWAH: LEGALITAS (3 KOLOM) --}}
             <section style="padding: 25px;">
                 <h4 style="margin-top: 0; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #C58F59; color: #8A6B52; font-weight: 800; text-transform: uppercase; font-size: 13px;">
                     <i class="fa fa-file-medical" style="margin-right: 8px; color: #C58F59;"></i> Legalitas (STR, SIP, Lisensi)
                 </h4>
                 
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                    {{-- BARIS 1 --}}
                     <div>
                         <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block;">Nomor Lisensi Klinik</label>
                         <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${doctor.license_no || '-'}</div>
@@ -197,8 +210,7 @@
                         <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${doctor.sip_number || '-'}</div>
                     </div>
 
-                    {{-- BARIS 2 --}}
-                    <div></div> {{-- Spacer --}}
+                    <div></div>
                     <div>
                         <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block;">Instansi STR</label>
                         <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${doctor.str_institution || '-'}</div>
@@ -208,8 +220,7 @@
                         <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${doctor.sip_institution || '-'}</div>
                     </div>
 
-                    {{-- BARIS 3 --}}
-                    <div></div> {{-- Spacer --}}
+                    <div></div>
                     <div>
                         <label style="font-size: 10px; color: #8A6B52; font-weight: 700; text-transform: uppercase; display:block;">Masa Berlaku STR</label>
                         <div style="font-size: 14px; color: #555; border-bottom: 1px solid #C58F59; padding-bottom: 4px;">${formatDisplayDate(doctor.str_expiry_date)}</div>
