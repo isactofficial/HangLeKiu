@@ -267,103 +267,113 @@ class EmrController extends Controller
         ->orderBy('appointment_datetime', 'desc')
         ->get();
 
-        // Mengambil data metode pembayaran (Tunai, QRIS, dll)
-        $paymentMethods = DB::table('master_payment_method')
-            ->where('is_active', 1)
+        // Ambil invoice manual (tanpa registration_id)
+        $manualInvoices = \App\Models\Invoice::with(['admin'])
+            ->select('*')
+            ->whereNull('registration_id')
+            ->orderBy('created_at', 'desc')
             ->get();
 
+        // Mengambil data metode pembayaran (Tunai, QRIS, dll)
+        $paymentMethods = DB::table('master_payment_method')
+            ->select('id', 'name', 'is_active')
+            ->where('is_active', 1)
+            ->get();
+        
         return view('admin.pages.cashier', [
             'appointments' => $appointments,
+            'manualInvoices' => $manualInvoices,
             'paymentMethods' => $paymentMethods
         ]);
     }
 
     public function storePayment(Request $request)
-        {
-            // 1. Tambahkan validasi untuk 'status' dan input Multi Payment
-            $request->validate([
-                'registration_id'       => 'required',
-                'payment_method'        => 'required',
-                'payment_type'          => 'nullable|string|max:100',
-                'cash_account'          => 'nullable|string|max:100',
-                'amount_paid'           => 'required|numeric', // Nominal bayar pertama (atau total yg diinput)
-                'change_amount'         => 'required|numeric',
-                'debt_amount'           => 'required|numeric',
-                'status'                => 'required|in:paid,partial,unpaid',
-                // Validasi untuk Multi Payment (hanya wajib jika is_multi_payment dicentang/bernilai 1)
-                'is_multi_payment'      => 'nullable',
-                'second_payment_method' => 'required_if:is_multi_payment,1|nullable|string|max:100',
-                'second_cash_account'   => 'nullable|string|max:100',
-                'second_payment_amount' => 'required_if:is_multi_payment,1|nullable|numeric',
-            ]);
+{
+    // 1. Tambahkan validasi untuk 'status' dan input Multi Payment
+    $request->validate([
+        'registration_id'       => 'required',
+        'payment_method'        => 'required',
+        'payment_type'          => 'nullable|string|max:100',
+        'cash_account'          => 'nullable|string|max:100',
+        'amount_paid'           => 'required|numeric', // Nominal bayar pertama (atau total yg diinput)
+        'change_amount'         => 'required|numeric',
+        'debt_amount'           => 'required|numeric',
+        'status'                => 'required|in:paid,partial,unpaid',
+        // Validasi untuk Multi Payment (hanya wajib jika is_multi_payment bernilai 1)
+        'is_multi_payment'      => 'nullable',
+        'second_payment_method' => 'required_if:is_multi_payment,1|nullable|string|max:100',
+        'second_cash_account'   => 'nullable|string|max:100',
+        'second_payment_amount' => 'required_if:is_multi_payment,1|nullable|numeric',
+    ]);
 
-            DB::beginTransaction();
-            try {
-                // Generate Nomor Invoice Otomatis (Format: INV-YYYYMMDD-0001)
-                $datePrefix = date('Ymd');
-                $lastInvoice = Invoice::where('invoice_number', 'like', 'INV-' . $datePrefix . '-%')
-                                    ->orderBy('invoice_number', 'desc')
-                                    ->first();
-                                    
-                $nextSeq = $lastInvoice ? ((int) substr($lastInvoice->invoice_number, -4)) + 1 : 1;
-                $invoiceNumber = 'INV-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
-                $receiptNumber = 'REC-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+    DB::beginTransaction();
+    try {
+        // Generate Nomor Invoice Otomatis (Format: INV-YYYYMMDD-0001)
+        $datePrefix = date('Ymd');
+        $lastInvoice = Invoice::where('invoice_number', 'like', 'INV-' . $datePrefix . '-%')
+                            ->orderBy('invoice_number', 'desc')
+                            ->first();
+                            
+        $nextSeq = $lastInvoice ? ((int) substr($lastInvoice->invoice_number, -4)) + 1 : 1;
+        $invoiceNumber = 'INV-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+        $receiptNumber = 'REC-' . $datePrefix . '-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
 
-                // Cek apakah mode multi payment aktif (dicentang)
-                $isMultiPayment = $request->has('is_multi_payment') && $request->is_multi_payment == 1;
+        // Cek apakah mode multi payment aktif (dikirim sebagai 1 atau 0 dari JS)
+        $isMultiPayment = $request->is_multi_payment == 1;
 
-                // 2. Simpan data transaksi ke tabel invoices, TERMASUK status & multi payment
+        // 2. Simpan data transaksi ke tabel invoices, TERMASUK status & multi payment
+        $invoicePayload = [
+            'registration_id' => $request->registration_id,
+            'admin_id'        => Auth::id() ?? '49f9ad75-bd0b-43ca-8a19-a9adebfd0c5f', // Fallback ID
+            'invoice_number'  => $invoiceNumber,
+            'receipt_number'  => $receiptNumber,
+            'payment_type'    => $request->payment_type ?? 'Langsung',
+            'payment_method'  => $request->payment_method, // Metode ke-1
+            'amount_paid'     => $request->amount_paid,    // Diterima ke-1
+            'change_amount'   => $request->change_amount,
+            'debt_amount'     => $request->debt_amount,
+            'status'          => $request->status, 
+            'rounding'        => 0,
+            'notes'           => $request->notes,
 
-                $invoicePayload = [
-                    'registration_id' => $request->registration_id,
-                    'admin_id'        => Auth::id() ?? '49f9ad75-bd0b-43ca-8a19-a9adebfd0c5f', // Fallback ID
-                    'invoice_number'  => $invoiceNumber,
-                    'receipt_number'  => $receiptNumber,
-                    'payment_type'    => $request->payment_type ?? 'Langsung',
-                    'payment_method'  => $request->payment_method, // Metode ke-1
-                    'amount_paid'     => $request->amount_paid,    // Diterima ke-1
-                    'change_amount'   => $request->change_amount,
-                    'debt_amount'     => $request->debt_amount,
-                    'status'          => $request->status, 
-                    'rounding'        => 0,
-                    'notes'           => $request->notes,
+            // ---- FIELD MULTI PAYMENT BARU ----
+            'is_multi_payment'         => $isMultiPayment,
+            // PERBAIKAN: Gunakan key 'second_payment_method_id' karena itu nama asli kolom di database,
+            // dan kita isi dengan nama metode (string) yang ada di $request->second_payment_method
+            'second_payment_method_id' => $isMultiPayment ? $request->second_payment_method : null,
+            'second_payment_amount'    => $isMultiPayment ? $request->second_payment_amount : null,
+        ];
 
-                    // ---- FIELD MULTI PAYMENT BARU ----
-                    'is_multi_payment'      => $isMultiPayment,
-                    'second_payment_method' => $isMultiPayment ? $request->second_payment_method : null,
-                    'second_payment_amount' => $isMultiPayment ? $request->second_payment_amount : null,
-                ];
-
-                // Simpan cash_account jika ada kolomnya
-                if (Schema::hasColumn('invoices', 'cash_account')) {
-                    $invoicePayload['cash_account'] = $request->cash_account;
-                }
-                // Simpan second_cash_account jika multi payment dan ada kolomnya
-                if ($isMultiPayment && Schema::hasColumn('invoices', 'second_cash_account')) {
-                    $invoicePayload['second_cash_account'] = $request->second_cash_account;
-                }
-
-                $invoice = Invoice::create($invoicePayload);
-
-                // Update status pendaftaran menjadi 'succeed' atau status selesai lainnya
-                Appointment::where('id', $request->registration_id)->update([
-                    'status' => 'succeed'
-                ]);
-
-                DB::commit();
-
-                return response()->json([
-                    'success'        => true,
-                    'message'        => 'Pembayaran berhasil disimpan!',
-                    'invoice_number' => $invoiceNumber
-                ]);
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
-                ], 500);
-            }
+        // Simpan cash_account jika ada kolomnya
+        if (Schema::hasColumn('invoices', 'cash_account')) {
+            $invoicePayload['cash_account'] = $request->cash_account;
         }
+        // Simpan second_cash_account jika multi payment dan ada kolomnya
+        if ($isMultiPayment && Schema::hasColumn('invoices', 'second_cash_account')) {
+            $invoicePayload['second_cash_account'] = $request->second_cash_account;
+        }
+
+        $invoice = Invoice::create($invoicePayload);
+
+        // Update status pendaftaran menjadi 'succeed' atau status selesai lainnya
+        Appointment::where('id', $request->registration_id)->update([
+            'status' => 'succeed'
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'success'        => true,
+            'message'        => 'Pembayaran berhasil disimpan!',
+            'invoice_number' => $invoiceNumber
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

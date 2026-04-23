@@ -207,13 +207,19 @@
 
                                 // Pembayaran kedua (split bill)
                                 $isMultiPayment = $invoice && property_exists($invoice, 'is_multi_payment') ? ($invoice->is_multi_payment ? true : false) : false;
-                                $secondPaymentMethod = $invoice && property_exists($invoice, 'second_payment_method') ? $invoice->second_payment_method : null;
+
+                                // KARENA NAMANYA ADALAH second_payment_method_id, KITA PANGGIL SESUAI NAMA KOLOMNYA
+                                $secondPaymentMethod = $invoice && property_exists($invoice, 'second_payment_method_id') ? $invoice->second_payment_method_id : null;
                                 $secondPaymentAmount = $invoice && property_exists($invoice, 'second_payment_amount') ? (float) $invoice->second_payment_amount : 0;
                                 $secondCashAccount = $invoice && property_exists($invoice, 'second_cash_account') ? $invoice->second_cash_account : null;
 
                                 // 5. Variabel Display & Data JS
                                 $invoiceNo = $invoice ? $invoice->invoice_number : 'INV' . \Carbon\Carbon::parse($apt->appointment_datetime)->format('Ymd') . str_pad($apt->id, 3, '0', STR_PAD_LEFT);
                                 $metodeBayar = $invoice ? $invoice->payment_method : ($apt->paymentMethod->name ?? 'Belum Ditentukan');
+
+                                // PERBAIKAN: Gunakan $metodeBayar2 untuk loop EMR, jangan gunakan $inv di sini
+                                $metodeBayar2 = $isMultiPayment ? ($secondPaymentMethod ?? 'Belum Ditentukan') : null;
+
                                 $catatanInvoice = $invoice ? ($invoice->notes ?? '-') : '-';
                                 $tglInputStr = \Carbon\Carbon::parse($apt->appointment_datetime)->format('d-m-Y H:i').' WIB';
 
@@ -270,6 +276,12 @@
                                                 <span style="color: #C58F59; font-weight: 800; font-size: 11px; background: #fdfaf8; padding: 2px 10px; border-radius: 4px; border: 1px solid #f0e6dd; display: inline-block; letter-spacing: 0.5px;">
                                                     {{ strtoupper($metodeBayar) }}
                                                 </span>
+                                                @if($metodeBayar2)
+                                                    {{-- Samakan styling badge (warna biru) dengan metode bayar 2 di EMR --}}
+                                                    <span style="color: #C58F59; font-weight: 700; font-size: 10px; background: #fdfaf8; padding: 2px 10px; border-radius: 4px; border: 1px solid #f0e6dd; display: inline-block; letter-spacing: 0.5px; margin-left: 4px;">
+                                                        {{ strtoupper($metodeBayar2) }}
+                                                    </span>
+                                                @endif
                                             </span>
                                         </div>
                                     </td>
@@ -335,9 +347,85 @@
                                 </td>
                                 </tr>
                             @empty
+                                {{-- No EMR appointments, but may have manual invoices --}}
+                            @endforelse
+
+                            {{-- Tampilkan invoice manual (tanpa registration) --}}
+                            @forelse($manualInvoices as $inv)
+                                <tr class="patient-row">
+                                    <td style="vertical-align: top; padding: 15px 10px;">
+                                        <div class="invoice-date" style="font-size: 11px; color: #6B513E;">
+                                            {{ $inv->created_at ? \Carbon\Carbon::parse($inv->created_at)->format('d M Y') : '-' }}
+                                        </div>
+                                        <div class="invoice-number" style="font-weight: 800; color: #C58F59;">
+                                            {{ $inv->invoice_number ?? '-' }}
+                                        </div>
+                                    </td>
+                                    <td class="patient-name" style="vertical-align: top; padding: 15px 10px; font-weight: 700; color: #6B513E;">
+                                        {{-- Nama pasien dari relasi atau notes --}}
+                                        @php
+                                            $manualPatient = null;
+                                            if (isset($inv->patient_id)) {
+                                                $manualPatient = \App\Models\Patient::find($inv->patient_id);
+                                            }
+                                        @endphp
+                                        {{ $manualPatient ? $manualPatient->full_name : ($inv->notes ? (Str::contains($inv->notes, 'Dibayar oleh:') ? Str::after($inv->notes, 'Dibayar oleh:') : 'Manual/Tidak Dikenal') : 'Manual/Tidak Dikenal') }}
+                                    </td>
+                                    <td style="vertical-align: top; padding: 15px 10px;">
+                                        <div class="keterangan-grid" style="display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; align-items: start;">
+                                            <span class="ket-label" style="font-size: 11px; color: #6B513E; text-transform: uppercase; font-weight: 700; margin-top: 2px;">Metode Bayar</span>
+                                            <span class="ket-value">
+                                                <span style="color: #C58F59; font-weight: 800; font-size: 11px; background: #fdfaf8; padding: 2px 10px; border-radius: 4px; border: 1px solid #f0e6dd; display: inline-block; letter-spacing: 0.5px;">
+                                                    {{ strtoupper($inv->payment_method) }}
+                                                </span>
+                                                @if(!empty($inv->second_payment_method_id))
+                                                    <span style="color: #C58F59; font-weight: 800; font-size: 11px; background: #fdfaf8; padding: 2px 10px; border-radius: 4px; border: 1px solid #f0e6dd; display: inline-block; letter-spacing: 0.5px; margin-left: 4px;">
+                                                        {{ $inv->second_payment_method_id }}
+                                                    </span>
+                                                @endif
+                                            </span>
+                                            <span class="ket-label" style="font-size: 11px; color: #6B513E; text-transform: uppercase; font-weight: 700; margin-top: 2px;">Catatan</span>
+                                            <span class="ket-value" style="font-size: 12px; color: #6B513E;">{{ $inv->notes ?? '-' }}</span>
+                                        </div>
+                                    </td>
+                                    <td style="vertical-align: top; text-align: center; padding: 15px 10px;">
+                                        <div class="flex items-center justify-center gap-2">
+                                            @if($inv->status === 'paid')
+                                                <span class="badge-lunas-hijau">Lunas</span>
+                                            @elseif($inv->status === 'partial')
+                                                <span class="badge-belum-lunas">Belum Lunas</span>
+                                            @else
+                                                <span class="badge-belum-lunas">Unpaid</span>
+                                            @endif
+                                            {{-- Tombol Nota --}}
+                                            <button class="flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-white transition-colors bg-[#8e6a45] border-2 border-[#8e6a45] rounded shadow-sm hover:bg-[#7a5938] hover:border-[#7a5938]"
+                                                onclick="prepareAndPrint(
+                                                    @json($inv->invoice_number),
+                                                    @json($manualPatient ? $manualPatient->full_name : 'Manual/Tidak Dikenal'),
+                                                    '-',
+                                                    [], [], [], [], [],
+                                                    @json(strtoupper($inv->payment_method)),
+                                                    @json($inv->created_at ? \Carbon\Carbon::parse($inv->created_at)->format('d-m-Y H:i').' WIB' : '-'),
+                                                    @json($inv->notes ?? '-'),
+                                                    @json($inv->status),
+                                                    {{ (float) $inv->amount_paid }},
+                                                    {{ (float) $inv->change_amount }},
+                                                    {{ (float) $inv->debt_amount }},
+                                                    @json($inv->is_multi_payment ?? false),
+                                                    @json($inv->second_payment_method ?? null),
+                                                    {{ (float) ($inv->second_payment_amount ?? 0) }},
+                                                    @json($inv->second_cash_account ?? null)
+                                                )"
+                                            >
+                                                <i class="fa fa-print"></i> Nota
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
                                 <tr>
                                     <td colspan="4" style="text-align: center; padding: 60px 20px; color: #94a3b8;">
-                                        <p>Belum ada antrean pembayaran dari EMR.</p>
+                                        <p>Belum ada antrean pembayaran dari EMR maupun pembayaran manual.</p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -680,11 +768,14 @@ function hitungKembalian() {
     // PENENTUAN STATUS (LUNAS / BELUM LUNAS)
     const statusKasir = debtAmount > 0 ? 'partial' : 'paid';
 
+    // Perbaikan: amount_paid (payment pertama) harus amountPaid1 jika multi payment, jika tidak multi payment tetap totalAmountPaid
+    let amountPaidToSend = isMultiPayment ? amountPaid1 : totalAmountPaid;
+
     const originalText = btnSimpan.innerHTML;
     btnSimpan.innerHTML = '<i class="fa fa-spinner fa-spin text-lg"></i> Memproses...';
     btnSimpan.disabled = true;
 
-    try {
+   try {
         const response = await fetch('/admin/cashier/store-payment', {
             method: 'POST',
             headers: {
@@ -697,8 +788,10 @@ function hitungKembalian() {
                 payment_method:  paymentMethodName,
                 payment_type:    document.getElementById('m-tipe')?.value || 'Langsung',
 
-                // Tambahan Field Multi Payment
-                is_multi_payment: isMultiPayment,
+                // PERBAIKAN UTAMA: Ubah boolean menjadi 1 atau 0 
+                is_multi_payment: isMultiPayment ? 1 : 0, 
+
+                // Field Multi Payment
                 second_payment_method: secondPaymentMethodName,
                 second_payment_method_id: secondPaymentMethodId,
                 second_payment_amount: amountPaid2,
@@ -706,8 +799,8 @@ function hitungKembalian() {
                 // Tambahan cash_account
                 cash_account: cashAccount,
 
-                // Total yang dikirim (amount_paid) bisa di set sebagai total uang fisik yang masuk
-                amount_paid:     totalAmountPaid,
+                // amount_paid: payment pertama saja jika multi payment, jika tidak multi payment kirim total
+                amount_paid:     amountPaidToSend,
                 change_amount:   changeAmount,
                 debt_amount:     debtAmount,
                 status:          statusKasir, 
@@ -942,19 +1035,23 @@ function hitungKembalian() {
         setHtml('print-diskon', formatRp(totalSeluruhDiskon));
         setHtml('print-total', formatRp(totalSeluruhSubtotal));
 
-        setHtml('print-label-transfer', `Dibayar (${metode})`);
-        // Gunakan parameter amount yang di-passing, jika kosong / undefined (kasus nota lama), gunakan totalSeluruhSubtotal
+
+        // SPLIT BILL (MULTI PAYMENT)
+        const rowMulti = document.getElementById('row-print-multi-payment');
         let finalPaid = amtPaid !== undefined ? amtPaid : totalSeluruhSubtotal;
         let finalChange = amtChange !== undefined ? amtChange : 0;
         let finalDebt = amtDebt !== undefined ? amtDebt : 0;
 
-        setHtml('print-dibayar', formatRp(finalPaid));
-        setHtml('print-kembali', formatRp(finalChange));
-
-        // SPLIT BILL (MULTI PAYMENT)
-        const rowMulti = document.getElementById('row-print-multi-payment');
         if (isMultiPayment && secondPaymentAmount && Number(secondPaymentAmount) > 0) {
-            // Label: gunakan nama metode kedua jika ada, default "Metode 2"
+            // Label dan nominal pembayaran pertama sesuai metode pertama
+            let label1 = 'Dibayar (Metode 1)';
+            if (metode && typeof metode === 'string' && metode.trim() !== '') {
+                label1 = `Dibayar (${metode})`;
+            }
+            setHtml('print-label-transfer', label1);
+            setHtml('print-dibayar', formatRp(finalPaid));
+
+            // Label dan nominal pembayaran kedua sesuai metode kedua
             let label2 = 'Dibayar (Metode 2)';
             if (secondPaymentMethod && typeof secondPaymentMethod === 'string' && secondPaymentMethod.trim() !== '') {
                 label2 = `Dibayar (${secondPaymentMethod})`;
@@ -963,9 +1060,16 @@ function hitungKembalian() {
             setHtml('print-dibayar-2', formatRp(secondPaymentAmount));
             rowMulti.style.display = 'table-row';
         } else {
-            // Sembunyikan baris jika tidak multi payment
+            // Jika bukan multi payment, hanya tampilkan satu baris pembayaran
+            let label1 = 'Dibayar';
+            if (metode && typeof metode === 'string' && metode.trim() !== '') {
+                label1 = `Dibayar (${metode})`;
+            }
+            setHtml('print-label-transfer', label1);
+            setHtml('print-dibayar', formatRp(finalPaid));
             rowMulti.style.display = 'none';
         }
+        setHtml('print-kembali', formatRp(finalChange));
 
         const rowHutang = document.getElementById('row-print-hutang');
         if(statusInv === 'partial' || finalDebt > 0) {

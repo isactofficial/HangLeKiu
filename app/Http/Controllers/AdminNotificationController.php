@@ -73,11 +73,13 @@ class AdminNotificationController extends Controller
         $appointment->update([
             'appointment_datetime' => $request->appointment_datetime,
             'admin_id'             => auth()->id(),
+            'status'               => 'confirmed',
+            'confirmed_at'         => now(),
         ]);
 
         return response()->json([
             'success'      => true,
-            'message'      => 'Jadwal berhasil diubah.',
+            'message'      => 'Jadwal berhasil diubah & dikonfirmasi.',
             'new_datetime' => $appointment->appointment_datetime,
         ]);
     }

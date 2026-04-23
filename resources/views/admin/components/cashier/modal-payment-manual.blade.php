@@ -91,10 +91,7 @@
                     </div>
                     <div style="display:flex; justify-content:flex-end; align-items:center; gap:20px; margin-top:14px; padding-top:12px; border-top:1px solid #f0ebe4;">
                         <div style="font-size:13px; color:#6B513E;">Total : <span id="pm-grand-total" style="font-size:20px; font-weight:800; color:#582C0C; margin-left:6px;">Rp0</span></div>
-                        <button onclick="pmPrintPreview()" style="background:none; border:1.5px solid #A67C52; color:#A67C52; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Instrument Sans',sans-serif; letter-spacing:0.5px; transition:all 0.2s;"
-                            onmouseover="this.style.background='#A67C52';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='#A67C52'">
-                            <i class="fa fa-print" style="margin-right:5px;"></i>PRINT
-                        </button>
+                        
                     </div>
                 </div>
             </div>
@@ -229,7 +226,7 @@
 
 {{-- ===== STYLES ===== --}}
 <style>
-.pm-section { border-radius:8px; overflow:hidden; border:1px solid #E5D6C5; }
+.pm-section { border-radius:8px;  border:1px solid #E5D6C5; }
 .pm-section-header { background:#A67C52; color:#fff; padding:9px 16px; font-size:12px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; }
 .pm-section-body { padding:16px; background:#fff; }
 .pm-info-label { font-size:10px; font-weight:700; color:#A67C52; text-transform:uppercase; margin-bottom:4px; letter-spacing:0.4px; }

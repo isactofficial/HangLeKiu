@@ -258,15 +258,6 @@
         </div>
         @endif
 
-        <div class="notif-section-label" style="margin-top:28px;">Segera hadir</div>
-        <div class="coming-soon-card">
-            <div class="cs-icon-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-            <div>
-                <p class="cs-title">Notifikasi Real-time & Push Notification</p>
-                <p class="cs-desc">Admin akan otomatis menerima alert setiap ada janji baru, perubahan jadwal, atau pembatalan tanpa perlu refresh halaman.</p>
-            </div>
-            <span class="cs-pill">Coming Soon</span>
-        </div>
     </div>
 
     {{-- TAB: JANJI TEMU --}}
@@ -530,16 +521,10 @@ let rescheduleAptId = null;
             const count = data.count || 0;
 
             if (count > lastCount) {
-                // Show 'New Data' banner on the page
-                const allTab = document.getElementById('tab-semua');
-                if (allTab && !document.getElementById('new-data-banner')) {
-                    const banner = document.createElement('div');
-                    banner.id = 'new-data-banner';
-                    banner.style = "background:#fdf0e4; border:1px solid #d6b08a; padding:12px; border-radius:8px; margin-bottom:12px; text-align:center; font-size:13px; color:#7a3b0a; cursor:pointer; font-weight:600;";
-                    banner.innerHTML = "✨ Ada janji temu baru! Klik di sini untuk memuat ulang daftar.";
-                    banner.onclick = () => location.reload();
-                    allTab.prepend(banner);
-                }
+                // Tampilkan banner pesan sebelum reload otomatis
+                localStorage.setItem('notifAutoReload', '1');
+                showAutoReloadBanner();
+                setTimeout(() => location.reload(), 1800);
             }
 
             lastCount = count;
@@ -565,6 +550,42 @@ let rescheduleAptId = null;
         } catch (err) {
             console.warn('Notif polling failed:', err);
         }
+    }
+
+    // Banner pesan reload otomatis
+    function showAutoReloadBanner() {
+        let banner = document.getElementById('auto-reload-banner');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'auto-reload-banner';
+            banner.style = "background:#fdf0e4; border:1px solid #d6b08a; padding:12px; border-radius:8px; margin-bottom:12px; text-align:center; font-size:13px; color:#7a3b0a; font-weight:600; position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:9999; min-width:260px; max-width:90vw;";
+            banner.innerHTML = "✨ Ada janji temu baru! Halaman diperbarui otomatis.";
+            document.body.appendChild(banner);
+        }
+        banner.style.display = 'block';
+        setTimeout(() => { if(banner) banner.style.display = 'none'; }, 2000);
+    }
+
+    // Tampilkan pesan setelah reload jika ada notifikasi baru
+    window.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('notifAutoReload') === '1') {
+            showAutoReloadBanner();
+            localStorage.removeItem('notifAutoReload');
+        }
+    });
+
+    // Banner pesan reload otomatis
+    function showAutoReloadBanner() {
+        let banner = document.getElementById('auto-reload-banner');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'auto-reload-banner';
+            banner.style = "background:#fdf0e4; border:1px solid #d6b08a; padding:12px; border-radius:8px; margin-bottom:12px; text-align:center; font-size:13px; color:#7a3b0a; font-weight:600; position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:9999; min-width:260px; max-width:90vw;";
+            banner.innerHTML = "✨ Ada janji temu baru! Halaman diperbarui otomatis.";
+            document.body.appendChild(banner);
+        }
+        banner.style.display = 'block';
+        setTimeout(() => { if(banner) banner.style.display = 'none'; }, 2000);
     }
 
     checkNotifCount();
@@ -622,34 +643,69 @@ function closePanel() {
 
 function renderPanelFooter(d) {
     const footer = document.getElementById('sp-footer');
+    const status = d.status ? d.status.toLowerCase() : 'pending';
 
+    // JIKA TIPE SISTEM (Didaftarkan langsung oleh Admin)
     if (d.type === 'sistem') {
         footer.innerHTML = `
+            <div class="sp-confirmed-state">
+                ✓ Didaftarkan oleh Admin<br>
+                <span style="font-weight:400; font-size:12px;">Pasien terdaftar via Sistem</span>
+            </div>
             <button class="btn-sp-calendar" onclick="handleGoogleCalendarFromPanel()">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 Tambah ke Google Calendar
             </button>
-            <p class="sp-footer-note">Janji ini telah didaftarkan langsung oleh admin</p>
-        `;
-    } else {
-        // SEBELUM KONFIRMASI: WA → Konfirmasi → Reschedule
-        footer.innerHTML = `
             <button class="btn-sp-wa" onclick="doSendWA()">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                 </svg>
                 Kirim via WhatsApp
             </button>
-            <button class="btn-sp-confirm" id="sp-btn-confirm" onclick="doConfirm()">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-                <span id="sp-confirm-label">Konfirmasi Janji</span>
-                <div class="sp-spinner" id="sp-confirm-spinner"></div>
-            </button>
-            <button class="btn-sp-reschedule" onclick="doReschedule()">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                Reschedule Jadwal
-            </button>
+            <p class="sp-footer-note" style="margin-top: 10px; font-size: 11px; text-align: center; color: #666;">*Janji ini telah didaftarkan langsung oleh admin</p>
         `;
+    } 
+    // JIKA TIPE BUKAN SISTEM (Daftar mandiri/online)
+    else {
+        // BELUM KONFIRMASI (Pending)
+        if (status === 'pending') {
+            footer.innerHTML = `
+                <button class="btn-sp-wa" onclick="doSendWA()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                    Kirim via WhatsApp
+                </button>
+                <button class="btn-sp-confirm" id="sp-btn-confirm" onclick="doConfirm()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                    <span id="sp-confirm-label">Konfirmasi Janji</span>
+                    <div class="sp-spinner" id="sp-confirm-spinner"></div>
+                </button>
+                <button class="btn-sp-reschedule" onclick="doReschedule()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Reschedule Jadwal
+                </button>
+            `;
+        } 
+        // SUDAH KONFIRMASI
+        else {
+            footer.innerHTML = `
+                <div class="sp-confirmed-state">
+                    ✓ Berhasil dikonfirmasi!<br>
+                    <span style="font-weight:400; font-size:12px;">Pasien sudah masuk Rawat Jalan</span>
+                </div>
+                <button class="btn-sp-calendar" onclick="handleGoogleCalendarFromPanel()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Tambah ke Google Calendar
+                </button>
+                <button class="btn-sp-wa" onclick="doSendWA()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                    Kirim Konfirmasi via WhatsApp
+                </button>
+            `;
+        }
     }
 }
 
@@ -784,8 +840,10 @@ async function doSaveReschedule() {
         if (data.success) {
             const card = document.querySelector(`.notif-card[data-id="${rescheduleAptId}"]`);
             if (card) {
+                // Set status to confirmed in dataset and UI
+                card.dataset.status = 'confirmed';
                 const actionsEl = card.querySelector('.notif-actions');
-                if (actionsEl) actionsEl.innerHTML = `<span class="status-rescheduled">↺ Dijadwalkan ulang</span>`;
+                if (actionsEl) actionsEl.innerHTML = `<span class="status-confirmed">✓ Dikonfirmasi — masuk Rawat Jalan</span>`;
                 card.classList.remove('unread');
                 card.querySelector('.notif-dot')?.remove();
                 const descEl = card.querySelector('.notif-desc');
@@ -795,8 +853,15 @@ async function doSaveReschedule() {
                         + ' · ' + newDt.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
                 }
             }
+            // Update currentAptData if rescheduling from panel
+            if (currentAptId === rescheduleAptId && currentAptData) {
+                currentAptData.status = 'confirmed';
+                currentAptData.datetime = newDatetime;
+                renderPanelFooter(currentAptData);
+            }
             closeRescheduleModal();
-            showToast('↺ Jadwal berhasil diubah!', 'success');
+            showToast('↺ Jadwal berhasil diubah & dikonfirmasi!', 'success');
+            updateBadges();
         } else {
             showToast(data.message || 'Gagal menyimpan.', 'error');
         }

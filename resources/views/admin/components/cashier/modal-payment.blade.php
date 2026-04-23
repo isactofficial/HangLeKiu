@@ -79,9 +79,7 @@
                         <div style="font-size:13px; font-weight:700; color:#582C0C;">
                             TOTAL: <span id="m-grand-total" style="font-size:20px; font-weight:800; color:#C58F59;">Rp0</span>
                         </div>
-                        <button onclick="doPrintPreview()" style="background:#8B5E3C; color:#fff; border:none; padding:8px 16px; border-radius:5px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
-                            <i class="fa fa-print"></i> PRINT PREVIEW
-                        </button>
+                        
                     </div>
                 </div>
             </div>
