@@ -80,6 +80,22 @@
                                 </div>
                             </div>
 
+                            {{-- SOSIAL MEDIA --}}
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="ms-field">
+                                    <label style="color: #8A6B52; font-weight: 700; font-size: 11px; text-transform: uppercase;">
+                                        <i class="fa-brands fa-instagram" style="margin-right: 4px;"></i> Instagram
+                                    </label>
+                                    <input id="edit_instagram_url" name="instagram_url" type="text" placeholder="@username atau URL" style="width:100%; border:none; border-bottom: 1px solid #C58F59; outline:none; padding:5px 0;">
+                                </div>
+                                <div class="ms-field">
+                                    <label style="color: #8A6B52; font-weight: 700; font-size: 11px; text-transform: uppercase;">
+                                        <i class="fa-brands fa-linkedin" style="margin-right: 4px;"></i> LinkedIn
+                                    </label>
+                                    <input id="edit_linkedin_url" name="linkedin_url" type="text" placeholder="URL atau username" style="width:100%; border:none; border-bottom: 1px solid #C58F59; outline:none; padding:5px 0;">
+                                </div>
+                            </div>
+
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div class="ms-field">
                                     <label style="font-size: 11px; color: #8A6B52; font-weight: 700; margin-bottom: 5px; display: block; text-transform: uppercase;">TTD Digital</label>
@@ -110,7 +126,6 @@
                         <i class="fa fa-file-medical" style="margin-right: 8px; color: #C58F59;"></i> Legalitas (STR, SIP, Lisensi)
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                        {{-- BARIS 1 --}}
                         <div class="ms-field">
                             <label style="font-size: 11px; color: #8A6B52; font-weight: 700; text-transform: uppercase;">No. Lisensi</label>
                             <input id="edit_license_no" name="license_no" type="text" style="width:100%; border:none; border-bottom: 1px solid #C58F59; outline:none; padding:5px 0;">
@@ -124,7 +139,6 @@
                             <input id="edit_sip_number" name="sip_number" type="text" style="width:100%; border:none; border-bottom: 1px solid #C58F59; outline:none; padding:5px 0;">
                         </div>
 
-                        {{-- BARIS 2 --}}
                         <div class="ms-field"></div>
                         <div class="ms-field">
                             <label style="font-size: 11px; color: #8A6B52; font-weight: 700; text-transform: uppercase;">Instansi STR</label>
@@ -135,7 +149,6 @@
                             <input id="edit_sip_institution" name="sip_institution" type="text" style="width:100%; border:none; border-bottom: 1px solid #C58F59; outline:none; padding:5px 0;">
                         </div>
 
-                        {{-- BARIS 3 --}}
                         <div class="ms-field"></div>
                         <div class="ms-field">
                             <label style="font-size: 11px; color: #8A6B52; font-weight: 700; text-transform: uppercase;">Masa Berlaku STR</label>
@@ -166,10 +179,8 @@
     function normalizeDateInput(value) {
         if (!value) return '';
         if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) return '';
-
         return date.toISOString().slice(0, 10);
     }
 
@@ -199,6 +210,10 @@
                     document.getElementById('edit_specialization').value = d.specialization || '';
                     document.getElementById('edit_estimasi_konsultasi').value = d.estimasi_konsultasi;
                     document.getElementById('edit_default_fee_percentage').value = d.default_fee_percentage ?? 0;
+
+                    // Sosial Media
+                    document.getElementById('edit_instagram_url').value = d.instagram_url || '';
+                    document.getElementById('edit_linkedin_url').value = d.linkedin_url || '';
                     
                     // Legalitas
                     document.getElementById('edit_license_no').value = d.license_no || '';
@@ -260,7 +275,7 @@
         const formData = new FormData(this);
         
         fetch(`/admin/settings/doctor/${id}`, {
-            method: 'POST', // Laravel handling for files with PUT
+            method: 'POST',
             body: formData,
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
         })
