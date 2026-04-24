@@ -191,9 +191,9 @@ class AuthController extends Controller
             ->first();
 
         // Prevent non-admin accounts from attempting admin authentication.
-        if (! $adminUser || $adminUser->role?->code !== 'ADM') {
+        if (! $adminUser || !in_array($adminUser->role?->code, ['ADM', 'OWN'])) {
             return back()->withErrors([
-                'email' => 'Akun ini bukan akun admin.',
+                'email' => 'Akun ini bukan akun admin atau owner.',
             ])->onlyInput('email');
         }
 

@@ -73,7 +73,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // ================= ADMIN & SHARED AREA — ALLOW ADM & DCT =================
-    Route::middleware('role:ADM,DCT')->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware('role:ADM,DCT,OWN')->prefix('admin')->name('admin.')->group(function () {
 
         // --- SHARED ROUTES (ADM & DCT) ---
         // Pencarian pasien dan pembuatan pasien
@@ -87,7 +87,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings/doctor/{id}', [DoctorController::class, 'showJson'])->name('settings.doctor.show_json');
 
         // --- ADMIN ONLY AREA ---
-        Route::middleware('role:ADM')->group(function() {
+        Route::middleware('role:ADM,OWN')->group(function() {
             Route::get('/dashboard',    fn() => view('admin.pages.dashboard'))->name('dashboard');
             Route::get('/outpatient',   [AppointmentController::class, 'schedule'])->name('outpatient');
             Route::get('/registration', [AppointmentController::class, 'index'])->name('registration.index');
