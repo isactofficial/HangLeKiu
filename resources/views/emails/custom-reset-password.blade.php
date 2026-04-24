@@ -30,7 +30,7 @@
             </div>
 
             <div class="content">
-                <h2>Halo, Dr. {{ $name }}</h2>
+                <h2>Halo, {{ $roleCode === 'ADM' ? 'Admin' : 'Dr.' }} {{ $name }}</h2>
                 <p>Kami menerima permintaan untuk mereset password akun Anda di sistem <strong>HangLeKiu Dental Clinic</strong>.</p>
                 <p>Silakan klik tombol di bawah ini untuk membuat password baru Anda:</p>
                 

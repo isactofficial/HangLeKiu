@@ -23,18 +23,33 @@ class AppServiceProvider extends ServiceProvider
     {
         // 1. Kustomisasi Email Reset Password
         ResetPassword::toMailUsing(function (object $notifiable, string $token) {
-            
-            // Buat link URL ke halaman form reset password yang kita buat sebelumnya
-            $url = route('password.reset', [
-                'token' => $token,
-                'email' => $notifiable->getEmailForPasswordReset(),
-            ]);
+
+            // Tentukan route berdasarkan role user
+            $roleCode = $notifiable->role?->code;
+
+            if ($roleCode === 'ADM') {
+                $url = route('admin.password.reset', [
+                    'token' => $token,
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                ]);
+            } elseif ($roleCode === 'DCT') {
+                $url = route('doctor.password.reset', [
+                    'token' => $token,
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                ]);
+            } else {
+                $url = route('password.reset', [
+                    'token' => $token,
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                ]);
+            }
 
             return (new MailMessage)
                 ->subject('Permintaan Reset Password - HangLeKiu Dental')
                 ->view('emails.custom-reset-password', [
                     'url'  => $url,
-                    'name' => $notifiable->name
+                    'name' => $notifiable->name, 
+                    'roleCode' => $roleCode,
                 ]);
         });
 

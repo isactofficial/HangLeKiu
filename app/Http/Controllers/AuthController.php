@@ -219,6 +219,60 @@ class AuthController extends Controller
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
     }
+    // Show Forgot Password Admin
+    public function showAdminForgotPassword()
+    {
+        return view('admin.pages.forgot-password');
+    }
+
+    // Kirim Reset Link Admin
+    public function sendAdminResetLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $admin = User::with('role')->where('email', $request->email)->first();
+        if (!$admin || $admin->role?->code !== 'ADM') {
+            return back()->withErrors(['email' => 'Email tidak ditemukan atau bukan akun admin.']);
+        }
+
+        $status = Password::broker()->sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with(['status' => 'Link reset password telah dikirim ke email Anda.'])
+            : back()->withErrors(['email' => 'Gagal mengirim link reset password.']);
+    }
+
+    // Show Reset Password Admin
+    public function showAdminResetPassword(Request $request, $token)
+    {
+        return view('admin.pages.reset-password', [
+            'token' => $token,
+            'email' => $request->email
+        ]);
+    }
+
+    // Proses Reset Password Admin
+    public function adminResetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'email'    => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::broker()->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill(['password' => Hash::make($password)])->setRememberToken(Str::random(60));
+                $user->save();
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('admin.login')->with('status', 'Password berhasil diperbarui! Silakan login.')
+            : back()->withErrors(['email' => 'Token tidak valid atau sudah kadaluwarsa.']);
+    }
 
     // ── USER REGISTER ─────────────────────────────────────────
 

@@ -40,14 +40,20 @@ Route::get('/pelayanan/dokter', [DoctorPageController::class, 'index'])->name('d
 // ================= ADMIN & DOCTOR AUTH =================
 Route::get('/admin/login',    [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login',   [AuthController::class, 'adminLogin'])->name('admin.login.post');
+//Lupa Password Admin
+Route::get('/admin/password', [AuthController::class, 'showAdminForgotPassword'])->name('admin.password.request');
+Route::post('/admin/password', [AuthController::class, 'sendAdminResetLink'])->name('admin.password.email');
+Route::get('/admin/password/reset/{token}', [AuthController::class, 'showAdminResetPassword'])->name('admin.password.reset');
+Route::post('/admin/password/reset', [AuthController::class, 'adminResetPassword'])->name('admin.password.update');
+
 // Dokter login
 Route::get('/doctor/login',   [AuthController::class, 'showDoctorLogin'])->name('doctor.login');
 Route::post('/doctor/login',  [AuthController::class, 'doctorLogin'])->name('doctor.login.post');
 // Lupa Password Dokter
 Route::get('/doctor/password', [AuthController::class, 'showDoctorForgotPassword'])->name('doctor.password.request');
 Route::post('/doctor/password', [AuthController::class, 'sendDoctorResetLink'])->name('doctor.password.email');
-Route::get('/doctor/password/reset/{token}', [AuthController::class, 'showDoctorResetPassword'])->name('password.reset');
-Route::post('/doctor/password/reset', [AuthController::class, 'doctorResetPassword'])->name('password.update');
+Route::get('/doctor/password/reset/{token}', [AuthController::class, 'showDoctorResetPassword'])->name('doctor.password.reset');
+Route::post('/doctor/password/reset', [AuthController::class, 'doctorResetPassword'])->name('doctor.password.update');
 
 // ================= GUEST ONLY =================
 Route::middleware('guest')->group(function () {

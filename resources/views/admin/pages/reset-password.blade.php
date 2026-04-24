@@ -109,7 +109,7 @@
             <div class="alert-error">{{ $errors->first() }}</div>
         @endif
 
-        <form method="POST" action="{{ route('doctor.password.update') }}">
+        <form method="POST" action="{{ route('admin.password.update') }}">
             @csrf
 
             <input type="hidden" name="token" value="{{ $token }}">

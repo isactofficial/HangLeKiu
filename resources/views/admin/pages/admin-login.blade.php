@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -46,7 +46,7 @@
                     </svg>
                 </button>
                 <div class="forgot-link">
-                    <a href="#">Lupa Kata Sandi</a>
+                    <a href="{{ route('admin.password.request') }}">Lupa Kata Sandi</a>
                 </div>
             </div>
 
