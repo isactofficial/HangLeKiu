@@ -128,6 +128,16 @@
             margin-bottom: 16px;
         }
 
+        .success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            font-size: 14px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
         .muted {
             text-align: center;
             margin-top: 12px;
@@ -155,6 +165,12 @@
 
         <h1 class="title">Login Dokter</h1>
 
+        @if(session('status'))
+            <div class="success">
+                {{ session('status') }}
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="error">
                 @foreach($errors->all() as $error)
@@ -180,6 +196,10 @@
                         <circle cx="12" cy="12" r="3"/>
                     </svg>
                 </button>
+            </div>
+
+            <div style="text-align: right; margin-bottom: 14px;">
+                <a href="{{ route('doctor.password.request') }}" style="color: #C58F59; text-decoration: none; font-size: 14px; font-weight: 600;">Lupa Password?</a>
             </div>
 
             <button type="submit" class="btn">Masuk</button>

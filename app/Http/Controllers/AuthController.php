@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
@@ -125,6 +127,54 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
+    }
+    public function showDoctorForgotPassword()
+    {
+        return view('doctor.pages.forgot-password');
+    }
+
+    public function sendDoctorResetLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        
+        // Validasi: Pastikan email terdaftar dan memiliki role DCT (Doctor)
+        $user = User::with('role')->where('email', $request->email)->first();
+        if (!$user || $user->role?->code !== 'DCT') {
+            return back()->withErrors(['email' => 'Email tidak ditemukan atau bukan akun dokter.']);
+        }
+
+        $status = Password::broker()->sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with(['status' => 'Link reset password telah dikirim ke email Anda.'])
+            : back()->withErrors(['email' => 'Gagal mengirim link reset password.']);
+    }
+
+    public function showDoctorResetPassword(Request $request, $token)
+    {
+        return view('doctor.pages.reset-password', ['token' => $token, 'email' => $request->email]);
+    }
+
+    public function doctorResetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::broker()->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill(['password' => Hash::make($password)])->setRememberToken(Str::random(60));
+                $user->save();
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('doctor.login')->with('status', 'Password berhasil diperbarui! Silakan login.')
+            : back()->withErrors(['email' => 'Token tidak valid atau sudah kadaluwarsa.']);
     }
 
     // ── ADMIN LOGIN ───────────────────────────────────────────
