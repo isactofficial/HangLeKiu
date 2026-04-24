@@ -62,9 +62,18 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register',[AuthController::class, 'register']);
 
+    // Password Reset Pasien
+    Route::get('/password/reset', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/password/email', [AuthController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/password/reset/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('password.update');
+
     // Google OAuth
     Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
     Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+    // Email Verification Web
+    Route::get('/verify-email/{token}', [AuthController::class, 'verifyWebEmail'])->name('verify.email');
 });
 
 // ================= AUTH REQUIRED =================

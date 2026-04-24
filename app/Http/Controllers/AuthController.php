@@ -87,6 +87,14 @@ class AuthController extends Controller
                 ])->onlyInput('email');
             }
 
+            // Validasi email terverifikasi (Email Asli)
+            if (!Auth::user()->is_verified) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Email Anda belum diverifikasi. Silakan cek inbox email Anda.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
             return redirect()->intended('/user/dashboard');
         }
@@ -94,6 +102,54 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
+    }
+
+    public function showForgotPassword()
+    {
+        return view('user.pages.forgot-password');
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::with('role')->where('email', $request->email)->first();
+        if (!$user || $user->role?->code !== 'PAT') {
+            return back()->withErrors(['email' => 'Email tidak ditemukan atau bukan akun pasien.']);
+        }
+
+        $status = Password::broker()->sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with(['status' => 'Link reset password telah dikirim ke email Anda.'])
+            : back()->withErrors(['email' => 'Gagal mengirim link reset password.']);
+    }
+
+    public function showResetPassword(Request $request, $token)
+    {
+        return view('user.pages.reset-password', ['token' => $token, 'email' => $request->email]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::broker()->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill(['password' => Hash::make($password)])->setRememberToken(Str::random(60));
+                $user->save();
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', 'Password berhasil diperbarui! Silakan login.')
+            : back()->withErrors(['email' => 'Token tidak valid atau sudah kadaluwarsa.']);
     }
 
     // ── DOCTOR LOGIN ───────────────────────────────────────
@@ -328,7 +384,7 @@ class AuthController extends Controller
         });
 
         try {
-            $verificationUrl = url('/api/auth/verify/' . $verificationToken);
+            $verificationUrl = route('verify.email', ['token' => $verificationToken]);
             Mail::to($user->email)->send(new VerifyEmailMail($verificationUrl, $user->name));
         } catch (\Exception $e) {
             Log::warning('Failed to send verification email after web registration.', [
@@ -338,10 +394,23 @@ class AuthController extends Controller
             ]);
         }
 
-        Auth::login($user);
-        $request->session()->regenerate();
+        return redirect('/login')->with('success', 'Registrasi berhasil. Silakan cek inbox email Anda untuk memverifikasi akun sebelum login.');
+    }
 
-        return redirect('/user/dashboard')->with('success', 'Registrasi berhasil. Data pasien sudah terhubung, dan email verifikasi telah dikirim.');
+    public function verifyWebEmail($token)
+    {
+        $user = User::where('email_verification_token', $token)->first();
+
+        if (!$user) {
+            return redirect('/login')->withErrors(['email' => 'Token verifikasi tidak valid atau sudah kadaluwarsa.']);
+        }
+
+        $user->update([
+            'is_verified' => true,
+            'email_verification_token' => null,
+        ]);
+
+        return redirect('/login')->with('success', 'Email berhasil diverifikasi! Silakan login untuk melanjutkan.');
     }
 
     private function generateMedicalRecordNumber(): string

@@ -13,26 +13,34 @@
 
         body {
             font-family: 'Instrument Sans', sans-serif;
-            background: url('{{ asset('images/bg-clinic.png') }}') no-repeat center center fixed;
+            background: linear-gradient(135deg, rgba(88, 44, 12, 0.05) 0%, rgba(197, 143, 89, 0.1) 100%), url('{{ asset('images/bg-clinic.png') }}') no-repeat center center fixed;
             background-size: cover;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .card {
-            background: white;
-            padding: 28px 36px;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(88, 44, 12, 0.08);
-            width: 480px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px 48px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(88, 44, 12, 0.15);
+            width: 520px;
+            border: 1px solid rgba(197, 143, 89, 0.2);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .logo {
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
         }
 
         .logo-container {
@@ -42,23 +50,19 @@
         }
 
         .logo-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            overflow: hidden;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .logo-icon img {
-            width: 100%;
             height: 100%;
             object-fit: contain;
         }
 
         .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 18px;
             position: relative;
         }
 
@@ -67,21 +71,21 @@
             font-size: 14px;
             font-weight: 600;
             color: #582C0C;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 10px 14px;
+            padding: 12px 16px;
             border: 1.5px solid #C58F59;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 14px;
             font-family: 'Instrument Sans', sans-serif;
             color: #582C0C;
-            background: transparent;
+            background: white;
             outline: none;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .form-group input::placeholder {
@@ -92,21 +96,22 @@
         .form-group input:focus,
         .form-group select:focus {
             border-color: #582C0C;
+            box-shadow: 0 0 0 4px rgba(88, 44, 12, 0.05);
         }
 
         /* Password field needs right padding for toggle button */
         .form-group input[type="password"] {
-            padding-right: 40px;
+            padding-right: 44px;
         }
 
         .password-toggle {
             position: absolute;
-            right: 10px;
-            top: 36px;
+            right: 14px;
+            top: 38px;
             background: none;
             border: none;
             cursor: pointer;
-            color: #582C0C;
+            color: #C58F59;
             padding: 4px;
             display: flex;
             align-items: center;
@@ -114,7 +119,7 @@
         }
 
         .password-toggle:hover {
-            color: #C58F59;
+            color: #582C0C;
         }
 
         .password-toggle svg {
@@ -124,23 +129,23 @@
 
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: #582C0C;
             color: #F7F7F7;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 600;
             font-family: 'Instrument Sans', sans-serif;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 6px;
+            margin-top: 10px;
         }
 
         .btn:hover {
             background: #3d1e08;
-            box-shadow: 0 6px 20px rgba(88, 44, 12, 0.35);
-            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(88, 44, 12, 0.3);
+            transform: translateY(-2px);
         }
 
         .btn:active {
@@ -149,7 +154,7 @@
 
         .muted {
             text-align: center;
-            margin-top: 12px;
+            margin-top: 20px;
             font-size: 14px;
             color: #582C0C;
         }
@@ -167,12 +172,12 @@
 
         .error {
             background-color: #fef2f2;
-            color: #b91c1c;
+            color: #991b1b;
             border: 1px solid #fecaca;
             font-size: 14px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 24px;
         }
 
         .error div {
@@ -180,9 +185,8 @@
         }
 
         /* Responsive */
-        @media (max-width: 992px) {
-            body { padding: 20px; }
-            .card { width: 100%; max-width: 420px; }
+        @media (max-width: 768px) {
+            .card { width: 100%; max-width: 440px; padding: 32px 28px; }
         }
 
         @media (max-width: 480px) {
