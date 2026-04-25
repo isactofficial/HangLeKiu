@@ -7,6 +7,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/layout/settings.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .form-card {
             background: white;
@@ -81,6 +82,28 @@
             color: #dc2626;
             border: 1px solid #ef444420;
         }
+        
+        /* CSS Khusus Select2 */
+        .select2-container .select2-selection--single {
+            height: 45px !important;
+            border: 1.5px solid #eee !important;
+            border-radius: 12px !important;
+            padding: 8px 16px !important;
+            display: flex;
+            align-items: center;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 45px !important;
+            right: 10px !important;
+        }
+        .select2-results__options {
+            max-height: 200px !important; /* Batas tinggi scroll */
+            overflow-y: auto !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: var(--font-color-primary);
+            padding-left: 0;
+        }
     </style>
 @endpush
 
@@ -151,6 +174,7 @@
                     @method('PUT')
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        
                         <div class="form-group" style="grid-column: span 2;">
                             <label class="form-label">Judul Artikel</label>
                             <input type="text" name="title" class="form-input" required value="{{ old('title', $article->title) }}">
@@ -158,27 +182,38 @@
 
                         <div class="form-group">
                             <label class="form-label">Kategori</label>
-                            <select name="category" class="form-input" required>
+                            <select name="category" id="kategoriSelect" class="form-input" style="width: 100%;" required>
+                                <option value="" disabled>Pilih Kategori</option>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat }}" {{ old('category', $article->category) == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                                 @endforeach
                             </select>
                         </div>
 
+                        <div class="form-group">
+                            <label class="form-label">Penulis (Author)</label>
+                            <input type="text" name="author" class="form-input" placeholder="Contoh: Drg. Farhan" value="{{ old('author', $article->author ?? 'Klinik HangLeKiu') }}" required>
+                        </div>
+
                         <div class="form-group" style="grid-column: span 2;">
-                            <label class="form-label">Ringkasan</label>
+                            <label class="form-label">Sumber Referensi</label>
+                            <input type="text" name="source" class="form-input" placeholder="Contoh: Jurnal Kesehatan Gigi 2026 atau link website..." value="{{ old('source', $article->source) }}">
+                        </div>
+
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label">Ringkasan Singkat</label>
                             <textarea name="description" class="form-input" rows="2" required>{{ old('description', $article->description) }}</textarea>
                         </div>
 
                         <div class="form-group" style="grid-column: span 2;">
-                            <label class="form-label">Isi Konten</label>
+                            <label class="form-label">Isi Konten Lengkap</label>
                             <textarea name="content" class="form-input" rows="8" required>{{ old('content', $article->content) }}</textarea>
                         </div>
 
                         <div class="form-group" style="grid-column: span 2;">
                             <label class="form-label">Gambar Thumbnail (Kosongkan jika tidak diubah)</label>
                             <input type="file" name="image" id="imageInput" class="form-input" accept="image/*">
-                            <img id="imagePreview" class="image-preview" src="{{ asset('images/artikel/' . ($article->image ?: 'placeholder.png')) }}" alt="Preview">
+                            <img id="imagePreview" class="image-preview" src="{{ asset('images/artikel/' . ($article->image ?: 'placeholder.png')) }}" alt="Preview Gambar">
                         </div>
                     </div>
 
@@ -197,7 +232,19 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
+    // Inisialisasi Dropdown Select2
+    $(document).ready(function() {
+        $('#kategoriSelect').select2({
+            placeholder: "Pilih Kategori",
+            allowClear: true
+        });
+    });
+
+    // Preview Gambar Saat Diubah
     document.getElementById('imageInput').onchange = function (evt) {
         const [file] = this.files;
         if (file) {

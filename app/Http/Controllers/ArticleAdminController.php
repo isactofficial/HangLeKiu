@@ -48,7 +48,11 @@ class ArticleAdminController extends Controller
      */
     public function create()
     {
-        $categories = ['Estetika', 'Spesialis', 'Teknologi', 'Gigi Anak', 'Tips and Trick'];
+        $categories = [
+            'Estetika', 'Spesialis', 'Teknologi', 'Gigi Anak', 
+            'Perawatan', 'Penyakit', 'Pencegahan', 'Tips & Trick', 
+            'Ortodonti', 'Gaya Hidup', 'Darurat Gigi', 'Nutrisi', 'Berita'
+        ];
         return view('admin.components.settings.artikel_create', compact('categories'));
     }
 
@@ -57,12 +61,15 @@ class ArticleAdminController extends Controller
      */
     public function store(Request $request)
     {
+        // Menambahkan validasi untuk author dan source
         $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string',
+            'title'       => 'required|string|max:255',
+            'category'    => 'required|string',
+            'author'      => 'required|string|max:100', // <-- Tambahan
+            'source'      => 'nullable|string|max:255', // <-- Tambahan (Opsional)
             'description' => 'required|string',
-            'content' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'content'     => 'required|string',
+            'image'       => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->all();
@@ -84,6 +91,8 @@ class ArticleAdminController extends Controller
                 'data' => $article
             ], 201);
         }
+
+        
 
         return redirect()->route('admin.settings', ['menu' => 'beranda-settings', 'submenu' => 'Artikel'])->with('success', 'Artikel berhasil dibuat.');
     }
@@ -121,7 +130,11 @@ class ArticleAdminController extends Controller
     public function edit(string $id)
     {
         $article = Article::findOrFail($id);
-        $categories = ['Estetika', 'Spesialis', 'Teknologi', 'Gigi Anak', 'Tips and Trick'];
+        $categories = [
+            'Estetika', 'Spesialis', 'Teknologi', 'Gigi Anak', 
+            'Perawatan', 'Penyakit', 'Pencegahan', 'Tips & Trick', 
+            'Ortodonti', 'Gaya Hidup', 'Darurat Gigi', 'Nutrisi', 'Berita'
+        ];
         return view('admin.components.settings.artikel_edit', compact('article', 'categories'));
     }
 
@@ -132,12 +145,15 @@ class ArticleAdminController extends Controller
     {
         $article = Article::findOrFail($id);
 
+        // Menambahkan validasi untuk author dan source
         $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string',
+            'title'       => 'required|string|max:255',
+            'category'    => 'required|string',
+            'author'      => 'required|string|max:100', // <-- Tambahan
+            'source'      => 'nullable|string|max:255', // <-- Tambahan (Opsional)
             'description' => 'required|string',
-            'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'content'     => 'required|string',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->all();

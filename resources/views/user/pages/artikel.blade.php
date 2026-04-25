@@ -6,6 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hanglekiu Dental — Artikel</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .custom-scrollbar {
+            /* Support untuk Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-primary) var(--color-background-secondary);
+        }
+
+        /* Support untuk Chrome, Safari, Edge */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--color-background-secondary); 
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--color-primary); 
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: var(--font-color-primary); 
+        }
+    </style>
 </head>
 
 <body class="font-sans text-[var(--font-color-primary)] m-0 min-h-screen flex flex-col relative bg-[#FAF9F6]">
@@ -28,12 +51,16 @@
 
         {{-- Filter Section --}}
         <div class="max-w-7xl mx-auto px-6 md:px-10 mb-10 flex flex-col lg:flex-row justify-between items-center gap-6">
-            <div class="flex flex-wrap justify-center lg:justify-start gap-2">
+            
+            {{-- Kategori Scroll Horizontal --}}
+            <div class="flex overflow-x-auto gap-3 pb-2 w-full lg:w-auto custom-scrollbar justify-start items-center">
                 @php
-                    $filters = ['Semua', 'Estetika', 'Spesialis', 'Teknologi', 'Gigi Anak', 'Tips and Trick'];
+                    $filters = ['Semua', 'Estetika', 'Spesialis', 'Teknologi', 'Gigi Anak', 'Perawatan', 'Penyakit', 'Pencegahan', 'Tips & Trick', 'Ortodonti', 'Gaya Hidup', 'Darurat Gigi', 'Nutrisi', 'Berita'];
+                    $activeFilter = request('category', 'Semua');
                 @endphp
                 @foreach ($filters as $filter)
-                    <a href="{{ request()->fullUrlWithQuery(['category' => $filter, 'page' => 1]) }}" class="px-4 py-3 rounded-full border-2 border-[#C58F59] font-medium text-[18.75px] transition-colors duration-300 {{ $filter === $activeFilter ? 'bg-[#C58F59] text-white' : 'text-[#C58F59] hover:bg-[#C58F59] hover:text-white' }}">
+                    <a href="{{ request()->fullUrlWithQuery(['category' => $filter, 'page' => 1]) }}" 
+                       class="flex-shrink-0 px-5 py-2.5 rounded-full border-2 border-[#C58F59] font-medium text-[16px] md:text-[18.75px] transition-colors duration-300 {{ $filter === $activeFilter ? 'bg-[#C58F59] text-white' : 'text-[#C58F59] hover:bg-[#C58F59] hover:text-white' }}">
                         {{ $filter }}
                     </a>
                 @endforeach
@@ -55,32 +82,40 @@
 
         {{-- Grid Artikel --}}
         <div class="max-w-7xl mx-auto px-6 md:px-10 pb-24">
+            {{-- Dikembalikan ke 3 kolom, jarak dirapikan --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-[40px]">
                 
                 @forelse ($articles as $article)
                 <article class="flex flex-col h-full bg-transparent">
-                    {{-- Image with Cutout Label --}}
-                    <div class="relative w-full aspect-[4/3] rounded-t-[24px] overflow-hidden group">
+                    {{-- Image with Cutout Label (16:9 Landscape) --}}
+                    <div class="relative w-full aspect-[16/9] rounded-t-[24px] overflow-hidden group shadow-sm">
                         <img src="{{ asset('images/artikel/' . ($article->image ?: 'placeholder.png')) }}" alt="{{ $article->title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                         
-                        {{-- Keterangan di pojok kiri bawah (Overlap) + Rating --}}
-                        <div class="absolute bottom-0 left-0 bg-[#FAF9F6] rounded-tr-[16px] flex items-center pr-4 shadow-sm">
-                            <span class="inline-block px-[14px] py-[10px] text-[#C58F59] font-bold text-[16px]">{{ $article->category }}</span>
-                        
+                        {{-- Keterangan di pojok kiri bawah (Overlap) --}}
+                        <div class="absolute bottom-0 left-0 bg-[#FAF9F6] rounded-tr-[16px] flex items-center pr-4">
+                            <span class="inline-block px-[14px] py-[10px] text-[#C58F59] font-bold text-[14px] md:text-[16px]">{{ $article->category }}</span>
                         </div>
                     </div>
 
                     {{-- Content --}}
-                    <div class="flex flex-col flex-grow mt-[20px]">
-                        <h3 class="font-bold text-[20px] text-[#582C0C] leading-tight group-hover:text-[#C58F59] transition-colors">
+                    <div class="flex flex-col flex-grow mt-[16px]">
+                        <h3 class="font-bold text-[20px] text-[#582C0C] leading-tight group-hover:text-[#C58F59] transition-colors line-clamp-2">
                             {{ $article->title }}
                         </h3>
+
+                        {{-- Menampilkan Penulis & Sumber (Dimiringkan) --}}
+                        <div class="mt-[6px] text-[13px] text-[#6B513E] opacity-90 flex flex-wrap items-center gap-1.5">
+                            @if($article->source)
+                                                         <span class="italic line-clamp-1">Sumber: {{ $article->source }}</span>
+                            @endif
+                        </div>
+
                         <p class="font-medium text-[14px] text-[#6B513E] leading-relaxed mt-[10px] flex-grow line-clamp-3 opacity-80">
                             {{ $article->description }}
                         </p>
                         
                         {{-- Button Selengkapnya --}}
-                        <a href="{{ route('artikel.show', $article->slug) }}" class="inline-flex items-center justify-center font-bold text-[16px] text-[#F7F7F7] bg-[#C58F59] rounded-xl px-[20px] py-[10px] mt-[24px] self-start transition-all hover:bg-[#B37E4A] hover:shadow-lg hover:-translate-y-0.5">
+                        <a href="{{ route('artikel.show', $article->slug) }}" class="inline-flex items-center justify-center font-bold text-[14px] md:text-[16px] text-[#F7F7F7] bg-[#C58F59] rounded-xl px-[20px] py-[10px] mt-[20px] self-start transition-all hover:bg-[#B37E4A] hover:shadow-lg hover:-translate-y-0.5">
                             Selengkapnya 
                             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path>
@@ -172,6 +207,8 @@
                 });
             }
         });
+
+        
     </script>
 </body>
 </html>
