@@ -74,6 +74,8 @@ Route::middleware('guest')->group(function () {
 
     // Email Verification Web
     Route::get('/verify-email/{token}', [AuthController::class, 'verifyWebEmail'])->name('verify.email');
+    Route::get('/verify-notice', [AuthController::class, 'showVerifyEmailNotice'])->name('verification.notice');
+    Route::post('/verify-resend', [AuthController::class, 'resendVerificationLink'])->name('verification.resend');
 });
 
 // ================= AUTH REQUIRED =================

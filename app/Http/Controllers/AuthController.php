@@ -46,6 +46,15 @@ class AuthController extends Controller
         return view('dokter.pages.login');
     }
 
+    public function showVerifyEmailNotice(Request $request)
+    {
+        $email = $request->query('email');
+        if (!$email) {
+            return redirect()->route('login');
+        }
+        return view('user.pages.verify-notice', ['email' => $email]);
+    }
+
     // ── USER LOGIN ────────────────────────────────────────────
 
     public function login(Request $request)
@@ -89,9 +98,10 @@ class AuthController extends Controller
 
             // Validasi email terverifikasi (Email Asli)
             if (!Auth::user()->is_verified) {
+                $email = Auth::user()->email;
                 Auth::logout();
                 return back()->withErrors([
-                    'email' => 'Email Anda belum diverifikasi. Silakan cek inbox email Anda.',
+                    'email' => 'Email Anda belum diverifikasi. <a href="'.route('verification.notice', ['email' => $email]).'" style="color: #C58F59; font-weight: bold; text-decoration: underline;">Klik di sini untuk kirim ulang email verifikasi.</a>',
                 ])->onlyInput('email');
             }
 
@@ -383,18 +393,33 @@ class AuthController extends Controller
             return $user;
         });
 
+        return redirect()->route('verification.notice', ['email' => $user->email])->with('success', 'Registrasi berhasil. Silakan cek inbox email Anda untuk memverifikasi akun.');
+    }
+
+    public function resendVerificationLink(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->with('error', 'Email tidak ditemukan.');
+        }
+
+        if ($user->is_verified) {
+            return redirect()->route('login')->with('status', 'Email sudah diverifikasi. Silakan login.');
+        }
+
+        $verificationToken = Str::random(64);
+        $user->update(['email_verification_token' => $verificationToken]);
+
         try {
             $verificationUrl = route('verify.email', ['token' => $verificationToken]);
             Mail::to($user->email)->send(new VerifyEmailMail($verificationUrl, $user->name));
         } catch (\Exception $e) {
-            Log::warning('Failed to send verification email after web registration.', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'message' => $e->getMessage(),
-            ]);
+            return back()->with('error', 'Gagal mengirim email verifikasi. Coba lagi nanti.');
         }
 
-        return redirect('/login')->with('success', 'Registrasi berhasil. Silakan cek inbox email Anda untuk memverifikasi akun sebelum login.');
+        return back()->with('success', 'Tautan verifikasi baru telah dikirim ke email Anda.');
     }
 
     public function verifyWebEmail($token)

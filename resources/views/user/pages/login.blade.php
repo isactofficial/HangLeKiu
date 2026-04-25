@@ -278,7 +278,7 @@
             @if($errors->any())
                 <div class="error">
                     @foreach($errors->all() as $error)
-                        <div>{{ $error }}</div>
+                        <div>{!! $error !!}</div>
                     @endforeach
                 </div>
             @endif
