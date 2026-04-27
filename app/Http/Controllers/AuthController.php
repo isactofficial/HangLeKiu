@@ -393,7 +393,16 @@ class AuthController extends Controller
             return $user;
         });
 
-        return redirect()->route('verification.notice', ['email' => $user->email])->with('success', 'Registrasi berhasil. Silakan cek inbox email Anda untuk memverifikasi akun.');
+        // ✅ Tambahkan ini sebelum return redirect
+        try {
+            $verificationUrl = route('verify.email', ['token' => $verificationToken]);
+            Mail::to($user->email)->send(new VerifyEmailMail($verificationUrl, $user->name));
+        } catch (\Exception $e) {
+            Log::error('Gagal kirim email verifikasi: ' . $e->getMessage());
+        }
+
+        return redirect()->route('verification.notice', ['email' => $user->email])
+            ->with('success', 'Registrasi berhasil. Silakan cek inbox email Anda untuk memverifikasi akun.');
     }
 
     public function resendVerificationLink(Request $request)
