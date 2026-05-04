@@ -78,6 +78,26 @@
                     Konsultasi Langsung
                 </a>
 
+                <div class="space-y-3 text-[16px] font-normal text-[#582C0C] mb-6 text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start gap-3">
+                        <span class="w-8 h-8 rounded-full bg-[#582C0C] flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5 text-[#E5D6C5]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                        </span>
+                        <span>021 7251410</span>
+                    </div>
+
+                    <div class="flex items-center justify-center md:justify-start gap-3 break-words">
+                        <span class="w-8 h-8 rounded-full bg-[#582C0C] flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5 text-[#E5D6C5]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 1.99 2H20c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
+                            </svg>
+                        </span>
+                        <span class="leading-relaxed">hanglekiudentalspecialist@gmail.com</span>
+                    </div>
+                </div>
+
                 {{-- Address --}}
                 <a href="{{ route('klinik') }}" class="text-[16px] font-normal text-[#582C0C] leading-relaxed max-w-[280px] md:max-w-none text-center md:text-left hover:text-[#A0703E] transition-colors block" style="text-decoration:underline; cursor:pointer;">
                     {{ $clinicProfile->address ?? 'Jl. Hang Lekiu V No.8, Gunung, Kec. Kby. Baru, Kota Jakarta Selatan, 12120' }}
